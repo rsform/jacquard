@@ -21,6 +21,53 @@ pub struct Fill<'a> {
     pub children: jacquard_common::types::value::Data<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FillOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///org.atsui.Fill
+pub struct FillResponse;
+impl jacquard_common::xrpc::XrpcResp for FillResponse {
+    const NSID: &'static str = "org.atsui.Fill";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FillOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Fill<'a> {
+    const NSID: &'static str = "org.atsui.Fill";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = FillResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Fill
+pub struct FillRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FillRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Fill";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Fill<'de>;
+    type Response = FillResponse;
+}
+
 pub mod fill_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,51 +171,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FillOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Fill
-pub struct FillResponse;
-impl jacquard_common::xrpc::XrpcResp for FillResponse {
-    const NSID: &'static str = "org.atsui.Fill";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FillOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Fill<'a> {
-    const NSID: &'static str = "org.atsui.Fill";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = FillResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Fill
-pub struct FillRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for FillRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Fill";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Fill<'de>;
-    type Response = FillResponse;
 }

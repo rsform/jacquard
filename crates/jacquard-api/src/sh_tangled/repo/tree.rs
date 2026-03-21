@@ -30,6 +30,289 @@ pub struct LastCommit<'a> {
     pub when: jacquard_common::types::string::Datetime,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Tree<'a> {
+    ///Defaults to `""`.
+    #[serde(default = "_default_path")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TreeOutput<'a> {
+    ///Parent directory path
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub dotdot: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub files: Vec<crate::sh_tangled::repo::tree::TreeEntry<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+    ///The parent path in the tree
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub parent: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Readme for this file tree
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub readme: std::option::Option<crate::sh_tangled::repo::tree::Readme<'a>>,
+    ///The git reference used
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum TreeError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Git reference not found
+    #[serde(rename = "RefNotFound")]
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Path not found in repository tree
+    #[serde(rename = "PathNotFound")]
+    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for TreeError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RefNotFound(msg) => {
+                write!(f, "RefNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::PathNotFound(msg) => {
+                write!(f, "PathNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Readme<'a> {
+    ///Contents of the readme file
+    #[serde(borrow)]
+    pub contents: jacquard_common::CowStr<'a>,
+    ///Name of the readme file
+    #[serde(borrow)]
+    pub filename: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Signature<'a> {
+    ///Author email
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+    ///Author name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Author timestamp
+    pub when: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TreeEntry<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+    ///File mode
+    #[serde(borrow)]
+    pub mode: jacquard_common::CowStr<'a>,
+    ///Relative file or directory name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///File size in bytes
+    pub size: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.tree"
+    }
+    fn def_name() -> &'static str {
+        "lastCommit"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_tree()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.tree
+pub struct TreeResponse;
+impl jacquard_common::xrpc::XrpcResp for TreeResponse {
+    const NSID: &'static str = "sh.tangled.repo.tree";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TreeOutput<'de>;
+    type Err<'de> = TreeError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Tree<'a> {
+    const NSID: &'static str = "sh.tangled.repo.tree";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = TreeResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.tree
+pub struct TreeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.tree";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Tree<'de>;
+    type Response = TreeResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Readme<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.tree"
+    }
+    fn def_name() -> &'static str {
+        "readme"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_tree()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.tree"
+    }
+    fn def_name() -> &'static str {
+        "signature"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_tree()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TreeEntry<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.tree"
+    }
+    fn def_name() -> &'static str {
+        "treeEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_tree()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod last_commit_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,51 +323,51 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Message;
         type When;
         type Hash;
-        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Message = Unset;
         type When = Unset;
         type Hash = Unset;
-        type Message = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Hash = S::Hash;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type When = S::When;
-        type Hash = Set<members::hash>;
-        type Message = S::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
+        type Message = Set<members::message>;
         type When = S::When;
         type Hash = S::Hash;
-        type Message = Set<members::message>;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Message = S::Message;
+        type When = Set<members::when>;
+        type Hash = S::Hash;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Message = S::Message;
+        type When = S::When;
+        type Hash = Set<members::hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `message` field
-        pub struct message(());
     }
 }
 
@@ -197,9 +480,9 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
+    S::Message: last_commit_state::IsSet,
     S::When: last_commit_state::IsSet,
     S::Hash: last_commit_state::IsSet,
-    S::Message: last_commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LastCommit<'a> {
@@ -637,47 +920,8 @@ fn lexicon_doc_sh_tangled_repo_tree() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.tree"
-    }
-    fn def_name() -> &'static str {
-        "lastCommit"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_tree()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_path() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from(""))
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Tree<'a> {
-    ///Defaults to `""`.
-    #[serde(default = "_default_path")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
 }
 
 pub mod tree_state {
@@ -690,37 +934,37 @@ pub mod tree_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Repo;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Repo = S::Repo;
+        type Ref = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Ref = S::Ref;
         type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -810,8 +1054,8 @@ where
 impl<'a, S> TreeBuilder<'a, S>
 where
     S: tree_state::State,
-    S::Ref: tree_state::IsSet,
     S::Repo: tree_state::IsSet,
+    S::Ref: tree_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tree<'a> {
@@ -821,191 +1065,6 @@ where
             repo: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TreeOutput<'a> {
-    ///Parent directory path
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub dotdot: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub files: Vec<crate::sh_tangled::repo::tree::TreeEntry<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
-    ///The parent path in the tree
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Readme for this file tree
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub readme: std::option::Option<crate::sh_tangled::repo::tree::Readme<'a>>,
-    ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TreeError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Git reference not found
-    #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Path not found in repository tree
-    #[serde(rename = "PathNotFound")]
-    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for TreeError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RefNotFound(msg) => {
-                write!(f, "RefNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::PathNotFound(msg) => {
-                write!(f, "PathNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.tree
-pub struct TreeResponse;
-impl jacquard_common::xrpc::XrpcResp for TreeResponse {
-    const NSID: &'static str = "sh.tangled.repo.tree";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TreeOutput<'de>;
-    type Err<'de> = TreeError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Tree<'a> {
-    const NSID: &'static str = "sh.tangled.repo.tree";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = TreeResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.tree
-pub struct TreeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.tree";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Tree<'de>;
-    type Response = TreeResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Readme<'a> {
-    ///Contents of the readme file
-    #[serde(borrow)]
-    pub contents: jacquard_common::CowStr<'a>,
-    ///Name of the readme file
-    #[serde(borrow)]
-    pub filename: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Readme<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.tree"
-    }
-    fn def_name() -> &'static str {
-        "readme"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_tree()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
-    ///Author email
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-    ///Author name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
-    pub when: jacquard_common::types::string::Datetime,
 }
 
 pub mod signature_state {
@@ -1018,51 +1077,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type When;
         type Name;
         type Email;
-        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type When = Unset;
         type Name = Unset;
         type Email = Unset;
-        type When = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Email = S::Email;
-        type When = S::When;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Name = S::Name;
-        type Email = Set<members::email>;
-        type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
+        type When = Set<members::when>;
         type Name = S::Name;
         type Email = S::Email;
-        type When = Set<members::when>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type When = S::When;
+        type Name = Set<members::name>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Name = S::Name;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
-        ///Marker type for the `when` field
-        pub struct when(());
     }
 }
 
@@ -1155,9 +1214,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
+    S::When: signature_state::IsSet,
     S::Name: signature_state::IsSet,
     S::Email: signature_state::IsSet,
-    S::When: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -1185,48 +1244,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.tree"
-    }
-    fn def_name() -> &'static str {
-        "signature"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_tree()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TreeEntry<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
-    ///File mode
-    #[serde(borrow)]
-    pub mode: jacquard_common::CowStr<'a>,
-    ///Relative file or directory name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///File size in bytes
-    pub size: i64,
-}
-
 pub mod tree_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1237,49 +1254,49 @@ pub mod tree_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mode;
         type Size;
+        type Mode;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mode = Unset;
         type Size = Unset;
+        type Mode = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMode<S> {}
-    impl<S: State> State for SetMode<S> {
-        type Mode = Set<members::mode>;
-        type Size = S::Size;
-        type Name = S::Name;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Mode = S::Mode;
         type Size = Set<members::size>;
+        type Mode = S::Mode;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMode<S> {}
+    impl<S: State> State for SetMode<S> {
+        type Size = S::Size;
+        type Mode = Set<members::mode>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Mode = S::Mode;
         type Size = S::Size;
+        type Mode = S::Mode;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mode` field
-        pub struct mode(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -1394,8 +1411,8 @@ where
 impl<'a, S> TreeEntryBuilder<'a, S>
 where
     S: tree_entry_state::State,
-    S::Mode: tree_entry_state::IsSet,
     S::Size: tree_entry_state::IsSet,
+    S::Mode: tree_entry_state::IsSet,
     S::Name: tree_entry_state::IsSet,
 {
     /// Build the final struct
@@ -1423,22 +1440,5 @@ where
             size: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TreeEntry<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.tree"
-    }
-    fn def_name() -> &'static str {
-        "treeEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_tree()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

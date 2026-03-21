@@ -22,6 +22,310 @@ pub struct IntervalSchedule<'a> {
     pub r#type: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Job<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_job_failure_count")]
+    pub failure_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub instructions: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_run: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub next_run: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub schedule: JobSchedule<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<JobStatus<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum JobSchedule<'a> {
+    #[serde(rename = "diy.razorgirl.winter.job#onceSchedule")]
+    OnceSchedule(Box<crate::diy_razorgirl::winter::job::OnceSchedule<'a>>),
+    #[serde(rename = "diy.razorgirl.winter.job#intervalSchedule")]
+    IntervalSchedule(Box<crate::diy_razorgirl::winter::job::IntervalSchedule<'a>>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JobStatus<'a> {
+    Pending,
+    Running,
+    Completed,
+    Failed,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> JobStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Running => "running",
+            Self::Completed => "completed",
+            Self::Failed => "failed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for JobStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "pending" => Self::Pending,
+            "running" => Self::Running,
+            "completed" => Self::Completed,
+            "failed" => Self::Failed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for JobStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "pending" => Self::Pending,
+            "running" => Self::Running,
+            "completed" => Self::Completed,
+            "failed" => Self::Failed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for JobStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for JobStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for JobStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for JobStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for JobStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for JobStatus<'_> {
+    type Output = JobStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            JobStatus::Pending => JobStatus::Pending,
+            JobStatus::Running => JobStatus::Running,
+            JobStatus::Completed => JobStatus::Completed,
+            JobStatus::Failed => JobStatus::Failed,
+            JobStatus::Other(v) => JobStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct JobGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Job<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OnceSchedule<'a> {
+    pub run_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Job<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, JobRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IntervalSchedule<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.job"
+    }
+    fn def_name() -> &'static str {
+        "intervalSchedule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_job()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct JobRecord;
+impl jacquard_common::xrpc::XrpcResp for JobRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.job";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = JobGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<JobGetRecordOutput<'_>> for Job<'_> {
+    fn from(output: JobGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Job<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.job";
+    type Record = JobRecord;
+}
+
+impl jacquard_common::types::collection::Collection for JobRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.job";
+    type Record = JobRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.job"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_job()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.instructions;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "instructions",
+                    ),
+                    max: 50000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OnceSchedule<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.job"
+    }
+    fn def_name() -> &'static str {
+        "onceSchedule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_job()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod interval_schedule_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -439,55 +743,6 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IntervalSchedule<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.job"
-    }
-    fn def_name() -> &'static str {
-        "intervalSchedule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_job()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Job<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_job_failure_count")]
-    pub failure_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub instructions: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_run: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub next_run: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub schedule: JobSchedule<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<JobStatus<'a>>,
-}
-
 fn _default_job_failure_count() -> std::option::Option<i64> {
     Some(0i64)
 }
@@ -502,65 +757,65 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Schedule;
         type CreatedAt;
+        type Schedule;
+        type Name;
         type Instructions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Schedule = Unset;
         type CreatedAt = Unset;
+        type Schedule = Unset;
+        type Name = Unset;
         type Instructions = Unset;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Schedule = S::Schedule;
-        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Instructions = S::Instructions;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Name = S::Name;
-        type Schedule = Set<members::schedule>;
         type CreatedAt = S::CreatedAt;
+        type Schedule = Set<members::schedule>;
+        type Name = S::Name;
         type Instructions = S::Instructions;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
         type Schedule = S::Schedule;
-        type CreatedAt = Set<members::created_at>;
+        type Name = Set<members::name>;
         type Instructions = S::Instructions;
     }
     ///State transition - sets the `instructions` field to Set
     pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInstructions<S> {}
     impl<S: State> State for SetInstructions<S> {
-        type Name = S::Name;
-        type Schedule = S::Schedule;
         type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
+        type Name = S::Name;
         type Instructions = Set<members::instructions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `schedule` field
-        pub struct schedule(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `schedule` field
+        pub struct schedule(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `instructions` field
         pub struct instructions(());
     }
@@ -743,9 +998,9 @@ impl<'a, S: job_state::State> JobBuilder<'a, S> {
 impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
-    S::Name: job_state::IsSet,
-    S::Schedule: job_state::IsSet,
     S::CreatedAt: job_state::IsSet,
+    S::Schedule: job_state::IsSet,
+    S::Name: job_state::IsSet,
     S::Instructions: job_state::IsSet,
 {
     /// Build the final struct
@@ -782,244 +1037,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> Job<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, JobRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum JobSchedule<'a> {
-    #[serde(rename = "diy.razorgirl.winter.job#onceSchedule")]
-    OnceSchedule(Box<crate::diy_razorgirl::winter::job::OnceSchedule<'a>>),
-    #[serde(rename = "diy.razorgirl.winter.job#intervalSchedule")]
-    IntervalSchedule(Box<crate::diy_razorgirl::winter::job::IntervalSchedule<'a>>),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum JobStatus<'a> {
-    Pending,
-    Running,
-    Completed,
-    Failed,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> JobStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Pending => "pending",
-            Self::Running => "running",
-            Self::Completed => "completed",
-            Self::Failed => "failed",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for JobStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "pending" => Self::Pending,
-            "running" => Self::Running,
-            "completed" => Self::Completed,
-            "failed" => Self::Failed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for JobStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "pending" => Self::Pending,
-            "running" => Self::Running,
-            "completed" => Self::Completed,
-            "failed" => Self::Failed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for JobStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for JobStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for JobStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for JobStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for JobStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for JobStatus<'_> {
-    type Output = JobStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            JobStatus::Pending => JobStatus::Pending,
-            JobStatus::Running => JobStatus::Running,
-            JobStatus::Completed => JobStatus::Completed,
-            JobStatus::Failed => JobStatus::Failed,
-            JobStatus::Other(v) => JobStatus::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct JobGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Job<'a>,
-}
-
-impl From<JobGetRecordOutput<'_>> for Job<'_> {
-    fn from(output: JobGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Job<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.job";
-    type Record = JobRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct JobRecord;
-impl jacquard_common::xrpc::XrpcResp for JobRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.job";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = JobGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for JobRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.job";
-    type Record = JobRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.job"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_job()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.instructions;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "instructions",
-                    ),
-                    max: 50000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OnceSchedule<'a> {
-    pub run_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
 }
 
 pub mod once_schedule_state {
@@ -1159,22 +1176,5 @@ where
             r#type: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OnceSchedule<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.job"
-    }
-    fn def_name() -> &'static str {
-        "onceSchedule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_job()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

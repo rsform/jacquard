@@ -34,6 +34,443 @@ pub struct LivestreamView<'a> {
     >,
 }
 
+/// Record announcing a livestream is happening
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Livestream<'a> {
+    ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub agent: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The primary URL where this livestream can be viewed, if available.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub canonical_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///Client-declared timestamp when this livestream started.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Client-declared timestamp when this livestream ended. Ended livestreams are not supposed to start up again.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Time in seconds after which this livestream should be automatically ended if idle. Zero means no timeout.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub idle_timeout_seconds: std::option::Option<i64>,
+    ///Client-declared timestamp when this livestream was last seen by the Streamplace station.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notification_settings: std::option::Option<
+        crate::place_stream::livestream::NotificationSettings<'a>,
+    >,
+    ///The post that announced this livestream.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub thumb: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///The title of the livestream, as it will be announced to followers.
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    ///The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LivestreamGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Livestream<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotificationSettings<'a> {
+    ///Whether this livestream should trigger a push notification to followers.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub push_notification: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StreamplaceAnything<'a> {
+    #[serde(borrow)]
+    pub livestream: StreamplaceAnythingLivestream<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum StreamplaceAnythingLivestream<'a> {
+    #[serde(rename = "place.stream.livestream#livestreamView")]
+    LivestreamView(Box<crate::place_stream::livestream::LivestreamView<'a>>),
+    #[serde(rename = "place.stream.livestream#viewerCount")]
+    ViewerCount(Box<crate::place_stream::livestream::ViewerCount<'a>>),
+    #[serde(rename = "place.stream.livestream#teleportArrival")]
+    TeleportArrival(Box<crate::place_stream::livestream::TeleportArrival<'a>>),
+    #[serde(rename = "place.stream.livestream#teleportCanceled")]
+    TeleportCanceled(Box<crate::place_stream::livestream::TeleportCanceled<'a>>),
+    #[serde(rename = "place.stream.defs#blockView")]
+    BlockView(Box<crate::place_stream::BlockView<'a>>),
+    #[serde(rename = "place.stream.defs#renditions")]
+    Renditions(Box<crate::place_stream::Renditions<'a>>),
+    #[serde(rename = "place.stream.defs#rendition")]
+    Rendition(Box<crate::place_stream::Rendition<'a>>),
+    #[serde(rename = "place.stream.chat.defs#messageView")]
+    MessageView(Box<crate::place_stream::chat::MessageView<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TeleportArrival<'a> {
+    ///The chat profile of the source streamer
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub chat_profile: std::option::Option<
+        crate::place_stream::chat::profile::Profile<'a>,
+    >,
+    ///The streamer who is teleporting their viewers here
+    #[serde(borrow)]
+    pub source: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///When this teleport started
+    pub starts_at: jacquard_common::types::string::Datetime,
+    ///The URI of the teleport record
+    #[serde(borrow)]
+    pub teleport_uri: jacquard_common::types::string::AtUri<'a>,
+    ///How many viewers are arriving from this teleport
+    pub viewer_count: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TeleportCanceled<'a> {
+    ///Why this teleport was canceled
+    #[serde(borrow)]
+    pub reason: jacquard_common::CowStr<'a>,
+    ///The URI of the teleport record that was canceled
+    #[serde(borrow)]
+    pub teleport_uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerCount<'a> {
+    pub count: i64,
+}
+
+impl<'a> Livestream<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LivestreamRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "livestreamView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LivestreamRecord;
+impl jacquard_common::xrpc::XrpcResp for LivestreamRecord {
+    const NSID: &'static str = "place.stream.livestream";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LivestreamGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
+    fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Livestream<'_> {
+    const NSID: &'static str = "place.stream.livestream";
+    type Record = LivestreamRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LivestreamRecord {
+    const NSID: &'static str = "place.stream.livestream";
+    type Record = LivestreamRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.thumb {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumb",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.thumb {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumb",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1400usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 1400usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 140usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 140usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "notificationSettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "streamplaceAnything"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportArrival<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "teleportArrival"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportCanceled<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "teleportCanceled"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "viewerCount"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_livestream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod livestream_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -45,84 +482,84 @@ pub mod livestream_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type IndexedAt;
-        type Author;
         type Uri;
-        type Record;
         type Cid;
+        type Record;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type IndexedAt = Unset;
-        type Author = Unset;
         type Uri = Unset;
-        type Record = Unset;
         type Cid = Unset;
+        type Record = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = S::Record;
         type Author = S::Author;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type IndexedAt = S::IndexedAt;
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
         type Record = S::Record;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
-        type Uri = S::Uri;
-        type Record = Set<members::record>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
         type Uri = S::Uri;
-        type Record = S::Record;
         type Cid = Set<members::cid>;
+        type Record = S::Record;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -276,10 +713,10 @@ impl<'a, S> LivestreamViewBuilder<'a, S>
 where
     S: livestream_view_state::State,
     S::IndexedAt: livestream_view_state::IsSet,
-    S::Author: livestream_view_state::IsSet,
     S::Uri: livestream_view_state::IsSet,
-    S::Record: livestream_view_state::IsSet,
     S::Cid: livestream_view_state::IsSet,
+    S::Record: livestream_view_state::IsSet,
+    S::Author: livestream_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamView<'a> {
@@ -922,76 +1359,6 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "livestreamView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Record announcing a livestream is happening
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Livestream<'a> {
-    ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub agent: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The primary URL where this livestream can be viewed, if available.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub canonical_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///Client-declared timestamp when this livestream started.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Client-declared timestamp when this livestream ended. Ended livestreams are not supposed to start up again.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Time in seconds after which this livestream should be automatically ended if idle. Zero means no timeout.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub idle_timeout_seconds: std::option::Option<i64>,
-    ///Client-declared timestamp when this livestream was last seen by the Streamplace station.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notification_settings: std::option::Option<
-        crate::place_stream::livestream::NotificationSettings<'a>,
-    >,
-    ///The post that announced this livestream.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///The title of the livestream, as it will be announced to followers.
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    ///The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-}
-
 pub mod livestream_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1337,209 +1704,6 @@ where
     }
 }
 
-impl<'a> Livestream<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LivestreamRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LivestreamGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Livestream<'a>,
-}
-
-impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
-    fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Livestream<'_> {
-    const NSID: &'static str = "place.stream.livestream";
-    type Record = LivestreamRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LivestreamRecord;
-impl jacquard_common::xrpc::XrpcResp for LivestreamRecord {
-    const NSID: &'static str = "place.stream.livestream";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LivestreamGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LivestreamRecord {
-    const NSID: &'static str = "place.stream.livestream";
-    type Record = LivestreamRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.thumb {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumb",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.thumb {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumb",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1400usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 1400usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotificationSettings<'a> {
-    ///Whether this livestream should trigger a push notification to followers.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub push_notification: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "notificationSettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StreamplaceAnything<'a> {
-    #[serde(borrow)]
-    pub livestream: StreamplaceAnythingLivestream<'a>,
-}
-
 pub mod streamplace_anything_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1643,84 +1807,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum StreamplaceAnythingLivestream<'a> {
-    #[serde(rename = "place.stream.livestream#livestreamView")]
-    LivestreamView(Box<crate::place_stream::livestream::LivestreamView<'a>>),
-    #[serde(rename = "place.stream.livestream#viewerCount")]
-    ViewerCount(Box<crate::place_stream::livestream::ViewerCount<'a>>),
-    #[serde(rename = "place.stream.livestream#teleportArrival")]
-    TeleportArrival(Box<crate::place_stream::livestream::TeleportArrival<'a>>),
-    #[serde(rename = "place.stream.livestream#teleportCanceled")]
-    TeleportCanceled(Box<crate::place_stream::livestream::TeleportCanceled<'a>>),
-    #[serde(rename = "place.stream.defs#blockView")]
-    BlockView(Box<crate::place_stream::BlockView<'a>>),
-    #[serde(rename = "place.stream.defs#renditions")]
-    Renditions(Box<crate::place_stream::Renditions<'a>>),
-    #[serde(rename = "place.stream.defs#rendition")]
-    Rendition(Box<crate::place_stream::Rendition<'a>>),
-    #[serde(rename = "place.stream.chat.defs#messageView")]
-    MessageView(Box<crate::place_stream::chat::MessageView<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "streamplaceAnything"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportArrival<'a> {
-    ///The chat profile of the source streamer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub chat_profile: std::option::Option<
-        crate::place_stream::chat::profile::Profile<'a>,
-    >,
-    ///The streamer who is teleporting their viewers here
-    #[serde(borrow)]
-    pub source: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///When this teleport started
-    pub starts_at: jacquard_common::types::string::Datetime,
-    ///The URI of the teleport record
-    #[serde(borrow)]
-    pub teleport_uri: jacquard_common::types::string::AtUri<'a>,
-    ///How many viewers are arriving from this teleport
-    pub viewer_count: i64,
-}
-
 pub mod teleport_arrival_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1731,65 +1817,65 @@ pub mod teleport_arrival_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TeleportUri;
         type Source;
         type StartsAt;
+        type TeleportUri;
         type ViewerCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TeleportUri = Unset;
         type Source = Unset;
         type StartsAt = Unset;
+        type TeleportUri = Unset;
         type ViewerCount = Unset;
-    }
-    ///State transition - sets the `teleport_uri` field to Set
-    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
-    impl<S: State> State for SetTeleportUri<S> {
-        type TeleportUri = Set<members::teleport_uri>;
-        type Source = S::Source;
-        type StartsAt = S::StartsAt;
-        type ViewerCount = S::ViewerCount;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type TeleportUri = S::TeleportUri;
         type Source = Set<members::source>;
         type StartsAt = S::StartsAt;
+        type TeleportUri = S::TeleportUri;
         type ViewerCount = S::ViewerCount;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
-        type TeleportUri = S::TeleportUri;
         type Source = S::Source;
         type StartsAt = Set<members::starts_at>;
+        type TeleportUri = S::TeleportUri;
+        type ViewerCount = S::ViewerCount;
+    }
+    ///State transition - sets the `teleport_uri` field to Set
+    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
+    impl<S: State> State for SetTeleportUri<S> {
+        type Source = S::Source;
+        type StartsAt = S::StartsAt;
+        type TeleportUri = Set<members::teleport_uri>;
         type ViewerCount = S::ViewerCount;
     }
     ///State transition - sets the `viewer_count` field to Set
     pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetViewerCount<S> {}
     impl<S: State> State for SetViewerCount<S> {
-        type TeleportUri = S::TeleportUri;
         type Source = S::Source;
         type StartsAt = S::StartsAt;
+        type TeleportUri = S::TeleportUri;
         type ViewerCount = Set<members::viewer_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `teleport_uri` field
-        pub struct teleport_uri(());
         ///Marker type for the `source` field
         pub struct source(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
+        ///Marker type for the `teleport_uri` field
+        pub struct teleport_uri(());
         ///Marker type for the `viewer_count` field
         pub struct viewer_count(());
     }
@@ -1924,9 +2010,9 @@ where
 impl<'a, S> TeleportArrivalBuilder<'a, S>
 where
     S: teleport_arrival_state::State,
-    S::TeleportUri: teleport_arrival_state::IsSet,
     S::Source: teleport_arrival_state::IsSet,
     S::StartsAt: teleport_arrival_state::IsSet,
+    S::TeleportUri: teleport_arrival_state::IsSet,
     S::ViewerCount: teleport_arrival_state::IsSet,
 {
     /// Build the final struct
@@ -1957,43 +2043,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportArrival<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "teleportArrival"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportCanceled<'a> {
-    ///Why this teleport was canceled
-    #[serde(borrow)]
-    pub reason: jacquard_common::CowStr<'a>,
-    ///The URI of the teleport record that was canceled
-    #[serde(borrow)]
-    pub teleport_uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod teleport_canceled_state {
@@ -2136,38 +2185,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportCanceled<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "teleportCanceled"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerCount<'a> {
-    pub count: i64,
-}
-
 pub mod viewer_count_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2268,22 +2285,5 @@ where
             count: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.livestream"
-    }
-    fn def_name() -> &'static str {
-        "viewerCount"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_livestream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -48,6 +48,84 @@ pub struct Contributor<'a> {
     pub video_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ContributorGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Contributor<'a>,
+}
+
+impl<'a> Contributor<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ContributorRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ContributorRecord;
+impl jacquard_common::xrpc::XrpcResp for ContributorRecord {
+    const NSID: &'static str = "org.hyperboards.contributor";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ContributorGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ContributorGetRecordOutput<'_>> for Contributor<'_> {
+    fn from(output: ContributorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Contributor<'_> {
+    const NSID: &'static str = "org.hyperboards.contributor";
+    type Record = ContributorRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ContributorRecord {
+    const NSID: &'static str = "org.hyperboards.contributor";
+    type Record = ContributorRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
+    fn nsid() -> &'static str {
+        "org.hyperboards.contributor"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hyperboards_contributor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod contributor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -289,84 +367,6 @@ where
             video_url: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Contributor<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ContributorRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ContributorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Contributor<'a>,
-}
-
-impl From<ContributorGetRecordOutput<'_>> for Contributor<'_> {
-    fn from(output: ContributorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Contributor<'_> {
-    const NSID: &'static str = "org.hyperboards.contributor";
-    type Record = ContributorRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ContributorRecord;
-impl jacquard_common::xrpc::XrpcResp for ContributorRecord {
-    const NSID: &'static str = "org.hyperboards.contributor";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ContributorGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ContributorRecord {
-    const NSID: &'static str = "org.hyperboards.contributor";
-    type Record = ContributorRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
-    fn nsid() -> &'static str {
-        "org.hyperboards.contributor"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hyperboards_contributor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

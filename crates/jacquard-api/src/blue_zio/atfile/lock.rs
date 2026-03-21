@@ -22,6 +22,84 @@ pub struct Lock<'a> {
     pub lock: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LockGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Lock<'a>,
+}
+
+impl<'a> Lock<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LockRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LockRecord;
+impl jacquard_common::xrpc::XrpcResp for LockRecord {
+    const NSID: &'static str = "blue.zio.atfile.lock";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LockGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LockGetRecordOutput<'_>> for Lock<'_> {
+    fn from(output: LockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Lock<'_> {
+    const NSID: &'static str = "blue.zio.atfile.lock";
+    type Record = LockRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LockRecord {
+    const NSID: &'static str = "blue.zio.atfile.lock";
+    type Record = LockRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lock<'a> {
+    fn nsid() -> &'static str {
+        "blue.zio.atfile.lock"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_zio_atfile_lock()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod lock_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -102,84 +180,6 @@ where
             lock: self.__unsafe_private_named.0,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Lock<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LockRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LockGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Lock<'a>,
-}
-
-impl From<LockGetRecordOutput<'_>> for Lock<'_> {
-    fn from(output: LockGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Lock<'_> {
-    const NSID: &'static str = "blue.zio.atfile.lock";
-    type Record = LockRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LockRecord;
-impl jacquard_common::xrpc::XrpcResp for LockRecord {
-    const NSID: &'static str = "blue.zio.atfile.lock";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LockGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LockRecord {
-    const NSID: &'static str = "blue.zio.atfile.lock";
-    type Record = LockRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lock<'a> {
-    fn nsid() -> &'static str {
-        "blue.zio.atfile.lock"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_zio_atfile_lock()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

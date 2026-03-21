@@ -22,6 +22,84 @@ pub struct Spindle<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SpindleGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Spindle<'a>,
+}
+
+impl<'a> Spindle<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SpindleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SpindleRecord;
+impl jacquard_common::xrpc::XrpcResp for SpindleRecord {
+    const NSID: &'static str = "sh.tangled.spindle";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SpindleGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SpindleGetRecordOutput<'_>> for Spindle<'_> {
+    fn from(output: SpindleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Spindle<'_> {
+    const NSID: &'static str = "sh.tangled.spindle";
+    type Record = SpindleRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SpindleRecord {
+    const NSID: &'static str = "sh.tangled.spindle";
+    type Record = SpindleRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spindle<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.spindle"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_spindle()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod spindle_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,84 +202,6 @@ where
             created_at: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Spindle<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SpindleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SpindleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Spindle<'a>,
-}
-
-impl From<SpindleGetRecordOutput<'_>> for Spindle<'_> {
-    fn from(output: SpindleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Spindle<'_> {
-    const NSID: &'static str = "sh.tangled.spindle";
-    type Record = SpindleRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SpindleRecord;
-impl jacquard_common::xrpc::XrpcResp for SpindleRecord {
-    const NSID: &'static str = "sh.tangled.spindle";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SpindleGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SpindleRecord {
-    const NSID: &'static str = "sh.tangled.spindle";
-    type Record = SpindleRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spindle<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.spindle"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_spindle()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

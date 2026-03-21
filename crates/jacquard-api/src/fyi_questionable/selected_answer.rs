@@ -26,6 +26,84 @@ pub struct SelectedAnswer<'a> {
     pub question_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SelectedAnswerGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: SelectedAnswer<'a>,
+}
+
+impl<'a> SelectedAnswer<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SelectedAnswerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SelectedAnswerRecord;
+impl jacquard_common::xrpc::XrpcResp for SelectedAnswerRecord {
+    const NSID: &'static str = "fyi.questionable.selectedAnswer";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SelectedAnswerGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SelectedAnswerGetRecordOutput<'_>> for SelectedAnswer<'_> {
+    fn from(output: SelectedAnswerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for SelectedAnswer<'_> {
+    const NSID: &'static str = "fyi.questionable.selectedAnswer";
+    type Record = SelectedAnswerRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SelectedAnswerRecord {
+    const NSID: &'static str = "fyi.questionable.selectedAnswer";
+    type Record = SelectedAnswerRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelectedAnswer<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.selectedAnswer"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_selectedAnswer()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod selected_answer_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,50 +115,50 @@ pub mod selected_answer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type QuestionRef;
-        type AnswerRef;
         type CreatedAt;
+        type AnswerRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type QuestionRef = Unset;
-        type AnswerRef = Unset;
         type CreatedAt = Unset;
+        type AnswerRef = Unset;
     }
     ///State transition - sets the `question_ref` field to Set
     pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
     impl<S: State> State for SetQuestionRef<S> {
         type QuestionRef = Set<members::question_ref>;
+        type CreatedAt = S::CreatedAt;
         type AnswerRef = S::AnswerRef;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `answer_ref` field to Set
-    pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
-    impl<S: State> State for SetAnswerRef<S> {
-        type QuestionRef = S::QuestionRef;
-        type AnswerRef = Set<members::answer_ref>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type QuestionRef = S::QuestionRef;
-        type AnswerRef = S::AnswerRef;
         type CreatedAt = Set<members::created_at>;
+        type AnswerRef = S::AnswerRef;
+    }
+    ///State transition - sets the `answer_ref` field to Set
+    pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
+    impl<S: State> State for SetAnswerRef<S> {
+        type QuestionRef = S::QuestionRef;
+        type CreatedAt = S::CreatedAt;
+        type AnswerRef = Set<members::answer_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
-        ///Marker type for the `answer_ref` field
-        pub struct answer_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `answer_ref` field
+        pub struct answer_ref(());
     }
 }
 
@@ -174,8 +252,8 @@ impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
     S::QuestionRef: selected_answer_state::IsSet,
-    S::AnswerRef: selected_answer_state::IsSet,
     S::CreatedAt: selected_answer_state::IsSet,
+    S::AnswerRef: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {
@@ -200,84 +278,6 @@ where
             question_ref: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> SelectedAnswer<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SelectedAnswerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SelectedAnswerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SelectedAnswer<'a>,
-}
-
-impl From<SelectedAnswerGetRecordOutput<'_>> for SelectedAnswer<'_> {
-    fn from(output: SelectedAnswerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for SelectedAnswer<'_> {
-    const NSID: &'static str = "fyi.questionable.selectedAnswer";
-    type Record = SelectedAnswerRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SelectedAnswerRecord;
-impl jacquard_common::xrpc::XrpcResp for SelectedAnswerRecord {
-    const NSID: &'static str = "fyi.questionable.selectedAnswer";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SelectedAnswerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SelectedAnswerRecord {
-    const NSID: &'static str = "fyi.questionable.selectedAnswer";
-    type Record = SelectedAnswerRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelectedAnswer<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.selectedAnswer"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_selectedAnswer()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

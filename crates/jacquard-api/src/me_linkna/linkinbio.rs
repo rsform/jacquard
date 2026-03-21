@@ -29,6 +29,2081 @@ pub struct ConnectedServices<'a> {
     pub goodreads_user_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// A single day's contribution data from GitHub.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GithubContributionDay<'a> {
+    ///Number of contributions on this day.
+    pub count: i64,
+    ///Date in YYYY-MM-DD format.
+    #[serde(borrow)]
+    pub date: jacquard_common::CowStr<'a>,
+    ///Contribution intensity level (0=none, 4=highest).
+    pub level: i64,
+}
+
+/// A book from a Goodreads shelf.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GoodreadsBook<'a> {
+    ///Book author.
+    #[serde(borrow)]
+    pub author: jacquard_common::CowStr<'a>,
+    ///URL to the book cover image.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URL to the book on Goodreads.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub link: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///User's rating (1-5), or absent if unrated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rating: std::option::Option<i64>,
+    ///Book title.
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+}
+
+/// A standard link card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkCard<'a> {
+    ///Whether the card is visible on the public page. Defaults to true.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub enabled: std::option::Option<bool>,
+    ///Whether the card is visually highlighted.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub highlighted: std::option::Option<bool>,
+    ///Unique identifier for the card.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Display text for the card (falls back to URL domain if empty).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Card type discriminator. Value: 'link' or absent for link cards.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URL the card links to.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+}
+
+/// A user's link-in-bio page containing cards, theme configuration, and social icons.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Linkinbio<'a> {
+    ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
+    #[serde(borrow)]
+    pub cards: Vec<LinkinbioCardsItem<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub connected_services: std::option::Option<
+        crate::me_linkna::linkinbio::ConnectedServices<'a>,
+    >,
+    ///Social media icons displayed on the profile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub social_icons: std::option::Option<
+        Vec<crate::me_linkna::linkinbio::SocialIcon<'a>>,
+    >,
+    ///Deprecated: use themeConfig instead.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub theme_config: std::option::Option<crate::me_linkna::linkinbio::ThemeConfig<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LinkinbioCardsItem<'a> {
+    #[serde(rename = "me.linkna.linkinbio#linkCard")]
+    LinkCard(Box<crate::me_linkna::linkinbio::LinkCard<'a>>),
+    #[serde(rename = "me.linkna.linkinbio#widgetGoodreads")]
+    WidgetGoodreads(Box<crate::me_linkna::linkinbio::WidgetGoodreads<'a>>),
+    #[serde(rename = "me.linkna.linkinbio#widgetGithub")]
+    WidgetGithub(Box<crate::me_linkna::linkinbio::WidgetGithub<'a>>),
+    #[serde(rename = "me.linkna.linkinbio#widgetTealfm")]
+    WidgetTealfm(Box<crate::me_linkna::linkinbio::WidgetTealfm<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkinbioGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Linkinbio<'a>,
+}
+
+/// A social media icon link.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SocialIcon<'a> {
+    ///Unique identifier for the icon.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///Platform identifier (e.g., 'bluesky', 'twitter', 'instagram').
+    #[serde(borrow)]
+    pub platform: jacquard_common::CowStr<'a>,
+    ///URL to the user's profile on this platform.
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+/// A recently played track from teal.fm.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TealfmPlay<'a> {
+    ///Artist name(s).
+    #[serde(borrow)]
+    pub artist_name: jacquard_common::CowStr<'a>,
+    ///URL to the album cover image (from Cover Art Archive).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URL to the track on the original music service.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///When the track was played.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Album/release name.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Track/song name.
+    #[serde(borrow)]
+    pub track_name: jacquard_common::CowStr<'a>,
+}
+
+/// Theme configuration for the page appearance.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeConfig<'a> {
+    ///Page background color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///CSS gradient for the page background.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_gradient: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Background wallpaper image blob.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///Optional credit URL for the wallpaper image artist. Stored for attribution purposes only, not displayed on the public page.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_image_credit: std::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
+    ///Button content alignment. Default: left.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub button_alignment: std::option::Option<ThemeConfigButtonAlignment<'a>>,
+    ///Whether buttons glow on hover. Default: false.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub button_hover_glow: std::option::Option<bool>,
+    ///Color for the button hover glow effect.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub button_hover_glow_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Individual card/button background color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Card/button border color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Card/button border radius.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_border_radius: std::option::Option<ThemeConfigCardBorderRadius<'a>>,
+    ///Card/button border color on hover.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_hover_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Card/button shadow intensity.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_shadow: std::option::Option<ThemeConfigCardShadow<'a>>,
+    ///Card/button text color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub card_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Card container background color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_card_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether cursor has sparkle trail. Default: false.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor_sparkles: std::option::Option<bool>,
+    ///Custom cursor style. Default: default.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor_style: std::option::Option<ThemeConfigCursorStyle<'a>>,
+    ///Font family for the page.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub font_family: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Font size. Default: md.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub font_size: std::option::Option<ThemeConfigFontSize<'a>>,
+    ///Background particle effect. Default: none.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub particles: std::option::Option<ThemeConfigParticles<'a>>,
+    ///Theme preset ID.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub preset: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Profile section alignment. Default: center.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile_alignment: std::option::Option<ThemeConfigProfileAlignment<'a>>,
+    ///Profile picture shape. Default: circle.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile_picture_shape: std::option::Option<ThemeConfigProfilePictureShape<'a>>,
+    ///Profile picture size. Default: sm.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile_picture_size: std::option::Option<ThemeConfigProfilePictureSize<'a>>,
+    ///Profile section text color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether Linkname branding is visible. Default: true.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_branding: std::option::Option<bool>,
+    ///Border color for social icons dock/sphere.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub social_icons_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Social icons color.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub social_icons_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Social icons container shape. Default: dock.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub social_icons_shape: std::option::Option<ThemeConfigSocialIconsShape<'a>>,
+    ///Background color for social icons dock/sphere.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub social_icons_shape_color: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Button content alignment. Default: left.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigButtonAlignment<'a> {
+    Left,
+    Right,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigButtonAlignment<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Left => "left",
+            Self::Right => "right",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigButtonAlignment<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "left" => Self::Left,
+            "right" => Self::Right,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigButtonAlignment<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "left" => Self::Left,
+            "right" => Self::Right,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigButtonAlignment<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigButtonAlignment<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigButtonAlignment<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigButtonAlignment<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigButtonAlignment<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigButtonAlignment<'_> {
+    type Output = ThemeConfigButtonAlignment<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigButtonAlignment::Left => ThemeConfigButtonAlignment::Left,
+            ThemeConfigButtonAlignment::Right => ThemeConfigButtonAlignment::Right,
+            ThemeConfigButtonAlignment::Other(v) => {
+                ThemeConfigButtonAlignment::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Card/button border radius.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigCardBorderRadius<'a> {
+    None,
+    Sm,
+    Md,
+    Lg,
+    Full,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigCardBorderRadius<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::Sm => "sm",
+            Self::Md => "md",
+            Self::Lg => "lg",
+            Self::Full => "full",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigCardBorderRadius<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            "full" => Self::Full,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigCardBorderRadius<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            "full" => Self::Full,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigCardBorderRadius<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigCardBorderRadius<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigCardBorderRadius<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCardBorderRadius<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigCardBorderRadius<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigCardBorderRadius<'_> {
+    type Output = ThemeConfigCardBorderRadius<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigCardBorderRadius::None => ThemeConfigCardBorderRadius::None,
+            ThemeConfigCardBorderRadius::Sm => ThemeConfigCardBorderRadius::Sm,
+            ThemeConfigCardBorderRadius::Md => ThemeConfigCardBorderRadius::Md,
+            ThemeConfigCardBorderRadius::Lg => ThemeConfigCardBorderRadius::Lg,
+            ThemeConfigCardBorderRadius::Full => ThemeConfigCardBorderRadius::Full,
+            ThemeConfigCardBorderRadius::Other(v) => {
+                ThemeConfigCardBorderRadius::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Card/button shadow intensity.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigCardShadow<'a> {
+    None,
+    Sm,
+    Md,
+    Lg,
+    Xl,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigCardShadow<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::Sm => "sm",
+            Self::Md => "md",
+            Self::Lg => "lg",
+            Self::Xl => "xl",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigCardShadow<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            "xl" => Self::Xl,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigCardShadow<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            "xl" => Self::Xl,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigCardShadow<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigCardShadow<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigCardShadow<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCardShadow<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigCardShadow<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigCardShadow<'_> {
+    type Output = ThemeConfigCardShadow<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigCardShadow::None => ThemeConfigCardShadow::None,
+            ThemeConfigCardShadow::Sm => ThemeConfigCardShadow::Sm,
+            ThemeConfigCardShadow::Md => ThemeConfigCardShadow::Md,
+            ThemeConfigCardShadow::Lg => ThemeConfigCardShadow::Lg,
+            ThemeConfigCardShadow::Xl => ThemeConfigCardShadow::Xl,
+            ThemeConfigCardShadow::Other(v) => {
+                ThemeConfigCardShadow::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Custom cursor style. Default: default.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigCursorStyle<'a> {
+    Default,
+    HelloKitty,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigCursorStyle<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Default => "default",
+            Self::HelloKitty => "hello-kitty",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigCursorStyle<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "default" => Self::Default,
+            "hello-kitty" => Self::HelloKitty,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigCursorStyle<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "default" => Self::Default,
+            "hello-kitty" => Self::HelloKitty,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigCursorStyle<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigCursorStyle<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigCursorStyle<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCursorStyle<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigCursorStyle<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigCursorStyle<'_> {
+    type Output = ThemeConfigCursorStyle<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigCursorStyle::Default => ThemeConfigCursorStyle::Default,
+            ThemeConfigCursorStyle::HelloKitty => ThemeConfigCursorStyle::HelloKitty,
+            ThemeConfigCursorStyle::Other(v) => {
+                ThemeConfigCursorStyle::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Font size. Default: md.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigFontSize<'a> {
+    Sm,
+    Md,
+    Lg,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigFontSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Sm => "sm",
+            Self::Md => "md",
+            Self::Lg => "lg",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigFontSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigFontSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigFontSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigFontSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigFontSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigFontSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigFontSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigFontSize<'_> {
+    type Output = ThemeConfigFontSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigFontSize::Sm => ThemeConfigFontSize::Sm,
+            ThemeConfigFontSize::Md => ThemeConfigFontSize::Md,
+            ThemeConfigFontSize::Lg => ThemeConfigFontSize::Lg,
+            ThemeConfigFontSize::Other(v) => ThemeConfigFontSize::Other(v.into_static()),
+        }
+    }
+}
+
+/// Background particle effect. Default: none.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigParticles<'a> {
+    None,
+    White,
+    Blue,
+    Leaves,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigParticles<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::White => "white",
+            Self::Blue => "blue",
+            Self::Leaves => "leaves",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigParticles<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "white" => Self::White,
+            "blue" => Self::Blue,
+            "leaves" => Self::Leaves,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigParticles<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "white" => Self::White,
+            "blue" => Self::Blue,
+            "leaves" => Self::Leaves,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigParticles<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigParticles<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigParticles<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigParticles<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigParticles<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigParticles<'_> {
+    type Output = ThemeConfigParticles<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigParticles::None => ThemeConfigParticles::None,
+            ThemeConfigParticles::White => ThemeConfigParticles::White,
+            ThemeConfigParticles::Blue => ThemeConfigParticles::Blue,
+            ThemeConfigParticles::Leaves => ThemeConfigParticles::Leaves,
+            ThemeConfigParticles::Other(v) => {
+                ThemeConfigParticles::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Profile section alignment. Default: center.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigProfileAlignment<'a> {
+    Left,
+    Center,
+    Right,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigProfileAlignment<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Left => "left",
+            Self::Center => "center",
+            Self::Right => "right",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigProfileAlignment<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "left" => Self::Left,
+            "center" => Self::Center,
+            "right" => Self::Right,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigProfileAlignment<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "left" => Self::Left,
+            "center" => Self::Center,
+            "right" => Self::Right,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigProfileAlignment<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigProfileAlignment<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigProfileAlignment<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfileAlignment<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigProfileAlignment<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigProfileAlignment<'_> {
+    type Output = ThemeConfigProfileAlignment<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigProfileAlignment::Left => ThemeConfigProfileAlignment::Left,
+            ThemeConfigProfileAlignment::Center => ThemeConfigProfileAlignment::Center,
+            ThemeConfigProfileAlignment::Right => ThemeConfigProfileAlignment::Right,
+            ThemeConfigProfileAlignment::Other(v) => {
+                ThemeConfigProfileAlignment::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Profile picture shape. Default: circle.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigProfilePictureShape<'a> {
+    Circle,
+    Rounded,
+    Square,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigProfilePictureShape<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Circle => "circle",
+            Self::Rounded => "rounded",
+            Self::Square => "square",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigProfilePictureShape<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "circle" => Self::Circle,
+            "rounded" => Self::Rounded,
+            "square" => Self::Square,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigProfilePictureShape<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "circle" => Self::Circle,
+            "rounded" => Self::Rounded,
+            "square" => Self::Square,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigProfilePictureShape<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigProfilePictureShape<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigProfilePictureShape<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfilePictureShape<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigProfilePictureShape<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigProfilePictureShape<'_> {
+    type Output = ThemeConfigProfilePictureShape<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigProfilePictureShape::Circle => {
+                ThemeConfigProfilePictureShape::Circle
+            }
+            ThemeConfigProfilePictureShape::Rounded => {
+                ThemeConfigProfilePictureShape::Rounded
+            }
+            ThemeConfigProfilePictureShape::Square => {
+                ThemeConfigProfilePictureShape::Square
+            }
+            ThemeConfigProfilePictureShape::Other(v) => {
+                ThemeConfigProfilePictureShape::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Profile picture size. Default: sm.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigProfilePictureSize<'a> {
+    Sm,
+    Md,
+    Lg,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigProfilePictureSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Sm => "sm",
+            Self::Md => "md",
+            Self::Lg => "lg",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigProfilePictureSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigProfilePictureSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sm" => Self::Sm,
+            "md" => Self::Md,
+            "lg" => Self::Lg,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigProfilePictureSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigProfilePictureSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigProfilePictureSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfilePictureSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigProfilePictureSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigProfilePictureSize<'_> {
+    type Output = ThemeConfigProfilePictureSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigProfilePictureSize::Sm => ThemeConfigProfilePictureSize::Sm,
+            ThemeConfigProfilePictureSize::Md => ThemeConfigProfilePictureSize::Md,
+            ThemeConfigProfilePictureSize::Lg => ThemeConfigProfilePictureSize::Lg,
+            ThemeConfigProfilePictureSize::Other(v) => {
+                ThemeConfigProfilePictureSize::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Social icons container shape. Default: dock.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeConfigSocialIconsShape<'a> {
+    Dock,
+    Sphere,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThemeConfigSocialIconsShape<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Dock => "dock",
+            Self::Sphere => "sphere",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThemeConfigSocialIconsShape<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "dock" => Self::Dock,
+            "sphere" => Self::Sphere,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThemeConfigSocialIconsShape<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "dock" => Self::Dock,
+            "sphere" => Self::Sphere,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThemeConfigSocialIconsShape<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThemeConfigSocialIconsShape<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThemeConfigSocialIconsShape<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigSocialIconsShape<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThemeConfigSocialIconsShape<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThemeConfigSocialIconsShape<'_> {
+    type Output = ThemeConfigSocialIconsShape<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeConfigSocialIconsShape::Dock => ThemeConfigSocialIconsShape::Dock,
+            ThemeConfigSocialIconsShape::Sphere => ThemeConfigSocialIconsShape::Sphere,
+            ThemeConfigSocialIconsShape::Other(v) => {
+                ThemeConfigSocialIconsShape::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A GitHub contributions graph widget card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WidgetGithub<'a> {
+    ///Contribution data for the last year.
+    #[serde(borrow)]
+    pub contributions: Vec<crate::me_linkna::linkinbio::GithubContributionDay<'a>>,
+    ///Whether the widget is visible on the public page. Defaults to true.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub enabled: std::option::Option<bool>,
+    ///GitHub username.
+    #[serde(borrow)]
+    pub github_username: jacquard_common::CowStr<'a>,
+    ///Unique identifier for the card.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///When the contribution data was last fetched from GitHub.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Widget display size. Default: 1x1.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub size: std::option::Option<WidgetGithubSize<'a>>,
+    ///Total number of contributions in the last year.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_contributions: std::option::Option<i64>,
+    ///Card type discriminator.
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+/// Widget display size. Default: 1x1.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WidgetGithubSize<'a> {
+    _1x1,
+    _1x2,
+    _2x2,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WidgetGithubSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1x1 => "1x1",
+            Self::_1x2 => "1x2",
+            Self::_2x2 => "2x2",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WidgetGithubSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WidgetGithubSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WidgetGithubSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WidgetGithubSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WidgetGithubSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WidgetGithubSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WidgetGithubSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WidgetGithubSize<'_> {
+    type Output = WidgetGithubSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WidgetGithubSize::_1x1 => WidgetGithubSize::_1x1,
+            WidgetGithubSize::_1x2 => WidgetGithubSize::_1x2,
+            WidgetGithubSize::_2x2 => WidgetGithubSize::_2x2,
+            WidgetGithubSize::Other(v) => WidgetGithubSize::Other(v.into_static()),
+        }
+    }
+}
+
+/// A Goodreads bookshelf widget card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WidgetGoodreads<'a> {
+    ///Books on the currently-reading shelf.
+    #[serde(borrow)]
+    pub books: Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
+    ///Whether the widget is visible on the public page. Defaults to true.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub enabled: std::option::Option<bool>,
+    ///Goodreads numeric user ID.
+    #[serde(borrow)]
+    pub goodreads_user_id: jacquard_common::CowStr<'a>,
+    ///Unique identifier for the card.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///When the book data was last fetched from Goodreads.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Books on the read shelf (used by 1x2 size).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub read_books: std::option::Option<
+        Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
+    >,
+    ///Shelf name (currently-reading, read, or to-read).
+    #[serde(borrow)]
+    pub shelf: jacquard_common::CowStr<'a>,
+    ///Widget display size. Default: 1x1.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub size: std::option::Option<WidgetGoodreadsSize<'a>>,
+    ///Card type discriminator.
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+/// Widget display size. Default: 1x1.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WidgetGoodreadsSize<'a> {
+    _1x1,
+    _1x2,
+    _2x2,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WidgetGoodreadsSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1x1 => "1x1",
+            Self::_1x2 => "1x2",
+            Self::_2x2 => "2x2",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WidgetGoodreadsSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WidgetGoodreadsSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WidgetGoodreadsSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WidgetGoodreadsSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WidgetGoodreadsSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WidgetGoodreadsSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WidgetGoodreadsSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WidgetGoodreadsSize<'_> {
+    type Output = WidgetGoodreadsSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WidgetGoodreadsSize::_1x1 => WidgetGoodreadsSize::_1x1,
+            WidgetGoodreadsSize::_1x2 => WidgetGoodreadsSize::_1x2,
+            WidgetGoodreadsSize::_2x2 => WidgetGoodreadsSize::_2x2,
+            WidgetGoodreadsSize::Other(v) => WidgetGoodreadsSize::Other(v.into_static()),
+        }
+    }
+}
+
+/// A teal.fm recently played tracks widget card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WidgetTealfm<'a> {
+    ///Copyright notice for cover art images.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover_art_notice: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether the widget is visible on the public page. Defaults to true.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub enabled: std::option::Option<bool>,
+    ///Unique identifier for the card.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///When the play data was last fetched from the PDS.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Recently played tracks.
+    #[serde(borrow)]
+    pub plays: Vec<crate::me_linkna::linkinbio::TealfmPlay<'a>>,
+    ///Widget display size. Default: 1x1.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub size: std::option::Option<WidgetTealfmSize<'a>>,
+    ///Card type discriminator.
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+/// Widget display size. Default: 1x1.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WidgetTealfmSize<'a> {
+    _1x1,
+    _1x2,
+    _2x2,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WidgetTealfmSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1x1 => "1x1",
+            Self::_1x2 => "1x2",
+            Self::_2x2 => "2x2",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WidgetTealfmSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WidgetTealfmSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "1x1" => Self::_1x1,
+            "1x2" => Self::_1x2,
+            "2x2" => Self::_2x2,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WidgetTealfmSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WidgetTealfmSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WidgetTealfmSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WidgetTealfmSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WidgetTealfmSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WidgetTealfmSize<'_> {
+    type Output = WidgetTealfmSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WidgetTealfmSize::_1x1 => WidgetTealfmSize::_1x1,
+            WidgetTealfmSize::_1x2 => WidgetTealfmSize::_1x2,
+            WidgetTealfmSize::_2x2 => WidgetTealfmSize::_2x2,
+            WidgetTealfmSize::Other(v) => WidgetTealfmSize::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> Linkinbio<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LinkinbioRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConnectedServices<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "connectedServices"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GithubContributionDay<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "githubContributionDay"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value > 4i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 4i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.level;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GoodreadsBook<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "goodreadsBook"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.rating {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.rating {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkCard<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "linkCard"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.text {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LinkinbioRecord;
+impl jacquard_common::xrpc::XrpcResp for LinkinbioRecord {
+    const NSID: &'static str = "me.linkna.linkinbio";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LinkinbioGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LinkinbioGetRecordOutput<'_>> for Linkinbio<'_> {
+    fn from(output: LinkinbioGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Linkinbio<'_> {
+    const NSID: &'static str = "me.linkna.linkinbio";
+    type Record = LinkinbioRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LinkinbioRecord {
+    const NSID: &'static str = "me.linkna.linkinbio";
+    type Record = LinkinbioRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Linkinbio<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SocialIcon<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "socialIcon"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TealfmPlay<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "tealfmPlay"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeConfig<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "themeConfig"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.background_image {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "background_image",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.background_image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "background_image",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGithub<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "widgetGithub"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGoodreads<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "widgetGoodreads"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetTealfm<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.linkinbio"
+    }
+    fn def_name() -> &'static str {
+        "widgetTealfm"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_linkinbio()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_me_linkna_linkinbio() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -1856,45 +3931,6 @@ fn lexicon_doc_me_linkna_linkinbio() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConnectedServices<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "connectedServices"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A single day's contribution data from GitHub.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GithubContributionDay<'a> {
-    ///Number of contributions on this day.
-    pub count: i64,
-    ///Date in YYYY-MM-DD format.
-    #[serde(borrow)]
-    pub date: jacquard_common::CowStr<'a>,
-    ///Contribution intensity level (0=none, 4=highest).
-    pub level: i64,
-}
-
 pub mod github_contribution_day_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2073,222 +4109,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GithubContributionDay<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "githubContributionDay"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 4i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 4i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A book from a Goodreads shelf.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GoodreadsBook<'a> {
-    ///Book author.
-    #[serde(borrow)]
-    pub author: jacquard_common::CowStr<'a>,
-    ///URL to the book cover image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL to the book on Goodreads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///User's rating (1-5), or absent if unrated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
-    ///Book title.
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GoodreadsBook<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "goodreadsBook"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.rating {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.rating {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A standard link card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkCard<'a> {
-    ///Whether the card is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
-    ///Whether the card is visually highlighted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub highlighted: std::option::Option<bool>,
-    ///Unique identifier for the card.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Display text for the card (falls back to URL domain if empty).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Card type discriminator. Value: 'link' or absent for link cards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL the card links to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkCard<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "linkCard"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.text {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A user's link-in-bio page containing cards, theme configuration, and social icons.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Linkinbio<'a> {
-    ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
-    #[serde(borrow)]
-    pub cards: Vec<LinkinbioCardsItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub connected_services: std::option::Option<
-        crate::me_linkna::linkinbio::ConnectedServices<'a>,
-    >,
-    ///Social media icons displayed on the profile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub social_icons: std::option::Option<
-        Vec<crate::me_linkna::linkinbio::SocialIcon<'a>>,
-    >,
-    ///Deprecated: use themeConfig instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub theme_config: std::option::Option<crate::me_linkna::linkinbio::ThemeConfig<'a>>,
 }
 
 pub mod linkinbio_state {
@@ -2481,131 +4301,6 @@ where
     }
 }
 
-impl<'a> Linkinbio<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LinkinbioRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum LinkinbioCardsItem<'a> {
-    #[serde(rename = "me.linkna.linkinbio#linkCard")]
-    LinkCard(Box<crate::me_linkna::linkinbio::LinkCard<'a>>),
-    #[serde(rename = "me.linkna.linkinbio#widgetGoodreads")]
-    WidgetGoodreads(Box<crate::me_linkna::linkinbio::WidgetGoodreads<'a>>),
-    #[serde(rename = "me.linkna.linkinbio#widgetGithub")]
-    WidgetGithub(Box<crate::me_linkna::linkinbio::WidgetGithub<'a>>),
-    #[serde(rename = "me.linkna.linkinbio#widgetTealfm")]
-    WidgetTealfm(Box<crate::me_linkna::linkinbio::WidgetTealfm<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkinbioGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Linkinbio<'a>,
-}
-
-impl From<LinkinbioGetRecordOutput<'_>> for Linkinbio<'_> {
-    fn from(output: LinkinbioGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Linkinbio<'_> {
-    const NSID: &'static str = "me.linkna.linkinbio";
-    type Record = LinkinbioRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LinkinbioRecord;
-impl jacquard_common::xrpc::XrpcResp for LinkinbioRecord {
-    const NSID: &'static str = "me.linkna.linkinbio";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkinbioGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LinkinbioRecord {
-    const NSID: &'static str = "me.linkna.linkinbio";
-    type Record = LinkinbioRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Linkinbio<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A social media icon link.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SocialIcon<'a> {
-    ///Unique identifier for the icon.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///Platform identifier (e.g., 'bluesky', 'twitter', 'instagram').
-    #[serde(borrow)]
-    pub platform: jacquard_common::CowStr<'a>,
-    ///URL to the user's profile on this platform.
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod social_icon_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2616,51 +4311,51 @@ pub mod social_icon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Platform;
         type Url;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Platform = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Platform = S::Platform;
-        type Url = S::Url;
+        type Id = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Id = S::Id;
         type Platform = Set<members::platform>;
         type Url = S::Url;
+        type Id = S::Id;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Id = S::Id;
         type Platform = S::Platform;
         type Url = Set<members::url>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Platform = S::Platform;
+        type Url = S::Url;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `platform` field
         pub struct platform(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2753,9 +4448,9 @@ where
 impl<'a, S> SocialIconBuilder<'a, S>
 where
     S: social_icon_state::State,
-    S::Id: social_icon_state::IsSet,
     S::Platform: social_icon_state::IsSet,
     S::Url: social_icon_state::IsSet,
+    S::Id: social_icon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SocialIcon<'a> {
@@ -2783,1284 +4478,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SocialIcon<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "socialIcon"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A recently played track from teal.fm.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TealfmPlay<'a> {
-    ///Artist name(s).
-    #[serde(borrow)]
-    pub artist_name: jacquard_common::CowStr<'a>,
-    ///URL to the album cover image (from Cover Art Archive).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL to the track on the original music service.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the track was played.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Album/release name.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Track/song name.
-    #[serde(borrow)]
-    pub track_name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TealfmPlay<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "tealfmPlay"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Theme configuration for the page appearance.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeConfig<'a> {
-    ///Page background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///CSS gradient for the page background.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_gradient: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Background wallpaper image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///Optional credit URL for the wallpaper image artist. Stored for attribution purposes only, not displayed on the public page.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_image_credit: std::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
-    ///Button content alignment. Default: left.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub button_alignment: std::option::Option<ThemeConfigButtonAlignment<'a>>,
-    ///Whether buttons glow on hover. Default: false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub button_hover_glow: std::option::Option<bool>,
-    ///Color for the button hover glow effect.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub button_hover_glow_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Individual card/button background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_background_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Card/button border color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Card/button border radius.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_border_radius: std::option::Option<ThemeConfigCardBorderRadius<'a>>,
-    ///Card/button border color on hover.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_hover_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Card/button shadow intensity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_shadow: std::option::Option<ThemeConfigCardShadow<'a>>,
-    ///Card/button text color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub card_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Card container background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_card_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether cursor has sparkle trail. Default: false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor_sparkles: std::option::Option<bool>,
-    ///Custom cursor style. Default: default.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor_style: std::option::Option<ThemeConfigCursorStyle<'a>>,
-    ///Font family for the page.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub font_family: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Font size. Default: md.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub font_size: std::option::Option<ThemeConfigFontSize<'a>>,
-    ///Background particle effect. Default: none.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub particles: std::option::Option<ThemeConfigParticles<'a>>,
-    ///Theme preset ID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub preset: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Profile section alignment. Default: center.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile_alignment: std::option::Option<ThemeConfigProfileAlignment<'a>>,
-    ///Profile picture shape. Default: circle.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile_picture_shape: std::option::Option<ThemeConfigProfilePictureShape<'a>>,
-    ///Profile picture size. Default: sm.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile_picture_size: std::option::Option<ThemeConfigProfilePictureSize<'a>>,
-    ///Profile section text color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether Linkname branding is visible. Default: true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_branding: std::option::Option<bool>,
-    ///Border color for social icons dock/sphere.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub social_icons_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Social icons color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub social_icons_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Social icons container shape. Default: dock.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub social_icons_shape: std::option::Option<ThemeConfigSocialIconsShape<'a>>,
-    ///Background color for social icons dock/sphere.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub social_icons_shape_color: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Button content alignment. Default: left.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigButtonAlignment<'a> {
-    Left,
-    Right,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigButtonAlignment<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Left => "left",
-            Self::Right => "right",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigButtonAlignment<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "left" => Self::Left,
-            "right" => Self::Right,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigButtonAlignment<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "left" => Self::Left,
-            "right" => Self::Right,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigButtonAlignment<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigButtonAlignment<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigButtonAlignment<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigButtonAlignment<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigButtonAlignment<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigButtonAlignment<'_> {
-    type Output = ThemeConfigButtonAlignment<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigButtonAlignment::Left => ThemeConfigButtonAlignment::Left,
-            ThemeConfigButtonAlignment::Right => ThemeConfigButtonAlignment::Right,
-            ThemeConfigButtonAlignment::Other(v) => {
-                ThemeConfigButtonAlignment::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Card/button border radius.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCardBorderRadius<'a> {
-    None,
-    Sm,
-    Md,
-    Lg,
-    Full,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigCardBorderRadius<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::Sm => "sm",
-            Self::Md => "md",
-            Self::Lg => "lg",
-            Self::Full => "full",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigCardBorderRadius<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigCardBorderRadius<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigCardBorderRadius<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigCardBorderRadius<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigCardBorderRadius<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCardBorderRadius<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigCardBorderRadius<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigCardBorderRadius<'_> {
-    type Output = ThemeConfigCardBorderRadius<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigCardBorderRadius::None => ThemeConfigCardBorderRadius::None,
-            ThemeConfigCardBorderRadius::Sm => ThemeConfigCardBorderRadius::Sm,
-            ThemeConfigCardBorderRadius::Md => ThemeConfigCardBorderRadius::Md,
-            ThemeConfigCardBorderRadius::Lg => ThemeConfigCardBorderRadius::Lg,
-            ThemeConfigCardBorderRadius::Full => ThemeConfigCardBorderRadius::Full,
-            ThemeConfigCardBorderRadius::Other(v) => {
-                ThemeConfigCardBorderRadius::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Card/button shadow intensity.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCardShadow<'a> {
-    None,
-    Sm,
-    Md,
-    Lg,
-    Xl,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigCardShadow<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::Sm => "sm",
-            Self::Md => "md",
-            Self::Lg => "lg",
-            Self::Xl => "xl",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigCardShadow<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            "xl" => Self::Xl,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigCardShadow<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            "xl" => Self::Xl,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigCardShadow<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigCardShadow<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigCardShadow<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCardShadow<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigCardShadow<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigCardShadow<'_> {
-    type Output = ThemeConfigCardShadow<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigCardShadow::None => ThemeConfigCardShadow::None,
-            ThemeConfigCardShadow::Sm => ThemeConfigCardShadow::Sm,
-            ThemeConfigCardShadow::Md => ThemeConfigCardShadow::Md,
-            ThemeConfigCardShadow::Lg => ThemeConfigCardShadow::Lg,
-            ThemeConfigCardShadow::Xl => ThemeConfigCardShadow::Xl,
-            ThemeConfigCardShadow::Other(v) => {
-                ThemeConfigCardShadow::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Custom cursor style. Default: default.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCursorStyle<'a> {
-    Default,
-    HelloKitty,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigCursorStyle<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Default => "default",
-            Self::HelloKitty => "hello-kitty",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigCursorStyle<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "default" => Self::Default,
-            "hello-kitty" => Self::HelloKitty,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigCursorStyle<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "default" => Self::Default,
-            "hello-kitty" => Self::HelloKitty,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigCursorStyle<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigCursorStyle<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigCursorStyle<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigCursorStyle<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigCursorStyle<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigCursorStyle<'_> {
-    type Output = ThemeConfigCursorStyle<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigCursorStyle::Default => ThemeConfigCursorStyle::Default,
-            ThemeConfigCursorStyle::HelloKitty => ThemeConfigCursorStyle::HelloKitty,
-            ThemeConfigCursorStyle::Other(v) => {
-                ThemeConfigCursorStyle::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Font size. Default: md.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigFontSize<'a> {
-    Sm,
-    Md,
-    Lg,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigFontSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Sm => "sm",
-            Self::Md => "md",
-            Self::Lg => "lg",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigFontSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigFontSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigFontSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigFontSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigFontSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigFontSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigFontSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigFontSize<'_> {
-    type Output = ThemeConfigFontSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigFontSize::Sm => ThemeConfigFontSize::Sm,
-            ThemeConfigFontSize::Md => ThemeConfigFontSize::Md,
-            ThemeConfigFontSize::Lg => ThemeConfigFontSize::Lg,
-            ThemeConfigFontSize::Other(v) => ThemeConfigFontSize::Other(v.into_static()),
-        }
-    }
-}
-
-/// Background particle effect. Default: none.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigParticles<'a> {
-    None,
-    White,
-    Blue,
-    Leaves,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigParticles<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::White => "white",
-            Self::Blue => "blue",
-            Self::Leaves => "leaves",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigParticles<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "white" => Self::White,
-            "blue" => Self::Blue,
-            "leaves" => Self::Leaves,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigParticles<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "white" => Self::White,
-            "blue" => Self::Blue,
-            "leaves" => Self::Leaves,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigParticles<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigParticles<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigParticles<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigParticles<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigParticles<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigParticles<'_> {
-    type Output = ThemeConfigParticles<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigParticles::None => ThemeConfigParticles::None,
-            ThemeConfigParticles::White => ThemeConfigParticles::White,
-            ThemeConfigParticles::Blue => ThemeConfigParticles::Blue,
-            ThemeConfigParticles::Leaves => ThemeConfigParticles::Leaves,
-            ThemeConfigParticles::Other(v) => {
-                ThemeConfigParticles::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Profile section alignment. Default: center.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfileAlignment<'a> {
-    Left,
-    Center,
-    Right,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigProfileAlignment<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Left => "left",
-            Self::Center => "center",
-            Self::Right => "right",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigProfileAlignment<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "left" => Self::Left,
-            "center" => Self::Center,
-            "right" => Self::Right,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigProfileAlignment<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "left" => Self::Left,
-            "center" => Self::Center,
-            "right" => Self::Right,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigProfileAlignment<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigProfileAlignment<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigProfileAlignment<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfileAlignment<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigProfileAlignment<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigProfileAlignment<'_> {
-    type Output = ThemeConfigProfileAlignment<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigProfileAlignment::Left => ThemeConfigProfileAlignment::Left,
-            ThemeConfigProfileAlignment::Center => ThemeConfigProfileAlignment::Center,
-            ThemeConfigProfileAlignment::Right => ThemeConfigProfileAlignment::Right,
-            ThemeConfigProfileAlignment::Other(v) => {
-                ThemeConfigProfileAlignment::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Profile picture shape. Default: circle.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfilePictureShape<'a> {
-    Circle,
-    Rounded,
-    Square,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigProfilePictureShape<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Circle => "circle",
-            Self::Rounded => "rounded",
-            Self::Square => "square",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigProfilePictureShape<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "circle" => Self::Circle,
-            "rounded" => Self::Rounded,
-            "square" => Self::Square,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigProfilePictureShape<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "circle" => Self::Circle,
-            "rounded" => Self::Rounded,
-            "square" => Self::Square,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigProfilePictureShape<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigProfilePictureShape<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigProfilePictureShape<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfilePictureShape<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigProfilePictureShape<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigProfilePictureShape<'_> {
-    type Output = ThemeConfigProfilePictureShape<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigProfilePictureShape::Circle => {
-                ThemeConfigProfilePictureShape::Circle
-            }
-            ThemeConfigProfilePictureShape::Rounded => {
-                ThemeConfigProfilePictureShape::Rounded
-            }
-            ThemeConfigProfilePictureShape::Square => {
-                ThemeConfigProfilePictureShape::Square
-            }
-            ThemeConfigProfilePictureShape::Other(v) => {
-                ThemeConfigProfilePictureShape::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Profile picture size. Default: sm.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfilePictureSize<'a> {
-    Sm,
-    Md,
-    Lg,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigProfilePictureSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Sm => "sm",
-            Self::Md => "md",
-            Self::Lg => "lg",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigProfilePictureSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigProfilePictureSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sm" => Self::Sm,
-            "md" => Self::Md,
-            "lg" => Self::Lg,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigProfilePictureSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigProfilePictureSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigProfilePictureSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigProfilePictureSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigProfilePictureSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigProfilePictureSize<'_> {
-    type Output = ThemeConfigProfilePictureSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigProfilePictureSize::Sm => ThemeConfigProfilePictureSize::Sm,
-            ThemeConfigProfilePictureSize::Md => ThemeConfigProfilePictureSize::Md,
-            ThemeConfigProfilePictureSize::Lg => ThemeConfigProfilePictureSize::Lg,
-            ThemeConfigProfilePictureSize::Other(v) => {
-                ThemeConfigProfilePictureSize::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Social icons container shape. Default: dock.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigSocialIconsShape<'a> {
-    Dock,
-    Sphere,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThemeConfigSocialIconsShape<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Dock => "dock",
-            Self::Sphere => "sphere",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThemeConfigSocialIconsShape<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "dock" => Self::Dock,
-            "sphere" => Self::Sphere,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThemeConfigSocialIconsShape<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dock" => Self::Dock,
-            "sphere" => Self::Sphere,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThemeConfigSocialIconsShape<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThemeConfigSocialIconsShape<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThemeConfigSocialIconsShape<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThemeConfigSocialIconsShape<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThemeConfigSocialIconsShape<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThemeConfigSocialIconsShape<'_> {
-    type Output = ThemeConfigSocialIconsShape<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThemeConfigSocialIconsShape::Dock => ThemeConfigSocialIconsShape::Dock,
-            ThemeConfigSocialIconsShape::Sphere => ThemeConfigSocialIconsShape::Sphere,
-            ThemeConfigSocialIconsShape::Other(v) => {
-                ThemeConfigSocialIconsShape::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeConfig<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "themeConfig"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.background_image {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "background_image",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.background_image {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "background_image",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A GitHub contributions graph widget card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WidgetGithub<'a> {
-    ///Contribution data for the last year.
-    #[serde(borrow)]
-    pub contributions: Vec<crate::me_linkna::linkinbio::GithubContributionDay<'a>>,
-    ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
-    ///GitHub username.
-    #[serde(borrow)]
-    pub github_username: jacquard_common::CowStr<'a>,
-    ///Unique identifier for the card.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///When the contribution data was last fetched from GitHub.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub size: std::option::Option<WidgetGithubSize<'a>>,
-    ///Total number of contributions in the last year.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_contributions: std::option::Option<i64>,
-    ///Card type discriminator.
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
 pub mod widget_github_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4071,67 +4488,67 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type GithubUsername;
+        type Contributions;
         type Id;
         type Type;
-        type Contributions;
-        type GithubUsername;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type GithubUsername = Unset;
+        type Contributions = Unset;
         type Id = Unset;
         type Type = Unset;
-        type Contributions = Unset;
-        type GithubUsername = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Type = S::Type;
-        type Contributions = S::Contributions;
-        type GithubUsername = S::GithubUsername;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Type = Set<members::r#type>;
-        type Contributions = S::Contributions;
-        type GithubUsername = S::GithubUsername;
-    }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributions<S> {}
-    impl<S: State> State for SetContributions<S> {
-        type Id = S::Id;
-        type Type = S::Type;
-        type Contributions = Set<members::contributions>;
-        type GithubUsername = S::GithubUsername;
     }
     ///State transition - sets the `github_username` field to Set
     pub struct SetGithubUsername<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGithubUsername<S> {}
     impl<S: State> State for SetGithubUsername<S> {
+        type GithubUsername = Set<members::github_username>;
+        type Contributions = S::Contributions;
         type Id = S::Id;
         type Type = S::Type;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContributions<S> {}
+    impl<S: State> State for SetContributions<S> {
+        type GithubUsername = S::GithubUsername;
+        type Contributions = Set<members::contributions>;
+        type Id = S::Id;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type GithubUsername = S::GithubUsername;
         type Contributions = S::Contributions;
-        type GithubUsername = Set<members::github_username>;
+        type Id = Set<members::id>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type GithubUsername = S::GithubUsername;
+        type Contributions = S::Contributions;
+        type Id = S::Id;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `github_username` field
+        pub struct github_username(());
+        ///Marker type for the `contributions` field
+        pub struct contributions(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `contributions` field
-        pub struct contributions(());
-        ///Marker type for the `github_username` field
-        pub struct github_username(());
     }
 }
 
@@ -4308,10 +4725,10 @@ where
 impl<'a, S> WidgetGithubBuilder<'a, S>
 where
     S: widget_github_state::State,
+    S::GithubUsername: widget_github_state::IsSet,
+    S::Contributions: widget_github_state::IsSet,
     S::Id: widget_github_state::IsSet,
     S::Type: widget_github_state::IsSet,
-    S::Contributions: widget_github_state::IsSet,
-    S::GithubUsername: widget_github_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGithub<'a> {
@@ -4349,163 +4766,6 @@ where
     }
 }
 
-/// Widget display size. Default: 1x1.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetGithubSize<'a> {
-    _1x1,
-    _1x2,
-    _2x2,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WidgetGithubSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_1x1 => "1x1",
-            Self::_1x2 => "1x2",
-            Self::_2x2 => "2x2",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WidgetGithubSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WidgetGithubSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WidgetGithubSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WidgetGithubSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WidgetGithubSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WidgetGithubSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WidgetGithubSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WidgetGithubSize<'_> {
-    type Output = WidgetGithubSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WidgetGithubSize::_1x1 => WidgetGithubSize::_1x1,
-            WidgetGithubSize::_1x2 => WidgetGithubSize::_1x2,
-            WidgetGithubSize::_2x2 => WidgetGithubSize::_2x2,
-            WidgetGithubSize::Other(v) => WidgetGithubSize::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGithub<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "widgetGithub"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A Goodreads bookshelf widget card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WidgetGoodreads<'a> {
-    ///Books on the currently-reading shelf.
-    #[serde(borrow)]
-    pub books: Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
-    ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
-    ///Goodreads numeric user ID.
-    #[serde(borrow)]
-    pub goodreads_user_id: jacquard_common::CowStr<'a>,
-    ///Unique identifier for the card.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///When the book data was last fetched from Goodreads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Books on the read shelf (used by 1x2 size).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub read_books: std::option::Option<
-        Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
-    >,
-    ///Shelf name (currently-reading, read, or to-read).
-    #[serde(borrow)]
-    pub shelf: jacquard_common::CowStr<'a>,
-    ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub size: std::option::Option<WidgetGoodreadsSize<'a>>,
-    ///Card type discriminator.
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
 pub mod widget_goodreads_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4516,85 +4776,85 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shelf;
-        type Books;
         type Id;
         type GoodreadsUserId;
         type Type;
+        type Books;
+        type Shelf;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shelf = Unset;
-        type Books = Unset;
         type Id = Unset;
         type GoodreadsUserId = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShelf<S> {}
-    impl<S: State> State for SetShelf<S> {
-        type Shelf = Set<members::shelf>;
-        type Books = S::Books;
-        type Id = S::Id;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Shelf = S::Shelf;
-        type Books = Set<members::books>;
-        type Id = S::Id;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = S::Type;
+        type Books = Unset;
+        type Shelf = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Shelf = S::Shelf;
-        type Books = S::Books;
         type Id = Set<members::id>;
         type GoodreadsUserId = S::GoodreadsUserId;
         type Type = S::Type;
+        type Books = S::Books;
+        type Shelf = S::Shelf;
     }
     ///State transition - sets the `goodreads_user_id` field to Set
     pub struct SetGoodreadsUserId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoodreadsUserId<S> {}
     impl<S: State> State for SetGoodreadsUserId<S> {
-        type Shelf = S::Shelf;
-        type Books = S::Books;
         type Id = S::Id;
         type GoodreadsUserId = Set<members::goodreads_user_id>;
         type Type = S::Type;
+        type Books = S::Books;
+        type Shelf = S::Shelf;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Shelf = S::Shelf;
-        type Books = S::Books;
         type Id = S::Id;
         type GoodreadsUserId = S::GoodreadsUserId;
         type Type = Set<members::r#type>;
+        type Books = S::Books;
+        type Shelf = S::Shelf;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Id = S::Id;
+        type GoodreadsUserId = S::GoodreadsUserId;
+        type Type = S::Type;
+        type Books = Set<members::books>;
+        type Shelf = S::Shelf;
+    }
+    ///State transition - sets the `shelf` field to Set
+    pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShelf<S> {}
+    impl<S: State> State for SetShelf<S> {
+        type Id = S::Id;
+        type GoodreadsUserId = S::GoodreadsUserId;
+        type Type = S::Type;
+        type Books = S::Books;
+        type Shelf = Set<members::shelf>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shelf` field
-        pub struct shelf(());
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `goodreads_user_id` field
         pub struct goodreads_user_id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `shelf` field
+        pub struct shelf(());
     }
 }
 
@@ -4805,11 +5065,11 @@ where
 impl<'a, S> WidgetGoodreadsBuilder<'a, S>
 where
     S: widget_goodreads_state::State,
-    S::Shelf: widget_goodreads_state::IsSet,
-    S::Books: widget_goodreads_state::IsSet,
     S::Id: widget_goodreads_state::IsSet,
     S::GoodreadsUserId: widget_goodreads_state::IsSet,
     S::Type: widget_goodreads_state::IsSet,
+    S::Books: widget_goodreads_state::IsSet,
+    S::Shelf: widget_goodreads_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGoodreads<'a> {
@@ -4849,155 +5109,6 @@ where
     }
 }
 
-/// Widget display size. Default: 1x1.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetGoodreadsSize<'a> {
-    _1x1,
-    _1x2,
-    _2x2,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WidgetGoodreadsSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_1x1 => "1x1",
-            Self::_1x2 => "1x2",
-            Self::_2x2 => "2x2",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WidgetGoodreadsSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WidgetGoodreadsSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WidgetGoodreadsSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WidgetGoodreadsSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WidgetGoodreadsSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WidgetGoodreadsSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WidgetGoodreadsSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WidgetGoodreadsSize<'_> {
-    type Output = WidgetGoodreadsSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WidgetGoodreadsSize::_1x1 => WidgetGoodreadsSize::_1x1,
-            WidgetGoodreadsSize::_1x2 => WidgetGoodreadsSize::_1x2,
-            WidgetGoodreadsSize::_2x2 => WidgetGoodreadsSize::_2x2,
-            WidgetGoodreadsSize::Other(v) => WidgetGoodreadsSize::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGoodreads<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "widgetGoodreads"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A teal.fm recently played tracks widget card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WidgetTealfm<'a> {
-    ///Copyright notice for cover art images.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover_art_notice: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
-    ///Unique identifier for the card.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///When the play data was last fetched from the PDS.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Recently played tracks.
-    #[serde(borrow)]
-    pub plays: Vec<crate::me_linkna::linkinbio::TealfmPlay<'a>>,
-    ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub size: std::option::Option<WidgetTealfmSize<'a>>,
-    ///Card type discriminator.
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
 pub mod widget_tealfm_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5008,51 +5119,51 @@ pub mod widget_tealfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Plays;
         type Id;
         type Type;
-        type Plays;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Plays = Unset;
         type Id = Unset;
         type Type = Unset;
-        type Plays = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Type = S::Type;
-        type Plays = S::Plays;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Type = Set<members::r#type>;
-        type Plays = S::Plays;
     }
     ///State transition - sets the `plays` field to Set
     pub struct SetPlays<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlays<S> {}
     impl<S: State> State for SetPlays<S> {
+        type Plays = Set<members::plays>;
         type Id = S::Id;
         type Type = S::Type;
-        type Plays = Set<members::plays>;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Plays = S::Plays;
+        type Id = Set<members::id>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Plays = S::Plays;
+        type Id = S::Id;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `plays` field
+        pub struct plays(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `plays` field
-        pub struct plays(());
     }
 }
 
@@ -5213,9 +5324,9 @@ where
 impl<'a, S> WidgetTealfmBuilder<'a, S>
 where
     S: widget_tealfm_state::State,
+    S::Plays: widget_tealfm_state::IsSet,
     S::Id: widget_tealfm_state::IsSet,
     S::Type: widget_tealfm_state::IsSet,
-    S::Plays: widget_tealfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetTealfm<'a> {
@@ -5248,116 +5359,5 @@ where
             r#type: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-/// Widget display size. Default: 1x1.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetTealfmSize<'a> {
-    _1x1,
-    _1x2,
-    _2x2,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WidgetTealfmSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_1x1 => "1x1",
-            Self::_1x2 => "1x2",
-            Self::_2x2 => "2x2",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WidgetTealfmSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WidgetTealfmSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1x1" => Self::_1x1,
-            "1x2" => Self::_1x2,
-            "2x2" => Self::_2x2,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WidgetTealfmSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WidgetTealfmSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WidgetTealfmSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WidgetTealfmSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WidgetTealfmSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WidgetTealfmSize<'_> {
-    type Output = WidgetTealfmSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WidgetTealfmSize::_1x1 => WidgetTealfmSize::_1x1,
-            WidgetTealfmSize::_1x2 => WidgetTealfmSize::_1x2,
-            WidgetTealfmSize::_2x2 => WidgetTealfmSize::_2x2,
-            WidgetTealfmSize::Other(v) => WidgetTealfmSize::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetTealfm<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.linkinbio"
-    }
-    fn def_name() -> &'static str {
-        "widgetTealfm"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_linkinbio()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

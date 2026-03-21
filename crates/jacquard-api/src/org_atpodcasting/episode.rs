@@ -26,6 +26,488 @@ pub struct ChaptersRef<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+/// A podcast episode. Record key is a UUIDv5 derived from the podcast GUID (as namespace) and the episode's feedItemGuid (as name), enabling deterministic lookup from RSS feed metadata.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Episode<'a> {
+    ///Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alternate_media: std::option::Option<
+        Vec<crate::org_atpodcasting::episode::MediaRef<'a>>,
+    >,
+    ///Episode-specific artwork. Overrides the podcast artwork when set. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artwork: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///Reference to an externally hosted chapters file.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub chapters: std::option::Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>,
+    ///When the episode record was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///A description or show notes for the episode.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Duration of the episode in seconds.
+    pub duration: i64,
+    ///Episode number within its season or the overall series.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub episode_number: std::option::Option<i64>,
+    ///The type of episode. Defaults to full.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub episode_type: std::option::Option<EpisodeEpisodeType<'a>>,
+    ///Whether the episode contains explicit content. Overrides the podcast-level setting when set.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub explicit: std::option::Option<bool>,
+    ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).
+    #[serde(borrow)]
+    pub feed_item_guid: jacquard_common::CowStr<'a>,
+    ///URL of a companion webpage or show notes page for the episode.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The primary media file for the episode.
+    #[serde(borrow)]
+    pub media: crate::org_atpodcasting::episode::MediaRef<'a>,
+    ///Identifies the parent podcast. Since episodes live in the same repository as their podcast, the AT URI is always derivable from the episode's DID and the podcastGuid.
+    #[serde(borrow)]
+    pub podcast: crate::org_atpodcasting::PodcastRef<'a>,
+    ///When the episode was published.
+    pub published_at: jacquard_common::types::string::Datetime,
+    ///Season number of the episode.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub season_number: std::option::Option<i64>,
+    ///The title of the episode.
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    ///References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub transcript: std::option::Option<
+        Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>,
+    >,
+}
+
+/// The type of episode. Defaults to full.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EpisodeEpisodeType<'a> {
+    Full,
+    Trailer,
+    Bonus,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EpisodeEpisodeType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Full => "full",
+            Self::Trailer => "trailer",
+            Self::Bonus => "bonus",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EpisodeEpisodeType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "full" => Self::Full,
+            "trailer" => Self::Trailer,
+            "bonus" => Self::Bonus,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EpisodeEpisodeType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "full" => Self::Full,
+            "trailer" => Self::Trailer,
+            "bonus" => Self::Bonus,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EpisodeEpisodeType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EpisodeEpisodeType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EpisodeEpisodeType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EpisodeEpisodeType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EpisodeEpisodeType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
+    type Output = EpisodeEpisodeType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EpisodeEpisodeType::Full => EpisodeEpisodeType::Full,
+            EpisodeEpisodeType::Trailer => EpisodeEpisodeType::Trailer,
+            EpisodeEpisodeType::Bonus => EpisodeEpisodeType::Bonus,
+            EpisodeEpisodeType::Other(v) => EpisodeEpisodeType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EpisodeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Episode<'a>,
+}
+
+/// Reference to an externally hosted media file.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaRef<'a> {
+    ///MIME type of the media file (e.g. audio/mpeg, video/mp4).
+    #[serde(borrow)]
+    pub mime_type: jacquard_common::CowStr<'a>,
+    ///URL of the media file.
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+/// Reference to an externally hosted transcript file.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TranscriptRef<'a> {
+    ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub language: std::option::Option<jacquard_common::types::string::Language>,
+    ///MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json).
+    #[serde(borrow)]
+    pub mime_type: jacquard_common::CowStr<'a>,
+    ///URL of the transcript file.
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+impl<'a> Episode<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EpisodeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChaptersRef<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.episode"
+    }
+    fn def_name() -> &'static str {
+        "chaptersRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_episode()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EpisodeRecord;
+impl jacquard_common::xrpc::XrpcResp for EpisodeRecord {
+    const NSID: &'static str = "org.atpodcasting.episode";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EpisodeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EpisodeGetRecordOutput<'_>> for Episode<'_> {
+    fn from(output: EpisodeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Episode<'_> {
+    const NSID: &'static str = "org.atpodcasting.episode";
+    type Record = EpisodeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EpisodeRecord {
+    const NSID: &'static str = "org.atpodcasting.episode";
+    type Record = EpisodeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.episode"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_episode()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alternate_media {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alternate_media",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.artwork {
+            {
+                let size = value.blob().size;
+                if size > 5000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        max: 5000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.artwork {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.duration;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.episode_number {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "episode_number",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.feed_item_guid;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_item_guid",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.season_number {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "season_number",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.transcript {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transcript",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaRef<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.episode"
+    }
+    fn def_name() -> &'static str {
+        "mediaRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_episode()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TranscriptRef<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.episode"
+    }
+    fn def_name() -> &'static str {
+        "transcriptRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_episode()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod chapters_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -712,97 +1194,6 @@ fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChaptersRef<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.episode"
-    }
-    fn def_name() -> &'static str {
-        "chaptersRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_episode()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A podcast episode. Record key is a UUIDv5 derived from the podcast GUID (as namespace) and the episode's feedItemGuid (as name), enabling deterministic lookup from RSS feed metadata.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Episode<'a> {
-    ///Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_media: std::option::Option<
-        Vec<crate::org_atpodcasting::episode::MediaRef<'a>>,
-    >,
-    ///Episode-specific artwork. Overrides the podcast artwork when set. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artwork: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///Reference to an externally hosted chapters file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub chapters: std::option::Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>,
-    ///When the episode record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///A description or show notes for the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Duration of the episode in seconds.
-    pub duration: i64,
-    ///Episode number within its season or the overall series.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub episode_number: std::option::Option<i64>,
-    ///The type of episode. Defaults to full.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub episode_type: std::option::Option<EpisodeEpisodeType<'a>>,
-    ///Whether the episode contains explicit content. Overrides the podcast-level setting when set.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub explicit: std::option::Option<bool>,
-    ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).
-    #[serde(borrow)]
-    pub feed_item_guid: jacquard_common::CowStr<'a>,
-    ///URL of a companion webpage or show notes page for the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The primary media file for the episode.
-    #[serde(borrow)]
-    pub media: crate::org_atpodcasting::episode::MediaRef<'a>,
-    ///Identifies the parent podcast. Since episodes live in the same repository as their podcast, the AT URI is always derivable from the episode's DID and the podcastGuid.
-    #[serde(borrow)]
-    pub podcast: crate::org_atpodcasting::PodcastRef<'a>,
-    ///When the episode was published.
-    pub published_at: jacquard_common::types::string::Datetime,
-    ///Season number of the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub season_number: std::option::Option<i64>,
-    ///The title of the episode.
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    ///References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub transcript: std::option::Option<
-        Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>,
-    >,
-}
-
 pub mod episode_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -813,127 +1204,127 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Duration;
         type Podcast;
         type Media;
-        type PublishedAt;
         type Title;
-        type Duration;
+        type PublishedAt;
         type FeedItemGuid;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type Duration = Unset;
         type Podcast = Unset;
         type Media = Unset;
-        type PublishedAt = Unset;
         type Title = Unset;
-        type Duration = Unset;
+        type PublishedAt = Unset;
         type FeedItemGuid = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `podcast` field to Set
-    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPodcast<S> {}
-    impl<S: State> State for SetPodcast<S> {
-        type Podcast = Set<members::podcast>;
-        type Media = S::Media;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type Podcast = S::Podcast;
-        type Media = Set<members::media>;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type Podcast = S::Podcast;
-        type Media = S::Media;
-        type PublishedAt = Set<members::published_at>;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Podcast = S::Podcast;
-        type Media = S::Media;
-        type PublishedAt = S::PublishedAt;
-        type Title = Set<members::title>;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Podcast = S::Podcast;
-        type Media = S::Media;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Duration = Set<members::duration>;
-        type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `feed_item_guid` field to Set
-    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
-    impl<S: State> State for SetFeedItemGuid<S> {
-        type Podcast = S::Podcast;
-        type Media = S::Media;
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type FeedItemGuid = Set<members::feed_item_guid>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Duration = S::Duration;
         type Podcast = S::Podcast;
         type Media = S::Media;
-        type PublishedAt = S::PublishedAt;
         type Title = S::Title;
-        type Duration = S::Duration;
+        type PublishedAt = S::PublishedAt;
         type FeedItemGuid = S::FeedItemGuid;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = Set<members::duration>;
+        type Podcast = S::Podcast;
+        type Media = S::Media;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `podcast` field to Set
+    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPodcast<S> {}
+    impl<S: State> State for SetPodcast<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Podcast = Set<members::podcast>;
+        type Media = S::Media;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+        type Media = Set<members::media>;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+        type Media = S::Media;
+        type Title = Set<members::title>;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+        type Media = S::Media;
+        type Title = S::Title;
+        type PublishedAt = Set<members::published_at>;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `feed_item_guid` field to Set
+    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
+    impl<S: State> State for SetFeedItemGuid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+        type Media = S::Media;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = Set<members::feed_item_guid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `podcast` field
         pub struct podcast(());
         ///Marker type for the `media` field
         pub struct media(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
         ///Marker type for the `feed_item_guid` field
         pub struct feed_item_guid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -1305,13 +1696,13 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
+    S::CreatedAt: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
     S::Podcast: episode_state::IsSet,
     S::Media: episode_state::IsSet,
-    S::PublishedAt: episode_state::IsSet,
     S::Title: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
+    S::PublishedAt: episode_state::IsSet,
     S::FeedItemGuid: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -1365,339 +1756,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> Episode<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EpisodeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// The type of episode. Defaults to full.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EpisodeEpisodeType<'a> {
-    Full,
-    Trailer,
-    Bonus,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> EpisodeEpisodeType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Full => "full",
-            Self::Trailer => "trailer",
-            Self::Bonus => "bonus",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for EpisodeEpisodeType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "full" => Self::Full,
-            "trailer" => Self::Trailer,
-            "bonus" => Self::Bonus,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for EpisodeEpisodeType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "full" => Self::Full,
-            "trailer" => Self::Trailer,
-            "bonus" => Self::Bonus,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EpisodeEpisodeType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for EpisodeEpisodeType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for EpisodeEpisodeType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for EpisodeEpisodeType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for EpisodeEpisodeType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
-    type Output = EpisodeEpisodeType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EpisodeEpisodeType::Full => EpisodeEpisodeType::Full,
-            EpisodeEpisodeType::Trailer => EpisodeEpisodeType::Trailer,
-            EpisodeEpisodeType::Bonus => EpisodeEpisodeType::Bonus,
-            EpisodeEpisodeType::Other(v) => EpisodeEpisodeType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Episode<'a>,
-}
-
-impl From<EpisodeGetRecordOutput<'_>> for Episode<'_> {
-    fn from(output: EpisodeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Episode<'_> {
-    const NSID: &'static str = "org.atpodcasting.episode";
-    type Record = EpisodeRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EpisodeRecord;
-impl jacquard_common::xrpc::XrpcResp for EpisodeRecord {
-    const NSID: &'static str = "org.atpodcasting.episode";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EpisodeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EpisodeRecord {
-    const NSID: &'static str = "org.atpodcasting.episode";
-    type Record = EpisodeRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.episode"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_episode()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alternate_media {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alternate_media",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.artwork {
-            {
-                let size = value.blob().size;
-                if size > 5000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
-                        max: 5000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.artwork {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.duration;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.episode_number {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "episode_number",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.feed_item_guid;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_item_guid",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.season_number {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "season_number",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.transcript {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transcript",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Reference to an externally hosted media file.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaRef<'a> {
-    ///MIME type of the media file (e.g. audio/mpeg, video/mp4).
-    #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
-    ///URL of the media file.
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod media_ref_state {
@@ -1838,47 +1896,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaRef<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.episode"
-    }
-    fn def_name() -> &'static str {
-        "mediaRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_episode()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Reference to an externally hosted transcript file.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TranscriptRef<'a> {
-    ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub language: std::option::Option<jacquard_common::types::string::Language>,
-    ///MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json).
-    #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
-    ///URL of the transcript file.
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod transcript_ref_state {
@@ -2040,22 +2057,5 @@ where
             url: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TranscriptRef<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.episode"
-    }
-    fn def_name() -> &'static str {
-        "transcriptRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_episode()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

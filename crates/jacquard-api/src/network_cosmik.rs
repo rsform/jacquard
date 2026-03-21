@@ -32,6 +32,23 @@ pub struct Provenance<'a> {
     pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Provenance<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.defs"
+    }
+    fn def_name() -> &'static str {
+        "provenance"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_network_cosmik_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -72,22 +89,5 @@ fn lexicon_doc_network_cosmik_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Provenance<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.defs"
-    }
-    fn def_name() -> &'static str {
-        "provenance"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

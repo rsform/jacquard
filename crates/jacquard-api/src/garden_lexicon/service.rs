@@ -37,6 +37,218 @@ pub struct Service<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ServiceGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Service<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Method<'a> {
+    ///Authentication methods supported by this method.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub auth_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Whether this method is deprecated and should no longer be used.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deprecated: std::option::Option<bool>,
+    ///AT-URI pointing to a lexicon schema that defines this method.
+    #[serde(borrow)]
+    pub lexicon: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UrlTemplate<'a> {
+    ///NSIDs of collections this URL template applies to.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ///Description of what this URL template is for.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URI template with placeholders for record data
+    #[serde(borrow)]
+    pub url: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Service<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ServiceRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ServiceRecord;
+impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
+    const NSID: &'static str = "garden.lexicon.service";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ServiceGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
+    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Service<'_> {
+    const NSID: &'static str = "garden.lexicon.service";
+    type Record = ServiceRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ServiceRecord {
+    const NSID: &'static str = "garden.lexicon.service";
+    type Record = ServiceRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.service"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.service_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "service_type",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Method<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.service"
+    }
+    fn def_name() -> &'static str {
+        "method"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.service"
+    }
+    fn def_name() -> &'static str {
+        "urlTemplate"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.url;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod service_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -205,109 +417,6 @@ where
             url_templates: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Service<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ServiceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Service<'a>,
-}
-
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Service<'_> {
-    const NSID: &'static str = "garden.lexicon.service";
-    type Record = ServiceRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ServiceRecord;
-impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
-    const NSID: &'static str = "garden.lexicon.service";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ServiceGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ServiceRecord {
-    const NSID: &'static str = "garden.lexicon.service";
-    type Record = ServiceRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.service"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.service_type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "service_type",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -592,30 +701,6 @@ fn lexicon_doc_garden_lexicon_service() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Method<'a> {
-    ///Authentication methods supported by this method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub auth_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Whether this method is deprecated and should no longer be used.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deprecated: std::option::Option<bool>,
-    ///AT-URI pointing to a lexicon schema that defines this method.
-    #[serde(borrow)]
-    pub lexicon: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod method_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -756,90 +841,5 @@ where
             lexicon: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Method<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.service"
-    }
-    fn def_name() -> &'static str {
-        "method"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlTemplate<'a> {
-    ///NSIDs of collections this URL template applies to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    ///Description of what this URL template is for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI template with placeholders for record data
-    #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.service"
-    }
-    fn def_name() -> &'static str {
-        "urlTemplate"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.url;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

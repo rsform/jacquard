@@ -25,6 +25,84 @@ pub struct Flora<'a> {
     pub gbif_taxon_keys: Vec<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FloraGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Flora<'a>,
+}
+
+impl<'a> Flora<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FloraRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FloraRecord;
+impl jacquard_common::xrpc::XrpcResp for FloraRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.flora";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FloraGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FloraGetRecordOutput<'_>> for Flora<'_> {
+    fn from(output: FloraGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Flora<'_> {
+    const NSID: &'static str = "app.gainforest.organization.observations.flora";
+    type Record = FloraRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FloraRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.flora";
+    type Record = FloraRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Flora<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.organization.observations.flora"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_organization_observations_flora()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod flora_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             gbif_taxon_keys: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Flora<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FloraRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FloraGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Flora<'a>,
-}
-
-impl From<FloraGetRecordOutput<'_>> for Flora<'_> {
-    fn from(output: FloraGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Flora<'_> {
-    const NSID: &'static str = "app.gainforest.organization.observations.flora";
-    type Record = FloraRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FloraRecord;
-impl jacquard_common::xrpc::XrpcResp for FloraRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.flora";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FloraGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FloraRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.flora";
-    type Record = FloraRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Flora<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.organization.observations.flora"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_organization_observations_flora()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

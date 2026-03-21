@@ -40,6 +40,84 @@ pub struct Test<'a> {
     pub url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TestGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Test<'a>,
+}
+
+impl<'a> Test<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TestRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TestRecord;
+impl jacquard_common::xrpc::XrpcResp for TestRecord {
+    const NSID: &'static str = "org.devcon.event.test";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TestGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TestGetRecordOutput<'_>> for Test<'_> {
+    fn from(output: TestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Test<'_> {
+    const NSID: &'static str = "org.devcon.event.test";
+    type Record = TestRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TestRecord {
+    const NSID: &'static str = "org.devcon.event.test";
+    type Record = TestRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Test<'a> {
+    fn nsid() -> &'static str {
+        "org.devcon.event.test"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_devcon_event_test()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod test_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -50,51 +128,51 @@ pub mod test_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
-        type Title;
         type End;
+        type Title;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
-        type Title = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type Title = S::Title;
-        type End = S::End;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Start = S::Start;
-        type Title = Set<members::title>;
-        type End = S::End;
+        type Title = Unset;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnd<S> {}
     impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
-        type Title = S::Title;
         type End = Set<members::end>;
+        type Title = S::Title;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type End = S::End;
+        type Title = Set<members::title>;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type End = S::End;
+        type Title = S::Title;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -258,9 +336,9 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
 impl<'a, S> TestBuilder<'a, S>
 where
     S: test_state::State,
-    S::Start: test_state::IsSet,
-    S::Title: test_state::IsSet,
     S::End: test_state::IsSet,
+    S::Title: test_state::IsSet,
+    S::Start: test_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Test<'a> {
@@ -293,84 +371,6 @@ where
             url: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Test<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TestRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Test<'a>,
-}
-
-impl From<TestGetRecordOutput<'_>> for Test<'_> {
-    fn from(output: TestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Test<'_> {
-    const NSID: &'static str = "org.devcon.event.test";
-    type Record = TestRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TestRecord;
-impl jacquard_common::xrpc::XrpcResp for TestRecord {
-    const NSID: &'static str = "org.devcon.event.test";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TestGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TestRecord {
-    const NSID: &'static str = "org.devcon.event.test";
-    type Record = TestRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Test<'a> {
-    fn nsid() -> &'static str {
-        "org.devcon.event.test"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_devcon_event_test()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

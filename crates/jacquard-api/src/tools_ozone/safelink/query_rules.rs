@@ -52,10 +52,6 @@ pub struct QueryRules<'a> {
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-fn _default_query_rules_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 /// Sort direction
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryRulesSortDirection<'a> {
@@ -195,4 +191,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     );
     type Request<'de> = QueryRules<'de>;
     type Response = QueryRulesResponse;
+}
+
+fn _default_query_rules_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }

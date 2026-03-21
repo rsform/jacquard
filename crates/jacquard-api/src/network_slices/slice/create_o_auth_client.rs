@@ -56,6 +56,53 @@ pub struct CreateOAuthClient<'a> {
     pub tos_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateOAuthClientOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::network_slices::slice::get_o_auth_clients::OauthClientDetails<'a>,
+}
+
+/// Response type for
+///network.slices.slice.createOAuthClient
+pub struct CreateOAuthClientResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateOAuthClientResponse {
+    const NSID: &'static str = "network.slices.slice.createOAuthClient";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateOAuthClientOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<'a> {
+    const NSID: &'static str = "network.slices.slice.createOAuthClient";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateOAuthClientResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.createOAuthClient
+pub struct CreateOAuthClientRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateOAuthClientRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.createOAuthClient";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateOAuthClient<'de>;
+    type Response = CreateOAuthClientResponse;
+}
+
 pub mod create_o_auth_client_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -393,51 +440,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateOAuthClientOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::network_slices::slice::get_o_auth_clients::OauthClientDetails<'a>,
-}
-
-/// Response type for
-///network.slices.slice.createOAuthClient
-pub struct CreateOAuthClientResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateOAuthClientResponse {
-    const NSID: &'static str = "network.slices.slice.createOAuthClient";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateOAuthClientOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<'a> {
-    const NSID: &'static str = "network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateOAuthClientResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.createOAuthClient
-pub struct CreateOAuthClientRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateOAuthClientRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateOAuthClient<'de>;
-    type Response = CreateOAuthClientResponse;
 }

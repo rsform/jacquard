@@ -5,18 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
-}
-
-fn _default_sort_field() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("lastReportedAt"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -133,6 +121,63 @@ pub struct QueryStatuses<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub takendown: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryStatusesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
+}
+
+/// Response type for
+///tools.ozone.moderation.queryStatuses
+pub struct QueryStatusesResponse;
+impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
+    const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QueryStatusesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for QueryStatuses<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = QueryStatusesResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.queryStatuses
+pub struct QueryStatusesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryStatusesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryStatuses";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = QueryStatuses<'de>;
+    type Response = QueryStatusesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("desc"))
+}
+
+fn _default_sort_field() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("lastReportedAt"))
 }
 
 pub mod query_statuses_state {
@@ -898,49 +943,4 @@ where
             takendown: self.__unsafe_private_named.35,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QueryStatusesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
-}
-
-/// Response type for
-///tools.ozone.moderation.queryStatuses
-pub struct QueryStatusesResponse;
-impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
-    const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QueryStatusesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for QueryStatuses<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = QueryStatusesResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.queryStatuses
-pub struct QueryStatusesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for QueryStatusesRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryStatuses";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = QueryStatuses<'de>;
-    type Response = QueryStatusesResponse;
 }

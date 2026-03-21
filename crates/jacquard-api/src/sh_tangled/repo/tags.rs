@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,110 @@ pub struct Tags<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagsOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum TagsError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for TagsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.tags
+pub struct TagsResponse;
+impl jacquard_common::xrpc::XrpcResp for TagsResponse {
+    const NSID: &'static str = "sh.tangled.repo.tags";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = TagsOutput;
+    type Err<'de> = TagsError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(TagsOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Tags<'a> {
+    const NSID: &'static str = "sh.tangled.repo.tags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = TagsResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.tags
+pub struct TagsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TagsRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.tags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Tags<'de>;
+    type Response = TagsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod tags_state {
@@ -153,104 +253,4 @@ where
             repo: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagsOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TagsError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for TagsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.tags
-pub struct TagsResponse;
-impl jacquard_common::xrpc::XrpcResp for TagsResponse {
-    const NSID: &'static str = "sh.tangled.repo.tags";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = TagsOutput;
-    type Err<'de> = TagsError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(TagsOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Tags<'a> {
-    const NSID: &'static str = "sh.tangled.repo.tags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = TagsResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.tags
-pub struct TagsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for TagsRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.tags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Tags<'de>;
-    type Response = TagsResponse;
 }

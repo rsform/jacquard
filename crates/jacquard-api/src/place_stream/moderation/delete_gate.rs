@@ -25,6 +25,104 @@ pub struct DeleteGate<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteGateOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteGateError<'a> {
+    /// The request lacks valid authentication credentials.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The caller does not have permission to unhide messages for this streamer.
+    #[serde(rename = "Forbidden")]
+    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The streamer's OAuth session could not be found or is invalid.
+    #[serde(rename = "SessionNotFound")]
+    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteGateError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Forbidden(msg) => {
+                write!(f, "Forbidden")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::SessionNotFound(msg) => {
+                write!(f, "SessionNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.moderation.deleteGate
+pub struct DeleteGateResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
+    const NSID: &'static str = "place.stream.moderation.deleteGate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeleteGateOutput<'de>;
+    type Err<'de> = DeleteGateError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGate<'a> {
+    const NSID: &'static str = "place.stream.moderation.deleteGate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteGateResponse;
+}
+
+/// Endpoint type for
+///place.stream.moderation.deleteGate
+pub struct DeleteGateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
+    const PATH: &'static str = "/xrpc/place.stream.moderation.deleteGate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteGate<'de>;
+    type Response = DeleteGateResponse;
+}
+
 pub mod delete_gate_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -163,102 +261,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteGateOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteGateError<'a> {
-    /// The request lacks valid authentication credentials.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The caller does not have permission to unhide messages for this streamer.
-    #[serde(rename = "Forbidden")]
-    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The streamer's OAuth session could not be found or is invalid.
-    #[serde(rename = "SessionNotFound")]
-    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteGateError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Forbidden(msg) => {
-                write!(f, "Forbidden")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::SessionNotFound(msg) => {
-                write!(f, "SessionNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.moderation.deleteGate
-pub struct DeleteGateResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
-    const NSID: &'static str = "place.stream.moderation.deleteGate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteGateOutput<'de>;
-    type Err<'de> = DeleteGateError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGate<'a> {
-    const NSID: &'static str = "place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteGateResponse;
-}
-
-/// Endpoint type for
-///place.stream.moderation.deleteGate
-pub struct DeleteGateRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
-    const PATH: &'static str = "/xrpc/place.stream.moderation.deleteGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteGate<'de>;
-    type Response = DeleteGateResponse;
 }

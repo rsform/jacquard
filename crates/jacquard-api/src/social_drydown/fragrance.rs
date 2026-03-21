@@ -34,6 +34,132 @@ pub struct Fragrance<'a> {
     pub year: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FragranceGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Fragrance<'a>,
+}
+
+impl<'a> Fragrance<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FragranceRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FragranceRecord;
+impl jacquard_common::xrpc::XrpcResp for FragranceRecord {
+    const NSID: &'static str = "social.drydown.fragrance";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FragranceGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FragranceGetRecordOutput<'_>> for Fragrance<'_> {
+    fn from(output: FragranceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Fragrance<'_> {
+    const NSID: &'static str = "social.drydown.fragrance";
+    type Record = FragranceRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FragranceRecord {
+    const NSID: &'static str = "social.drydown.fragrance";
+    type Record = FragranceRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fragrance<'a> {
+    fn nsid() -> &'static str {
+        "social.drydown.fragrance"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_drydown_fragrance()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.year {
+            if *value > 2100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "year",
+                    ),
+                    max: 2100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.year {
+            if *value < 1000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "year",
+                    ),
+                    min: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod fragrance_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -44,49 +170,49 @@ pub mod fragrance_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type House;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type House = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type House = S::House;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `house` field to Set
     pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHouse<S> {}
     impl<S: State> State for SetHouse<S> {
-        type Name = S::Name;
         type House = Set<members::house>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type House = S::House;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type House = S::House;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `house` field
         pub struct house(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -215,8 +341,8 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
 impl<'a, S> FragranceBuilder<'a, S>
 where
     S: fragrance_state::State,
-    S::Name: fragrance_state::IsSet,
     S::House: fragrance_state::IsSet,
+    S::Name: fragrance_state::IsSet,
     S::CreatedAt: fragrance_state::IsSet,
 {
     /// Build the final struct
@@ -246,132 +372,6 @@ where
             year: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Fragrance<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FragranceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FragranceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fragrance<'a>,
-}
-
-impl From<FragranceGetRecordOutput<'_>> for Fragrance<'_> {
-    fn from(output: FragranceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Fragrance<'_> {
-    const NSID: &'static str = "social.drydown.fragrance";
-    type Record = FragranceRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FragranceRecord;
-impl jacquard_common::xrpc::XrpcResp for FragranceRecord {
-    const NSID: &'static str = "social.drydown.fragrance";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FragranceGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FragranceRecord {
-    const NSID: &'static str = "social.drydown.fragrance";
-    type Record = FragranceRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fragrance<'a> {
-    fn nsid() -> &'static str {
-        "social.drydown.fragrance"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_drydown_fragrance()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.year {
-            if *value > 2100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
-                    max: 2100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.year {
-            if *value < 1000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
-                    min: 1000i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

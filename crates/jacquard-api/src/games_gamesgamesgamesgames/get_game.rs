@@ -24,6 +24,48 @@ pub struct GetGame<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetGameOutput<'a> {
+    #[serde(borrow)]
+    pub game: crate::games_gamesgamesgamesgames::GameDetailView<'a>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.getGame
+pub struct GetGameResponse;
+impl jacquard_common::xrpc::XrpcResp for GetGameResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetGameOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetGame<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetGameResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.getGame
+pub struct GetGameRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getGame";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetGame<'de>;
+    type Response = GetGameResponse;
+}
+
 pub mod get_game_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -117,46 +159,4 @@ where
             uri: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetGameOutput<'a> {
-    #[serde(borrow)]
-    pub game: crate::games_gamesgamesgamesgames::GameDetailView<'a>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.getGame
-pub struct GetGameResponse;
-impl jacquard_common::xrpc::XrpcResp for GetGameResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGameOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGame<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetGameResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.getGame
-pub struct GetGameRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGame<'de>;
-    type Response = GetGameResponse;
 }

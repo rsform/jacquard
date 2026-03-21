@@ -28,196 +28,6 @@ pub struct ColourScheme<'a> {
     pub variant: jacquard_common::CowStr<'a>,
 }
 
-pub mod colour_scheme_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Name;
-        type Variant;
-        type Colours;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Name = Unset;
-        type Variant = Unset;
-        type Colours = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Variant = S::Variant;
-        type Colours = S::Colours;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Name = S::Name;
-        type Variant = Set<members::variant>;
-        type Colours = S::Colours;
-    }
-    ///State transition - sets the `colours` field to Set
-    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetColours<S> {}
-    impl<S: State> State for SetColours<S> {
-        type Name = S::Name;
-        type Variant = S::Variant;
-        type Colours = Set<members::colours>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `variant` field
-        pub struct variant(());
-        ///Marker type for the `colours` field
-        pub struct colours(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ColourSchemeBuilder<'a, S: colour_scheme_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<ColourSchemeColours<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> ColourScheme<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
-        ColourSchemeBuilder::new()
-    }
-}
-
-impl<'a> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ColourSchemeBuilder<'a, S>
-where
-    S: colour_scheme_state::State,
-    S::Colours: colour_scheme_state::IsUnset,
-{
-    /// Set the `colours` field (required)
-    pub fn colours(
-        mut self,
-        value: impl Into<ColourSchemeColours<'a>>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetColours<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ColourSchemeBuilder<'a, S>
-where
-    S: colour_scheme_state::State,
-    S::Name: colour_scheme_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ColourSchemeBuilder<'a, S>
-where
-    S: colour_scheme_state::State,
-    S::Variant: colour_scheme_state::IsUnset,
-{
-    /// Set the `variant` field (required)
-    pub fn variant(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetVariant<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ColourSchemeBuilder<'a, S>
-where
-    S: colour_scheme_state::State,
-    S::Name: colour_scheme_state::IsSet,
-    S::Variant: colour_scheme_state::IsSet,
-    S::Colours: colour_scheme_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> ColourScheme<'a> {
-        ColourScheme {
-            colours: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            variant: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> ColourScheme<'a> {
-        ColourScheme {
-            colours: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            variant: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> ColourScheme<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ColourSchemeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -279,6 +89,101 @@ pub struct ColourSchemeColours<'a> {
     ///Warning state colour
     #[serde(borrow)]
     pub warning: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ColourSchemeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ColourScheme<'a>,
+}
+
+impl<'a> ColourScheme<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ColourSchemeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ColourSchemeRecord;
+impl jacquard_common::xrpc::XrpcResp for ColourSchemeRecord {
+    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ColourSchemeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ColourSchemeGetRecordOutput<'_>> for ColourScheme<'_> {
+    fn from(output: ColourSchemeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for ColourScheme<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
+    type Record = ColourSchemeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ColourSchemeRecord {
+    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
+    type Record = ColourSchemeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.colourScheme"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_colourScheme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.colourScheme"
+    }
+    fn def_name() -> &'static str {
+        "ColourSchemeColours"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_colourScheme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
 }
 
 fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -731,84 +636,179 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.colourScheme"
+pub mod colour_scheme_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
     }
-    fn def_name() -> &'static str {
-        "ColourSchemeColours"
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Colours;
+        type Name;
+        type Variant;
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_colourScheme()
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Colours = Unset;
+        type Name = Unset;
+        type Variant = Unset;
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
+    ///State transition - sets the `colours` field to Set
+    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetColours<S> {}
+    impl<S: State> State for SetColours<S> {
+        type Colours = Set<members::colours>;
+        type Name = S::Name;
+        type Variant = S::Variant;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Colours = S::Colours;
+        type Name = Set<members::name>;
+        type Variant = S::Variant;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVariant<S> {}
+    impl<S: State> State for SetVariant<S> {
+        type Colours = S::Colours;
+        type Name = S::Name;
+        type Variant = Set<members::variant>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `colours` field
+        pub struct colours(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `variant` field
+        pub struct variant(());
     }
 }
 
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ColourSchemeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ColourScheme<'a>,
+/// Builder for constructing an instance of this type
+pub struct ColourSchemeBuilder<'a, S: colour_scheme_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ColourSchemeColours<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl From<ColourSchemeGetRecordOutput<'_>> for ColourScheme<'_> {
-    fn from(output: ColourSchemeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> ColourScheme<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
+        ColourSchemeBuilder::new()
     }
 }
 
-impl jacquard_common::types::collection::Collection for ColourScheme<'_> {
-    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
-    type Record = ColourSchemeRecord;
+impl<'a> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ColourSchemeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
 }
 
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ColourSchemeRecord;
-impl jacquard_common::xrpc::XrpcResp for ColourSchemeRecord {
-    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ColourSchemeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+impl<'a, S> ColourSchemeBuilder<'a, S>
+where
+    S: colour_scheme_state::State,
+    S::Colours: colour_scheme_state::IsUnset,
+{
+    /// Set the `colours` field (required)
+    pub fn colours(
+        mut self,
+        value: impl Into<ColourSchemeColours<'a>>,
+    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetColours<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ColourSchemeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
 }
 
-impl jacquard_common::types::collection::Collection for ColourSchemeRecord {
-    const NSID: &'static str = "sh.weaver.notebook.colourScheme";
-    type Record = ColourSchemeRecord;
+impl<'a, S> ColourSchemeBuilder<'a, S>
+where
+    S: colour_scheme_state::State,
+    S::Name: colour_scheme_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ColourSchemeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.colourScheme"
+impl<'a, S> ColourSchemeBuilder<'a, S>
+where
+    S: colour_scheme_state::State,
+    S::Variant: colour_scheme_state::IsUnset,
+{
+    /// Set the `variant` field (required)
+    pub fn variant(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetVariant<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ColourSchemeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
-    fn def_name() -> &'static str {
-        "main"
+}
+
+impl<'a, S> ColourSchemeBuilder<'a, S>
+where
+    S: colour_scheme_state::State,
+    S::Colours: colour_scheme_state::IsSet,
+    S::Name: colour_scheme_state::IsSet,
+    S::Variant: colour_scheme_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ColourScheme<'a> {
+        ColourScheme {
+            colours: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            variant: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_colourScheme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ColourScheme<'a> {
+        ColourScheme {
+            colours: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            variant: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }

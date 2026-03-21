@@ -26,6 +26,81 @@ pub struct Channel<'a> {
     pub uri: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUserChannelsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub channels: std::option::Option<
+        Vec<crate::chat_firehose::get_user_channels::Channel<'a>>,
+    >,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
+    fn nsid() -> &'static str {
+        "chat.firehose.getUserChannels"
+    }
+    fn def_name() -> &'static str {
+        "channel"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_chat_firehose_getUserChannels()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct GetUserChannels;
+/// Response type for
+///chat.firehose.getUserChannels
+pub struct GetUserChannelsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetUserChannelsResponse {
+    const NSID: &'static str = "chat.firehose.getUserChannels";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetUserChannelsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetUserChannels {
+    const NSID: &'static str = "chat.firehose.getUserChannels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetUserChannelsResponse;
+}
+
+/// Endpoint type for
+///chat.firehose.getUserChannels
+pub struct GetUserChannelsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetUserChannelsRequest {
+    const PATH: &'static str = "/xrpc/chat.firehose.getUserChannels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetUserChannels;
+    type Response = GetUserChannelsResponse;
+}
+
 fn lexicon_doc_chat_firehose_getUserChannels() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -95,79 +170,4 @@ fn lexicon_doc_chat_firehose_getUserChannels() -> ::jacquard_lexicon::lexicon::L
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
-    fn nsid() -> &'static str {
-        "chat.firehose.getUserChannels"
-    }
-    fn def_name() -> &'static str {
-        "channel"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_chat_firehose_getUserChannels()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetUserChannelsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub channels: std::option::Option<
-        Vec<crate::chat_firehose::get_user_channels::Channel<'a>>,
-    >,
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct GetUserChannels;
-/// Response type for
-///chat.firehose.getUserChannels
-pub struct GetUserChannelsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetUserChannelsResponse {
-    const NSID: &'static str = "chat.firehose.getUserChannels";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetUserChannelsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetUserChannels {
-    const NSID: &'static str = "chat.firehose.getUserChannels";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetUserChannelsResponse;
-}
-
-/// Endpoint type for
-///chat.firehose.getUserChannels
-pub struct GetUserChannelsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetUserChannelsRequest {
-    const PATH: &'static str = "/xrpc/chat.firehose.getUserChannels";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetUserChannels;
-    type Response = GetUserChannelsResponse;
 }

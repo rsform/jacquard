@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(100i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,92 @@ pub struct GetValues<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetValuesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub set: crate::tools_ozone::set::SetView<'a>,
+    #[serde(borrow)]
+    pub values: Vec<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetValuesError<'a> {
+    /// set with the given name does not exist
+    #[serde(rename = "SetNotFound")]
+    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetValuesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SetNotFound(msg) => {
+                write!(f, "SetNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.set.getValues
+pub struct GetValuesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetValuesResponse {
+    const NSID: &'static str = "tools.ozone.set.getValues";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetValuesOutput<'de>;
+    type Err<'de> = GetValuesError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetValues<'a> {
+    const NSID: &'static str = "tools.ozone.set.getValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetValuesResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.set.getValues
+pub struct GetValuesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.getValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetValues<'de>;
+    type Response = GetValuesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(100i64)
 }
 
 pub mod get_values_state {
@@ -153,86 +235,4 @@ where
             name: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetValuesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub set: crate::tools_ozone::set::SetView<'a>,
-    #[serde(borrow)]
-    pub values: Vec<jacquard_common::CowStr<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetValuesError<'a> {
-    /// set with the given name does not exist
-    #[serde(rename = "SetNotFound")]
-    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetValuesError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::SetNotFound(msg) => {
-                write!(f, "SetNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.set.getValues
-pub struct GetValuesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetValuesResponse {
-    const NSID: &'static str = "tools.ozone.set.getValues";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetValuesOutput<'de>;
-    type Err<'de> = GetValuesError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetValues<'a> {
-    const NSID: &'static str = "tools.ozone.set.getValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetValuesResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.set.getValues
-pub struct GetValuesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.set.getValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetValues<'de>;
-    type Response = GetValuesResponse;
 }

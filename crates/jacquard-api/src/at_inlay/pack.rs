@@ -25,6 +25,137 @@ pub struct Export<'a> {
     pub r#type: jacquard_common::types::string::Nsid<'a>,
 }
 
+/// A list of type to component exports
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Pack<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Type to component mappings
+    #[serde(borrow)]
+    pub exports: Vec<crate::at_inlay::pack::Export<'a>>,
+    ///Short slug for the pack (e.g. "core", "ui")
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PackGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pack<'a>,
+}
+
+impl<'a> Pack<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PackRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Export<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.pack"
+    }
+    fn def_name() -> &'static str {
+        "export"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_pack()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PackRecord;
+impl jacquard_common::xrpc::XrpcResp for PackRecord {
+    const NSID: &'static str = "at.inlay.pack";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PackGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PackGetRecordOutput<'_>> for Pack<'_> {
+    fn from(output: PackGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pack<'_> {
+    const NSID: &'static str = "at.inlay.pack";
+    type Record = PackRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PackRecord {
+    const NSID: &'static str = "at.inlay.pack";
+    type Record = PackRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.pack"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_pack()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod export_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -326,46 +457,6 @@ fn lexicon_doc_at_inlay_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Export<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.pack"
-    }
-    fn def_name() -> &'static str {
-        "export"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_pack()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A list of type to component exports
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Pack<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Type to component mappings
-    #[serde(borrow)]
-    pub exports: Vec<crate::at_inlay::pack::Export<'a>>,
-    ///Short slug for the pack (e.g. "core", "ui")
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
 pub mod pack_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -376,37 +467,37 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Exports;
         type Name;
+        type Exports;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Exports = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `exports` field to Set
-    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExports<S> {}
-    impl<S: State> State for SetExports<S> {
-        type Exports = Set<members::exports>;
-        type Name = S::Name;
+        type Exports = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Exports = S::Exports;
         type Name = Set<members::name>;
+        type Exports = S::Exports;
+    }
+    ///State transition - sets the `exports` field to Set
+    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExports<S> {}
+    impl<S: State> State for SetExports<S> {
+        type Name = S::Name;
+        type Exports = Set<members::exports>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `exports` field
-        pub struct exports(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `exports` field
+        pub struct exports(());
     }
 }
 
@@ -499,8 +590,8 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::Exports: pack_state::IsSet,
     S::Name: pack_state::IsSet,
+    S::Exports: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {
@@ -525,96 +616,5 @@ where
             name: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Pack<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PackRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PackGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pack<'a>,
-}
-
-impl From<PackGetRecordOutput<'_>> for Pack<'_> {
-    fn from(output: PackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Pack<'_> {
-    const NSID: &'static str = "at.inlay.pack";
-    type Record = PackRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PackRecord;
-impl jacquard_common::xrpc::XrpcResp for PackRecord {
-    const NSID: &'static str = "at.inlay.pack";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PackGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PackRecord {
-    const NSID: &'static str = "at.inlay.pack";
-    type Record = PackRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.pack"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_pack()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -76,6 +76,285 @@ pub struct Profile<'a> {
     pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Profile<'a>,
+}
+
+impl<'a> Profile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfileRecord;
+impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
+    const NSID: &'static str = "social.showcase.profile.profile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProfileGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
+    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Profile<'_> {
+    const NSID: &'static str = "social.showcase.profile.profile";
+    type Record = ProfileRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ProfileRecord {
+    const NSID: &'static str = "social.showcase.profile.profile";
+    type Record = ProfileRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.profile.profile"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_profile_profile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.accent_color {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accent_color",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.banner {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.banner {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.bio {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bio",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.did;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "did",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.handle;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 253usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "handle",
+                    ),
+                    max: 253usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.showcase {
+            #[allow(unused_comparisons)]
+            if value.len() > 4usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "showcase",
+                    ),
+                    max: 4usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.tags;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.theme {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "theme",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.website {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "website",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_profile_collection_count() -> std::option::Option<i64> {
     Some(0i64)
 }
@@ -100,8 +379,8 @@ pub mod profile_state {
     pub trait State: sealed::Sealed {
         type CreatedAt;
         type Did;
-        type Tags;
         type Handle;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -109,8 +388,8 @@ pub mod profile_state {
     impl State for Empty {
         type CreatedAt = Unset;
         type Did = Unset;
-        type Tags = Unset;
         type Handle = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -118,8 +397,8 @@ pub mod profile_state {
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
         type Did = S::Did;
-        type Tags = S::Tags;
         type Handle = S::Handle;
+        type Tags = S::Tags;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -127,17 +406,8 @@ pub mod profile_state {
     impl<S: State> State for SetDid<S> {
         type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
         type Tags = S::Tags;
-        type Handle = S::Handle;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-        type Tags = Set<members::tags>;
-        type Handle = S::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -145,8 +415,17 @@ pub mod profile_state {
     impl<S: State> State for SetHandle<S> {
         type CreatedAt = S::CreatedAt;
         type Did = S::Did;
-        type Tags = S::Tags;
         type Handle = Set<members::handle>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -155,10 +434,10 @@ pub mod profile_state {
         pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
@@ -503,8 +782,8 @@ where
     S: profile_state::State,
     S::CreatedAt: profile_state::IsSet,
     S::Did: profile_state::IsSet,
-    S::Tags: profile_state::IsSet,
     S::Handle: profile_state::IsSet,
+    S::Tags: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -555,285 +834,6 @@ where
             website: self.__unsafe_private_named.15,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
-}
-
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Profile<'_> {
-    const NSID: &'static str = "social.showcase.profile.profile";
-    type Record = ProfileRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ProfileRecord;
-impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
-    const NSID: &'static str = "social.showcase.profile.profile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ProfileRecord {
-    const NSID: &'static str = "social.showcase.profile.profile";
-    type Record = ProfileRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.profile.profile"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_profile_profile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.accent_color {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "accent_color",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.banner {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "banner",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.banner {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "banner",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.bio {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bio",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.did;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "did",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.handle;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 253usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "handle",
-                    ),
-                    max: 253usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.showcase {
-            #[allow(unused_comparisons)]
-            if value.len() > 4usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "showcase",
-                    ),
-                    max: 4usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.tags;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.theme {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "theme",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.website {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "website",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

@@ -25,6 +25,84 @@ pub struct Star<'a> {
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StarGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Star<'a>,
+}
+
+impl<'a> Star<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StarRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StarRecord;
+impl jacquard_common::xrpc::XrpcResp for StarRecord {
+    const NSID: &'static str = "io.atcr.sailor.star";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StarGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StarGetRecordOutput<'_>> for Star<'_> {
+    fn from(output: StarGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Star<'_> {
+    const NSID: &'static str = "io.atcr.sailor.star";
+    type Record = StarRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StarRecord {
+    const NSID: &'static str = "io.atcr.sailor.star";
+    type Record = StarRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Star<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.sailor.star"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_sailor_star()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod star_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             subject: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Star<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StarRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StarGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Star<'a>,
-}
-
-impl From<StarGetRecordOutput<'_>> for Star<'_> {
-    fn from(output: StarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Star<'_> {
-    const NSID: &'static str = "io.atcr.sailor.star";
-    type Record = StarRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StarRecord;
-impl jacquard_common::xrpc::XrpcResp for StarRecord {
-    const NSID: &'static str = "io.atcr.sailor.star";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StarGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StarRecord {
-    const NSID: &'static str = "io.atcr.sailor.star";
-    type Record = StarRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Star<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.sailor.star"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_sailor_star()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

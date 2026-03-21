@@ -20,6 +20,82 @@ pub struct GetHead<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetHeadOutput<'a> {
+    #[serde(borrow)]
+    pub root: jacquard_common::types::string::Cid<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetHeadError<'a> {
+    #[serde(rename = "HeadNotFound")]
+    HeadNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetHeadError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::HeadNotFound(msg) => {
+                write!(f, "HeadNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.sync.getHead
+pub struct GetHeadResponse;
+impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
+    const NSID: &'static str = "com.atproto.sync.getHead";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetHeadOutput<'de>;
+    type Err<'de> = GetHeadError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
+    const NSID: &'static str = "com.atproto.sync.getHead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetHeadResponse;
+}
+
+/// Endpoint type for
+///com.atproto.sync.getHead
+pub struct GetHeadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getHead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetHead<'de>;
+    type Response = GetHeadResponse;
+}
+
 pub mod get_head_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,80 +185,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetHeadOutput<'a> {
-    #[serde(borrow)]
-    pub root: jacquard_common::types::string::Cid<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetHeadError<'a> {
-    #[serde(rename = "HeadNotFound")]
-    HeadNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetHeadError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::HeadNotFound(msg) => {
-                write!(f, "HeadNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.sync.getHead
-pub struct GetHeadResponse;
-impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
-    const NSID: &'static str = "com.atproto.sync.getHead";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetHeadOutput<'de>;
-    type Err<'de> = GetHeadError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
-    const NSID: &'static str = "com.atproto.sync.getHead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetHeadResponse;
-}
-
-/// Endpoint type for
-///com.atproto.sync.getHead
-pub struct GetHeadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.sync.getHead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetHead<'de>;
-    type Response = GetHeadResponse;
 }

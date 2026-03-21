@@ -51,6 +51,188 @@ pub struct Datastream<'a> {
     pub vertical_datum: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DatastreamGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Datastream<'a>,
+}
+
+/// UCUM-compatible unit description.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UnitOfMeasurement<'a> {
+    ///URI from QUDT, UCUM, or similar unit ontology
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub definition: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub symbol: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Datastream<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DatastreamRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DatastreamRecord;
+impl jacquard_common::xrpc::XrpcResp for DatastreamRecord {
+    const NSID: &'static str = "dev.sensorthings.datastream";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DatastreamGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DatastreamGetRecordOutput<'_>> for Datastream<'_> {
+    fn from(output: DatastreamGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Datastream<'_> {
+    const NSID: &'static str = "dev.sensorthings.datastream";
+    type Record = DatastreamRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DatastreamRecord {
+    const NSID: &'static str = "dev.sensorthings.datastream";
+    type Record = DatastreamRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
+    fn nsid() -> &'static str {
+        "dev.sensorthings.datastream"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_sensorthings_datastream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.vertical_datum {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "vertical_datum",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
+    fn nsid() -> &'static str {
+        "dev.sensorthings.datastream"
+    }
+    fn def_name() -> &'static str {
+        "unitOfMeasurement"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_sensorthings_datastream()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.symbol;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "symbol",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod datastream_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -61,125 +243,125 @@ pub mod datastream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Sensor;
         type ObservedProperty;
-        type Name;
+        type CreatedAt;
         type UnitOfMeasurement;
         type ObservationType;
-        type Sensor;
-        type CreatedAt;
+        type Name;
         type Thing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Sensor = Unset;
         type ObservedProperty = Unset;
-        type Name = Unset;
+        type CreatedAt = Unset;
         type UnitOfMeasurement = Unset;
         type ObservationType = Unset;
-        type Sensor = Unset;
-        type CreatedAt = Unset;
+        type Name = Unset;
         type Thing = Unset;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type ObservedProperty = Set<members::observed_property>;
-        type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-        type Sensor = S::Sensor;
-        type CreatedAt = S::CreatedAt;
-        type Thing = S::Thing;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Name = Set<members::name>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-        type Sensor = S::Sensor;
-        type CreatedAt = S::CreatedAt;
-        type Thing = S::Thing;
-    }
-    ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type UnitOfMeasurement = Set<members::unit_of_measurement>;
-        type ObservationType = S::ObservationType;
-        type Sensor = S::Sensor;
-        type CreatedAt = S::CreatedAt;
-        type Thing = S::Thing;
-    }
-    ///State transition - sets the `observation_type` field to Set
-    pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservationType<S> {}
-    impl<S: State> State for SetObservationType<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = Set<members::observation_type>;
-        type Sensor = S::Sensor;
-        type CreatedAt = S::CreatedAt;
-        type Thing = S::Thing;
     }
     ///State transition - sets the `sensor` field to Set
     pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSensor<S> {}
     impl<S: State> State for SetSensor<S> {
+        type Sensor = Set<members::sensor>;
         type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
-        type Sensor = Set<members::sensor>;
+        type Name = S::Name;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type Sensor = S::Sensor;
+        type ObservedProperty = Set<members::observed_property>;
         type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = S::ObservationType;
+        type Name = S::Name;
         type Thing = S::Thing;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Sensor = S::Sensor;
         type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
+        type Name = S::Name;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `unit_of_measurement` field to Set
+    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
+    impl<S: State> State for SetUnitOfMeasurement<S> {
         type Sensor = S::Sensor;
-        type CreatedAt = Set<members::created_at>;
+        type ObservedProperty = S::ObservedProperty;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type ObservationType = S::ObservationType;
+        type Name = S::Name;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `observation_type` field to Set
+    pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservationType<S> {}
+    impl<S: State> State for SetObservationType<S> {
+        type Sensor = S::Sensor;
+        type ObservedProperty = S::ObservedProperty;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = Set<members::observation_type>;
+        type Name = S::Name;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Sensor = S::Sensor;
+        type ObservedProperty = S::ObservedProperty;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = S::ObservationType;
+        type Name = Set<members::name>;
         type Thing = S::Thing;
     }
     ///State transition - sets the `thing` field to Set
     pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThing<S> {}
     impl<S: State> State for SetThing<S> {
+        type Sensor = S::Sensor;
         type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
-        type Sensor = S::Sensor;
-        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Thing = Set<members::thing>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
         ///Marker type for the `observation_type` field
         pub struct observation_type(());
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `thing` field
         pub struct thing(());
     }
@@ -442,12 +624,12 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
 impl<'a, S> DatastreamBuilder<'a, S>
 where
     S: datastream_state::State,
+    S::Sensor: datastream_state::IsSet,
     S::ObservedProperty: datastream_state::IsSet,
-    S::Name: datastream_state::IsSet,
+    S::CreatedAt: datastream_state::IsSet,
     S::UnitOfMeasurement: datastream_state::IsSet,
     S::ObservationType: datastream_state::IsSet,
-    S::Sensor: datastream_state::IsSet,
-    S::CreatedAt: datastream_state::IsSet,
+    S::Name: datastream_state::IsSet,
     S::Thing: datastream_state::IsSet,
 {
     /// Build the final struct
@@ -489,121 +671,6 @@ where
             vertical_datum: self.__unsafe_private_named.10,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Datastream<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DatastreamRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DatastreamGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Datastream<'a>,
-}
-
-impl From<DatastreamGetRecordOutput<'_>> for Datastream<'_> {
-    fn from(output: DatastreamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Datastream<'_> {
-    const NSID: &'static str = "dev.sensorthings.datastream";
-    type Record = DatastreamRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DatastreamRecord;
-impl jacquard_common::xrpc::XrpcResp for DatastreamRecord {
-    const NSID: &'static str = "dev.sensorthings.datastream";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DatastreamGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DatastreamRecord {
-    const NSID: &'static str = "dev.sensorthings.datastream";
-    type Record = DatastreamRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
-    fn nsid() -> &'static str {
-        "dev.sensorthings.datastream"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_sensorthings_datastream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.vertical_datum {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "vertical_datum",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -932,72 +999,5 @@ fn lexicon_doc_dev_sensorthings_datastream() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-/// UCUM-compatible unit description.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UnitOfMeasurement<'a> {
-    ///URI from QUDT, UCUM, or similar unit ontology
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub definition: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub symbol: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
-    fn nsid() -> &'static str {
-        "dev.sensorthings.datastream"
-    }
-    fn def_name() -> &'static str {
-        "unitOfMeasurement"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_sensorthings_datastream()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.symbol;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "symbol",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

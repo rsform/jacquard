@@ -20,6 +20,90 @@ pub struct ResolveVersionConflict<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveVersionConflictOutput<'a> {
+    #[serde(borrow)]
+    pub canonical: crate::sh_weaver::notebook::PublishedVersionView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collaboration_state: std::option::Option<
+        crate::sh_weaver::collab::CollaborationStateView<'a>,
+    >,
+    #[serde(borrow)]
+    pub related: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveVersionConflictError<'a> {
+    /// The URIs don't appear to be related versions
+    #[serde(rename = "NoRelatedVersions")]
+    NoRelatedVersions(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveVersionConflictError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NoRelatedVersions(msg) => {
+                write!(f, "NoRelatedVersions")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.resolveVersionConflict
+pub struct ResolveVersionConflictResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveVersionConflictResponse {
+    const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveVersionConflictOutput<'de>;
+    type Err<'de> = ResolveVersionConflictError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveVersionConflict<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveVersionConflictResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.resolveVersionConflict
+pub struct ResolveVersionConflictRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveVersionConflictRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveVersionConflict";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveVersionConflict<'de>;
+    type Response = ResolveVersionConflictResponse;
+}
+
 pub mod resolve_version_conflict_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -112,88 +196,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveVersionConflictOutput<'a> {
-    #[serde(borrow)]
-    pub canonical: crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub collaboration_state: std::option::Option<
-        crate::sh_weaver::collab::CollaborationStateView<'a>,
-    >,
-    #[serde(borrow)]
-    pub related: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveVersionConflictError<'a> {
-    /// The URIs don't appear to be related versions
-    #[serde(rename = "NoRelatedVersions")]
-    NoRelatedVersions(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveVersionConflictError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NoRelatedVersions(msg) => {
-                write!(f, "NoRelatedVersions")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.resolveVersionConflict
-pub struct ResolveVersionConflictResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveVersionConflictResponse {
-    const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveVersionConflictOutput<'de>;
-    type Err<'de> = ResolveVersionConflictError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveVersionConflict<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveVersionConflictResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.resolveVersionConflict
-pub struct ResolveVersionConflictRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveVersionConflictRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveVersionConflict";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveVersionConflict<'de>;
-    type Response = ResolveVersionConflictResponse;
 }

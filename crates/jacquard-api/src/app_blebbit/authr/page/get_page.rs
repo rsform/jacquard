@@ -20,6 +20,58 @@ pub struct GetPage<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPageOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub public: std::option::Option<bool>,
+}
+
+/// Response type for
+///app.blebbit.authr.page.getPage
+pub struct GetPageResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
+    const NSID: &'static str = "app.blebbit.authr.page.getPage";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPageOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
+    const NSID: &'static str = "app.blebbit.authr.page.getPage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPageResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.page.getPage
+pub struct GetPageRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.getPage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPage<'de>;
+    type Response = GetPageResponse;
+}
+
 pub mod get_page_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,56 +159,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPageOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: std::option::Option<bool>,
-}
-
-/// Response type for
-///app.blebbit.authr.page.getPage
-pub struct GetPageResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
-    const NSID: &'static str = "app.blebbit.authr.page.getPage";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPageOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
-    const NSID: &'static str = "app.blebbit.authr.page.getPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPageResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.page.getPage
-pub struct GetPageRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.getPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPage<'de>;
-    type Response = GetPageResponse;
 }

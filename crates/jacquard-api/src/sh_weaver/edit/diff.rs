@@ -37,6 +37,126 @@ pub struct Diff<'a> {
     pub snapshot: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DiffGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Diff<'a>,
+}
+
+impl<'a> Diff<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DiffRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DiffRecord;
+impl jacquard_common::xrpc::XrpcResp for DiffRecord {
+    const NSID: &'static str = "sh.weaver.edit.diff";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DiffGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
+    fn from(output: DiffGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Diff<'_> {
+    const NSID: &'static str = "sh.weaver.edit.diff";
+    type Record = DiffRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DiffRecord {
+    const NSID: &'static str = "sh.weaver.edit.diff";
+    type Record = DiffRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.diff"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_diff()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.snapshot {
+            {
+                let size = value.blob().size;
+                if size > 3000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "snapshot",
+                        ),
+                        max: 3000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.snapshot {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "snapshot",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod diff_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -262,126 +382,6 @@ where
             snapshot: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Diff<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DiffRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DiffGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Diff<'a>,
-}
-
-impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
-    fn from(output: DiffGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Diff<'_> {
-    const NSID: &'static str = "sh.weaver.edit.diff";
-    type Record = DiffRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DiffRecord;
-impl jacquard_common::xrpc::XrpcResp for DiffRecord {
-    const NSID: &'static str = "sh.weaver.edit.diff";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DiffGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DiffRecord {
-    const NSID: &'static str = "sh.weaver.edit.diff";
-    type Record = DiffRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.diff"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_diff()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.snapshot {
-            {
-                let size = value.blob().size;
-                if size > 3000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "snapshot",
-                        ),
-                        max: 3000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.snapshot {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "snapshot",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

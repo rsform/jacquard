@@ -20,6 +20,62 @@ pub struct ResolveMiniDoc<'a> {
     pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveMiniDocOutput<'a> {
+    ///DID, bi-directionally verified if a handle was provided in the query.
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    /**The validated handle of the account or `handle.invalid` if the handle
+did not bi-directionally match the DID document.*/
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    ///The identity's PDS URL
+    #[serde(borrow)]
+    pub pds: jacquard_common::types::string::UriValue<'a>,
+    /**The atproto signing key publicKeyMultibase
+
+Legacy key encoding not supported. the key is returned directly; `id`,
+`type`, and `controller` are omitted.*/
+    #[serde(borrow)]
+    pub signing_key: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///com.bad-example.identity.resolveMiniDoc
+pub struct ResolveMiniDocResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveMiniDocResponse {
+    const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveMiniDocOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveMiniDoc<'a> {
+    const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveMiniDocResponse;
+}
+
+/// Endpoint type for
+///com.bad-example.identity.resolveMiniDoc
+pub struct ResolveMiniDocRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
+    const PATH: &'static str = "/xrpc/com.bad-example.identity.resolveMiniDoc";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveMiniDoc<'de>;
+    type Response = ResolveMiniDocResponse;
+}
+
 pub mod resolve_mini_doc_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,60 +165,4 @@ where
             identifier: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveMiniDocOutput<'a> {
-    ///DID, bi-directionally verified if a handle was provided in the query.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    /**The validated handle of the account or `handle.invalid` if the handle
-did not bi-directionally match the DID document.*/
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    ///The identity's PDS URL
-    #[serde(borrow)]
-    pub pds: jacquard_common::types::string::UriValue<'a>,
-    /**The atproto signing key publicKeyMultibase
-
-Legacy key encoding not supported. the key is returned directly; `id`,
-`type`, and `controller` are omitted.*/
-    #[serde(borrow)]
-    pub signing_key: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///com.bad-example.identity.resolveMiniDoc
-pub struct ResolveMiniDocResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveMiniDocResponse {
-    const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveMiniDocOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveMiniDoc<'a> {
-    const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveMiniDocResponse;
-}
-
-/// Endpoint type for
-///com.bad-example.identity.resolveMiniDoc
-pub struct ResolveMiniDocRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
-    const PATH: &'static str = "/xrpc/com.bad-example.identity.resolveMiniDoc";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveMiniDoc<'de>;
-    type Response = ResolveMiniDocResponse;
 }

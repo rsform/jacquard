@@ -21,6 +21,81 @@ pub struct DeleteMember<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteMemberError<'a> {
+    /// The member being deleted does not exist
+    #[serde(rename = "MemberNotFound")]
+    MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// You can not delete yourself from the team
+    #[serde(rename = "CannotDeleteSelf")]
+    CannotDeleteSelf(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteMemberError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::MemberNotFound(msg) => {
+                write!(f, "MemberNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::CannotDeleteSelf(msg) => {
+                write!(f, "CannotDeleteSelf")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.team.deleteMember
+pub struct DeleteMemberResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteMemberResponse {
+    const NSID: &'static str = "tools.ozone.team.deleteMember";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = DeleteMemberError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMember<'a> {
+    const NSID: &'static str = "tools.ozone.team.deleteMember";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteMemberResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.team.deleteMember
+pub struct DeleteMemberRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.team.deleteMember";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteMember<'de>;
+    type Response = DeleteMemberResponse;
+}
+
 pub mod delete_member_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,79 +199,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteMemberError<'a> {
-    /// The member being deleted does not exist
-    #[serde(rename = "MemberNotFound")]
-    MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// You can not delete yourself from the team
-    #[serde(rename = "CannotDeleteSelf")]
-    CannotDeleteSelf(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteMemberError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::MemberNotFound(msg) => {
-                write!(f, "MemberNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::CannotDeleteSelf(msg) => {
-                write!(f, "CannotDeleteSelf")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.team.deleteMember
-pub struct DeleteMemberResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteMemberResponse {
-    const NSID: &'static str = "tools.ozone.team.deleteMember";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteMemberError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMember<'a> {
-    const NSID: &'static str = "tools.ozone.team.deleteMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteMemberResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.team.deleteMember
-pub struct DeleteMemberRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.team.deleteMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteMember<'de>;
-    type Response = DeleteMemberResponse;
 }

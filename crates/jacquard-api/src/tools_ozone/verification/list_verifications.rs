@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -48,6 +40,59 @@ pub struct ListVerifications<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListVerificationsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
+}
+
+/// Response type for
+///tools.ozone.verification.listVerifications
+pub struct ListVerificationsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListVerificationsResponse {
+    const NSID: &'static str = "tools.ozone.verification.listVerifications";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListVerificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListVerifications<'a> {
+    const NSID: &'static str = "tools.ozone.verification.listVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListVerificationsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.verification.listVerifications
+pub struct ListVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.listVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListVerifications<'de>;
+    type Response = ListVerificationsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("desc"))
 }
 
 pub mod list_verifications_state {
@@ -257,49 +302,4 @@ where
             subjects: self.__unsafe_private_named.7,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListVerificationsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
-}
-
-/// Response type for
-///tools.ozone.verification.listVerifications
-pub struct ListVerificationsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListVerificationsResponse {
-    const NSID: &'static str = "tools.ozone.verification.listVerifications";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListVerifications<'a> {
-    const NSID: &'static str = "tools.ozone.verification.listVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListVerificationsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.verification.listVerifications
-pub struct ListVerificationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.verification.listVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListVerifications<'de>;
-    type Response = ListVerificationsResponse;
 }

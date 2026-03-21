@@ -23,6 +23,261 @@ pub struct Audio<'a> {
     pub rate: i64,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Framerate<'a> {
+    pub den: i64,
+    pub num: i64,
+}
+
+/// Media file representing a segment of a livestream
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Segment<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_rights: std::option::Option<
+        crate::place_stream::metadata::content_rights::ContentRights<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_warnings: std::option::Option<
+        crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+    >,
+    #[serde(borrow)]
+    pub creator: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub distribution_policy: std::option::Option<
+        crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+    >,
+    ///The duration of the segment in nanoseconds
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duration: std::option::Option<i64>,
+    ///Unique identifier for the segment
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///The DID of the signing key used for this segment
+    #[serde(borrow)]
+    pub signing_key: jacquard_common::CowStr<'a>,
+    ///The size of the segment in bytes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: std::option::Option<i64>,
+    ///When this segment started
+    pub start_time: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub video: std::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SegmentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Segment<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SegmentView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Video<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub bframes: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub codec: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub framerate: std::option::Option<crate::place_stream::segment::Framerate<'a>>,
+    pub height: i64,
+    pub width: i64,
+}
+
+impl<'a> Segment<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SegmentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "audio"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_segment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "framerate"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_segment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SegmentRecord;
+impl jacquard_common::xrpc::XrpcResp for SegmentRecord {
+    const NSID: &'static str = "place.stream.segment";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SegmentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SegmentGetRecordOutput<'_>> for Segment<'_> {
+    fn from(output: SegmentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Segment<'_> {
+    const NSID: &'static str = "place.stream.segment";
+    type Record = SegmentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SegmentRecord {
+    const NSID: &'static str = "place.stream.segment";
+    type Record = SegmentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_segment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "segmentView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_segment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "video"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_segment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod audio_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,51 +288,51 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Channels;
         type Codec;
         type Rate;
-        type Channels;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Channels = Unset;
         type Codec = Unset;
         type Rate = Unset;
-        type Channels = Unset;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Codec = Set<members::codec>;
-        type Rate = S::Rate;
-        type Channels = S::Channels;
-    }
-    ///State transition - sets the `rate` field to Set
-    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRate<S> {}
-    impl<S: State> State for SetRate<S> {
-        type Codec = S::Codec;
-        type Rate = Set<members::rate>;
-        type Channels = S::Channels;
     }
     ///State transition - sets the `channels` field to Set
     pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannels<S> {}
     impl<S: State> State for SetChannels<S> {
+        type Channels = Set<members::channels>;
         type Codec = S::Codec;
         type Rate = S::Rate;
-        type Channels = Set<members::channels>;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Channels = S::Channels;
+        type Codec = Set<members::codec>;
+        type Rate = S::Rate;
+    }
+    ///State transition - sets the `rate` field to Set
+    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRate<S> {}
+    impl<S: State> State for SetRate<S> {
+        type Channels = S::Channels;
+        type Codec = S::Codec;
+        type Rate = Set<members::rate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `channels` field
+        pub struct channels(());
         ///Marker type for the `codec` field
         pub struct codec(());
         ///Marker type for the `rate` field
         pub struct rate(());
-        ///Marker type for the `channels` field
-        pub struct channels(());
     }
 }
 
@@ -170,9 +425,9 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
+    S::Channels: audio_state::IsSet,
     S::Codec: audio_state::IsSet,
     S::Rate: audio_state::IsSet,
-    S::Channels: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
@@ -646,39 +901,6 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.segment"
-    }
-    fn def_name() -> &'static str {
-        "audio"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_segment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Framerate<'a> {
-    pub den: i64,
-    pub num: i64,
-}
-
 pub mod framerate_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -816,75 +1038,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.segment"
-    }
-    fn def_name() -> &'static str {
-        "framerate"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_segment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Media file representing a segment of a livestream
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Segment<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_rights: std::option::Option<
-        crate::place_stream::metadata::content_rights::ContentRights<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_warnings: std::option::Option<
-        crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
-    >,
-    #[serde(borrow)]
-    pub creator: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub distribution_policy: std::option::Option<
-        crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
-    >,
-    ///The duration of the segment in nanoseconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
-    ///Unique identifier for the segment
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///The DID of the signing key used for this segment
-    #[serde(borrow)]
-    pub signing_key: jacquard_common::CowStr<'a>,
-    ///The size of the segment in bytes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
-    ///When this segment started
-    pub start_time: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub video: std::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
-}
-
 pub mod segment_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -895,65 +1048,65 @@ pub mod segment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Creator;
         type Id;
         type StartTime;
-        type Creator;
         type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Creator = Unset;
         type Id = Unset;
         type StartTime = Unset;
-        type Creator = Unset;
         type SigningKey = Unset;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Creator = Set<members::creator>;
+        type Id = S::Id;
+        type StartTime = S::StartTime;
+        type SigningKey = S::SigningKey;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Creator = S::Creator;
         type Id = Set<members::id>;
         type StartTime = S::StartTime;
-        type Creator = S::Creator;
         type SigningKey = S::SigningKey;
     }
     ///State transition - sets the `start_time` field to Set
     pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartTime<S> {}
     impl<S: State> State for SetStartTime<S> {
+        type Creator = S::Creator;
         type Id = S::Id;
         type StartTime = Set<members::start_time>;
-        type Creator = S::Creator;
-        type SigningKey = S::SigningKey;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Id = S::Id;
-        type StartTime = S::StartTime;
-        type Creator = Set<members::creator>;
         type SigningKey = S::SigningKey;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigningKey<S> {}
     impl<S: State> State for SetSigningKey<S> {
+        type Creator = S::Creator;
         type Id = S::Id;
         type StartTime = S::StartTime;
-        type Creator = S::Creator;
         type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `creator` field
+        pub struct creator(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
     }
@@ -1228,9 +1381,9 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
 impl<'a, S> SegmentBuilder<'a, S>
 where
     S: segment_state::State,
+    S::Creator: segment_state::IsSet,
     S::Id: segment_state::IsSet,
     S::StartTime: segment_state::IsSet,
-    S::Creator: segment_state::IsSet,
     S::SigningKey: segment_state::IsSet,
 {
     /// Build the final struct
@@ -1273,102 +1426,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> Segment<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SegmentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SegmentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Segment<'a>,
-}
-
-impl From<SegmentGetRecordOutput<'_>> for Segment<'_> {
-    fn from(output: SegmentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Segment<'_> {
-    const NSID: &'static str = "place.stream.segment";
-    type Record = SegmentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SegmentRecord;
-impl jacquard_common::xrpc::XrpcResp for SegmentRecord {
-    const NSID: &'static str = "place.stream.segment";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SegmentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SegmentRecord {
-    const NSID: &'static str = "place.stream.segment";
-    type Record = SegmentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.segment"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_segment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SegmentView<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod segment_view_state {
@@ -1511,46 +1568,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.segment"
-    }
-    fn def_name() -> &'static str {
-        "segmentView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_segment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Video<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bframes: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub codec: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub framerate: std::option::Option<crate::place_stream::segment::Framerate<'a>>,
-    pub height: i64,
-    pub width: i64,
-}
-
 pub mod video_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1561,49 +1578,49 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Codec;
+        type Width;
         type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Codec = Unset;
+        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Codec = S::Codec;
-        type Height = S::Height;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodec<S> {}
     impl<S: State> State for SetCodec<S> {
-        type Width = S::Width;
         type Codec = Set<members::codec>;
+        type Width = S::Width;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Codec = S::Codec;
+        type Width = Set<members::width>;
         type Height = S::Height;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Codec = S::Codec;
+        type Width = S::Width;
         type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `codec` field
         pub struct codec(());
+        ///Marker type for the `width` field
+        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
     }
@@ -1732,8 +1749,8 @@ where
 impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
-    S::Width: video_state::IsSet,
     S::Codec: video_state::IsSet,
+    S::Width: video_state::IsSet,
     S::Height: video_state::IsSet,
 {
     /// Build the final struct
@@ -1763,22 +1780,5 @@ where
             width: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.segment"
-    }
-    fn def_name() -> &'static str {
-        "video"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_segment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

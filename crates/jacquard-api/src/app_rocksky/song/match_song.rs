@@ -22,6 +22,49 @@ pub struct MatchSong<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MatchSongOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::song::SongViewDetailed<'a>,
+}
+
+/// Response type for
+///app.rocksky.song.matchSong
+pub struct MatchSongResponse;
+impl jacquard_common::xrpc::XrpcResp for MatchSongResponse {
+    const NSID: &'static str = "app.rocksky.song.matchSong";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MatchSongOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for MatchSong<'a> {
+    const NSID: &'static str = "app.rocksky.song.matchSong";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = MatchSongResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.song.matchSong
+pub struct MatchSongRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MatchSongRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.song.matchSong";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = MatchSong<'de>;
+    type Response = MatchSongResponse;
+}
+
 pub mod match_song_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,47 +188,4 @@ where
             title: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MatchSongOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::song::SongViewDetailed<'a>,
-}
-
-/// Response type for
-///app.rocksky.song.matchSong
-pub struct MatchSongResponse;
-impl jacquard_common::xrpc::XrpcResp for MatchSongResponse {
-    const NSID: &'static str = "app.rocksky.song.matchSong";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MatchSongOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for MatchSong<'a> {
-    const NSID: &'static str = "app.rocksky.song.matchSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = MatchSongResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.song.matchSong
-pub struct MatchSongRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for MatchSongRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.song.matchSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = MatchSong<'de>;
-    type Response = MatchSongResponse;
 }

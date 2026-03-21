@@ -20,6 +20,82 @@ pub struct GetPost<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostOutput<'a> {
+    #[serde(borrow)]
+    pub post: crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetPostError<'a> {
+    #[serde(rename = "PostNotFound")]
+    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetPostError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::PostNotFound(msg) => {
+                write!(f, "PostNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.chronosky.schedule.getPost
+pub struct GetPostResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
+    const NSID: &'static str = "app.chronosky.schedule.getPost";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPostOutput<'de>;
+    type Err<'de> = GetPostError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
+    const NSID: &'static str = "app.chronosky.schedule.getPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPostResponse;
+}
+
+/// Endpoint type for
+///app.chronosky.schedule.getPost
+pub struct GetPostRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
+    const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPost<'de>;
+    type Response = GetPostResponse;
+}
+
 pub mod get_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,80 +183,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPostOutput<'a> {
-    #[serde(borrow)]
-    pub post: crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPostError<'a> {
-    #[serde(rename = "PostNotFound")]
-    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetPostError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::PostNotFound(msg) => {
-                write!(f, "PostNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.chronosky.schedule.getPost
-pub struct GetPostResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
-    const NSID: &'static str = "app.chronosky.schedule.getPost";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostOutput<'de>;
-    type Err<'de> = GetPostError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
-    const NSID: &'static str = "app.chronosky.schedule.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPostResponse;
-}
-
-/// Endpoint type for
-///app.chronosky.schedule.getPost
-pub struct GetPostRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
-    const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPost<'de>;
-    type Response = GetPostResponse;
 }

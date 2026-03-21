@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,57 @@ pub struct GetEditHistory<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub resource: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEditHistoryOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub diffs: Vec<crate::sh_weaver::edit::EditHistoryEntry<'a>>,
+    #[serde(borrow)]
+    pub roots: Vec<crate::sh_weaver::edit::EditHistoryEntry<'a>>,
+}
+
+/// Response type for
+///sh.weaver.edit.getEditHistory
+pub struct GetEditHistoryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEditHistoryResponse {
+    const NSID: &'static str = "sh.weaver.edit.getEditHistory";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEditHistoryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditHistory<'a> {
+    const NSID: &'static str = "sh.weaver.edit.getEditHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEditHistoryResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.edit.getEditHistory
+pub struct GetEditHistoryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEditHistoryRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEditHistory<'de>;
+    type Response = GetEditHistoryResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_edit_history_state {
@@ -177,51 +224,4 @@ where
             resource: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEditHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub diffs: Vec<crate::sh_weaver::edit::EditHistoryEntry<'a>>,
-    #[serde(borrow)]
-    pub roots: Vec<crate::sh_weaver::edit::EditHistoryEntry<'a>>,
-}
-
-/// Response type for
-///sh.weaver.edit.getEditHistory
-pub struct GetEditHistoryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEditHistoryResponse {
-    const NSID: &'static str = "sh.weaver.edit.getEditHistory";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEditHistoryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditHistory<'a> {
-    const NSID: &'static str = "sh.weaver.edit.getEditHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEditHistoryResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.edit.getEditHistory
-pub struct GetEditHistoryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEditHistoryRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEditHistory<'de>;
-    type Response = GetEditHistoryResponse;
 }

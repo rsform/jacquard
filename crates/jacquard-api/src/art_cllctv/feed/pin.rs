@@ -22,6 +22,84 @@ pub struct Pin<'a> {
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PinGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pin<'a>,
+}
+
+impl<'a> Pin<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PinRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PinRecord;
+impl jacquard_common::xrpc::XrpcResp for PinRecord {
+    const NSID: &'static str = "art.cllctv.feed.pin";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PinGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PinGetRecordOutput<'_>> for Pin<'_> {
+    fn from(output: PinGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pin<'_> {
+    const NSID: &'static str = "art.cllctv.feed.pin";
+    type Record = PinRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PinRecord {
+    const NSID: &'static str = "art.cllctv.feed.pin";
+    type Record = PinRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pin<'a> {
+    fn nsid() -> &'static str {
+        "art.cllctv.feed.pin"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_art_cllctv_feed_pin()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod pin_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -159,84 +237,6 @@ where
             subject: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Pin<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PinRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PinGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pin<'a>,
-}
-
-impl From<PinGetRecordOutput<'_>> for Pin<'_> {
-    fn from(output: PinGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Pin<'_> {
-    const NSID: &'static str = "art.cllctv.feed.pin";
-    type Record = PinRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PinRecord;
-impl jacquard_common::xrpc::XrpcResp for PinRecord {
-    const NSID: &'static str = "art.cllctv.feed.pin";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PinGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PinRecord {
-    const NSID: &'static str = "art.cllctv.feed.pin";
-    type Record = PinRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pin<'a> {
-    fn nsid() -> &'static str {
-        "art.cllctv.feed.pin"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_art_cllctv_feed_pin()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -24,6 +24,84 @@ pub struct FollowAccept<'a> {
     pub follow: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FollowAcceptGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: FollowAccept<'a>,
+}
+
+impl<'a> FollowAccept<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FollowAcceptRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FollowAcceptRecord;
+impl jacquard_common::xrpc::XrpcResp for FollowAcceptRecord {
+    const NSID: &'static str = "sh.weaver.graph.followAccept";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FollowAcceptGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FollowAcceptGetRecordOutput<'_>> for FollowAccept<'_> {
+    fn from(output: FollowAcceptGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for FollowAccept<'_> {
+    const NSID: &'static str = "sh.weaver.graph.followAccept";
+    type Record = FollowAcceptRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FollowAcceptRecord {
+    const NSID: &'static str = "sh.weaver.graph.followAccept";
+    type Record = FollowAcceptRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowAccept<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.followAccept"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_followAccept()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod follow_accept_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,84 +239,6 @@ where
             follow: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> FollowAccept<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FollowAcceptRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowAcceptGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FollowAccept<'a>,
-}
-
-impl From<FollowAcceptGetRecordOutput<'_>> for FollowAccept<'_> {
-    fn from(output: FollowAcceptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for FollowAccept<'_> {
-    const NSID: &'static str = "sh.weaver.graph.followAccept";
-    type Record = FollowAcceptRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FollowAcceptRecord;
-impl jacquard_common::xrpc::XrpcResp for FollowAcceptRecord {
-    const NSID: &'static str = "sh.weaver.graph.followAccept";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FollowAcceptGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FollowAcceptRecord {
-    const NSID: &'static str = "sh.weaver.graph.followAccept";
-    type Record = FollowAcceptRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowAccept<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.followAccept"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_followAccept()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -24,6 +24,84 @@ pub struct Stats<'a> {
     pub key: crate::blue__2048::key::Key<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Stats<'a>,
+}
+
+impl<'a> Stats<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StatsRecord;
+impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+    const NSID: &'static str = "blue.2048.key.player.stats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
+    fn from(output: StatsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Stats<'_> {
+    const NSID: &'static str = "blue.2048.key.player.stats";
+    type Record = StatsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StatsRecord {
+    const NSID: &'static str = "blue.2048.key.player.stats";
+    type Record = StatsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+    fn nsid() -> &'static str {
+        "blue.2048.key.player.stats"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_2048_key_player_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,84 +239,6 @@ where
             key: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Stats<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stats<'a>,
-}
-
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Stats<'_> {
-    const NSID: &'static str = "blue.2048.key.player.stats";
-    type Record = StatsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
-    const NSID: &'static str = "blue.2048.key.player.stats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StatsRecord {
-    const NSID: &'static str = "blue.2048.key.player.stats";
-    type Record = StatsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
-    fn nsid() -> &'static str {
-        "blue.2048.key.player.stats"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_2048_key_player_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

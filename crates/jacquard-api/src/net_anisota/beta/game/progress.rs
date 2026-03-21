@@ -69,6 +69,319 @@ pub struct Progress<'a> {
     pub xp_to_next_level: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProgressGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Progress<'a>,
+}
+
+/// Additional metadata about this progress update
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Metadata<'a> {
+    ///Version of the client when this progress was recorded
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Platform where the level up occurred (web, mobile, etc.)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Game-specific statistics and metrics
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Stats<'a> {
+    ///Total daily rewards claimed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub daily_rewards_claimed: std::option::Option<i64>,
+    ///Total items collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub items_collected: std::option::Option<i64>,
+    ///Date when posts read today was last updated (for daily reset tracking)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_post_read_date: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    ///Posts read today (resets daily)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub posts_read_today: std::option::Option<i64>,
+    ///Total posts read (all time, cumulative)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub posts_read_total: std::option::Option<i64>,
+    ///Total posts viewed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub posts_viewed: std::option::Option<i64>,
+    ///Total shuffles performed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub shuffles_performed: std::option::Option<i64>,
+    ///Total specimens collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub specimens_collected: std::option::Option<i64>,
+}
+
+impl<'a> Progress<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ProgressRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProgressRecord;
+impl jacquard_common::xrpc::XrpcResp for ProgressRecord {
+    const NSID: &'static str = "net.anisota.beta.game.progress";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProgressGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
+    fn from(output: ProgressGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Progress<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.progress";
+    type Record = ProgressRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ProgressRecord {
+    const NSID: &'static str = "net.anisota.beta.game.progress";
+    type Record = ProgressRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.progress"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_progress()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.previous_level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "previous_level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.total_xp;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_xp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.xp_gained_since_last_save {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp_gained_since_last_save",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.xp_to_next_level;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp_to_next_level",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.progress"
+    }
+    fn def_name() -> &'static str {
+        "metadata"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_progress()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.progress"
+    }
+    fn def_name() -> &'static str {
+        "stats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_progress()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.daily_rewards_claimed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "daily_rewards_claimed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.items_collected {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "items_collected",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_read_today {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_read_today",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_read_total {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_read_total",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_viewed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_viewed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.shuffles_performed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shuffles_performed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.specimens_collected {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "specimens_collected",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod progress_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -79,85 +392,85 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalXp;
-        type XpToNextLevel;
+        type ProgressPercentage;
         type Level;
         type CreatedAt;
-        type ProgressPercentage;
+        type XpToNextLevel;
+        type TotalXp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalXp = Unset;
-        type XpToNextLevel = Unset;
+        type ProgressPercentage = Unset;
         type Level = Unset;
         type CreatedAt = Unset;
-        type ProgressPercentage = Unset;
-    }
-    ///State transition - sets the `total_xp` field to Set
-    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
-    impl<S: State> State for SetTotalXp<S> {
-        type TotalXp = Set<members::total_xp>;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
-    impl<S: State> State for SetXpToNextLevel<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = Set<members::level>;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
-        type CreatedAt = Set<members::created_at>;
-        type ProgressPercentage = S::ProgressPercentage;
+        type XpToNextLevel = Unset;
+        type TotalXp = Unset;
     }
     ///State transition - sets the `progress_percentage` field to Set
     pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
     impl<S: State> State for SetProgressPercentage<S> {
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
+        type ProgressPercentage = Set<members::progress_percentage>;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = Set<members::progress_percentage>;
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
+    impl<S: State> State for SetXpToNextLevel<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
+        type TotalXp = S::TotalXp;
+    }
+    ///State transition - sets the `total_xp` field to Set
+    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
+    impl<S: State> State for SetTotalXp<S> {
+        type ProgressPercentage = S::ProgressPercentage;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = Set<members::total_xp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
+        ///Marker type for the `progress_percentage` field
+        pub struct progress_percentage(());
         ///Marker type for the `level` field
         pub struct level(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `progress_percentage` field
-        pub struct progress_percentage(());
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
     }
 }
 
@@ -491,11 +804,11 @@ where
 impl<'a, S> ProgressBuilder<'a, S>
 where
     S: progress_state::State,
-    S::TotalXp: progress_state::IsSet,
-    S::XpToNextLevel: progress_state::IsSet,
+    S::ProgressPercentage: progress_state::IsSet,
     S::Level: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
-    S::ProgressPercentage: progress_state::IsSet,
+    S::XpToNextLevel: progress_state::IsSet,
+    S::TotalXp: progress_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Progress<'a> {
@@ -544,142 +857,6 @@ where
             xp_to_next_level: self.__unsafe_private_named.14.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Progress<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProgressRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProgressGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Progress<'a>,
-}
-
-impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
-    fn from(output: ProgressGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Progress<'_> {
-    const NSID: &'static str = "net.anisota.beta.game.progress";
-    type Record = ProgressRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ProgressRecord;
-impl jacquard_common::xrpc::XrpcResp for ProgressRecord {
-    const NSID: &'static str = "net.anisota.beta.game.progress";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProgressGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ProgressRecord {
-    const NSID: &'static str = "net.anisota.beta.game.progress";
-    type Record = ProgressRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.progress"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_progress()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.previous_level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "previous_level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_xp;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_xp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.xp_gained_since_last_save {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp_gained_since_last_save",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.xp_to_next_level;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp_to_next_level",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -1172,182 +1349,5 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-/// Additional metadata about this progress update
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Metadata<'a> {
-    ///Version of the client when this progress was recorded
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Platform where the level up occurred (web, mobile, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.progress"
-    }
-    fn def_name() -> &'static str {
-        "metadata"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_progress()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Game-specific statistics and metrics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Stats<'a> {
-    ///Total daily rewards claimed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub daily_rewards_claimed: std::option::Option<i64>,
-    ///Total items collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub items_collected: std::option::Option<i64>,
-    ///Date when posts read today was last updated (for daily reset tracking)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_post_read_date: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
-    ///Posts read today (resets daily)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_today: std::option::Option<i64>,
-    ///Total posts read (all time, cumulative)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_total: std::option::Option<i64>,
-    ///Total posts viewed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_viewed: std::option::Option<i64>,
-    ///Total shuffles performed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shuffles_performed: std::option::Option<i64>,
-    ///Total specimens collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub specimens_collected: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.progress"
-    }
-    fn def_name() -> &'static str {
-        "stats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_progress()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.daily_rewards_claimed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "daily_rewards_claimed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.items_collected {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items_collected",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.posts_read_today {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_read_today",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.posts_read_total {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_read_total",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.posts_viewed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_viewed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.shuffles_performed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shuffles_performed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.specimens_collected {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "specimens_collected",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

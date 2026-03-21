@@ -47,6 +47,282 @@ pub struct Group<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// Type of group, see Table 30 of DAB SPI for idea
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GroupKind<'a> {
+    Series,
+    Show,
+    Concept,
+    Magazine,
+    Topic,
+    OtherCollection,
+    OtherChoice,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> GroupKind<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Series => "series",
+            Self::Show => "show",
+            Self::Concept => "concept",
+            Self::Magazine => "magazine",
+            Self::Topic => "topic",
+            Self::OtherCollection => "otherCollection",
+            Self::OtherChoice => "otherChoice",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for GroupKind<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "series" => Self::Series,
+            "show" => Self::Show,
+            "concept" => Self::Concept,
+            "magazine" => Self::Magazine,
+            "topic" => Self::Topic,
+            "otherCollection" => Self::OtherCollection,
+            "otherChoice" => Self::OtherChoice,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for GroupKind<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "series" => Self::Series,
+            "show" => Self::Show,
+            "concept" => Self::Concept,
+            "magazine" => Self::Magazine,
+            "topic" => Self::Topic,
+            "otherCollection" => Self::OtherCollection,
+            "otherChoice" => Self::OtherChoice,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for GroupKind<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for GroupKind<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for GroupKind<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for GroupKind<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for GroupKind<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for GroupKind<'_> {
+    type Output = GroupKind<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GroupKind::Series => GroupKind::Series,
+            GroupKind::Show => GroupKind::Show,
+            GroupKind::Concept => GroupKind::Concept,
+            GroupKind::Magazine => GroupKind::Magazine,
+            GroupKind::Topic => GroupKind::Topic,
+            GroupKind::OtherCollection => GroupKind::OtherCollection,
+            GroupKind::OtherChoice => GroupKind::OtherChoice,
+            GroupKind::Other(v) => GroupKind::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Group<'a>,
+}
+
+impl<'a> Group<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, GroupRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct GroupRecord;
+impl jacquard_common::xrpc::XrpcResp for GroupRecord {
+    const NSID: &'static str = "media.ionosphere.group";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GroupGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<GroupGetRecordOutput<'_>> for Group<'_> {
+    fn from(output: GroupGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Group<'_> {
+    const NSID: &'static str = "media.ionosphere.group";
+    type Record = GroupRecord;
+}
+
+impl jacquard_common::types::collection::Collection for GroupRecord {
+    const NSID: &'static str = "media.ionosphere.group";
+    type Record = GroupRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.group"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_group()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.ionosphere;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ionosphere",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.kind {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "kind",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod group_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -357,282 +633,6 @@ where
             name: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Group<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, GroupRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Type of group, see Table 30 of DAB SPI for idea
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GroupKind<'a> {
-    Series,
-    Show,
-    Concept,
-    Magazine,
-    Topic,
-    OtherCollection,
-    OtherChoice,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> GroupKind<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Series => "series",
-            Self::Show => "show",
-            Self::Concept => "concept",
-            Self::Magazine => "magazine",
-            Self::Topic => "topic",
-            Self::OtherCollection => "otherCollection",
-            Self::OtherChoice => "otherChoice",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for GroupKind<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "series" => Self::Series,
-            "show" => Self::Show,
-            "concept" => Self::Concept,
-            "magazine" => Self::Magazine,
-            "topic" => Self::Topic,
-            "otherCollection" => Self::OtherCollection,
-            "otherChoice" => Self::OtherChoice,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for GroupKind<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "series" => Self::Series,
-            "show" => Self::Show,
-            "concept" => Self::Concept,
-            "magazine" => Self::Magazine,
-            "topic" => Self::Topic,
-            "otherCollection" => Self::OtherCollection,
-            "otherChoice" => Self::OtherChoice,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for GroupKind<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for GroupKind<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for GroupKind<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for GroupKind<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for GroupKind<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for GroupKind<'_> {
-    type Output = GroupKind<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GroupKind::Series => GroupKind::Series,
-            GroupKind::Show => GroupKind::Show,
-            GroupKind::Concept => GroupKind::Concept,
-            GroupKind::Magazine => GroupKind::Magazine,
-            GroupKind::Topic => GroupKind::Topic,
-            GroupKind::OtherCollection => GroupKind::OtherCollection,
-            GroupKind::OtherChoice => GroupKind::OtherChoice,
-            GroupKind::Other(v) => GroupKind::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Group<'a>,
-}
-
-impl From<GroupGetRecordOutput<'_>> for Group<'_> {
-    fn from(output: GroupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Group<'_> {
-    const NSID: &'static str = "media.ionosphere.group";
-    type Record = GroupRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct GroupRecord;
-impl jacquard_common::xrpc::XrpcResp for GroupRecord {
-    const NSID: &'static str = "media.ionosphere.group";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GroupGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for GroupRecord {
-    const NSID: &'static str = "media.ionosphere.group";
-    type Record = GroupRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.group"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_group()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.icon {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.ionosphere;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ionosphere",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.kind {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "kind",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

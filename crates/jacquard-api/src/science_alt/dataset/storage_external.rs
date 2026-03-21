@@ -23,6 +23,36 @@ pub struct StorageExternal<'a> {
     pub urls: Vec<jacquard_common::types::string::UriValue<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageExternal<'a> {
+    fn nsid() -> &'static str {
+        "science.alt.dataset.storageExternal"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_science_alt_dataset_storageExternal()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.urls;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "urls",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod storage_external_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -189,35 +219,5 @@ fn lexicon_doc_science_alt_dataset_storageExternal() -> ::jacquard_lexicon::lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageExternal<'a> {
-    fn nsid() -> &'static str {
-        "science.alt.dataset.storageExternal"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_science_alt_dataset_storageExternal()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.urls;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "urls",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

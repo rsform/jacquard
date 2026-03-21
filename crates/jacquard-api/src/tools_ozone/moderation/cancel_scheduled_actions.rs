@@ -27,6 +27,129 @@ pub struct CancellationResults<'a> {
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FailedCancellation<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub error: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelScheduledActions<'a> {
+    ///Optional comment describing the reason for cancellation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Array of DID subjects to cancel scheduled actions for
+    #[serde(borrow)]
+    pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelScheduledActionsOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.moderation.cancelScheduledActions"
+    }
+    fn def_name() -> &'static str {
+        "cancellationResults"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.moderation.cancelScheduledActions"
+    }
+    fn def_name() -> &'static str {
+        "failedCancellation"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///tools.ozone.moderation.cancelScheduledActions
+pub struct CancelScheduledActionsResponse;
+impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CancelScheduledActionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CancelScheduledActionsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.cancelScheduledActions
+pub struct CancelScheduledActionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.cancelScheduledActions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CancelScheduledActions<'de>;
+    type Response = CancelScheduledActionsResponse;
+}
+
 pub mod cancellation_results_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,37 +160,37 @@ pub mod cancellation_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Failed;
         type Succeeded;
+        type Failed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Failed = Unset;
         type Succeeded = Unset;
-    }
-    ///State transition - sets the `failed` field to Set
-    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFailed<S> {}
-    impl<S: State> State for SetFailed<S> {
-        type Failed = Set<members::failed>;
-        type Succeeded = S::Succeeded;
+        type Failed = Unset;
     }
     ///State transition - sets the `succeeded` field to Set
     pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSucceeded<S> {}
     impl<S: State> State for SetSucceeded<S> {
-        type Failed = S::Failed;
         type Succeeded = Set<members::succeeded>;
+        type Failed = S::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFailed<S> {}
+    impl<S: State> State for SetFailed<S> {
+        type Succeeded = S::Succeeded;
+        type Failed = Set<members::failed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `failed` field
-        pub struct failed(());
         ///Marker type for the `succeeded` field
         pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
     }
 }
 
@@ -152,8 +275,8 @@ where
 impl<'a, S> CancellationResultsBuilder<'a, S>
 where
     S: cancellation_results_state::State,
-    S::Failed: cancellation_results_state::IsSet,
     S::Succeeded: cancellation_results_state::IsSet,
+    S::Failed: cancellation_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancellationResults<'a> {
@@ -417,44 +540,6 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.moderation.cancelScheduledActions"
-    }
-    fn def_name() -> &'static str {
-        "cancellationResults"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FailedCancellation<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub error: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod failed_cancellation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -617,44 +702,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.moderation.cancelScheduledActions"
-    }
-    fn def_name() -> &'static str {
-        "failedCancellation"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CancelScheduledActions<'a> {
-    ///Optional comment describing the reason for cancellation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Array of DID subjects to cancel scheduled actions for
-    #[serde(borrow)]
-    pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
-}
-
 pub mod cancel_scheduled_actions_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -783,51 +830,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CancelScheduledActionsOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-/// Response type for
-///tools.ozone.moderation.cancelScheduledActions
-pub struct CancelScheduledActionsResponse;
-impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CancelScheduledActionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CancelScheduledActionsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.cancelScheduledActions
-pub struct CancelScheduledActionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CancelScheduledActions<'de>;
-    type Response = CancelScheduledActionsResponse;
 }

@@ -82,6 +82,334 @@ pub struct Review<'a> {
     pub weighted_score: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReviewGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Review<'a>,
+}
+
+impl<'a> Review<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReviewRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ReviewRecord;
+impl jacquard_common::xrpc::XrpcResp for ReviewRecord {
+    const NSID: &'static str = "social.drydown.review";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ReviewGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
+    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Review<'_> {
+    const NSID: &'static str = "social.drydown.review";
+    type Record = ReviewRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ReviewRecord {
+    const NSID: &'static str = "social.drydown.review";
+    type Record = ReviewRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
+    fn nsid() -> &'static str {
+        "social.drydown.review"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_drydown_review()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.complexity {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.complexity {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.drydown_rating {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "drydown_rating",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.drydown_rating {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "drydown_rating",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.end_rating {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end_rating",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.end_rating {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end_rating",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.longevity {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.longevity {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mid_projection {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mid_projection",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mid_projection {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mid_projection",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.opening_projection {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "opening_projection",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.opening_projection {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "opening_projection",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.opening_rating {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "opening_rating",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.opening_rating {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "opening_rating",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.overall_rating {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "overall_rating",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.overall_rating {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "overall_rating",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sillage {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sillage",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sillage {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sillage",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.text {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.text {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 255usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 255usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.uv_index {
+            if *value > 11i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uv_index",
+                    ),
+                    max: 11i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.uv_index {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uv_index",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod review_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -92,37 +420,37 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Fragrance;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Fragrance = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Fragrance = S::Fragrance;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `fragrance` field to Set
     pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFragrance<S> {}
     impl<S: State> State for SetFragrance<S> {
-        type CreatedAt = S::CreatedAt;
         type Fragrance = Set<members::fragrance>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Fragrance = S::Fragrance;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `fragrance` field
         pub struct fragrance(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -477,8 +805,8 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::CreatedAt: review_state::IsSet,
     S::Fragrance: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -537,334 +865,6 @@ where
             weighted_score: self.__unsafe_private_named.19,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Review<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReviewRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Review<'a>,
-}
-
-impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
-    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Review<'_> {
-    const NSID: &'static str = "social.drydown.review";
-    type Record = ReviewRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ReviewRecord;
-impl jacquard_common::xrpc::XrpcResp for ReviewRecord {
-    const NSID: &'static str = "social.drydown.review";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReviewGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ReviewRecord {
-    const NSID: &'static str = "social.drydown.review";
-    type Record = ReviewRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
-    fn nsid() -> &'static str {
-        "social.drydown.review"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_drydown_review()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.complexity {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.complexity {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.drydown_rating {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "drydown_rating",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.drydown_rating {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "drydown_rating",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.end_rating {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.end_rating {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.longevity {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.longevity {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mid_projection {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mid_projection",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mid_projection {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mid_projection",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.opening_projection {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_projection",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.opening_projection {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_projection",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.opening_rating {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_rating",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.opening_rating {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_rating",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.overall_rating {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "overall_rating",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.overall_rating {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "overall_rating",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sillage {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sillage {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.text {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.text {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 255usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 255usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.uv_index {
-            if *value > 11i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
-                    max: 11i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.uv_index {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

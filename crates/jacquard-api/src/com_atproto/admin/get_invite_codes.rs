@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(100i64)
-}
-
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("recent"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -36,6 +28,59 @@ pub struct GetInviteCodes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetInviteCodesOutput<'a> {
+    #[serde(borrow)]
+    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///com.atproto.admin.getInviteCodes
+pub struct GetInviteCodesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
+    const NSID: &'static str = "com.atproto.admin.getInviteCodes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetInviteCodesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetInviteCodes<'a> {
+    const NSID: &'static str = "com.atproto.admin.getInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetInviteCodesResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.getInviteCodes
+pub struct GetInviteCodesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.getInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetInviteCodes<'de>;
+    type Response = GetInviteCodesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(100i64)
+}
+
+fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("recent"))
 }
 
 pub mod get_invite_codes_state {
@@ -143,49 +188,4 @@ where
             sort: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetInviteCodesOutput<'a> {
-    #[serde(borrow)]
-    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///com.atproto.admin.getInviteCodes
-pub struct GetInviteCodesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
-    const NSID: &'static str = "com.atproto.admin.getInviteCodes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetInviteCodes<'a> {
-    const NSID: &'static str = "com.atproto.admin.getInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetInviteCodesResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.getInviteCodes
-pub struct GetInviteCodesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.getInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetInviteCodes<'de>;
-    type Response = GetInviteCodesResponse;
 }

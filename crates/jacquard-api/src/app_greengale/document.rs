@@ -23,6 +23,243 @@ pub struct ContentRef<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// A markdown document with extended theme and LaTeX support.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Document<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blobs: std::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
+    ///Markdown content of the document
+    #[serde(borrow)]
+    pub content: jacquard_common::CowStr<'a>,
+    ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_document_latex")]
+    pub latex: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ogp: std::option::Option<crate::app_greengale::blog::Ogp<'a>>,
+    ///Document path relative to the publication URL (e.g., /handle/rkey)
+    #[serde(borrow)]
+    pub path: jacquard_common::CowStr<'a>,
+    ///Publication timestamp
+    pub published_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub theme: std::option::Option<crate::app_greengale::blog::Theme<'a>>,
+    ///Document title
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    ///Base publication URL (e.g., https://greengale.app)
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+    ///Controls who can view this document Defaults to `"public"`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_document_visibility")]
+    #[serde(borrow)]
+    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Document<'a>,
+}
+
+impl<'a> Document<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DocumentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRef<'a> {
+    fn nsid() -> &'static str {
+        "app.greengale.document"
+    }
+    fn def_name() -> &'static str {
+        "contentRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_greengale_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentRecord;
+impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
+    const NSID: &'static str = "app.greengale.document";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DocumentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
+    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Document<'_> {
+    const NSID: &'static str = "app.greengale.document";
+    type Record = DocumentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DocumentRecord {
+    const NSID: &'static str = "app.greengale.document";
+    type Record = DocumentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
+    fn nsid() -> &'static str {
+        "app.greengale.document"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_greengale_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.content;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.path;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.subtitle {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subtitle",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.url;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.visibility {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 16usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "visibility",
+                    ),
+                    max: 16usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod content_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -435,77 +672,6 @@ fn lexicon_doc_app_greengale_document() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRef<'a> {
-    fn nsid() -> &'static str {
-        "app.greengale.document"
-    }
-    fn def_name() -> &'static str {
-        "contentRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_greengale_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A markdown document with extended theme and LaTeX support.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Document<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub blobs: std::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
-    ///Markdown content of the document
-    #[serde(borrow)]
-    pub content: jacquard_common::CowStr<'a>,
-    ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_document_latex")]
-    pub latex: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub ogp: std::option::Option<crate::app_greengale::blog::Ogp<'a>>,
-    ///Document path relative to the publication URL (e.g., /handle/rkey)
-    #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
-    ///Publication timestamp
-    pub published_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub theme: std::option::Option<crate::app_greengale::blog::Theme<'a>>,
-    ///Document title
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    ///Base publication URL (e.g., https://greengale.app)
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
-    ///Controls who can view this document Defaults to `"public"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_document_visibility")]
-    #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 fn _default_document_latex() -> std::option::Option<bool> {
     Some(false)
 }
@@ -526,85 +692,85 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PublishedAt;
-        type Title;
-        type Url;
-        type Content;
         type Path;
+        type Url;
+        type Title;
+        type PublishedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PublishedAt = Unset;
-        type Title = Unset;
-        type Url = Unset;
-        type Content = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type PublishedAt = Set<members::published_at>;
-        type Title = S::Title;
-        type Url = S::Url;
-        type Content = S::Content;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type PublishedAt = S::PublishedAt;
-        type Title = Set<members::title>;
-        type Url = S::Url;
-        type Content = S::Content;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Url = Set<members::url>;
-        type Content = S::Content;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Url = S::Url;
-        type Content = Set<members::content>;
-        type Path = S::Path;
+        type Url = Unset;
+        type Title = Unset;
+        type PublishedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
-        type PublishedAt = S::PublishedAt;
-        type Title = S::Title;
-        type Url = S::Url;
-        type Content = S::Content;
         type Path = Set<members::path>;
+        type Url = S::Url;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Path = S::Path;
+        type Url = Set<members::url>;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Path = S::Path;
+        type Url = S::Url;
+        type Title = Set<members::title>;
+        type PublishedAt = S::PublishedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Path = S::Path;
+        type Url = S::Url;
+        type Title = S::Title;
+        type PublishedAt = Set<members::published_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Path = S::Path;
+        type Url = S::Url;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -881,11 +1047,11 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::PublishedAt: document_state::IsSet,
-    S::Title: document_state::IsSet,
-    S::Url: document_state::IsSet,
-    S::Content: document_state::IsSet,
     S::Path: document_state::IsSet,
+    S::Url: document_state::IsSet,
+    S::Title: document_state::IsSet,
+    S::PublishedAt: document_state::IsSet,
+    S::Content: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -934,171 +1100,5 @@ where
                 .or_else(|| Some(jacquard_common::CowStr::from("public"))),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Document<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DocumentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Document<'a>,
-}
-
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Document<'_> {
-    const NSID: &'static str = "app.greengale.document";
-    type Record = DocumentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DocumentRecord;
-impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
-    const NSID: &'static str = "app.greengale.document";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DocumentRecord {
-    const NSID: &'static str = "app.greengale.document";
-    type Record = DocumentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
-    fn nsid() -> &'static str {
-        "app.greengale.document"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_greengale_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.content;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.path;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.subtitle {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subtitle",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.url;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.visibility {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "visibility",
-                    ),
-                    max: 16usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

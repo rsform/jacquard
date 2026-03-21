@@ -20,6 +20,49 @@ pub struct GetResourceTags<'a> {
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetResourceTagsOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::sh_weaver::graph::ResourceTagsView<'a>,
+}
+
+/// Response type for
+///sh.weaver.graph.getResourceTags
+pub struct GetResourceTagsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetResourceTagsResponse {
+    const NSID: &'static str = "sh.weaver.graph.getResourceTags";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetResourceTagsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceTags<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getResourceTags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetResourceTagsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getResourceTags
+pub struct GetResourceTagsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetResourceTagsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getResourceTags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetResourceTags<'de>;
+    type Response = GetResourceTagsResponse;
+}
+
 pub mod get_resource_tags_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             resource: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetResourceTagsOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::sh_weaver::graph::ResourceTagsView<'a>,
-}
-
-/// Response type for
-///sh.weaver.graph.getResourceTags
-pub struct GetResourceTagsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetResourceTagsResponse {
-    const NSID: &'static str = "sh.weaver.graph.getResourceTags";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceTagsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceTags<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getResourceTags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetResourceTagsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getResourceTags
-pub struct GetResourceTagsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetResourceTagsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getResourceTags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceTags<'de>;
-    type Response = GetResourceTagsResponse;
 }

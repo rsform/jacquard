@@ -20,6 +20,67 @@ pub struct GetRecords<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecordsOutput<'a> {
+    #[serde(borrow)]
+    pub records: Vec<GetRecordsOutputRecordsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRecordsOutputRecordsItem<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#recordViewDetail")]
+    RecordViewDetail(Box<crate::tools_ozone::moderation::RecordViewDetail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
+    RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
+}
+
+/// Response type for
+///tools.ozone.moderation.getRecords
+pub struct GetRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRecordsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecords<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.getRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecordsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.getRecords
+pub struct GetRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecords<'de>;
+    type Response = GetRecordsResponse;
+}
+
 pub mod get_records_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,65 +170,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecordsOutput<'a> {
-    #[serde(borrow)]
-    pub records: Vec<GetRecordsOutputRecordsItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordsOutputRecordsItem<'a> {
-    #[serde(rename = "tools.ozone.moderation.defs#recordViewDetail")]
-    RecordViewDetail(Box<crate::tools_ozone::moderation::RecordViewDetail<'a>>),
-    #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
-    RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
-}
-
-/// Response type for
-///tools.ozone.moderation.getRecords
-pub struct GetRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.getRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecords<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.getRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRecordsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.getRecords
-pub struct GetRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecords<'de>;
-    type Response = GetRecordsResponse;
 }

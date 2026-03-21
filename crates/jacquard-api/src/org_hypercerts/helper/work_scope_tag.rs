@@ -48,6 +48,183 @@ pub struct WorkScopeTag<'a> {
     pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum WorkScopeTagExternalReference<'a> {
+    #[serde(rename = "org.hypercerts.defs#uri")]
+    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    #[serde(rename = "org.hypercerts.defs#smallBlob")]
+    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkScopeTagGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: WorkScopeTag<'a>,
+}
+
+impl<'a> WorkScopeTag<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WorkScopeTagRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct WorkScopeTagRecord;
+impl jacquard_common::xrpc::XrpcResp for WorkScopeTagRecord {
+    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WorkScopeTagGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<WorkScopeTagGetRecordOutput<'_>> for WorkScopeTag<'_> {
+    fn from(output: WorkScopeTagGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for WorkScopeTag<'_> {
+    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
+    type Record = WorkScopeTagRecord;
+}
+
+impl jacquard_common::types::collection::Collection for WorkScopeTagRecord {
+    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
+    type Record = WorkScopeTagRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.helper.workScopeTag"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_helper_workScopeTag()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.aliases {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "aliases",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 120usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    max: 120usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.kind {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "kind",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.label;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod work_scope_tag_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -58,51 +235,51 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Label;
         type CreatedAt;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Label = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Label = S::Label;
-        type CreatedAt = S::CreatedAt;
+        type Key = Unset;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type Key = S::Key;
         type Label = Set<members::label>;
         type CreatedAt = S::CreatedAt;
+        type Key = S::Key;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Key = S::Key;
         type Label = S::Label;
         type CreatedAt = Set<members::created_at>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `label` field
         pub struct label(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -292,9 +469,9 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
 impl<'a, S> WorkScopeTagBuilder<'a, S>
 where
     S: work_scope_tag_state::State,
-    S::Key: work_scope_tag_state::IsSet,
     S::Label: work_scope_tag_state::IsSet,
     S::CreatedAt: work_scope_tag_state::IsSet,
+    S::Key: work_scope_tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkScopeTag<'a> {
@@ -329,183 +506,6 @@ where
             parent: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> WorkScopeTag<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WorkScopeTagRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum WorkScopeTagExternalReference<'a> {
-    #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
-    #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkScopeTagGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WorkScopeTag<'a>,
-}
-
-impl From<WorkScopeTagGetRecordOutput<'_>> for WorkScopeTag<'_> {
-    fn from(output: WorkScopeTagGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for WorkScopeTag<'_> {
-    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
-    type Record = WorkScopeTagRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct WorkScopeTagRecord;
-impl jacquard_common::xrpc::XrpcResp for WorkScopeTagRecord {
-    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = WorkScopeTagGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for WorkScopeTagRecord {
-    const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
-    type Record = WorkScopeTagRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.helper.workScopeTag"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_helper_workScopeTag()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.aliases {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "aliases",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 120usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    max: 120usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.kind {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "kind",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.label;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

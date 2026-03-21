@@ -47,6 +47,170 @@ pub struct Tape<'a> {
     pub zip_url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TapeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Tape<'a>,
+}
+
+impl<'a> Tape<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TapeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TapeRecord;
+impl jacquard_common::xrpc::XrpcResp for TapeRecord {
+    const NSID: &'static str = "computer.aesthetic.tape";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TapeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TapeGetRecordOutput<'_>> for Tape<'_> {
+    fn from(output: TapeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Tape<'_> {
+    const NSID: &'static str = "computer.aesthetic.tape";
+    type Record = TapeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TapeRecord {
+    const NSID: &'static str = "computer.aesthetic.tape";
+    type Record = TapeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
+    fn nsid() -> &'static str {
+        "computer.aesthetic.tape"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_computer_aesthetic_tape()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.thumbnail {
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.thumbnail {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/jpeg", "image/png"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "thumbnail",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.video {
+            {
+                let size = value.blob().size;
+                if size > 52428800usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        max: 52428800usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.video {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["video/mp4"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        accepted: vec!["video/mp4".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod tape_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -57,51 +221,51 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
-        type Code;
         type Slug;
+        type Code;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
-        type Code = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Code = S::Code;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type When = S::When;
-        type Code = Set<members::code>;
-        type Slug = S::Slug;
+        type Code = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type When = S::When;
-        type Code = S::Code;
         type Slug = Set<members::slug>;
+        type Code = S::Code;
+        type When = S::When;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Slug = S::Slug;
+        type Code = Set<members::code>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -285,9 +449,9 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::When: tape_state::IsSet,
-    S::Code: tape_state::IsSet,
     S::Slug: tape_state::IsSet,
+    S::Code: tape_state::IsSet,
+    S::When: tape_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tape<'a> {
@@ -322,170 +486,6 @@ where
             zip_url: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Tape<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TapeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TapeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tape<'a>,
-}
-
-impl From<TapeGetRecordOutput<'_>> for Tape<'_> {
-    fn from(output: TapeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Tape<'_> {
-    const NSID: &'static str = "computer.aesthetic.tape";
-    type Record = TapeRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TapeRecord;
-impl jacquard_common::xrpc::XrpcResp for TapeRecord {
-    const NSID: &'static str = "computer.aesthetic.tape";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TapeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TapeRecord {
-    const NSID: &'static str = "computer.aesthetic.tape";
-    type Record = TapeRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
-    fn nsid() -> &'static str {
-        "computer.aesthetic.tape"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_computer_aesthetic_tape()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.thumbnail {
-            {
-                let size = value.blob().size;
-                if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumbnail",
-                        ),
-                        max: 1048576usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.thumbnail {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/jpeg", "image/png"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumbnail",
-                        ),
-                        accepted: vec![
-                            "image/jpeg".to_string(), "image/png".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.video {
-            {
-                let size = value.blob().size;
-                if size > 52428800usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "video",
-                        ),
-                        max: 52428800usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.video {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["video/mp4"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "video",
-                        ),
-                        accepted: vec!["video/mp4".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

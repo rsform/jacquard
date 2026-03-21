@@ -22,6 +22,32 @@ pub struct GoogleCallback<'a> {
     pub state: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///app.ocho.auth.googleCallback
+pub struct GoogleCallbackResponse;
+impl jacquard_common::xrpc::XrpcResp for GoogleCallbackResponse {
+    const NSID: &'static str = "app.ocho.auth.googleCallback";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GoogleCallback<'a> {
+    const NSID: &'static str = "app.ocho.auth.googleCallback";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GoogleCallbackResponse;
+}
+
+/// Endpoint type for
+///app.ocho.auth.googleCallback
+pub struct GoogleCallbackRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.auth.googleCallback";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GoogleCallback<'de>;
+    type Response = GoogleCallbackResponse;
+}
+
 pub mod google_callback_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,30 +171,4 @@ where
             state: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-/// Response type for
-///app.ocho.auth.googleCallback
-pub struct GoogleCallbackResponse;
-impl jacquard_common::xrpc::XrpcResp for GoogleCallbackResponse {
-    const NSID: &'static str = "app.ocho.auth.googleCallback";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GoogleCallback<'a> {
-    const NSID: &'static str = "app.ocho.auth.googleCallback";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GoogleCallbackResponse;
-}
-
-/// Endpoint type for
-///app.ocho.auth.googleCallback
-pub struct GoogleCallbackRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.auth.googleCallback";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GoogleCallback<'de>;
-    type Response = GoogleCallbackResponse;
 }

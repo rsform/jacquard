@@ -39,6 +39,4950 @@ pub struct Abilities<'a> {
     pub wis: std::option::Option<i64>,
 }
 
+/// An attack action
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Attack<'a> {
+    ///Attack bonus (e.g., +5)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub bonus: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Damage dice (e.g., 1d8)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Damage bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub damage_bonus: std::option::Option<i64>,
+    ///Damage type
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub damage_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Attack name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+/// Currency
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Coinage<'a> {
+    ///Copper pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cp: std::option::Option<i64>,
+    ///Electrum pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ep: std::option::Option<i64>,
+    ///Gold pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub gp: std::option::Option<i64>,
+    ///Platinum pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pp: std::option::Option<i64>,
+    ///Silver pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sp: std::option::Option<i64>,
+}
+
+/// Combat and defensive stats
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Combat<'a> {
+    ///Armor Class
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ac: std::option::Option<i64>,
+    ///Hit dice (e.g., 5d10)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hit_dice: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Hit dice expended
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hit_dice_used: std::option::Option<i64>,
+    ///Initiative modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub initiative: std::option::Option<i64>,
+    ///Speed in feet
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub speed: std::option::Option<i64>,
+}
+
+/// Status conditions and effects
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Conditions<'a> {
+    ///Death saving throw progress
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub death_saves: std::option::Option<crate::actor_rpg::stats::DeathSaves<'a>>,
+    ///Exhaustion level (0-6)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub exhaustion: std::option::Option<i64>,
+    ///Has inspiration
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub inspiration: std::option::Option<bool>,
+}
+
+/// A custom stat
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CustomStat<'a> {
+    ///Category (optional)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Maximum (optional)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max: std::option::Option<i64>,
+    ///Minimum (optional)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min: std::option::Option<i64>,
+    ///Stat name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Value
+    pub value: i64,
+}
+
+/// User-defined custom stat system
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CustomStats<'a> {
+    ///Custom stat entries
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub stats: std::option::Option<Vec<crate::actor_rpg::stats::CustomStat<'a>>>,
+    ///System name
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub system_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Version
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub system_version: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccAbilities<'a> {
+    ///Agility
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub agi: std::option::Option<i64>,
+    ///Agility base (before spellburn)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub agi_base: std::option::Option<i64>,
+    ///Intelligence
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub int: std::option::Option<i64>,
+    ///Luck (can be permanently burned)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub luk: std::option::Option<i64>,
+    ///Personality
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub per: std::option::Option<i64>,
+    ///Stamina
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sta: std::option::Option<i64>,
+    ///Stamina base (before spellburn)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sta_base: std::option::Option<i64>,
+    ///Strength
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub str: std::option::Option<i64>,
+    ///Strength base (before spellburn)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub str_base: std::option::Option<i64>,
+}
+
+/// A weapon attack (includes deed die for warriors)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccAttack<'a> {
+    ///Attack modifier (e.g., +2, d16+2 for deed die)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub attack_mod: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Damage dice (e.g., 1d8+2, 1d6+d3)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Damage bonus (e.g., +2, +d3 for deed die)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub damage_bonus: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Weapon name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Special properties (backstab, trained weapon, etc.)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Range (melee or distance)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub range: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Attack type (melee, ranged, etc.)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Cleric spellcasting features
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccCleric<'a> {
+    ///Deity or supernatural patron
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub deity: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Current disapproval range (starts at 1, accumulates)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disapproval_range: std::option::Option<i64>,
+    ///Deity-specific disapproval table if any
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub disapproval_table: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Holy symbol description
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub holy_symbol: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Known cleric spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub known_spells: std::option::Option<
+        Vec<crate::actor_rpg::stats::DccClericSpell<'a>>,
+    >,
+    ///Lay on hands die (e.g., d14, d16)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lay_on_hands_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Highest spell level accessible
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_spell_level: std::option::Option<i64>,
+    ///Spell check modifier (PER mod + level)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spell_check_mod: std::option::Option<i64>,
+    ///Turn unholy die (e.g., d14, d16)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub turn_unholy_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Serves a Chaotic deity (unholy instead of holy)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub unholy: std::option::Option<bool>,
+}
+
+/// A cleric spell
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccClericSpell<'a> {
+    ///Spell level
+    pub level: i64,
+    ///Spell name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Additional spell notes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Casting may cause additional disapproval
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sinful: std::option::Option<bool>,
+}
+
+/// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccCoinage<'a> {
+    ///Copper pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cp: std::option::Option<i64>,
+    ///Gold pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub gp: std::option::Option<i64>,
+    ///Silver pieces
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sp: std::option::Option<i64>,
+}
+
+/// Combat statistics
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccCombat<'a> {
+    ///Armor Class (10 + armor + AGI mod + shield)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ac: std::option::Option<i64>,
+    ///Primary action die (e.g., d20, d20+d14)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub action_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Base attack modifier (level-based for non-warriors)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub attack_mod: std::option::Option<i64>,
+    ///Critical hit die (e.g., d8, d12, d14)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub crit_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Critical hit table (I, II, III, IV, V)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub crit_table: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Fumble die (typically d4 for 0-level, varies by armor)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub fumble_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Initiative modifier (AGI mod)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub initiative: std::option::Option<i64>,
+    ///Speed in feet (typically 30, Dwarves 20)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub speed: std::option::Option<i64>,
+}
+
+/// A corruption effect from failed spell checks
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccCorruption<'a> {
+    ///Description of the corruption
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub effect: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether this corruption is permanent
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub permanent: std::option::Option<bool>,
+    ///What spell caused this corruption
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Corruption severity (minor, major, greater)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Equipment and inventory
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccEquipment<'a> {
+    ///Armor worn (affects fumble die)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Armor check penalty (affects skills)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub armor_check_penalty: std::option::Option<i64>,
+    ///Other equipment
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Shield (if any)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub shield: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Trade goods from occupation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub trade_goods: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Valuables and treasure
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Weapons carried
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Halfling class features
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccHalfling<'a> {
+    ///Can spend luck to aid nearby allies
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub good_luck_charm: std::option::Option<bool>,
+    ///Infravision range in feet (30)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub infravision: std::option::Option<i64>,
+    ///Total luck points spent helping allies
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub luck_spent_on_allies: std::option::Option<i64>,
+    ///Weapon type luck modifier applies to
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Bonus to sneak/hide when in natural environment
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sneak_and_hide: std::option::Option<i64>,
+    ///Can dual-wield without penalty
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub two_weapon_fighting: std::option::Option<bool>,
+}
+
+/// Hit points (0-level characters use 1d4 + STA mod)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccHp<'a> {
+    ///Current HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub current: std::option::Option<i64>,
+    ///Maximum HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max: std::option::Option<i64>,
+}
+
+/// DCC character identity and progression
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccIdentity<'a> {
+    ///Alignment (Lawful, Neutral, Chaotic)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Character level (0 for funnel characters)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub level: std::option::Option<i64>,
+    ///0-level occupation (e.g., Blacksmith, Farmer)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub occupation: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Level title (e.g., Squire, Cutpurse, Acolyte)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Experience points
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub xp: std::option::Option<i64>,
+}
+
+/// Birth augur and luck mechanics
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccLuck<'a> {
+    ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub birth_augur: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///What the luck modifier applies to
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub birth_augur_effect: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Weapon type that luck applies to (Dwarves/Halflings)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Starting luck score (for tracking burned luck)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub starting_luck: std::option::Option<i64>,
+}
+
+/// DCC saving throws (3 saves, not 6)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccSaves<'a> {
+    ///Fortitude save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub fort: std::option::Option<i64>,
+    ///Reflex save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub r#ref: std::option::Option<i64>,
+    ///Willpower save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub will: std::option::Option<i64>,
+}
+
+/// Current spellburn (temporary ability score sacrifice)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccSpellburn<'a> {
+    ///Agility points currently burned
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub agi_burned: std::option::Option<i64>,
+    ///Points recovered per day
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub recovery_rate: std::option::Option<i64>,
+    ///Stamina points currently burned
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sta_burned: std::option::Option<i64>,
+    ///Strength points currently burned
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub str_burned: std::option::Option<i64>,
+}
+
+/// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccStats<'a> {
+    ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub abilities: std::option::Option<crate::actor_rpg::stats::DccAbilities<'a>>,
+    ///Notes about special abilities, class features, and racial traits
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub abilities_notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Weapon attacks
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::DccAttack<'a>>>,
+    ///Cleric spellcasting (disapproval, turn unholy, lay on hands)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cleric: std::option::Option<crate::actor_rpg::stats::DccCleric<'a>>,
+    ///Currency (cp, sp, gp)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub coinage: std::option::Option<crate::actor_rpg::stats::DccCoinage<'a>>,
+    ///Combat stats (AC, speed, action die, initiative, crit die/table)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub combat: std::option::Option<crate::actor_rpg::stats::DccCombat<'a>>,
+    ///Gear, treasure, and trade goods
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub equipment: std::option::Option<crate::actor_rpg::stats::DccEquipment<'a>>,
+    ///Halfling luck-sharing and dual wielding
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub halfling: std::option::Option<crate::actor_rpg::stats::DccHalfling<'a>>,
+    ///Hit points
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hp: std::option::Option<crate::actor_rpg::stats::DccHp<'a>>,
+    ///Character identity (occupation, class, level, alignment)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identity: std::option::Option<crate::actor_rpg::stats::DccIdentity<'a>>,
+    ///Languages known
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Birth augur and luck tracking
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub luck: std::option::Option<crate::actor_rpg::stats::DccLuck<'a>>,
+    ///Character notes, backstory, and special abilities
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Saving throws (Reflex, Fortitude, Willpower)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub saves: std::option::Option<crate::actor_rpg::stats::DccSaves<'a>>,
+    ///Thief skills and abilities
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub thief: std::option::Option<crate::actor_rpg::stats::DccThief<'a>>,
+    ///Warrior/Dwarf class features (deed die, mighty deeds)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub warrior: std::option::Option<crate::actor_rpg::stats::DccWarrior<'a>>,
+    ///Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub wizard: std::option::Option<crate::actor_rpg::stats::DccWizard<'a>>,
+}
+
+/// Thief class features and skills
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccThief<'a> {
+    ///Alignment (affects some skill targets)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Backstab damage die level (+1, +2, etc.)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub backstab: std::option::Option<i64>,
+    ///Weapon type that luck applies to (one type only)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Thief skill modifiers
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub skills: std::option::Option<crate::actor_rpg::stats::DccThiefSkills<'a>>,
+}
+
+/// Thief skill bonuses (roll d20 + skill vs target)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccThiefSkills<'a> {
+    ///Backstab attack bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub backstab: std::option::Option<i64>,
+    ///Cast spell from scroll bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cast_spell_from_scroll: std::option::Option<i64>,
+    ///Climb sheer surfaces bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub climb_sheer_surfaces: std::option::Option<i64>,
+    ///Disable trap bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disable_trap: std::option::Option<i64>,
+    ///Disguise self bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disguise_self: std::option::Option<i64>,
+    ///Find trap bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub find_trap: std::option::Option<i64>,
+    ///Forge document bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub forge_document: std::option::Option<i64>,
+    ///Handle poison bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub handle_poison: std::option::Option<i64>,
+    ///Hide in shadows bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hide_in_shadows: std::option::Option<i64>,
+    ///Pick lock bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pick_lock: std::option::Option<i64>,
+    ///Pick pocket bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pick_pocket: std::option::Option<i64>,
+    ///Read languages bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub read_languages: std::option::Option<i64>,
+    ///Sneak silently bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sneak_silently: std::option::Option<i64>,
+}
+
+/// Warrior and Dwarf class features
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccWarrior<'a> {
+    ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub deed_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Infravision range in feet (Dwarves: 60)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub infravision: std::option::Option<i64>,
+    ///Weapon type luck modifier applies to
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Signature mighty deeds of arms
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mighty_deeds: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Can use shield bash (Dwarves)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub shield_bash: std::option::Option<bool>,
+    ///Can smell gold/gems (Dwarves)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub smell_gold: std::option::Option<bool>,
+    ///Underground detection bonus (Dwarves: equal to level)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub underground_skills: std::option::Option<i64>,
+}
+
+/// Wizard and Elf spellcasting features
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccWizard<'a> {
+    ///Corruption effects suffered (structured)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub corruption: std::option::Option<Vec<crate::actor_rpg::stats::DccCorruption<'a>>>,
+    ///Corruption effects as free-form text
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub corruption_text: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Known spells with mercurial magic effects
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub known_spells: std::option::Option<
+        Vec<crate::actor_rpg::stats::DccWizardSpell<'a>>,
+    >,
+    ///Highest spell level accessible
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_spell_level: std::option::Option<i64>,
+    ///Supernatural patron (if any)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub patron: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Patron bond description and effects
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub patron_bond: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Spell check modifier (INT mod + level)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spell_check_mod: std::option::Option<i64>,
+    ///Current spellburn status
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub spellburn: std::option::Option<crate::actor_rpg::stats::DccSpellburn<'a>>,
+}
+
+/// A wizard spell with mercurial magic effect
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DccWizardSpell<'a> {
+    ///Spell level
+    pub level: i64,
+    ///Spell is currently lost (must be re-learned)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lost: std::option::Option<bool>,
+    ///Unique mercurial magic effect (d100 roll result)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mercurial_magic: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The d100 roll for mercurial magic
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mercurial_roll: std::option::Option<i64>,
+    ///Spell name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Additional spell notes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Death saving throw successes and failures
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeathSaves<'a> {
+    ///Failures (0-3)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub failures: std::option::Option<i64>,
+    ///Successes (0-3)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub successes: std::option::Option<i64>,
+}
+
+/// D&D 5e character sheet. All sub-objects are optional.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DndStats<'a> {
+    ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub abilities: std::option::Option<crate::actor_rpg::stats::Abilities<'a>>,
+    ///Attack actions
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::Attack<'a>>>,
+    ///Currency (cp, sp, ep, gp, pp)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub coinage: std::option::Option<crate::actor_rpg::stats::Coinage<'a>>,
+    ///Combat stats (AC, speed, initiative, hit dice)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub combat: std::option::Option<crate::actor_rpg::stats::Combat<'a>>,
+    ///Status conditions (inspiration, exhaustion, death saves)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub conditions: std::option::Option<crate::actor_rpg::stats::Conditions<'a>>,
+    ///Gear and inventory
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub equipment: std::option::Option<crate::actor_rpg::stats::Equipment<'a>>,
+    ///Class features, racial traits, and feats
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub features: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Hit points (current, max, temp)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hp: std::option::Option<crate::actor_rpg::stats::Hp<'a>>,
+    ///Character identity (race, class, level, background)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identity: std::option::Option<crate::actor_rpg::stats::Identity<'a>>,
+    ///Languages known
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Passive scores (Perception, Investigation, Insight)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub passives: std::option::Option<crate::actor_rpg::stats::Passives<'a>>,
+    ///Traits, ideals, bonds, flaws, backstory
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub personality: std::option::Option<crate::actor_rpg::stats::Personality<'a>>,
+    ///Armor, weapon, and tool proficiencies
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub proficiencies: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Saving throw modifiers
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub saves: std::option::Option<crate::actor_rpg::stats::Saves<'a>>,
+    ///Skill modifiers
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub skills: std::option::Option<crate::actor_rpg::stats::Skills<'a>>,
+    ///Spellcasting details (for casters)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub spellcasting: std::option::Option<crate::actor_rpg::stats::Spellcasting<'a>>,
+}
+
+/// Gear and inventory
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Equipment<'a> {
+    ///Armor
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Other equipment
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Valuables and treasure
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Weapons
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Hit point tracking
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Hp<'a> {
+    ///Current HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub current: std::option::Option<i64>,
+    ///Maximum HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max: std::option::Option<i64>,
+    ///Temporary HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub temp: std::option::Option<i64>,
+}
+
+/// Character identity and progression
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Identity<'a> {
+    ///Alignment (e.g., Lawful Good)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Background (e.g., Soldier, Sage)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Class and subclass (e.g., Fighter (Champion))
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Character level
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub level: std::option::Option<i64>,
+    ///Proficiency bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub proficiency: std::option::Option<i64>,
+    ///Race (e.g., Human, Elf, Dwarf)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub race: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Experience points
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub xp: std::option::Option<i64>,
+}
+
+/// A user's RPG character statistics. One record per user (rkey: self).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Stats<'a> {
+    ///Timestamp when this record was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///User-defined custom stat system
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub custom: std::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
+    ///Dungeon Crawl Classics RPG character sheet
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub dcc: std::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
+    ///Dungeons & Dragons 5th Edition character sheet
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub dnd: std::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
+    ///Reverie House philosophical alignment
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reverie: std::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
+    ///RPG Maker MZ engine character parameters
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rmmz: std::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
+    ///Timestamp when this record was last modified
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Stats<'a>,
+}
+
+/// Passive scores (10 + skill modifier)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Passives<'a> {
+    ///Passive Insight
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub insight: std::option::Option<i64>,
+    ///Passive Investigation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub investigation: std::option::Option<i64>,
+    ///Passive Perception
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub perception: std::option::Option<i64>,
+}
+
+/// Personality and backstory
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Personality<'a> {
+    ///Backstory
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub backstory: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Bonds
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub bonds: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Flaws
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub flaws: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Ideals
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ideals: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Personality traits
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub traits: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Reverie House philosophical alignment
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReverieStats<'a> {
+    ///Authority (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub authority: std::option::Option<i64>,
+    ///Entropy (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entropy: std::option::Option<i64>,
+    ///Liberty (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub liberty: std::option::Option<i64>,
+    ///Oblivion (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub oblivion: std::option::Option<i64>,
+    ///Philosophical octant
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub octant: std::option::Option<ReverieStatsOctant<'a>>,
+    ///Receptive (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub receptive: std::option::Option<i64>,
+    ///Skeptic (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub skeptic: std::option::Option<i64>,
+}
+
+/// Philosophical octant
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReverieStatsOctant<'a> {
+    Adaptive,
+    Chaotic,
+    Prepared,
+    Intended,
+    Contented,
+    Assertive,
+    Ordered,
+    Guarded,
+    Equilibrium,
+    Singling,
+    Confused,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReverieStatsOctant<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Adaptive => "adaptive",
+            Self::Chaotic => "chaotic",
+            Self::Prepared => "prepared",
+            Self::Intended => "intended",
+            Self::Contented => "contented",
+            Self::Assertive => "assertive",
+            Self::Ordered => "ordered",
+            Self::Guarded => "guarded",
+            Self::Equilibrium => "equilibrium",
+            Self::Singling => "singling",
+            Self::Confused => "confused",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReverieStatsOctant<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "adaptive" => Self::Adaptive,
+            "chaotic" => Self::Chaotic,
+            "prepared" => Self::Prepared,
+            "intended" => Self::Intended,
+            "contented" => Self::Contented,
+            "assertive" => Self::Assertive,
+            "ordered" => Self::Ordered,
+            "guarded" => Self::Guarded,
+            "equilibrium" => Self::Equilibrium,
+            "singling" => Self::Singling,
+            "confused" => Self::Confused,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReverieStatsOctant<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "adaptive" => Self::Adaptive,
+            "chaotic" => Self::Chaotic,
+            "prepared" => Self::Prepared,
+            "intended" => Self::Intended,
+            "contented" => Self::Contented,
+            "assertive" => Self::Assertive,
+            "ordered" => Self::Ordered,
+            "guarded" => Self::Guarded,
+            "equilibrium" => Self::Equilibrium,
+            "singling" => Self::Singling,
+            "confused" => Self::Confused,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ReverieStatsOctant<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ReverieStatsOctant<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ReverieStatsOctant<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReverieStatsOctant<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ReverieStatsOctant<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
+    type Output = ReverieStatsOctant<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReverieStatsOctant::Adaptive => ReverieStatsOctant::Adaptive,
+            ReverieStatsOctant::Chaotic => ReverieStatsOctant::Chaotic,
+            ReverieStatsOctant::Prepared => ReverieStatsOctant::Prepared,
+            ReverieStatsOctant::Intended => ReverieStatsOctant::Intended,
+            ReverieStatsOctant::Contented => ReverieStatsOctant::Contented,
+            ReverieStatsOctant::Assertive => ReverieStatsOctant::Assertive,
+            ReverieStatsOctant::Ordered => ReverieStatsOctant::Ordered,
+            ReverieStatsOctant::Guarded => ReverieStatsOctant::Guarded,
+            ReverieStatsOctant::Equilibrium => ReverieStatsOctant::Equilibrium,
+            ReverieStatsOctant::Singling => ReverieStatsOctant::Singling,
+            ReverieStatsOctant::Confused => ReverieStatsOctant::Confused,
+            ReverieStatsOctant::Other(v) => ReverieStatsOctant::Other(v.into_static()),
+        }
+    }
+}
+
+/// RPG Maker MZ character parameters
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RmmzStats<'a> {
+    ///Agility
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub agi: std::option::Option<i64>,
+    ///Attack
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub atk: std::option::Option<i64>,
+    ///Class
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Critical %
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cri: std::option::Option<i64>,
+    ///Defense
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub def: std::option::Option<i64>,
+    ///Evasion %
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub eva: std::option::Option<i64>,
+    ///Hit Rate %
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hit: std::option::Option<i64>,
+    ///Current HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hp: std::option::Option<i64>,
+    ///Level
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub level: std::option::Option<i64>,
+    ///Luck
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub luk: std::option::Option<i64>,
+    ///Magic Attack
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mat: std::option::Option<i64>,
+    ///Max HP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_hp: std::option::Option<i64>,
+    ///Max MP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_mp: std::option::Option<i64>,
+    ///Max TP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_tp: std::option::Option<i64>,
+    ///Magic Defense
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mdf: std::option::Option<i64>,
+    ///Current MP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mp: std::option::Option<i64>,
+    ///Current TP
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tp: std::option::Option<i64>,
+    ///Experience
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub xp: std::option::Option<i64>,
+}
+
+/// Saving throw modifiers (actual values, not proficiency flags)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Saves<'a> {
+    ///Charisma save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cha: std::option::Option<i64>,
+    ///Constitution save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub con: std::option::Option<i64>,
+    ///Dexterity save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub dex: std::option::Option<i64>,
+    ///Intelligence save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub int: std::option::Option<i64>,
+    ///Strength save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub str: std::option::Option<i64>,
+    ///Wisdom save modifier
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub wis: std::option::Option<i64>,
+}
+
+/// Skill modifiers (actual values, not proficiency flags)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Skills<'a> {
+    ///Acrobatics (DEX)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub acrobatics: std::option::Option<i64>,
+    ///Animal Handling (WIS)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub animal_handling: std::option::Option<i64>,
+    ///Arcana (INT)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub arcana: std::option::Option<i64>,
+    ///Athletics (STR)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub athletics: std::option::Option<i64>,
+    ///Deception (CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deception: std::option::Option<i64>,
+    ///History (INT)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub history: std::option::Option<i64>,
+    ///Insight (WIS)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub insight: std::option::Option<i64>,
+    ///Intimidation (CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub intimidation: std::option::Option<i64>,
+    ///Investigation (INT)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub investigation: std::option::Option<i64>,
+    ///Medicine (WIS)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub medicine: std::option::Option<i64>,
+    ///Nature (INT)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub nature: std::option::Option<i64>,
+    ///Perception (WIS)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub perception: std::option::Option<i64>,
+    ///Performance (CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub performance: std::option::Option<i64>,
+    ///Persuasion (CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub persuasion: std::option::Option<i64>,
+    ///Religion (INT)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub religion: std::option::Option<i64>,
+    ///Sleight of Hand (DEX)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sleight_of_hand: std::option::Option<i64>,
+    ///Stealth (DEX)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub stealth: std::option::Option<i64>,
+    ///Survival (WIS)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub survival: std::option::Option<i64>,
+}
+
+/// Spells organized by level
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SpellList<'a> {
+    ///Cantrips (at-will)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cantrips: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///1st-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l1: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///2nd-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l2: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///3rd-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l3: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///4th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l4: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///5th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l5: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///6th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l6: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///7th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l7: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///8th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l8: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///9th-level spells
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub l9: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// Spellcasting details
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Spellcasting<'a> {
+    ///Spellcasting ability (INT, WIS, CHA)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ability: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Spell attack bonus
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub attack: std::option::Option<i64>,
+    ///Spell save DC
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub dc: std::option::Option<i64>,
+    ///Spell slots by level
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slots: std::option::Option<Vec<crate::actor_rpg::stats::Spellslot<'a>>>,
+    ///Known/prepared spells by level
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub spells: std::option::Option<crate::actor_rpg::stats::SpellList<'a>>,
+}
+
+/// Spell slot entry
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Spellslot<'a> {
+    ///Spell level
+    pub level: i64,
+    ///Total slots
+    pub total: i64,
+    ///Slots used
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub used: std::option::Option<i64>,
+}
+
+impl<'a> Stats<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "abilities"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cha {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cha",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.cha {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cha",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.con {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "con",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.con {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "con",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.dex {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "dex",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.dex {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "dex",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.int {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "int",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.int {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "int",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.wis {
+            if *value > 30i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "wis",
+                    ),
+                    max: 30i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.wis {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "wis",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "attack"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.bonus {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bonus",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.damage {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "damage",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.damage_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "damage_type",
+                    ),
+                    max: 30usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "coinage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.ep {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ep",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.gp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "gp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.pp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "combat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.ac {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ac",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.hit_dice {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hit_dice",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.hit_dice_used {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hit_dice_used",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.speed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "speed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "conditions"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.exhaustion {
+            if *value > 6i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "exhaustion",
+                    ),
+                    max: 6i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.exhaustion {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "exhaustion",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "customStat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.category {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "category",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "customStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.system_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "system_name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.system_version {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "system_version",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccAbilities"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.agi {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.agi {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.agi_base {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi_base",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.agi_base {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi_base",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.int {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "int",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.int {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "int",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.luk {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "luk",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.luk {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "luk",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.per {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "per",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.per {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "per",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sta {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sta",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sta {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sta",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sta_base {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sta_base",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sta_base {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sta_base",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str_base {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str_base",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str_base {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str_base",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccAttack"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.attack_mod {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "attack_mod",
+                    ),
+                    max: 30usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.damage {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "damage",
+                    ),
+                    max: 30usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.damage_bonus {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "damage_bonus",
+                    ),
+                    max: 30usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.range {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "range",
+                    ),
+                    max: 30usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.r#type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccCleric"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.deity {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "deity",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.disapproval_range {
+            if *value > 20i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "disapproval_range",
+                    ),
+                    max: 20i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.disapproval_range {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "disapproval_range",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.disapproval_table {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "disapproval_table",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.holy_symbol {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "holy_symbol",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.known_spells {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "known_spells",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.lay_on_hands_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lay_on_hands_die",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.max_spell_level {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_spell_level",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_spell_level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_spell_level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.turn_unholy_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "turn_unholy_die",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccClericSpell"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccCoinage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.gp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "gp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccCombat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.ac {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ac",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.action_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "action_die",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.crit_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "crit_die",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.crit_table {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "crit_table",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.fumble_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "fumble_die",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.speed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "speed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccCorruption"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.effect {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "effect",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.source {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.r#type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccEquipment"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.armor {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "armor",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.armor_check_penalty {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "armor_check_penalty",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.gear {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "gear",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.shield {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shield",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.trade_goods {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "trade_goods",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.treasure {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "treasure",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.weapons {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "weapons",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccHalfling"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.infravision {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "infravision",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.luck_spent_on_allies {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "luck_spent_on_allies",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.lucky_weapon {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lucky_weapon",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccHp"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.current {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "current",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccIdentity"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alignment {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alignment",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.class {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "class",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value > 10i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.occupation {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "occupation",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.title {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.xp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccLuck"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.birth_augur {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "birth_augur",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.birth_augur_effect {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "birth_augur_effect",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.lucky_weapon {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lucky_weapon",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.starting_luck {
+            if *value > 24i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "starting_luck",
+                    ),
+                    max: 24i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.starting_luck {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "starting_luck",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSaves<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccSaves"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccSpellburn"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.agi_burned {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi_burned",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.recovery_rate {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "recovery_rate",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sta_burned {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sta_burned",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.str_burned {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "str_burned",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.abilities_notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "abilities_notes",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.attacks {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "attacks",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.languages {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "languages",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccThief"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alignment {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alignment",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.backstab {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "backstab",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.lucky_weapon {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lucky_weapon",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThiefSkills<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccThiefSkills"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccWarrior"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.deed_die {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "deed_die",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.infravision {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "infravision",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.lucky_weapon {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lucky_weapon",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.mighty_deeds {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mighty_deeds",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.underground_skills {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "underground_skills",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccWizard"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.corruption {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "corruption",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.corruption_text {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "corruption_text",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.known_spells {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "known_spells",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.max_spell_level {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_spell_level",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_spell_level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_spell_level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.patron {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "patron",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.patron_bond {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "patron_bond",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dccWizardSpell"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mercurial_magic {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mercurial_magic",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.mercurial_roll {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mercurial_roll",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mercurial_roll {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mercurial_roll",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "deathSaves"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.failures {
+            if *value > 3i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "failures",
+                    ),
+                    max: 3i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.failures {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "failures",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.successes {
+            if *value > 3i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "successes",
+                    ),
+                    max: 3i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.successes {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "successes",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "dndStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.attacks {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "attacks",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.features {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "features",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.languages {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "languages",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.proficiencies {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "proficiencies",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "equipment"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.armor {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "armor",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.gear {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "gear",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.treasure {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "treasure",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.weapons {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "weapons",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "hp"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.current {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "current",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.temp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "temp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "identity"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alignment {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alignment",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.background {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "background",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.class {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "class",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.proficiency {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "proficiency",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.race {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "race",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.xp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StatsRecord;
+impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+    const NSID: &'static str = "actor.rpg.stats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
+    fn from(output: StatsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Stats<'_> {
+    const NSID: &'static str = "actor.rpg.stats";
+    type Record = StatsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StatsRecord {
+    const NSID: &'static str = "actor.rpg.stats";
+    type Record = StatsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Passives<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "passives"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "personality"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.backstory {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "backstory",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.bonds {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bonds",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.flaws {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "flaws",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.ideals {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ideals",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.traits {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "traits",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "reverieStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.authority {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authority",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.authority {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authority",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.entropy {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "entropy",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.entropy {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "entropy",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.liberty {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "liberty",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.liberty {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "liberty",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.oblivion {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "oblivion",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.oblivion {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "oblivion",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.receptive {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "receptive",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.receptive {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "receptive",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.skeptic {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "skeptic",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.skeptic {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "skeptic",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "rmmzStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.agi {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "agi",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.atk {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "atk",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.class {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "class",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.cri {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cri",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.cri {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cri",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.def {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "def",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.eva {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "eva",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.eva {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "eva",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.hit {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hit",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.hit {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hit",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.hp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.luk {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "luk",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mat {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mat",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_hp {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_hp",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_mp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_mp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_tp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_tp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mdf {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mdf",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.mp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.tp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.xp {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Saves<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "saves"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Skills<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "skills"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "spellList"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cantrips {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cantrips",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l1 {
+            #[allow(unused_comparisons)]
+            if value.len() > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l1",
+                    ),
+                    max: 30usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l2 {
+            #[allow(unused_comparisons)]
+            if value.len() > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l2",
+                    ),
+                    max: 30usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l3 {
+            #[allow(unused_comparisons)]
+            if value.len() > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l3",
+                    ),
+                    max: 30usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l4 {
+            #[allow(unused_comparisons)]
+            if value.len() > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l4",
+                    ),
+                    max: 30usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l5 {
+            #[allow(unused_comparisons)]
+            if value.len() > 30usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l5",
+                    ),
+                    max: 30usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l6 {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l6",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l7 {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l7",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l8 {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l8",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.l9 {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "l9",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "spellcasting"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.ability {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ability",
+                    ),
+                    max: 3usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.dc {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "dc",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.slots {
+            #[allow(unused_comparisons)]
+            if value.len() > 9usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slots",
+                    ),
+                    max: 9usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.stats"
+    }
+    fn def_name() -> &'static str {
+        "spellslot"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value > 9i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 9i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.total;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.used {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "used",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -4923,547 +9867,6 @@ fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "abilities"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cha {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cha",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.cha {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cha",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.con {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "con",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.con {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "con",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.dex {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dex",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.dex {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dex",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.int {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.int {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.wis {
-            if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "wis",
-                    ),
-                    max: 30i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.wis {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "wis",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An attack action
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Attack<'a> {
-    ///Attack bonus (e.g., +5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub bonus: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Damage dice (e.g., 1d8)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Damage bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub damage_bonus: std::option::Option<i64>,
-    ///Damage type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub damage_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Attack name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "attack"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.bonus {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bonus",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.damage {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.damage_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage_type",
-                    ),
-                    max: 30usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Currency
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Coinage<'a> {
-    ///Copper pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cp: std::option::Option<i64>,
-    ///Electrum pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ep: std::option::Option<i64>,
-    ///Gold pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub gp: std::option::Option<i64>,
-    ///Platinum pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pp: std::option::Option<i64>,
-    ///Silver pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "coinage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.ep {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ep",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.gp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.pp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Combat and defensive stats
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Combat<'a> {
-    ///Armor Class
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ac: std::option::Option<i64>,
-    ///Hit dice (e.g., 5d10)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hit_dice: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Hit dice expended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hit_dice_used: std::option::Option<i64>,
-    ///Initiative modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub initiative: std::option::Option<i64>,
-    ///Speed in feet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub speed: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "combat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.ac {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ac",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.hit_dice {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit_dice",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.hit_dice_used {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit_dice_used",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.speed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "speed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Status conditions and effects
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Conditions<'a> {
-    ///Death saving throw progress
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub death_saves: std::option::Option<crate::actor_rpg::stats::DeathSaves<'a>>,
-    ///Exhaustion level (0-6)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exhaustion: std::option::Option<i64>,
-    ///Has inspiration
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub inspiration: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "conditions"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.exhaustion {
-            if *value > 6i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exhaustion",
-                    ),
-                    max: 6i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.exhaustion {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exhaustion",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A custom stat
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomStat<'a> {
-    ///Category (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
-    ///Minimum (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub min: std::option::Option<i64>,
-    ///Stat name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Value
-    pub value: i64,
-}
-
 pub mod custom_stat_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5474,37 +9877,37 @@ pub mod custom_stat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Value;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Value = S::Value;
+        type Name = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Name = S::Name;
         type Value = Set<members::value>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Value = S::Value;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -5622,8 +10025,8 @@ where
 impl<'a, S> CustomStatBuilder<'a, S>
 where
     S: custom_stat_state::State,
-    S::Name: custom_stat_state::IsSet,
     S::Value: custom_stat_state::IsSet,
+    S::Name: custom_stat_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CustomStat<'a> {
@@ -5653,734 +10056,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "customStat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.category {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// User-defined custom stat system
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomStats<'a> {
-    ///Custom stat entries
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub stats: std::option::Option<Vec<crate::actor_rpg::stats::CustomStat<'a>>>,
-    ///System name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub system_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Version
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub system_version: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "customStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.system_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system_name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.system_version {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system_version",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccAbilities<'a> {
-    ///Agility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi: std::option::Option<i64>,
-    ///Agility base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi_base: std::option::Option<i64>,
-    ///Intelligence
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub int: std::option::Option<i64>,
-    ///Luck (can be permanently burned)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luk: std::option::Option<i64>,
-    ///Personality
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub per: std::option::Option<i64>,
-    ///Stamina
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta: std::option::Option<i64>,
-    ///Stamina base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta_base: std::option::Option<i64>,
-    ///Strength
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str: std::option::Option<i64>,
-    ///Strength base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str_base: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccAbilities"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.agi {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.agi {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.agi_base {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_base",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.agi_base {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_base",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.int {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.int {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.luk {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.luk {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.per {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "per",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.per {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "per",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sta {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sta {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sta_base {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_base",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sta_base {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_base",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str_base {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_base",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str_base {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_base",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A weapon attack (includes deed die for warriors)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccAttack<'a> {
-    ///Attack modifier (e.g., +2, d16+2 for deed die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attack_mod: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Damage dice (e.g., 1d8+2, 1d6+d3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Damage bonus (e.g., +2, +d3 for deed die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub damage_bonus: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Weapon name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Special properties (backstab, trained weapon, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Range (melee or distance)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub range: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Attack type (melee, ranged, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccAttack"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.attack_mod {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attack_mod",
-                    ),
-                    max: 30usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.damage {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage",
-                    ),
-                    max: 30usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.damage_bonus {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage_bonus",
-                    ),
-                    max: 30usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.range {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "range",
-                    ),
-                    max: 30usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.r#type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Cleric spellcasting features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCleric<'a> {
-    ///Deity or supernatural patron
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub deity: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Current disapproval range (starts at 1, accumulates)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disapproval_range: std::option::Option<i64>,
-    ///Deity-specific disapproval table if any
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub disapproval_table: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Holy symbol description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub holy_symbol: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Known cleric spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub known_spells: std::option::Option<
-        Vec<crate::actor_rpg::stats::DccClericSpell<'a>>,
-    >,
-    ///Lay on hands die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lay_on_hands_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Highest spell level accessible
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_spell_level: std::option::Option<i64>,
-    ///Spell check modifier (PER mod + level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub spell_check_mod: std::option::Option<i64>,
-    ///Turn unholy die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub turn_unholy_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Serves a Chaotic deity (unholy instead of holy)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unholy: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccCleric"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.deity {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "deity",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.disapproval_range {
-            if *value > 20i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_range",
-                    ),
-                    max: 20i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.disapproval_range {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_range",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.disapproval_table {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_table",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.holy_symbol {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "holy_symbol",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.known_spells {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "known_spells",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.lay_on_hands_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lay_on_hands_die",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.max_spell_level {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_spell_level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.turn_unholy_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "turn_unholy_die",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A cleric spell
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccClericSpell<'a> {
-    ///Spell level
-    pub level: i64,
-    ///Spell name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Additional spell notes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Casting may cause additional disapproval
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sinful: std::option::Option<bool>,
 }
 
 pub mod dcc_cleric_spell_state {
@@ -6556,1625 +10231,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccClericSpell"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCoinage<'a> {
-    ///Copper pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cp: std::option::Option<i64>,
-    ///Gold pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub gp: std::option::Option<i64>,
-    ///Silver pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccCoinage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.gp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Combat statistics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCombat<'a> {
-    ///Armor Class (10 + armor + AGI mod + shield)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ac: std::option::Option<i64>,
-    ///Primary action die (e.g., d20, d20+d14)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub action_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Base attack modifier (level-based for non-warriors)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attack_mod: std::option::Option<i64>,
-    ///Critical hit die (e.g., d8, d12, d14)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub crit_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Critical hit table (I, II, III, IV, V)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub crit_table: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Fumble die (typically d4 for 0-level, varies by armor)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub fumble_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Initiative modifier (AGI mod)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub initiative: std::option::Option<i64>,
-    ///Speed in feet (typically 30, Dwarves 20)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub speed: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccCombat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.ac {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ac",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.action_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "action_die",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.crit_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "crit_die",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.crit_table {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "crit_table",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.fumble_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "fumble_die",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.speed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "speed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A corruption effect from failed spell checks
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCorruption<'a> {
-    ///Description of the corruption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub effect: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether this corruption is permanent
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub permanent: std::option::Option<bool>,
-    ///What spell caused this corruption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Corruption severity (minor, major, greater)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccCorruption"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.effect {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "effect",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.source {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.r#type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Equipment and inventory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccEquipment<'a> {
-    ///Armor worn (affects fumble die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Armor check penalty (affects skills)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub armor_check_penalty: std::option::Option<i64>,
-    ///Other equipment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Shield (if any)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub shield: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Trade goods from occupation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub trade_goods: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Valuables and treasure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Weapons carried
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccEquipment"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.armor {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.armor_check_penalty {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor_check_penalty",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.gear {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gear",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.shield {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shield",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.trade_goods {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "trade_goods",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.treasure {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "treasure",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.weapons {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weapons",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Halfling class features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccHalfling<'a> {
-    ///Can spend luck to aid nearby allies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub good_luck_charm: std::option::Option<bool>,
-    ///Infravision range in feet (30)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub infravision: std::option::Option<i64>,
-    ///Total luck points spent helping allies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luck_spent_on_allies: std::option::Option<i64>,
-    ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Bonus to sneak/hide when in natural environment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sneak_and_hide: std::option::Option<i64>,
-    ///Can dual-wield without penalty
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub two_weapon_fighting: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccHalfling"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.infravision {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "infravision",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.luck_spent_on_allies {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luck_spent_on_allies",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.lucky_weapon {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Hit points (0-level characters use 1d4 + STA mod)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccHp<'a> {
-    ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current: std::option::Option<i64>,
-    ///Maximum HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccHp"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.current {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// DCC character identity and progression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccIdentity<'a> {
-    ///Alignment (Lawful, Neutral, Chaotic)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Character level (0 for funnel characters)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
-    ///0-level occupation (e.g., Blacksmith, Farmer)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub occupation: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Level title (e.g., Squire, Cutpurse, Acolyte)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Experience points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccIdentity"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alignment {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.class {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.level {
-            if *value > 10i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 10i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.level {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.occupation {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "occupation",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.title {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.xp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Birth augur and luck mechanics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccLuck<'a> {
-    ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub birth_augur: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///What the luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub birth_augur_effect: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Weapon type that luck applies to (Dwarves/Halflings)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Starting luck score (for tracking burned luck)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starting_luck: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccLuck"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.birth_augur {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "birth_augur",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.birth_augur_effect {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "birth_augur_effect",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.lucky_weapon {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.starting_luck {
-            if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "starting_luck",
-                    ),
-                    max: 24i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.starting_luck {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "starting_luck",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// DCC saving throws (3 saves, not 6)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccSaves<'a> {
-    ///Fortitude save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub fort: std::option::Option<i64>,
-    ///Reflex save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub r#ref: std::option::Option<i64>,
-    ///Willpower save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub will: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSaves<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccSaves"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Current spellburn (temporary ability score sacrifice)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccSpellburn<'a> {
-    ///Agility points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi_burned: std::option::Option<i64>,
-    ///Points recovered per day
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub recovery_rate: std::option::Option<i64>,
-    ///Stamina points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta_burned: std::option::Option<i64>,
-    ///Strength points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str_burned: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccSpellburn"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.agi_burned {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_burned",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.recovery_rate {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "recovery_rate",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sta_burned {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_burned",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.str_burned {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_burned",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccStats<'a> {
-    ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub abilities: std::option::Option<crate::actor_rpg::stats::DccAbilities<'a>>,
-    ///Notes about special abilities, class features, and racial traits
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub abilities_notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Weapon attacks
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::DccAttack<'a>>>,
-    ///Cleric spellcasting (disapproval, turn unholy, lay on hands)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cleric: std::option::Option<crate::actor_rpg::stats::DccCleric<'a>>,
-    ///Currency (cp, sp, gp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub coinage: std::option::Option<crate::actor_rpg::stats::DccCoinage<'a>>,
-    ///Combat stats (AC, speed, action die, initiative, crit die/table)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub combat: std::option::Option<crate::actor_rpg::stats::DccCombat<'a>>,
-    ///Gear, treasure, and trade goods
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub equipment: std::option::Option<crate::actor_rpg::stats::DccEquipment<'a>>,
-    ///Halfling luck-sharing and dual wielding
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub halfling: std::option::Option<crate::actor_rpg::stats::DccHalfling<'a>>,
-    ///Hit points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hp: std::option::Option<crate::actor_rpg::stats::DccHp<'a>>,
-    ///Character identity (occupation, class, level, alignment)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identity: std::option::Option<crate::actor_rpg::stats::DccIdentity<'a>>,
-    ///Languages known
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Birth augur and luck tracking
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub luck: std::option::Option<crate::actor_rpg::stats::DccLuck<'a>>,
-    ///Character notes, backstory, and special abilities
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Saving throws (Reflex, Fortitude, Willpower)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub saves: std::option::Option<crate::actor_rpg::stats::DccSaves<'a>>,
-    ///Thief skills and abilities
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub thief: std::option::Option<crate::actor_rpg::stats::DccThief<'a>>,
-    ///Warrior/Dwarf class features (deed die, mighty deeds)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub warrior: std::option::Option<crate::actor_rpg::stats::DccWarrior<'a>>,
-    ///Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub wizard: std::option::Option<crate::actor_rpg::stats::DccWizard<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.abilities_notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "abilities_notes",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.attacks {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attacks",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.languages {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Thief class features and skills
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccThief<'a> {
-    ///Alignment (affects some skill targets)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Backstab damage die level (+1, +2, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub backstab: std::option::Option<i64>,
-    ///Weapon type that luck applies to (one type only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Thief skill modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub skills: std::option::Option<crate::actor_rpg::stats::DccThiefSkills<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccThief"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alignment {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.backstab {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "backstab",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.lucky_weapon {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Thief skill bonuses (roll d20 + skill vs target)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccThiefSkills<'a> {
-    ///Backstab attack bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub backstab: std::option::Option<i64>,
-    ///Cast spell from scroll bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cast_spell_from_scroll: std::option::Option<i64>,
-    ///Climb sheer surfaces bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub climb_sheer_surfaces: std::option::Option<i64>,
-    ///Disable trap bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_trap: std::option::Option<i64>,
-    ///Disguise self bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disguise_self: std::option::Option<i64>,
-    ///Find trap bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub find_trap: std::option::Option<i64>,
-    ///Forge document bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub forge_document: std::option::Option<i64>,
-    ///Handle poison bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub handle_poison: std::option::Option<i64>,
-    ///Hide in shadows bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_in_shadows: std::option::Option<i64>,
-    ///Pick lock bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pick_lock: std::option::Option<i64>,
-    ///Pick pocket bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pick_pocket: std::option::Option<i64>,
-    ///Read languages bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub read_languages: std::option::Option<i64>,
-    ///Sneak silently bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sneak_silently: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThiefSkills<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccThiefSkills"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Warrior and Dwarf class features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWarrior<'a> {
-    ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub deed_die: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Infravision range in feet (Dwarves: 60)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub infravision: std::option::Option<i64>,
-    ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Signature mighty deeds of arms
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mighty_deeds: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Can use shield bash (Dwarves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shield_bash: std::option::Option<bool>,
-    ///Can smell gold/gems (Dwarves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub smell_gold: std::option::Option<bool>,
-    ///Underground detection bonus (Dwarves: equal to level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub underground_skills: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccWarrior"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.deed_die {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "deed_die",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.infravision {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "infravision",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.lucky_weapon {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.mighty_deeds {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mighty_deeds",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.underground_skills {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "underground_skills",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Wizard and Elf spellcasting features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWizard<'a> {
-    ///Corruption effects suffered (structured)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub corruption: std::option::Option<Vec<crate::actor_rpg::stats::DccCorruption<'a>>>,
-    ///Corruption effects as free-form text
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub corruption_text: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Known spells with mercurial magic effects
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub known_spells: std::option::Option<
-        Vec<crate::actor_rpg::stats::DccWizardSpell<'a>>,
-    >,
-    ///Highest spell level accessible
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_spell_level: std::option::Option<i64>,
-    ///Supernatural patron (if any)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub patron: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Patron bond description and effects
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub patron_bond: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Spell check modifier (INT mod + level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub spell_check_mod: std::option::Option<i64>,
-    ///Current spellburn status
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub spellburn: std::option::Option<crate::actor_rpg::stats::DccSpellburn<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccWizard"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.corruption {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "corruption",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.corruption_text {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "corruption_text",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.known_spells {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "known_spells",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.max_spell_level {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_spell_level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.patron {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "patron",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.patron_bond {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "patron_bond",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A wizard spell with mercurial magic effect
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWizardSpell<'a> {
-    ///Spell level
-    pub level: i64,
-    ///Spell is currently lost (must be re-learned)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lost: std::option::Option<bool>,
-    ///Unique mercurial magic effect (d100 roll result)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mercurial_magic: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The d100 roll for mercurial magic
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mercurial_roll: std::option::Option<i64>,
-    ///Spell name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Additional spell notes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod dcc_wizard_spell_state {
@@ -8388,685 +10444,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dccWizardSpell"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mercurial_magic {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_magic",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.mercurial_roll {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_roll",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mercurial_roll {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_roll",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Death saving throw successes and failures
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeathSaves<'a> {
-    ///Failures (0-3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub failures: std::option::Option<i64>,
-    ///Successes (0-3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub successes: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "deathSaves"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.failures {
-            if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "failures",
-                    ),
-                    max: 3i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.failures {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "failures",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.successes {
-            if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "successes",
-                    ),
-                    max: 3i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.successes {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "successes",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// D&D 5e character sheet. All sub-objects are optional.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DndStats<'a> {
-    ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub abilities: std::option::Option<crate::actor_rpg::stats::Abilities<'a>>,
-    ///Attack actions
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::Attack<'a>>>,
-    ///Currency (cp, sp, ep, gp, pp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub coinage: std::option::Option<crate::actor_rpg::stats::Coinage<'a>>,
-    ///Combat stats (AC, speed, initiative, hit dice)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub combat: std::option::Option<crate::actor_rpg::stats::Combat<'a>>,
-    ///Status conditions (inspiration, exhaustion, death saves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub conditions: std::option::Option<crate::actor_rpg::stats::Conditions<'a>>,
-    ///Gear and inventory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub equipment: std::option::Option<crate::actor_rpg::stats::Equipment<'a>>,
-    ///Class features, racial traits, and feats
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub features: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Hit points (current, max, temp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hp: std::option::Option<crate::actor_rpg::stats::Hp<'a>>,
-    ///Character identity (race, class, level, background)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identity: std::option::Option<crate::actor_rpg::stats::Identity<'a>>,
-    ///Languages known
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Passive scores (Perception, Investigation, Insight)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub passives: std::option::Option<crate::actor_rpg::stats::Passives<'a>>,
-    ///Traits, ideals, bonds, flaws, backstory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub personality: std::option::Option<crate::actor_rpg::stats::Personality<'a>>,
-    ///Armor, weapon, and tool proficiencies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub proficiencies: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Saving throw modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub saves: std::option::Option<crate::actor_rpg::stats::Saves<'a>>,
-    ///Skill modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub skills: std::option::Option<crate::actor_rpg::stats::Skills<'a>>,
-    ///Spellcasting details (for casters)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub spellcasting: std::option::Option<crate::actor_rpg::stats::Spellcasting<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "dndStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.attacks {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attacks",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.features {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "features",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.languages {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.proficiencies {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "proficiencies",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Gear and inventory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Equipment<'a> {
-    ///Armor
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Other equipment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Valuables and treasure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Weapons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "equipment"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.armor {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.gear {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gear",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.treasure {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "treasure",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.weapons {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weapons",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Hit point tracking
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Hp<'a> {
-    ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current: std::option::Option<i64>,
-    ///Maximum HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
-    ///Temporary HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub temp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "hp"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.current {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.temp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "temp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Character identity and progression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Identity<'a> {
-    ///Alignment (e.g., Lawful Good)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Background (e.g., Soldier, Sage)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Class and subclass (e.g., Fighter (Champion))
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Character level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
-    ///Proficiency bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub proficiency: std::option::Option<i64>,
-    ///Race (e.g., Human, Elf, Dwarf)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub race: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Experience points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "identity"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alignment {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.background {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.class {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.proficiency {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "proficiency",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.race {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "race",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.xp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A user's RPG character statistics. One record per user (rkey: self).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Stats<'a> {
-    ///Timestamp when this record was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///User-defined custom stat system
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub custom: std::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
-    ///Dungeon Crawl Classics RPG character sheet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub dcc: std::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
-    ///Dungeons & Dragons 5th Edition character sheet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub dnd: std::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
-    ///Reverie House philosophical alignment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reverie: std::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
-    ///RPG Maker MZ engine character parameters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rmmz: std::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
-    ///Timestamp when this record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod stats_state {
@@ -9306,1319 +10683,6 @@ where
     }
 }
 
-impl<'a> Stats<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stats<'a>,
-}
-
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Stats<'_> {
-    const NSID: &'static str = "actor.rpg.stats";
-    type Record = StatsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
-    const NSID: &'static str = "actor.rpg.stats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StatsRecord {
-    const NSID: &'static str = "actor.rpg.stats";
-    type Record = StatsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Passive scores (10 + skill modifier)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Passives<'a> {
-    ///Passive Insight
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub insight: std::option::Option<i64>,
-    ///Passive Investigation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub investigation: std::option::Option<i64>,
-    ///Passive Perception
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub perception: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Passives<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "passives"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Personality and backstory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Personality<'a> {
-    ///Backstory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub backstory: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Bonds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub bonds: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Flaws
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub flaws: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Ideals
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub ideals: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Personality traits
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub traits: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "personality"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.backstory {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "backstory",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.bonds {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bonds",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.flaws {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "flaws",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.ideals {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ideals",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.traits {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "traits",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Reverie House philosophical alignment
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReverieStats<'a> {
-    ///Authority (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub authority: std::option::Option<i64>,
-    ///Entropy (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entropy: std::option::Option<i64>,
-    ///Liberty (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub liberty: std::option::Option<i64>,
-    ///Oblivion (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub oblivion: std::option::Option<i64>,
-    ///Philosophical octant
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub octant: std::option::Option<ReverieStatsOctant<'a>>,
-    ///Receptive (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub receptive: std::option::Option<i64>,
-    ///Skeptic (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub skeptic: std::option::Option<i64>,
-}
-
-/// Philosophical octant
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReverieStatsOctant<'a> {
-    Adaptive,
-    Chaotic,
-    Prepared,
-    Intended,
-    Contented,
-    Assertive,
-    Ordered,
-    Guarded,
-    Equilibrium,
-    Singling,
-    Confused,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ReverieStatsOctant<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Adaptive => "adaptive",
-            Self::Chaotic => "chaotic",
-            Self::Prepared => "prepared",
-            Self::Intended => "intended",
-            Self::Contented => "contented",
-            Self::Assertive => "assertive",
-            Self::Ordered => "ordered",
-            Self::Guarded => "guarded",
-            Self::Equilibrium => "equilibrium",
-            Self::Singling => "singling",
-            Self::Confused => "confused",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ReverieStatsOctant<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "adaptive" => Self::Adaptive,
-            "chaotic" => Self::Chaotic,
-            "prepared" => Self::Prepared,
-            "intended" => Self::Intended,
-            "contented" => Self::Contented,
-            "assertive" => Self::Assertive,
-            "ordered" => Self::Ordered,
-            "guarded" => Self::Guarded,
-            "equilibrium" => Self::Equilibrium,
-            "singling" => Self::Singling,
-            "confused" => Self::Confused,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ReverieStatsOctant<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "adaptive" => Self::Adaptive,
-            "chaotic" => Self::Chaotic,
-            "prepared" => Self::Prepared,
-            "intended" => Self::Intended,
-            "contented" => Self::Contented,
-            "assertive" => Self::Assertive,
-            "ordered" => Self::Ordered,
-            "guarded" => Self::Guarded,
-            "equilibrium" => Self::Equilibrium,
-            "singling" => Self::Singling,
-            "confused" => Self::Confused,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReverieStatsOctant<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ReverieStatsOctant<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ReverieStatsOctant<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ReverieStatsOctant<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ReverieStatsOctant<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
-    type Output = ReverieStatsOctant<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReverieStatsOctant::Adaptive => ReverieStatsOctant::Adaptive,
-            ReverieStatsOctant::Chaotic => ReverieStatsOctant::Chaotic,
-            ReverieStatsOctant::Prepared => ReverieStatsOctant::Prepared,
-            ReverieStatsOctant::Intended => ReverieStatsOctant::Intended,
-            ReverieStatsOctant::Contented => ReverieStatsOctant::Contented,
-            ReverieStatsOctant::Assertive => ReverieStatsOctant::Assertive,
-            ReverieStatsOctant::Ordered => ReverieStatsOctant::Ordered,
-            ReverieStatsOctant::Guarded => ReverieStatsOctant::Guarded,
-            ReverieStatsOctant::Equilibrium => ReverieStatsOctant::Equilibrium,
-            ReverieStatsOctant::Singling => ReverieStatsOctant::Singling,
-            ReverieStatsOctant::Confused => ReverieStatsOctant::Confused,
-            ReverieStatsOctant::Other(v) => ReverieStatsOctant::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "reverieStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.authority {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authority",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.authority {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authority",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.entropy {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entropy",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.entropy {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entropy",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.liberty {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "liberty",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.liberty {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "liberty",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.oblivion {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "oblivion",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.oblivion {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "oblivion",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.receptive {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "receptive",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.receptive {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "receptive",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.skeptic {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "skeptic",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.skeptic {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "skeptic",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// RPG Maker MZ character parameters
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RmmzStats<'a> {
-    ///Agility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi: std::option::Option<i64>,
-    ///Attack
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub atk: std::option::Option<i64>,
-    ///Class
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Critical %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cri: std::option::Option<i64>,
-    ///Defense
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub def: std::option::Option<i64>,
-    ///Evasion %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub eva: std::option::Option<i64>,
-    ///Hit Rate %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hit: std::option::Option<i64>,
-    ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hp: std::option::Option<i64>,
-    ///Level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
-    ///Luck
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luk: std::option::Option<i64>,
-    ///Magic Attack
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mat: std::option::Option<i64>,
-    ///Max HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_hp: std::option::Option<i64>,
-    ///Max MP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_mp: std::option::Option<i64>,
-    ///Max TP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_tp: std::option::Option<i64>,
-    ///Magic Defense
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mdf: std::option::Option<i64>,
-    ///Current MP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mp: std::option::Option<i64>,
-    ///Current TP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tp: std::option::Option<i64>,
-    ///Experience
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "rmmzStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.agi {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.atk {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "atk",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.class {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.cri {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cri",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.cri {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cri",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.def {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "def",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.eva {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "eva",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.eva {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "eva",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.hit {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.hit {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.hp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.luk {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mat {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mat",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_hp {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_hp",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_mp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_mp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_tp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_tp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mdf {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mdf",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.mp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.tp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.xp {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Saving throw modifiers (actual values, not proficiency flags)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Saves<'a> {
-    ///Charisma save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cha: std::option::Option<i64>,
-    ///Constitution save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub con: std::option::Option<i64>,
-    ///Dexterity save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dex: std::option::Option<i64>,
-    ///Intelligence save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub int: std::option::Option<i64>,
-    ///Strength save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str: std::option::Option<i64>,
-    ///Wisdom save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub wis: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Saves<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "saves"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Skill modifiers (actual values, not proficiency flags)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Skills<'a> {
-    ///Acrobatics (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acrobatics: std::option::Option<i64>,
-    ///Animal Handling (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub animal_handling: std::option::Option<i64>,
-    ///Arcana (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub arcana: std::option::Option<i64>,
-    ///Athletics (STR)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub athletics: std::option::Option<i64>,
-    ///Deception (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deception: std::option::Option<i64>,
-    ///History (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub history: std::option::Option<i64>,
-    ///Insight (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub insight: std::option::Option<i64>,
-    ///Intimidation (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub intimidation: std::option::Option<i64>,
-    ///Investigation (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub investigation: std::option::Option<i64>,
-    ///Medicine (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub medicine: std::option::Option<i64>,
-    ///Nature (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub nature: std::option::Option<i64>,
-    ///Perception (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub perception: std::option::Option<i64>,
-    ///Performance (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub performance: std::option::Option<i64>,
-    ///Persuasion (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub persuasion: std::option::Option<i64>,
-    ///Religion (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub religion: std::option::Option<i64>,
-    ///Sleight of Hand (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sleight_of_hand: std::option::Option<i64>,
-    ///Stealth (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stealth: std::option::Option<i64>,
-    ///Survival (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub survival: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Skills<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "skills"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Spells organized by level
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SpellList<'a> {
-    ///Cantrips (at-will)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cantrips: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///1st-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l1: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///2nd-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l2: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///3rd-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l3: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///4th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l4: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///5th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l5: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///6th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l6: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///7th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l7: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///8th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l8: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///9th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub l9: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "spellList"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cantrips {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cantrips",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l1 {
-            #[allow(unused_comparisons)]
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l1",
-                    ),
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l2 {
-            #[allow(unused_comparisons)]
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l2",
-                    ),
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l3 {
-            #[allow(unused_comparisons)]
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l3",
-                    ),
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l4 {
-            #[allow(unused_comparisons)]
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l4",
-                    ),
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l5 {
-            #[allow(unused_comparisons)]
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l5",
-                    ),
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l6 {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l6",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l7 {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l7",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l8 {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l8",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.l9 {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l9",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Spellcasting details
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Spellcasting<'a> {
-    ///Spellcasting ability (INT, WIS, CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub ability: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Spell attack bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attack: std::option::Option<i64>,
-    ///Spell save DC
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dc: std::option::Option<i64>,
-    ///Spell slots by level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slots: std::option::Option<Vec<crate::actor_rpg::stats::Spellslot<'a>>>,
-    ///Known/prepared spells by level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub spells: std::option::Option<crate::actor_rpg::stats::SpellList<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "spellcasting"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.ability {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ability",
-                    ),
-                    max: 3usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.dc {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dc",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.slots {
-            #[allow(unused_comparisons)]
-            if value.len() > 9usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slots",
-                    ),
-                    max: 9usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Spell slot entry
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Spellslot<'a> {
-    ///Spell level
-    pub level: i64,
-    ///Total slots
-    pub total: i64,
-    ///Slots used
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub used: std::option::Option<i64>,
-}
-
 pub mod spellslot_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -10629,37 +10693,37 @@ pub mod spellslot_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Total;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Total = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Total = S::Total;
+        type Level = Unset;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
-        type Level = S::Level;
         type Total = Set<members::total>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Total = S::Total;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `total` field
         pub struct total(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -10746,8 +10810,8 @@ impl<'a, S: spellslot_state::State> SpellslotBuilder<'a, S> {
 impl<'a, S> SpellslotBuilder<'a, S>
 where
     S: spellslot_state::State,
-    S::Level: spellslot_state::IsSet,
     S::Total: spellslot_state::IsSet,
+    S::Level: spellslot_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Spellslot<'a> {
@@ -10772,69 +10836,5 @@ where
             used: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.stats"
-    }
-    fn def_name() -> &'static str {
-        "spellslot"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 9i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 9i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.used {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "used",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

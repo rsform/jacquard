@@ -22,6 +22,84 @@ pub struct Config<'a> {
     pub hub_ref: jacquard_common::types::string::UriValue<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ConfigGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Config<'a>,
+}
+
+impl<'a> Config<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ConfigRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ConfigRecord;
+impl jacquard_common::xrpc::XrpcResp for ConfigRecord {
+    const NSID: &'static str = "com.suibari.atsumeat.config";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ConfigGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
+    fn from(output: ConfigGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Config<'_> {
+    const NSID: &'static str = "com.suibari.atsumeat.config";
+    type Record = ConfigRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ConfigRecord {
+    const NSID: &'static str = "com.suibari.atsumeat.config";
+    type Record = ConfigRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
+    fn nsid() -> &'static str {
+        "com.suibari.atsumeat.config"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_suibari_atsumeat_config()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod config_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,84 +202,6 @@ where
             hub_ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Config<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ConfigRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfigGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Config<'a>,
-}
-
-impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
-    fn from(output: ConfigGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Config<'_> {
-    const NSID: &'static str = "com.suibari.atsumeat.config";
-    type Record = ConfigRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ConfigRecord;
-impl jacquard_common::xrpc::XrpcResp for ConfigRecord {
-    const NSID: &'static str = "com.suibari.atsumeat.config";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ConfigGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ConfigRecord {
-    const NSID: &'static str = "com.suibari.atsumeat.config";
-    type Record = ConfigRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
-    fn nsid() -> &'static str {
-        "com.suibari.atsumeat.config"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_suibari_atsumeat_config()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,60 @@ pub struct GetSuggestedUsers<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestedUsersOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+    ///DEPRECATED: use recIdStr instead.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getSuggestedUsers
+pub struct GetSuggestedUsersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestedUsersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsers<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestedUsersResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getSuggestedUsers
+pub struct GetSuggestedUsersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedUsers<'de>;
+    type Response = GetSuggestedUsersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod get_suggested_users_state {
@@ -116,54 +166,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestedUsersOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-    ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getSuggestedUsers
-pub struct GetSuggestedUsersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedUsersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsers<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestedUsersResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getSuggestedUsers
-pub struct GetSuggestedUsersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedUsers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedUsers<'de>;
-    type Response = GetSuggestedUsersResponse;
 }

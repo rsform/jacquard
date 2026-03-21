@@ -21,6 +21,36 @@ pub struct MuteActor<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+/// Response type for
+///app.bsky.graph.muteActor
+pub struct MuteActorResponse;
+impl jacquard_common::xrpc::XrpcResp for MuteActorResponse {
+    const NSID: &'static str = "app.bsky.graph.muteActor";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for MuteActor<'a> {
+    const NSID: &'static str = "app.bsky.graph.muteActor";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = MuteActorResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.muteActor
+pub struct MuteActorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MuteActorRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.muteActor";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = MuteActor<'de>;
+    type Response = MuteActorResponse;
+}
+
 pub mod mute_actor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.graph.muteActor
-pub struct MuteActorResponse;
-impl jacquard_common::xrpc::XrpcResp for MuteActorResponse {
-    const NSID: &'static str = "app.bsky.graph.muteActor";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for MuteActor<'a> {
-    const NSID: &'static str = "app.bsky.graph.muteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = MuteActorResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.muteActor
-pub struct MuteActorRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for MuteActorRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.muteActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = MuteActor<'de>;
-    type Response = MuteActorResponse;
 }

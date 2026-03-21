@@ -20,6 +20,48 @@ pub struct GetMentionsByEntry<'a> {
     pub post_uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetMentionsByEntryOutput<'a> {
+    #[serde(borrow)]
+    pub mentions: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+/// Response type for
+///com.whtwnd.blog.getMentionsByEntry
+pub struct GetMentionsByEntryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
+    const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetMentionsByEntryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<'a> {
+    const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetMentionsByEntryResponse;
+}
+
+/// Endpoint type for
+///com.whtwnd.blog.getMentionsByEntry
+pub struct GetMentionsByEntryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getMentionsByEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetMentionsByEntry<'de>;
+    type Response = GetMentionsByEntryResponse;
+}
+
 pub mod get_mentions_by_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             post_uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetMentionsByEntryOutput<'a> {
-    #[serde(borrow)]
-    pub mentions: Vec<jacquard_common::types::string::AtUri<'a>>,
-}
-
-/// Response type for
-///com.whtwnd.blog.getMentionsByEntry
-pub struct GetMentionsByEntryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
-    const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetMentionsByEntryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<'a> {
-    const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetMentionsByEntryResponse;
-}
-
-/// Endpoint type for
-///com.whtwnd.blog.getMentionsByEntry
-pub struct GetMentionsByEntryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
-    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getMentionsByEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetMentionsByEntry<'de>;
-    type Response = GetMentionsByEntryResponse;
 }

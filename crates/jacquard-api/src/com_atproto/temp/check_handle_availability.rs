@@ -25,6 +25,213 @@ pub struct CheckHandleAvailability<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CheckHandleAvailabilityOutput<'a> {
+    ///Echo of the input handle.
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(borrow)]
+    pub result: CheckHandleAvailabilityOutputResult<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CheckHandleAvailabilityOutputResult<'a> {
+    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
+    ResultAvailable(
+        Box<crate::com_atproto::temp::check_handle_availability::ResultAvailable<'a>>,
+    ),
+    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultUnavailable")]
+    ResultUnavailable(
+        Box<crate::com_atproto::temp::check_handle_availability::ResultUnavailable<'a>>,
+    ),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CheckHandleAvailabilityError<'a> {
+    /// An invalid email was provided.
+    #[serde(rename = "InvalidEmail")]
+    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CheckHandleAvailabilityError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidEmail(msg) => {
+                write!(f, "InvalidEmail")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Indicates the provided handle is available.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResultAvailable<'a> {}
+/// Indicates the provided handle is unavailable and gives suggestions of available handles.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResultUnavailable<'a> {
+    ///List of suggested handles based on the provided inputs.
+    #[serde(borrow)]
+    pub suggestions: Vec<
+        crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Suggestion<'a> {
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
+    #[serde(borrow)]
+    pub method: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///com.atproto.temp.checkHandleAvailability
+pub struct CheckHandleAvailabilityResponse;
+impl jacquard_common::xrpc::XrpcResp for CheckHandleAvailabilityResponse {
+    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CheckHandleAvailabilityOutput<'de>;
+    type Err<'de> = CheckHandleAvailabilityError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CheckHandleAvailability<'a> {
+    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CheckHandleAvailabilityResponse;
+}
+
+/// Endpoint type for
+///com.atproto.temp.checkHandleAvailability
+pub struct CheckHandleAvailabilityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.checkHandleAvailability";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = CheckHandleAvailability<'de>;
+    type Response = CheckHandleAvailabilityResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.temp.checkHandleAvailability"
+    }
+    fn def_name() -> &'static str {
+        "resultAvailable"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_temp_checkHandleAvailability()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.temp.checkHandleAvailability"
+    }
+    fn def_name() -> &'static str {
+        "resultUnavailable"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_temp_checkHandleAvailability()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.temp.checkHandleAvailability"
+    }
+    fn def_name() -> &'static str {
+        "suggestion"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_temp_checkHandleAvailability()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod check_handle_availability_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -170,123 +377,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CheckHandleAvailabilityOutput<'a> {
-    ///Echo of the input handle.
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(borrow)]
-    pub result: CheckHandleAvailabilityOutputResult<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CheckHandleAvailabilityOutputResult<'a> {
-    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
-    ResultAvailable(
-        Box<crate::com_atproto::temp::check_handle_availability::ResultAvailable<'a>>,
-    ),
-    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultUnavailable")]
-    ResultUnavailable(
-        Box<crate::com_atproto::temp::check_handle_availability::ResultUnavailable<'a>>,
-    ),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CheckHandleAvailabilityError<'a> {
-    /// An invalid email was provided.
-    #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CheckHandleAvailabilityError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidEmail(msg) => {
-                write!(f, "InvalidEmail")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.temp.checkHandleAvailability
-pub struct CheckHandleAvailabilityResponse;
-impl jacquard_common::xrpc::XrpcResp for CheckHandleAvailabilityResponse {
-    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CheckHandleAvailabilityOutput<'de>;
-    type Err<'de> = CheckHandleAvailabilityError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CheckHandleAvailability<'a> {
-    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = CheckHandleAvailabilityResponse;
-}
-
-/// Endpoint type for
-///com.atproto.temp.checkHandleAvailability
-pub struct CheckHandleAvailabilityRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.temp.checkHandleAvailability";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = CheckHandleAvailability<'de>;
-    type Response = CheckHandleAvailabilityResponse;
-}
-
-/// Indicates the provided handle is available.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResultAvailable<'a> {}
 fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -512,43 +602,6 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.temp.checkHandleAvailability"
-    }
-    fn def_name() -> &'static str {
-        "resultAvailable"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_temp_checkHandleAvailability()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Indicates the provided handle is unavailable and gives suggestions of available handles.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResultUnavailable<'a> {
-    ///List of suggested handles based on the provided inputs.
-    #[serde(borrow)]
-    pub suggestions: Vec<
-        crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
-    >,
-}
-
 pub mod result_unavailable_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -656,42 +709,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.temp.checkHandleAvailability"
-    }
-    fn def_name() -> &'static str {
-        "resultUnavailable"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_temp_checkHandleAvailability()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Suggestion<'a> {
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
-    #[serde(borrow)]
-    pub method: jacquard_common::CowStr<'a>,
 }
 
 pub mod suggestion_state {
@@ -831,22 +848,5 @@ where
             method: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.temp.checkHandleAvailability"
-    }
-    fn def_name() -> &'static str {
-        "suggestion"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_temp_checkHandleAvailability()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

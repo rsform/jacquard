@@ -26,6 +26,90 @@ pub struct CollectionStats<'a> {
     pub unique_actors: i64,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Stats<'a> {
+    #[serde(borrow)]
+    pub slice: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatsOutput<'a> {
+    ///Per-collection statistics
+    #[serde(borrow)]
+    pub collection_stats: Vec<crate::network_slices::slice::stats::CollectionStats<'a>>,
+    ///List of collection NSIDs indexed in this slice
+    #[serde(borrow)]
+    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
+    ///Total number of unique actors indexed in this slice
+    pub total_actors: i64,
+    ///Total number of lexicons defined for this slice
+    pub total_lexicons: i64,
+    ///Total number of records indexed in this slice
+    pub total_records: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.stats"
+    }
+    fn def_name() -> &'static str {
+        "collectionStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_slice_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///network.slices.slice.stats
+pub struct StatsResponse;
+impl jacquard_common::xrpc::XrpcResp for StatsResponse {
+    const NSID: &'static str = "network.slices.slice.stats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Stats<'a> {
+    const NSID: &'static str = "network.slices.slice.stats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = StatsResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.stats
+pub struct StatsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.stats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Stats<'de>;
+    type Response = StatsResponse;
+}
+
 pub mod collection_stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,50 +121,50 @@ pub mod collection_stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type UniqueActors;
         type RecordCount;
+        type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type UniqueActors = Unset;
         type RecordCount = Unset;
+        type UniqueActors = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Collection = Set<members::collection>;
+        type RecordCount = S::RecordCount;
         type UniqueActors = S::UniqueActors;
-        type RecordCount = S::RecordCount;
-    }
-    ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
-    impl<S: State> State for SetUniqueActors<S> {
-        type Collection = S::Collection;
-        type UniqueActors = Set<members::unique_actors>;
-        type RecordCount = S::RecordCount;
     }
     ///State transition - sets the `record_count` field to Set
     pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordCount<S> {}
     impl<S: State> State for SetRecordCount<S> {
         type Collection = S::Collection;
-        type UniqueActors = S::UniqueActors;
         type RecordCount = Set<members::record_count>;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
+    impl<S: State> State for SetUniqueActors<S> {
+        type Collection = S::Collection;
+        type RecordCount = S::RecordCount;
+        type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `unique_actors` field
-        pub struct unique_actors(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
     }
 }
 
@@ -174,8 +258,8 @@ impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
     S::Collection: collection_stats_state::IsSet,
-    S::UniqueActors: collection_stats_state::IsSet,
     S::RecordCount: collection_stats_state::IsSet,
+    S::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionStats<'a> {
@@ -330,38 +414,6 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.slice.stats"
-    }
-    fn def_name() -> &'static str {
-        "collectionStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_slice_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Stats<'a> {
-    #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
-}
-
 pub mod stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -449,56 +501,4 @@ where
             slice: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsOutput<'a> {
-    ///Per-collection statistics
-    #[serde(borrow)]
-    pub collection_stats: Vec<crate::network_slices::slice::stats::CollectionStats<'a>>,
-    ///List of collection NSIDs indexed in this slice
-    #[serde(borrow)]
-    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
-    ///Total number of unique actors indexed in this slice
-    pub total_actors: i64,
-    ///Total number of lexicons defined for this slice
-    pub total_lexicons: i64,
-    ///Total number of records indexed in this slice
-    pub total_records: i64,
-}
-
-/// Response type for
-///network.slices.slice.stats
-pub struct StatsResponse;
-impl jacquard_common::xrpc::XrpcResp for StatsResponse {
-    const NSID: &'static str = "network.slices.slice.stats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Stats<'a> {
-    const NSID: &'static str = "network.slices.slice.stats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = StatsResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.stats
-pub struct StatsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.stats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Stats<'de>;
-    type Response = StatsResponse;
 }

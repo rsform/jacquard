@@ -27,6 +27,60 @@ pub struct DecryptByCid<'a> {
     pub repo: jacquard_common::types::string::Did<'a>,
 }
 
+/// Returns the encrypted result.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DecryptByCidOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///uk.skyblur.post.decryptByCid
+pub struct DecryptByCidResponse;
+impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
+    const NSID: &'static str = "uk.skyblur.post.decryptByCid";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DecryptByCidOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DecryptByCid<'a> {
+    const NSID: &'static str = "uk.skyblur.post.decryptByCid";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DecryptByCidResponse;
+}
+
+/// Endpoint type for
+///uk.skyblur.post.decryptByCid
+pub struct DecryptByCidRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DecryptByCidRequest {
+    const PATH: &'static str = "/xrpc/uk.skyblur.post.decryptByCid";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DecryptByCid<'de>;
+    type Response = DecryptByCidResponse;
+}
+
 pub mod decrypt_by_cid_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,65 +91,65 @@ pub mod decrypt_by_cid_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Password;
         type Pds;
+        type Repo;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Password = Unset;
         type Pds = Unset;
+        type Repo = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Password = S::Password;
-        type Pds = S::Pds;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type Repo = S::Repo;
         type Password = Set<members::password>;
         type Pds = S::Pds;
+        type Repo = S::Repo;
         type Cid = S::Cid;
     }
     ///State transition - sets the `pds` field to Set
     pub struct SetPds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPds<S> {}
     impl<S: State> State for SetPds<S> {
-        type Repo = S::Repo;
         type Password = S::Password;
         type Pds = Set<members::pds>;
+        type Repo = S::Repo;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Password = S::Password;
+        type Pds = S::Pds;
+        type Repo = Set<members::repo>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Repo = S::Repo;
         type Password = S::Password;
         type Pds = S::Pds;
+        type Repo = S::Repo;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `password` field
         pub struct password(());
         ///Marker type for the `pds` field
         pub struct pds(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -210,9 +264,9 @@ where
 impl<'a, S> DecryptByCidBuilder<'a, S>
 where
     S: decrypt_by_cid_state::State,
-    S::Repo: decrypt_by_cid_state::IsSet,
     S::Password: decrypt_by_cid_state::IsSet,
     S::Pds: decrypt_by_cid_state::IsSet,
+    S::Repo: decrypt_by_cid_state::IsSet,
     S::Cid: decrypt_by_cid_state::IsSet,
 {
     /// Build the final struct
@@ -241,58 +295,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Returns the encrypted result.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DecryptByCidOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///uk.skyblur.post.decryptByCid
-pub struct DecryptByCidResponse;
-impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
-    const NSID: &'static str = "uk.skyblur.post.decryptByCid";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DecryptByCidOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DecryptByCid<'a> {
-    const NSID: &'static str = "uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DecryptByCidResponse;
-}
-
-/// Endpoint type for
-///uk.skyblur.post.decryptByCid
-pub struct DecryptByCidRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DecryptByCidRequest {
-    const PATH: &'static str = "/xrpc/uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DecryptByCid<'de>;
-    type Response = DecryptByCidResponse;
 }

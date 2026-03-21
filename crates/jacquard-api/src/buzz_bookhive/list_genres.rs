@@ -24,6 +24,91 @@ pub struct GenreWithCount<'a> {
     pub genre: jacquard_common::CowStr<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGenres {
+    ///Defaults to `50`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    ///Defaults to `0`. Min: 0.
+    #[serde(default = "_default_min_books")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_books: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offset: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGenresOutput<'a> {
+    #[serde(borrow)]
+    pub genres: Vec<crate::buzz_bookhive::list_genres::GenreWithCount<'a>>,
+    ///Next offset for pagination
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offset: std::option::Option<i64>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GenreWithCount<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.listGenres"
+    }
+    fn def_name() -> &'static str {
+        "genreWithCount"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_listGenres()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///buzz.bookhive.listGenres
+pub struct ListGenresResponse;
+impl jacquard_common::xrpc::XrpcResp for ListGenresResponse {
+    const NSID: &'static str = "buzz.bookhive.listGenres";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListGenresOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for ListGenres {
+    const NSID: &'static str = "buzz.bookhive.listGenres";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListGenresResponse;
+}
+
+/// Endpoint type for
+///buzz.bookhive.listGenres
+pub struct ListGenresRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
+    const PATH: &'static str = "/xrpc/buzz.bookhive.listGenres";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListGenres;
+    type Response = ListGenresResponse;
+}
+
 pub mod genre_with_count_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,37 +119,37 @@ pub mod genre_with_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Genre;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Genre = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type Genre = S::Genre;
+        type Count = Unset;
     }
     ///State transition - sets the `genre` field to Set
     pub struct SetGenre<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGenre<S> {}
     impl<S: State> State for SetGenre<S> {
-        type Count = S::Count;
         type Genre = Set<members::genre>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Genre = S::Genre;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `genre` field
         pub struct genre(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -137,8 +222,8 @@ where
 impl<'a, S> GenreWithCountBuilder<'a, S>
 where
     S: genre_with_count_state::State,
-    S::Count: genre_with_count_state::IsSet,
     S::Genre: genre_with_count_state::IsSet,
+    S::Count: genre_with_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GenreWithCount<'a> {
@@ -287,52 +372,12 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GenreWithCount<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.listGenres"
-    }
-    fn def_name() -> &'static str {
-        "genreWithCount"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_listGenres()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(50i64)
 }
 
 fn _default_min_books() -> std::option::Option<i64> {
     Some(0i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGenres {
-    ///Defaults to `50`. Min: 1. Max: 100.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    ///Defaults to `0`. Min: 0.
-    #[serde(default = "_default_min_books")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub min_books: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
 }
 
 pub mod list_genres_state {
@@ -432,49 +477,4 @@ where
             offset: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGenresOutput<'a> {
-    #[serde(borrow)]
-    pub genres: Vec<crate::buzz_bookhive::list_genres::GenreWithCount<'a>>,
-    ///Next offset for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
-}
-
-/// Response type for
-///buzz.bookhive.listGenres
-pub struct ListGenresResponse;
-impl jacquard_common::xrpc::XrpcResp for ListGenresResponse {
-    const NSID: &'static str = "buzz.bookhive.listGenres";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGenresOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for ListGenres {
-    const NSID: &'static str = "buzz.bookhive.listGenres";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListGenresResponse;
-}
-
-/// Endpoint type for
-///buzz.bookhive.listGenres
-pub struct ListGenresRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
-    const PATH: &'static str = "/xrpc/buzz.bookhive.listGenres";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListGenres;
-    type Response = ListGenresResponse;
 }

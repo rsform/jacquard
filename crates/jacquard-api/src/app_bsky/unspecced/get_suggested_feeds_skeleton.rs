@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,52 @@ pub struct GetSuggestedFeedsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestedFeedsSkeletonOutput<'a> {
+    #[serde(borrow)]
+    pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getSuggestedFeedsSkeleton
+pub struct GetSuggestedFeedsSkeletonResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestedFeedsSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeedsSkeleton";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestedFeedsSkeletonOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFeedsSkeleton<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeedsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestedFeedsSkeletonResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getSuggestedFeedsSkeleton
+pub struct GetSuggestedFeedsSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFeedsSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedFeedsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedFeedsSkeleton<'de>;
+    type Response = GetSuggestedFeedsSkeletonResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod get_suggested_feeds_skeleton_state {
@@ -133,46 +175,4 @@ where
             viewer: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestedFeedsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getSuggestedFeedsSkeleton
-pub struct GetSuggestedFeedsSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestedFeedsSkeletonResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeedsSkeleton";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedFeedsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFeedsSkeleton<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeedsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestedFeedsSkeletonResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getSuggestedFeedsSkeleton
-pub struct GetSuggestedFeedsSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFeedsSkeletonRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedFeedsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedFeedsSkeleton<'de>;
-    type Response = GetSuggestedFeedsSkeletonResponse;
 }

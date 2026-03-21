@@ -28,6 +28,50 @@ pub struct GetTopTracks {
     pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTopTracksOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tracks: std::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
+}
+
+/// Response type for
+///app.rocksky.charts.getTopTracks
+pub struct GetTopTracksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTopTracksResponse {
+    const NSID: &'static str = "app.rocksky.charts.getTopTracks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTopTracksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetTopTracks {
+    const NSID: &'static str = "app.rocksky.charts.getTopTracks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTopTracksResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.charts.getTopTracks
+pub struct GetTopTracksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTopTracksRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.charts.getTopTracks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTopTracks;
+    type Response = GetTopTracksResponse;
+}
+
 pub mod get_top_tracks_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -152,48 +196,4 @@ where
             start_date: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTopTracksOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tracks: std::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
-}
-
-/// Response type for
-///app.rocksky.charts.getTopTracks
-pub struct GetTopTracksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTopTracksResponse {
-    const NSID: &'static str = "app.rocksky.charts.getTopTracks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTopTracksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetTopTracks {
-    const NSID: &'static str = "app.rocksky.charts.getTopTracks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTopTracksResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.charts.getTopTracks
-pub struct GetTopTracksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTopTracksRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.charts.getTopTracks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTopTracks;
-    type Response = GetTopTracksResponse;
 }

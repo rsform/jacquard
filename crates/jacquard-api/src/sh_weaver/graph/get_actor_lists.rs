@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,55 @@ pub struct GetActorLists<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub purpose: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorListsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub lists: Vec<crate::sh_weaver::graph::ListView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.graph.getActorLists
+pub struct GetActorListsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorListsResponse {
+    const NSID: &'static str = "sh.weaver.graph.getActorLists";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorListsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorLists<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getActorLists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorListsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getActorLists
+pub struct GetActorListsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorListsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getActorLists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorLists<'de>;
+    type Response = GetActorListsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_actor_lists_state {
@@ -174,49 +219,4 @@ where
             purpose: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorListsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub lists: Vec<crate::sh_weaver::graph::ListView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.graph.getActorLists
-pub struct GetActorListsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorListsResponse {
-    const NSID: &'static str = "sh.weaver.graph.getActorLists";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorListsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorLists<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getActorLists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorListsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getActorLists
-pub struct GetActorListsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorListsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getActorLists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorLists<'de>;
-    type Response = GetActorListsResponse;
 }

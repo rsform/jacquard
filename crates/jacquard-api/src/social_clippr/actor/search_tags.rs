@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,57 @@ pub struct SearchTags<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchTagsOutput<'a> {
+    ///A parameter to paginate results
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///A list of tags and their associated details
+    #[serde(borrow)]
+    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
+}
+
+/// Response type for
+///social.clippr.actor.searchTags
+pub struct SearchTagsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
+    const NSID: &'static str = "social.clippr.actor.searchTags";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchTagsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchTags<'a> {
+    const NSID: &'static str = "social.clippr.actor.searchTags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchTagsResponse;
+}
+
+/// Endpoint type for
+///social.clippr.actor.searchTags
+pub struct SearchTagsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {
+    const PATH: &'static str = "/xrpc/social.clippr.actor.searchTags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchTags<'de>;
+    type Response = SearchTagsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_tags_state {
@@ -177,51 +224,4 @@ where
             q: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchTagsOutput<'a> {
-    ///A parameter to paginate results
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A list of tags and their associated details
-    #[serde(borrow)]
-    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
-}
-
-/// Response type for
-///social.clippr.actor.searchTags
-pub struct SearchTagsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
-    const NSID: &'static str = "social.clippr.actor.searchTags";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchTagsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchTags<'a> {
-    const NSID: &'static str = "social.clippr.actor.searchTags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchTagsResponse;
-}
-
-/// Endpoint type for
-///social.clippr.actor.searchTags
-pub struct SearchTagsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {
-    const PATH: &'static str = "/xrpc/social.clippr.actor.searchTags";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchTags<'de>;
-    type Response = SearchTagsResponse;
 }

@@ -26,6 +26,64 @@ pub struct NotFoundRecipe<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response model for fetching multiple recipes.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecipeView<'a> {
+    #[serde(borrow)]
+    pub author: crate::blue_recipes::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub record: crate::blue_recipes::feed::recipe::Recipe<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundRecipe<'a> {
+    fn nsid() -> &'static str {
+        "blue.recipes.feed.defs"
+    }
+    fn def_name() -> &'static str {
+        "notFoundRecipe"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_recipes_feed_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecipeView<'a> {
+    fn nsid() -> &'static str {
+        "blue.recipes.feed.defs"
+    }
+    fn def_name() -> &'static str {
+        "recipeView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_recipes_feed_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod not_found_recipe_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -332,47 +390,6 @@ fn lexicon_doc_blue_recipes_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundRecipe<'a> {
-    fn nsid() -> &'static str {
-        "blue.recipes.feed.defs"
-    }
-    fn def_name() -> &'static str {
-        "notFoundRecipe"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_recipes_feed_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Response model for fetching multiple recipes.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecipeView<'a> {
-    #[serde(borrow)]
-    pub author: crate::blue_recipes::actor::ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub record: crate::blue_recipes::feed::recipe::Recipe<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod recipe_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -384,84 +401,84 @@ pub mod recipe_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Author;
+        type Uri;
+        type Record;
         type IndexedAt;
         type Cid;
-        type Record;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Author = Unset;
+        type Uri = Unset;
+        type Record = Unset;
         type IndexedAt = Unset;
         type Cid = Unset;
-        type Record = Unset;
-        type Uri = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type Record = S::Record;
         type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Author = S::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Author = S::Author;
+        type Uri = Set<members::uri>;
+        type Record = S::Record;
         type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
         type Record = S::Record;
-        type Uri = Set<members::uri>;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -595,10 +612,10 @@ impl<'a, S> RecipeViewBuilder<'a, S>
 where
     S: recipe_view_state::State,
     S::Author: recipe_view_state::IsSet,
+    S::Uri: recipe_view_state::IsSet,
+    S::Record: recipe_view_state::IsSet,
     S::IndexedAt: recipe_view_state::IsSet,
     S::Cid: recipe_view_state::IsSet,
-    S::Record: recipe_view_state::IsSet,
-    S::Uri: recipe_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecipeView<'a> {
@@ -627,22 +644,5 @@ where
             uri: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecipeView<'a> {
-    fn nsid() -> &'static str {
-        "blue.recipes.feed.defs"
-    }
-    fn def_name() -> &'static str {
-        "recipeView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_recipes_feed_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

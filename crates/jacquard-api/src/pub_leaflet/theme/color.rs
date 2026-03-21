@@ -22,6 +22,226 @@ pub struct Rgb<'a> {
     pub r: i64,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Rgba<'a> {
+    pub a: i64,
+    pub b: i64,
+    pub g: i64,
+    pub r: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.theme.color"
+    }
+    fn def_name() -> &'static str {
+        "rgb"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_theme_color()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.b;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "b",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "b",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "g",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "g",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "r",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "r",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.theme.color"
+    }
+    fn def_name() -> &'static str {
+        "rgba"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_theme_color()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.a;
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "a",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.a;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "a",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "b",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "b",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "g",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "g",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "r",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "r",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod rgb_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,50 +253,50 @@ pub mod rgb_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type G;
-        type B;
         type R;
+        type B;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type G = Unset;
-        type B = Unset;
         type R = Unset;
+        type B = Unset;
     }
     ///State transition - sets the `g` field to Set
     pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetG<S> {}
     impl<S: State> State for SetG<S> {
         type G = Set<members::g>;
+        type R = S::R;
         type B = S::B;
-        type R = S::R;
-    }
-    ///State transition - sets the `b` field to Set
-    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetB<S> {}
-    impl<S: State> State for SetB<S> {
-        type G = S::G;
-        type B = Set<members::b>;
-        type R = S::R;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetR<S> {}
     impl<S: State> State for SetR<S> {
         type G = S::G;
-        type B = S::B;
         type R = Set<members::r>;
+        type B = S::B;
+    }
+    ///State transition - sets the `b` field to Set
+    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetB<S> {}
+    impl<S: State> State for SetB<S> {
+        type G = S::G;
+        type R = S::R;
+        type B = Set<members::b>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `g` field
         pub struct g(());
-        ///Marker type for the `b` field
-        pub struct b(());
         ///Marker type for the `r` field
         pub struct r(());
+        ///Marker type for the `b` field
+        pub struct b(());
     }
 }
 
@@ -161,8 +381,8 @@ impl<'a, S> RgbBuilder<'a, S>
 where
     S: rgb_state::State,
     S::G: rgb_state::IsSet,
-    S::B: rgb_state::IsSet,
     S::R: rgb_state::IsSet,
+    S::B: rgb_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgb<'a> {
@@ -321,113 +541,6 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.theme.color"
-    }
-    fn def_name() -> &'static str {
-        "rgb"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_theme_color()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.b;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "b",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.b;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "b",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.g;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "g",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.g;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "g",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.r;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "r",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.r;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "r",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Rgba<'a> {
-    pub a: i64,
-    pub b: i64,
-    pub g: i64,
-    pub r: i64,
-}
-
 pub mod rgba_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -439,66 +552,66 @@ pub mod rgba_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type R;
+        type G;
         type B;
         type A;
-        type G;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type R = Unset;
+        type G = Unset;
         type B = Unset;
         type A = Unset;
-        type G = Unset;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetR<S> {}
     impl<S: State> State for SetR<S> {
         type R = Set<members::r>;
+        type G = S::G;
         type B = S::B;
         type A = S::A;
-        type G = S::G;
-    }
-    ///State transition - sets the `b` field to Set
-    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetB<S> {}
-    impl<S: State> State for SetB<S> {
-        type R = S::R;
-        type B = Set<members::b>;
-        type A = S::A;
-        type G = S::G;
-    }
-    ///State transition - sets the `a` field to Set
-    pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetA<S> {}
-    impl<S: State> State for SetA<S> {
-        type R = S::R;
-        type B = S::B;
-        type A = Set<members::a>;
-        type G = S::G;
     }
     ///State transition - sets the `g` field to Set
     pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetG<S> {}
     impl<S: State> State for SetG<S> {
         type R = S::R;
+        type G = Set<members::g>;
         type B = S::B;
         type A = S::A;
-        type G = Set<members::g>;
+    }
+    ///State transition - sets the `b` field to Set
+    pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetB<S> {}
+    impl<S: State> State for SetB<S> {
+        type R = S::R;
+        type G = S::G;
+        type B = Set<members::b>;
+        type A = S::A;
+    }
+    ///State transition - sets the `a` field to Set
+    pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetA<S> {}
+    impl<S: State> State for SetA<S> {
+        type R = S::R;
+        type G = S::G;
+        type B = S::B;
+        type A = Set<members::a>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `r` field
         pub struct r(());
+        ///Marker type for the `g` field
+        pub struct g(());
         ///Marker type for the `b` field
         pub struct b(());
         ///Marker type for the `a` field
         pub struct a(());
-        ///Marker type for the `g` field
-        pub struct g(());
     }
 }
 
@@ -600,9 +713,9 @@ impl<'a, S> RgbaBuilder<'a, S>
 where
     S: rgba_state::State,
     S::R: rgba_state::IsSet,
+    S::G: rgba_state::IsSet,
     S::B: rgba_state::IsSet,
     S::A: rgba_state::IsSet,
-    S::G: rgba_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgba<'a> {
@@ -629,118 +742,5 @@ where
             r: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.theme.color"
-    }
-    fn def_name() -> &'static str {
-        "rgba"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_theme_color()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.a;
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "a",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.a;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "a",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.b;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "b",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.b;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "b",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.g;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "g",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.g;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "g",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.r;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "r",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.r;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "r",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

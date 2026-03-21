@@ -23,6 +23,50 @@ pub struct GetState<'a> {
     pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStateOutput<'a> {
+    #[serde(borrow)]
+    pub metadata: crate::app_bsky::ageassurance::StateMetadata<'a>,
+    #[serde(borrow)]
+    pub state: crate::app_bsky::ageassurance::State<'a>,
+}
+
+/// Response type for
+///app.bsky.ageassurance.getState
+pub struct GetStateResponse;
+impl jacquard_common::xrpc::XrpcResp for GetStateResponse {
+    const NSID: &'static str = "app.bsky.ageassurance.getState";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetStateOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetState<'a> {
+    const NSID: &'static str = "app.bsky.ageassurance.getState";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStateResponse;
+}
+
+/// Endpoint type for
+///app.bsky.ageassurance.getState
+pub struct GetStateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.ageassurance.getState";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetState<'de>;
+    type Response = GetStateResponse;
+}
+
 pub mod get_state_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,48 +177,4 @@ where
             region_code: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetStateOutput<'a> {
-    #[serde(borrow)]
-    pub metadata: crate::app_bsky::ageassurance::StateMetadata<'a>,
-    #[serde(borrow)]
-    pub state: crate::app_bsky::ageassurance::State<'a>,
-}
-
-/// Response type for
-///app.bsky.ageassurance.getState
-pub struct GetStateResponse;
-impl jacquard_common::xrpc::XrpcResp for GetStateResponse {
-    const NSID: &'static str = "app.bsky.ageassurance.getState";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStateOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetState<'a> {
-    const NSID: &'static str = "app.bsky.ageassurance.getState";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetStateResponse;
-}
-
-/// Endpoint type for
-///app.bsky.ageassurance.getState
-pub struct GetStateRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.ageassurance.getState";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetState<'de>;
-    type Response = GetStateResponse;
 }

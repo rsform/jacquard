@@ -45,6 +45,177 @@ pub struct Collection<'a> {
     >,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionType<'a> {
+    Franchise,
+    Series,
+    Curated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CollectionType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Franchise => "franchise",
+            Self::Series => "series",
+            Self::Curated => "curated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CollectionType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "franchise" => Self::Franchise,
+            "series" => Self::Series,
+            "curated" => Self::Curated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CollectionType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "franchise" => Self::Franchise,
+            "series" => Self::Series,
+            "curated" => Self::Curated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CollectionType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CollectionType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CollectionType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CollectionType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CollectionType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CollectionType<'_> {
+    type Output = CollectionType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionType::Franchise => CollectionType::Franchise,
+            CollectionType::Series => CollectionType::Series,
+            CollectionType::Curated => CollectionType::Curated,
+            CollectionType::Other(v) => CollectionType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collection<'a>,
+}
+
+impl<'a> Collection<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CollectionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CollectionRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
+    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Collection<'_> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
+    type Record = CollectionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CollectionRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
+    type Record = CollectionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.collection"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_collection()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod collection_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -308,177 +479,6 @@ where
             websites: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Collection<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CollectionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionType<'a> {
-    Franchise,
-    Series,
-    Curated,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CollectionType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Franchise => "franchise",
-            Self::Series => "series",
-            Self::Curated => "curated",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CollectionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CollectionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CollectionType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CollectionType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CollectionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CollectionType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CollectionType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CollectionType<'_> {
-    type Output = CollectionType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CollectionType::Franchise => CollectionType::Franchise,
-            CollectionType::Series => CollectionType::Series,
-            CollectionType::Curated => CollectionType::Curated,
-            CollectionType::Other(v) => CollectionType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collection<'a>,
-}
-
-impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
-    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Collection<'_> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
-    type Record = CollectionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CollectionRecord;
-impl jacquard_common::xrpc::XrpcResp for CollectionRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CollectionRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.collection";
-    type Record = CollectionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.collection"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_collection()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -33,6 +33,170 @@ pub struct Theme<'a> {
     pub transparency: std::option::Option<i64>,
 }
 
+/// Color palette with CSS hex values
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Palette<'a> {
+    ///Accent color (hex value)
+    #[serde(borrow)]
+    pub accent: jacquard_common::CowStr<'a>,
+    ///Background color (hex value)
+    #[serde(borrow)]
+    pub background: jacquard_common::CowStr<'a>,
+    ///Link color (hex value)
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    ///Surface hover color (hex value)
+    #[serde(borrow)]
+    pub surface_hover: jacquard_common::CowStr<'a>,
+    ///Primary text color (hex value)
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.theme"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.font {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "font",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.transparency {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transparency",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.transparency {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transparency",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.theme"
+    }
+    fn def_name() -> &'static str {
+        "palette"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.accent;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accent",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.background;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "background",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.link;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "link",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.surface_hover;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "surface_hover",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 7usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod theme_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,37 +207,37 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dark;
         type Light;
+        type Dark;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dark = Unset;
         type Light = Unset;
-    }
-    ///State transition - sets the `dark` field to Set
-    pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDark<S> {}
-    impl<S: State> State for SetDark<S> {
-        type Dark = Set<members::dark>;
-        type Light = S::Light;
+        type Dark = Unset;
     }
     ///State transition - sets the `light` field to Set
     pub struct SetLight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLight<S> {}
     impl<S: State> State for SetLight<S> {
-        type Dark = S::Dark;
         type Light = Set<members::light>;
+        type Dark = S::Dark;
+    }
+    ///State transition - sets the `dark` field to Set
+    pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDark<S> {}
+    impl<S: State> State for SetDark<S> {
+        type Light = S::Light;
+        type Dark = Set<members::dark>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dark` field
-        pub struct dark(());
         ///Marker type for the `light` field
         pub struct light(());
+        ///Marker type for the `dark` field
+        pub struct dark(());
     }
 }
 
@@ -177,8 +341,8 @@ impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
-    S::Dark: theme_state::IsSet,
     S::Light: theme_state::IsSet,
+    S::Dark: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
@@ -422,169 +586,5 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.theme"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.font {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.transparency {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transparency",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.transparency {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transparency",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Color palette with CSS hex values
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Palette<'a> {
-    ///Accent color (hex value)
-    #[serde(borrow)]
-    pub accent: jacquard_common::CowStr<'a>,
-    ///Background color (hex value)
-    #[serde(borrow)]
-    pub background: jacquard_common::CowStr<'a>,
-    ///Link color (hex value)
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    ///Surface hover color (hex value)
-    #[serde(borrow)]
-    pub surface_hover: jacquard_common::CowStr<'a>,
-    ///Primary text color (hex value)
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.theme"
-    }
-    fn def_name() -> &'static str {
-        "palette"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.accent;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "accent",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.background;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.link;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "link",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.surface_hover;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "surface_hover",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 7usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

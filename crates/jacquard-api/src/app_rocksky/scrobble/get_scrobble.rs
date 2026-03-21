@@ -20,6 +20,49 @@ pub struct GetScrobble<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetScrobbleOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::scrobble::ScrobbleViewDetailed<'a>,
+}
+
+/// Response type for
+///app.rocksky.scrobble.getScrobble
+pub struct GetScrobbleResponse;
+impl jacquard_common::xrpc::XrpcResp for GetScrobbleResponse {
+    const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetScrobbleOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobble<'a> {
+    const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetScrobbleResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.scrobble.getScrobble
+pub struct GetScrobbleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetScrobbleRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobble";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetScrobble<'de>;
+    type Response = GetScrobbleResponse;
+}
+
 pub mod get_scrobble_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetScrobbleOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::scrobble::ScrobbleViewDetailed<'a>,
-}
-
-/// Response type for
-///app.rocksky.scrobble.getScrobble
-pub struct GetScrobbleResponse;
-impl jacquard_common::xrpc::XrpcResp for GetScrobbleResponse {
-    const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobbleOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobble<'a> {
-    const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetScrobbleResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.scrobble.getScrobble
-pub struct GetScrobbleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetScrobbleRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobble<'de>;
-    type Response = GetScrobbleResponse;
 }

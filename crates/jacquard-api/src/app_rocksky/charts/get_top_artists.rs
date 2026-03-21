@@ -28,6 +28,52 @@ pub struct GetTopArtists {
     pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTopArtistsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artists: std::option::Option<
+        Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
+    >,
+}
+
+/// Response type for
+///app.rocksky.charts.getTopArtists
+pub struct GetTopArtistsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTopArtistsResponse {
+    const NSID: &'static str = "app.rocksky.charts.getTopArtists";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTopArtistsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetTopArtists {
+    const NSID: &'static str = "app.rocksky.charts.getTopArtists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTopArtistsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.charts.getTopArtists
+pub struct GetTopArtistsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTopArtistsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.charts.getTopArtists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTopArtists;
+    type Response = GetTopArtistsResponse;
+}
+
 pub mod get_top_artists_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -152,50 +198,4 @@ where
             start_date: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTopArtistsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artists: std::option::Option<
-        Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
-    >,
-}
-
-/// Response type for
-///app.rocksky.charts.getTopArtists
-pub struct GetTopArtistsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTopArtistsResponse {
-    const NSID: &'static str = "app.rocksky.charts.getTopArtists";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTopArtistsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetTopArtists {
-    const NSID: &'static str = "app.rocksky.charts.getTopArtists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTopArtistsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.charts.getTopArtists
-pub struct GetTopArtistsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTopArtistsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.charts.getTopArtists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTopArtists;
-    type Response = GetTopArtistsResponse;
 }

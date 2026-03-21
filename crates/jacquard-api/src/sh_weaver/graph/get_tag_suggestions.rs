@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -31,6 +27,52 @@ pub struct GetTagSuggestions<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub query: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTagSuggestionsOutput<'a> {
+    #[serde(borrow)]
+    pub suggestions: Vec<crate::sh_weaver::graph::TagView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.graph.getTagSuggestions
+pub struct GetTagSuggestionsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTagSuggestionsResponse {
+    const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTagSuggestionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagSuggestions<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTagSuggestionsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getTagSuggestions
+pub struct GetTagSuggestionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTagSuggestionsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getTagSuggestions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTagSuggestions<'de>;
+    type Response = GetTagSuggestionsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
 }
 
 pub mod get_tag_suggestions_state {
@@ -141,46 +183,4 @@ where
             query: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTagSuggestionsOutput<'a> {
-    #[serde(borrow)]
-    pub suggestions: Vec<crate::sh_weaver::graph::TagView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.graph.getTagSuggestions
-pub struct GetTagSuggestionsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTagSuggestionsResponse {
-    const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTagSuggestionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagSuggestions<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTagSuggestionsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getTagSuggestions
-pub struct GetTagSuggestionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTagSuggestionsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getTagSuggestions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTagSuggestions<'de>;
-    type Response = GetTagSuggestionsResponse;
 }

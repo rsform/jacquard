@@ -20,6 +20,151 @@ pub struct GetDefaultBranch<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetDefaultBranchOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub author: std::option::Option<
+        crate::sh_tangled::repo::get_default_branch::Signature<'a>,
+    >,
+    ///Latest commit hash on default branch
+    #[serde(borrow)]
+    pub hash: jacquard_common::CowStr<'a>,
+    ///Latest commit message
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Default branch name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Short commit hash
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Timestamp of latest commit
+    pub when: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetDefaultBranchError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetDefaultBranchError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Signature<'a> {
+    ///Author email
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+    ///Author name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Author timestamp
+    pub when: jacquard_common::types::string::Datetime,
+}
+
+/// Response type for
+///sh.tangled.repo.getDefaultBranch
+pub struct GetDefaultBranchResponse;
+impl jacquard_common::xrpc::XrpcResp for GetDefaultBranchResponse {
+    const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetDefaultBranchOutput<'de>;
+    type Err<'de> = GetDefaultBranchError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetDefaultBranch<'a> {
+    const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetDefaultBranchResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.getDefaultBranch
+pub struct GetDefaultBranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.getDefaultBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetDefaultBranch<'de>;
+    type Response = GetDefaultBranchResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.getDefaultBranch"
+    }
+    fn def_name() -> &'static str {
+        "signature"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_getDefaultBranch()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod get_default_branch_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,134 +254,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetDefaultBranchOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub author: std::option::Option<
-        crate::sh_tangled::repo::get_default_branch::Signature<'a>,
-    >,
-    ///Latest commit hash on default branch
-    #[serde(borrow)]
-    pub hash: jacquard_common::CowStr<'a>,
-    ///Latest commit message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Default branch name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Short commit hash
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp of latest commit
-    pub when: jacquard_common::types::string::Datetime,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetDefaultBranchError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetDefaultBranchError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.getDefaultBranch
-pub struct GetDefaultBranchResponse;
-impl jacquard_common::xrpc::XrpcResp for GetDefaultBranchResponse {
-    const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetDefaultBranchOutput<'de>;
-    type Err<'de> = GetDefaultBranchError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetDefaultBranch<'a> {
-    const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetDefaultBranchResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.getDefaultBranch
-pub struct GetDefaultBranchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.getDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetDefaultBranch<'de>;
-    type Response = GetDefaultBranchResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
-    ///Author email
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-    ///Author name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
-    pub when: jacquard_common::types::string::Datetime,
-}
-
 pub mod signature_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -247,49 +264,49 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Email;
         type When;
+        type Email;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Email = Unset;
         type When = Unset;
+        type Email = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Email = Set<members::email>;
-        type When = S::When;
-        type Name = S::Name;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Email = S::Email;
         type When = Set<members::when>;
+        type Email = S::Email;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Email = Set<members::email>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Email = S::Email;
         type When = S::When;
+        type Email = S::Email;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `email` field
+        pub struct email(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -384,8 +401,8 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::Email: signature_state::IsSet,
     S::When: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
     S::Name: signature_state::IsSet,
 {
     /// Build the final struct
@@ -548,22 +565,5 @@ fn lexicon_doc_sh_tangled_repo_getDefaultBranch() -> ::jacquard_lexicon::lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.getDefaultBranch"
-    }
-    fn def_name() -> &'static str {
-        "signature"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_getDefaultBranch()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

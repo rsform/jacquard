@@ -28,6 +28,84 @@ pub struct Stamp<'a> {
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StampGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Stamp<'a>,
+}
+
+impl<'a> Stamp<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StampRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StampRecord;
+impl jacquard_common::xrpc::XrpcResp for StampRecord {
+    const NSID: &'static str = "bond.biblio.stamp";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StampGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StampGetRecordOutput<'_>> for Stamp<'_> {
+    fn from(output: StampGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Stamp<'_> {
+    const NSID: &'static str = "bond.biblio.stamp";
+    type Record = StampRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StampRecord {
+    const NSID: &'static str = "bond.biblio.stamp";
+    type Record = StampRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stamp<'a> {
+    fn nsid() -> &'static str {
+        "bond.biblio.stamp"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_bond_biblio_stamp()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod stamp_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +116,51 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Book;
         type CreatedAt;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Book = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
+        type List = Unset;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type List = S::List;
         type Book = Set<members::book>;
         type CreatedAt = S::CreatedAt;
+        type List = S::List;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type List = S::List;
         type Book = S::Book;
         type CreatedAt = Set<members::created_at>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Book = S::Book;
+        type CreatedAt = S::CreatedAt;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `book` field
         pub struct book(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
@@ -175,9 +253,9 @@ where
 impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
-    S::List: stamp_state::IsSet,
     S::Book: stamp_state::IsSet,
     S::CreatedAt: stamp_state::IsSet,
+    S::List: stamp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stamp<'a> {
@@ -202,84 +280,6 @@ where
             list: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Stamp<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StampRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StampGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stamp<'a>,
-}
-
-impl From<StampGetRecordOutput<'_>> for Stamp<'_> {
-    fn from(output: StampGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Stamp<'_> {
-    const NSID: &'static str = "bond.biblio.stamp";
-    type Record = StampRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StampRecord;
-impl jacquard_common::xrpc::XrpcResp for StampRecord {
-    const NSID: &'static str = "bond.biblio.stamp";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StampGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StampRecord {
-    const NSID: &'static str = "bond.biblio.stamp";
-    type Record = StampRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stamp<'a> {
-    fn nsid() -> &'static str {
-        "bond.biblio.stamp"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_bond_biblio_stamp()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

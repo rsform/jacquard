@@ -37,6 +37,467 @@ pub struct EvaluationTypeDefinition<'a> {
     pub result_type: jacquard_common::CowStr<'a>,
 }
 
+/// Localized name and description for an evaluation type.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EvaluationTypeLocale<'a> {
+    ///Longer description of what this evaluation type does.
+    #[serde(borrow)]
+    pub description: jacquard_common::CowStr<'a>,
+    ///Language code (BCP-47, e.g., 'en', 'pt-BR').
+    #[serde(borrow)]
+    pub lang: jacquard_common::CowStr<'a>,
+    ///Short human-readable name for this evaluation type.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+/// Policies declaring what this evaluator does and how it operates.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EvaluatorPolicies<'a> {
+    ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub access_model: std::option::Option<EvaluatorPoliciesAccessModel<'a>>,
+    ///Detailed definitions for each evaluation type, including human-readable descriptions.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub evaluation_type_definitions: std::option::Option<
+        Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>,
+    >,
+    ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
+    #[serde(borrow)]
+    pub evaluation_types: Vec<jacquard_common::CowStr<'a>>,
+    ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EvaluatorPoliciesAccessModel<'a> {
+    Open,
+    Subscription,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EvaluatorPoliciesAccessModel<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Subscription => "subscription",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EvaluatorPoliciesAccessModel<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "open" => Self::Open,
+            "subscription" => Self::Subscription,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EvaluatorPoliciesAccessModel<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "open" => Self::Open,
+            "subscription" => Self::Subscription,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EvaluatorPoliciesAccessModel<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EvaluatorPoliciesAccessModel<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EvaluatorPoliciesAccessModel<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EvaluatorPoliciesAccessModel<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EvaluatorPoliciesAccessModel<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EvaluatorPoliciesAccessModel<'_> {
+    type Output = EvaluatorPoliciesAccessModel<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EvaluatorPoliciesAccessModel::Open => EvaluatorPoliciesAccessModel::Open,
+            EvaluatorPoliciesAccessModel::Subscription => {
+                EvaluatorPoliciesAccessModel::Subscription
+            }
+            EvaluatorPoliciesAccessModel::Other(v) => {
+                EvaluatorPoliciesAccessModel::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// An evaluator service declaration. Publish at /app.gainforest.evaluator.service/self to declare this account as an evaluator.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Service<'a> {
+    ///Timestamp of when this evaluator service was declared.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///The evaluator's policies including supported evaluation types and access model.
+    #[serde(borrow)]
+    pub policies: crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ServiceGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Service<'a>,
+}
+
+impl<'a> Service<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ServiceRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.service"
+    }
+    fn def_name() -> &'static str {
+        "evaluationTypeDefinition"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.identifier;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identifier",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.locales {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "locales",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.result_type;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "result_type",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.service"
+    }
+    fn def_name() -> &'static str {
+        "evaluationTypeLocale"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.description;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.lang;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 16usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "lang",
+                        ),
+                        max: 16usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.service"
+    }
+    fn def_name() -> &'static str {
+        "evaluatorPolicies"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.access_model {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "access_model",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.evaluation_type_definitions {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "evaluation_type_definitions",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.evaluation_types;
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "evaluation_types",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.subject_collections {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subject_collections",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ServiceRecord;
+impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
+    const NSID: &'static str = "app.gainforest.evaluator.service";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ServiceGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
+    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Service<'_> {
+    const NSID: &'static str = "app.gainforest.evaluator.service";
+    type Record = ServiceRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ServiceRecord {
+    const NSID: &'static str = "app.gainforest.evaluator.service";
+    type Record = ServiceRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.service"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_service()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -413,204 +874,6 @@ fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.service"
-    }
-    fn def_name() -> &'static str {
-        "evaluationTypeDefinition"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.identifier;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identifier",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.locales {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locales",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.result_type;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "result_type",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Localized name and description for an evaluation type.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluationTypeLocale<'a> {
-    ///Longer description of what this evaluation type does.
-    #[serde(borrow)]
-    pub description: jacquard_common::CowStr<'a>,
-    ///Language code (BCP-47, e.g., 'en', 'pt-BR').
-    #[serde(borrow)]
-    pub lang: jacquard_common::CowStr<'a>,
-    ///Short human-readable name for this evaluation type.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.service"
-    }
-    fn def_name() -> &'static str {
-        "evaluationTypeLocale"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.description;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.lang;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "lang",
-                        ),
-                        max: 16usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Policies declaring what this evaluator does and how it operates.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluatorPolicies<'a> {
-    ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub access_model: std::option::Option<EvaluatorPoliciesAccessModel<'a>>,
-    ///Detailed definitions for each evaluation type, including human-readable descriptions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub evaluation_type_definitions: std::option::Option<
-        Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>,
-    >,
-    ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
-    #[serde(borrow)]
-    pub evaluation_types: Vec<jacquard_common::CowStr<'a>>,
-    ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub subject_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
 pub mod evaluator_policies_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -794,191 +1057,6 @@ where
     }
 }
 
-/// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EvaluatorPoliciesAccessModel<'a> {
-    Open,
-    Subscription,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> EvaluatorPoliciesAccessModel<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Open => "open",
-            Self::Subscription => "subscription",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for EvaluatorPoliciesAccessModel<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "open" => Self::Open,
-            "subscription" => Self::Subscription,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for EvaluatorPoliciesAccessModel<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "open" => Self::Open,
-            "subscription" => Self::Subscription,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EvaluatorPoliciesAccessModel<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for EvaluatorPoliciesAccessModel<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for EvaluatorPoliciesAccessModel<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for EvaluatorPoliciesAccessModel<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for EvaluatorPoliciesAccessModel<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for EvaluatorPoliciesAccessModel<'_> {
-    type Output = EvaluatorPoliciesAccessModel<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EvaluatorPoliciesAccessModel::Open => EvaluatorPoliciesAccessModel::Open,
-            EvaluatorPoliciesAccessModel::Subscription => {
-                EvaluatorPoliciesAccessModel::Subscription
-            }
-            EvaluatorPoliciesAccessModel::Other(v) => {
-                EvaluatorPoliciesAccessModel::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.service"
-    }
-    fn def_name() -> &'static str {
-        "evaluatorPolicies"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.access_model {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "access_model",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.evaluation_type_definitions {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evaluation_type_definitions",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.evaluation_types;
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evaluation_types",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.subject_collections {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subject_collections",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An evaluator service declaration. Publish at /app.gainforest.evaluator.service/self to declare this account as an evaluator.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Service<'a> {
-    ///Timestamp of when this evaluator service was declared.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///The evaluator's policies including supported evaluation types and access model.
-    #[serde(borrow)]
-    pub policies: crate::app_gainforest::evaluator::service::EvaluatorPolicies<'a>,
-}
-
 pub mod service_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -989,37 +1067,37 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Policies;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Policies = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Policies = S::Policies;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `policies` field to Set
     pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPolicies<S> {}
     impl<S: State> State for SetPolicies<S> {
-        type CreatedAt = S::CreatedAt;
         type Policies = Set<members::policies>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Policies = S::Policies;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `policies` field
         pub struct policies(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1096,8 +1174,8 @@ where
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::CreatedAt: service_state::IsSet,
     S::Policies: service_state::IsSet,
+    S::CreatedAt: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
@@ -1120,83 +1198,5 @@ where
             policies: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Service<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ServiceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Service<'a>,
-}
-
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Service<'_> {
-    const NSID: &'static str = "app.gainforest.evaluator.service";
-    type Record = ServiceRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ServiceRecord;
-impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
-    const NSID: &'static str = "app.gainforest.evaluator.service";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ServiceGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ServiceRecord {
-    const NSID: &'static str = "app.gainforest.evaluator.service";
-    type Record = ServiceRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.service"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_service()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -33,6 +33,141 @@ pub struct SubjectRef<'a> {
     pub uri: jacquard_common::CowStr<'a>,
 }
 
+/// The type of subject being reviewed.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SubjectType<'a> {
+    Record,
+    User,
+    Pds,
+    Lexicon,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SubjectType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Record => "record",
+            Self::User => "user",
+            Self::Pds => "pds",
+            Self::Lexicon => "lexicon",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SubjectType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "record" => Self::Record,
+            "user" => Self::User,
+            "pds" => Self::Pds,
+            "lexicon" => Self::Lexicon,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SubjectType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "record" => Self::Record,
+            "user" => Self::User,
+            "pds" => Self::Pds,
+            "lexicon" => Self::Lexicon,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for SubjectType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for SubjectType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for SubjectType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SubjectType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for SubjectType<'_> {
+    type Output = SubjectType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubjectType::Record => SubjectType::Record,
+            SubjectType::User => SubjectType::User,
+            SubjectType::Pds => SubjectType::Pds,
+            SubjectType::Lexicon => SubjectType::Lexicon,
+            SubjectType::Other(v) => SubjectType::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
+    fn nsid() -> &'static str {
+        "org.impactindexer.review.defs"
+    }
+    fn def_name() -> &'static str {
+        "subjectRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_impactindexer_review_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cid {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cid",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.uri;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 8192usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uri",
+                    ),
+                    max: 8192usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod subject_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,37 +178,37 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Type;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Type = S::Type;
+        type Uri = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
         type Type = Set<members::r#type>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Type = S::Type;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -160,8 +295,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Uri: subject_ref_state::IsSet,
     S::Type: subject_ref_state::IsSet,
+    S::Uri: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {
@@ -293,140 +428,5 @@ fn lexicon_doc_org_impactindexer_review_defs() -> ::jacquard_lexicon::lexicon::L
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
-    fn nsid() -> &'static str {
-        "org.impactindexer.review.defs"
-    }
-    fn def_name() -> &'static str {
-        "subjectRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_impactindexer_review_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cid {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cid",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.uri;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 8192usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uri",
-                    ),
-                    max: 8192usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// The type of subject being reviewed.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubjectType<'a> {
-    Record,
-    User,
-    Pds,
-    Lexicon,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SubjectType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Record => "record",
-            Self::User => "user",
-            Self::Pds => "pds",
-            Self::Lexicon => "lexicon",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SubjectType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "record" => Self::Record,
-            "user" => Self::User,
-            "pds" => Self::Pds,
-            "lexicon" => Self::Lexicon,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SubjectType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "record" => Self::Record,
-            "user" => Self::User,
-            "pds" => Self::Pds,
-            "lexicon" => Self::Lexicon,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for SubjectType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for SubjectType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for SubjectType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SubjectType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for SubjectType<'_> {
-    type Output = SubjectType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubjectType::Record => SubjectType::Record,
-            SubjectType::User => SubjectType::User,
-            SubjectType::Pds => SubjectType::Pds,
-            SubjectType::Lexicon => SubjectType::Lexicon,
-            SubjectType::Other(v) => SubjectType::Other(v.into_static()),
-        }
     }
 }

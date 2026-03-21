@@ -40,10 +40,6 @@ pub struct QueryEvents<'a> {
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-fn _default_query_events_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 /// Sort direction
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryEventsSortDirection<'a> {
@@ -183,4 +179,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     );
     type Request<'de> = QueryEvents<'de>;
     type Response = QueryEventsResponse;
+}
+
+fn _default_query_events_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }

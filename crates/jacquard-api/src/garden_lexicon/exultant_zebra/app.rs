@@ -30,6 +30,84 @@ pub struct App<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AppGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: App<'a>,
+}
+
+impl<'a> App<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AppRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AppRecord;
+impl jacquard_common::xrpc::XrpcResp for AppRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AppGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AppGetRecordOutput<'_>> for App<'_> {
+    fn from(output: AppGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for App<'_> {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
+    type Record = AppRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AppRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
+    type Record = AppRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for App<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.app"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_app()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod app_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -189,84 +267,6 @@ where
             name: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> App<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AppRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AppGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: App<'a>,
-}
-
-impl From<AppGetRecordOutput<'_>> for App<'_> {
-    fn from(output: AppGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for App<'_> {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
-    type Record = AppRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AppRecord;
-impl jacquard_common::xrpc::XrpcResp for AppRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AppGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AppRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
-    type Record = AppRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for App<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.app"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_app()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

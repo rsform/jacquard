@@ -30,6 +30,97 @@ pub struct Log<'a> {
     pub programme: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LogGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Log<'a>,
+}
+
+impl<'a> Log<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LogRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LogRecord;
+impl jacquard_common::xrpc::XrpcResp for LogRecord {
+    const NSID: &'static str = "media.ionosphere.log";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LogGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LogGetRecordOutput<'_>> for Log<'_> {
+    fn from(output: LogGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Log<'_> {
+    const NSID: &'static str = "media.ionosphere.log";
+    type Record = LogRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LogRecord {
+    const NSID: &'static str = "media.ionosphere.log";
+    type Record = LogRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.log"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_log()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.ionosphere;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ionosphere",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod log_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,51 +131,51 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Item;
         type Ionosphere;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Item = Unset;
         type Ionosphere = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type Ionosphere = S::Ionosphere;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Item = S::Item;
-        type Ionosphere = Set<members::ionosphere>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Item = S::Item;
         type Ionosphere = S::Ionosphere;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type CreatedAt = S::CreatedAt;
+        type Item = Set<members::item>;
+        type Ionosphere = S::Ionosphere;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type CreatedAt = S::CreatedAt;
+        type Item = S::Item;
+        type Ionosphere = Set<members::ionosphere>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `item` field
         pub struct item(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -197,9 +288,9 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
+    S::CreatedAt: log_state::IsSet,
     S::Item: log_state::IsSet,
     S::Ionosphere: log_state::IsSet,
-    S::CreatedAt: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {
@@ -226,97 +317,6 @@ where
             programme: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Log<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LogRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Log<'a>,
-}
-
-impl From<LogGetRecordOutput<'_>> for Log<'_> {
-    fn from(output: LogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Log<'_> {
-    const NSID: &'static str = "media.ionosphere.log";
-    type Record = LogRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LogRecord;
-impl jacquard_common::xrpc::XrpcResp for LogRecord {
-    const NSID: &'static str = "media.ionosphere.log";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LogGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LogRecord {
-    const NSID: &'static str = "media.ionosphere.log";
-    type Record = LogRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.log"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_log()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.ionosphere;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ionosphere",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

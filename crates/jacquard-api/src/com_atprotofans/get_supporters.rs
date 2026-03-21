@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,92 @@ pub struct GetSupporters<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSupportersOutput<'a> {
+    ///Pagination cursor for fetching the next page of results.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///List of supporter profiles.
+    #[serde(borrow)]
+    pub supporters: Vec<crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetSupportersError<'a> {
+    /// Invalid DID format.
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetSupportersError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atprotofans.getSupporters
+pub struct GetSupportersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSupportersResponse {
+    const NSID: &'static str = "com.atprotofans.getSupporters";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSupportersOutput<'de>;
+    type Err<'de> = GetSupportersError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSupporters<'a> {
+    const NSID: &'static str = "com.atprotofans.getSupporters";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSupportersResponse;
+}
+
+/// Endpoint type for
+///com.atprotofans.getSupporters
+pub struct GetSupportersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSupportersRequest {
+    const PATH: &'static str = "/xrpc/com.atprotofans.getSupporters";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSupporters<'de>;
+    type Response = GetSupportersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_supporters_state {
@@ -153,86 +235,4 @@ where
             subject: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSupportersOutput<'a> {
-    ///Pagination cursor for fetching the next page of results.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///List of supporter profiles.
-    #[serde(borrow)]
-    pub supporters: Vec<crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetSupportersError<'a> {
-    /// Invalid DID format.
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetSupportersError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atprotofans.getSupporters
-pub struct GetSupportersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSupportersResponse {
-    const NSID: &'static str = "com.atprotofans.getSupporters";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSupportersOutput<'de>;
-    type Err<'de> = GetSupportersError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSupporters<'a> {
-    const NSID: &'static str = "com.atprotofans.getSupporters";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSupportersResponse;
-}
-
-/// Endpoint type for
-///com.atprotofans.getSupporters
-pub struct GetSupportersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSupportersRequest {
-    const PATH: &'static str = "/xrpc/com.atprotofans.getSupporters";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSupporters<'de>;
-    type Response = GetSupportersResponse;
 }

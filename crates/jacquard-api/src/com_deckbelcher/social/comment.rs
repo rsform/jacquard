@@ -22,6 +22,407 @@ pub struct CardSubject<'a> {
     pub r#ref: crate::com_deckbelcher::CardRef<'a>,
 }
 
+/// Target: a card (in a deck or collection).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CardTarget<'a> {
+    #[serde(borrow)]
+    pub r#ref: crate::com_deckbelcher::CardRef<'a>,
+}
+
+/// Target: a deck (in a collection).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeckTarget<'a> {
+    #[serde(borrow)]
+    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// Top-level comment on a card, deck, or collection.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Comment<'a> {
+    ///Rich text content.
+    #[serde(borrow)]
+    pub content: crate::com_deckbelcher::richtext::Document<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///What this comment is on.
+    #[serde(borrow)]
+    pub subject: CommentSubject<'a>,
+    ///Optional refinement within subject (card/section/tag in a deck).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub target: std::option::Option<CommentTarget<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CommentSubject<'a> {
+    #[serde(rename = "com.deckbelcher.social.comment#cardSubject")]
+    CardSubject(Box<crate::com_deckbelcher::social::comment::CardSubject<'a>>),
+    #[serde(rename = "com.deckbelcher.social.comment#recordSubject")]
+    RecordSubject(Box<crate::com_deckbelcher::social::comment::RecordSubject<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CommentTarget<'a> {
+    #[serde(rename = "com.deckbelcher.social.comment#cardTarget")]
+    CardTarget(Box<crate::com_deckbelcher::social::comment::CardTarget<'a>>),
+    #[serde(rename = "com.deckbelcher.social.comment#deckTarget")]
+    DeckTarget(Box<crate::com_deckbelcher::social::comment::DeckTarget<'a>>),
+    #[serde(rename = "com.deckbelcher.social.comment#sectionTarget")]
+    SectionTarget(Box<crate::com_deckbelcher::social::comment::SectionTarget<'a>>),
+    #[serde(rename = "com.deckbelcher.social.comment#tagTarget")]
+    TagTarget(Box<crate::com_deckbelcher::social::comment::TagTarget<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CommentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Comment<'a>,
+}
+
+/// Subject: an ATProto record (deck, collection).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordSubject<'a> {
+    #[serde(borrow)]
+    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// Target: a deck section (mainboard, sideboard, etc).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SectionTarget<'a> {
+    #[serde(borrow)]
+    pub section: jacquard_common::CowStr<'a>,
+}
+
+/// Target: a tag package (ramp, removal, wincons, etc).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagTarget<'a> {
+    #[serde(borrow)]
+    pub tag: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Comment<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CommentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardSubject<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "cardSubject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardTarget<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "cardTarget"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeckTarget<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "deckTarget"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CommentRecord;
+impl jacquard_common::xrpc::XrpcResp for CommentRecord {
+    const NSID: &'static str = "com.deckbelcher.social.comment";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CommentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
+    fn from(output: CommentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Comment<'_> {
+    const NSID: &'static str = "com.deckbelcher.social.comment";
+    type Record = CommentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CommentRecord {
+    const NSID: &'static str = "com.deckbelcher.social.comment";
+    type Record = CommentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordSubject<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "recordSubject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SectionTarget<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "sectionTarget"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.section;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "section",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.section;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "section",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagTarget<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.comment"
+    }
+    fn def_name() -> &'static str {
+        "tagTarget"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_comment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.tag;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tag",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tag;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "tag",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod card_subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -458,40 +859,6 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> ::jacquard_lexicon::lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardSubject<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "cardSubject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Target: a card (in a deck or collection).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CardTarget<'a> {
-    #[serde(borrow)]
-    pub r#ref: crate::com_deckbelcher::CardRef<'a>,
-}
-
 pub mod card_target_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -597,40 +964,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardTarget<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "cardTarget"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Target: a deck (in a collection).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeckTarget<'a> {
-    #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod deck_target_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -734,51 +1067,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeckTarget<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "deckTarget"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Top-level comment on a card, deck, or collection.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Comment<'a> {
-    ///Rich text content.
-    #[serde(borrow)]
-    pub content: crate::com_deckbelcher::richtext::Document<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///What this comment is on.
-    #[serde(borrow)]
-    pub subject: CommentSubject<'a>,
-    ///Optional refinement within subject (card/section/tag in a deck).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub target: std::option::Option<CommentTarget<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod comment_state {
@@ -996,143 +1284,6 @@ where
     }
 }
 
-impl<'a> Comment<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CommentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CommentSubject<'a> {
-    #[serde(rename = "com.deckbelcher.social.comment#cardSubject")]
-    CardSubject(Box<crate::com_deckbelcher::social::comment::CardSubject<'a>>),
-    #[serde(rename = "com.deckbelcher.social.comment#recordSubject")]
-    RecordSubject(Box<crate::com_deckbelcher::social::comment::RecordSubject<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CommentTarget<'a> {
-    #[serde(rename = "com.deckbelcher.social.comment#cardTarget")]
-    CardTarget(Box<crate::com_deckbelcher::social::comment::CardTarget<'a>>),
-    #[serde(rename = "com.deckbelcher.social.comment#deckTarget")]
-    DeckTarget(Box<crate::com_deckbelcher::social::comment::DeckTarget<'a>>),
-    #[serde(rename = "com.deckbelcher.social.comment#sectionTarget")]
-    SectionTarget(Box<crate::com_deckbelcher::social::comment::SectionTarget<'a>>),
-    #[serde(rename = "com.deckbelcher.social.comment#tagTarget")]
-    TagTarget(Box<crate::com_deckbelcher::social::comment::TagTarget<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CommentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Comment<'a>,
-}
-
-impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
-    fn from(output: CommentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Comment<'_> {
-    const NSID: &'static str = "com.deckbelcher.social.comment";
-    type Record = CommentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CommentRecord;
-impl jacquard_common::xrpc::XrpcResp for CommentRecord {
-    const NSID: &'static str = "com.deckbelcher.social.comment";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CommentRecord {
-    const NSID: &'static str = "com.deckbelcher.social.comment";
-    type Record = CommentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Subject: an ATProto record (deck, collection).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordSubject<'a> {
-    #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod record_subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1235,156 +1386,5 @@ where
             r#ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordSubject<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "recordSubject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Target: a deck section (mainboard, sideboard, etc).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SectionTarget<'a> {
-    #[serde(borrow)]
-    pub section: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SectionTarget<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "sectionTarget"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.section;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "section",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.section;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "section",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Target: a tag package (ramp, removal, wincons, etc).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagTarget<'a> {
-    #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagTarget<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.comment"
-    }
-    fn def_name() -> &'static str {
-        "tagTarget"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_comment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.tag;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tag",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.tag;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "tag",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

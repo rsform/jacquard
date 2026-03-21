@@ -28,6 +28,184 @@ pub struct Status<'a> {
     pub status: StatusStatus<'a>,
 }
 
+/// status of the pull request
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StatusStatus<'a> {
+    ShTangledRepoPullStatusOpen,
+    ShTangledRepoPullStatusClosed,
+    ShTangledRepoPullStatusMerged,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StatusStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ShTangledRepoPullStatusOpen => "sh.tangled.repo.pull.status.open",
+            Self::ShTangledRepoPullStatusClosed => "sh.tangled.repo.pull.status.closed",
+            Self::ShTangledRepoPullStatusMerged => "sh.tangled.repo.pull.status.merged",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StatusStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
+            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
+            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StatusStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
+            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
+            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StatusStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StatusStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StatusStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StatusStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StatusStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StatusStatus<'_> {
+    type Output = StatusStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StatusStatus::ShTangledRepoPullStatusOpen => {
+                StatusStatus::ShTangledRepoPullStatusOpen
+            }
+            StatusStatus::ShTangledRepoPullStatusClosed => {
+                StatusStatus::ShTangledRepoPullStatusClosed
+            }
+            StatusStatus::ShTangledRepoPullStatusMerged => {
+                StatusStatus::ShTangledRepoPullStatusMerged
+            }
+            StatusStatus::Other(v) => StatusStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Status<'a>,
+}
+
+impl<'a> Status<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StatusRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StatusRecord;
+impl jacquard_common::xrpc::XrpcResp for StatusRecord {
+    const NSID: &'static str = "sh.tangled.repo.pull.status";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatusGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StatusGetRecordOutput<'_>> for Status<'_> {
+    fn from(output: StatusGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Status<'_> {
+    const NSID: &'static str = "sh.tangled.repo.pull.status";
+    type Record = StatusRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StatusRecord {
+    const NSID: &'static str = "sh.tangled.repo.pull.status";
+    type Record = StatusRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.pull.status"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_pull_status()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -165,184 +343,6 @@ where
             status: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Status<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatusRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// status of the pull request
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StatusStatus<'a> {
-    ShTangledRepoPullStatusOpen,
-    ShTangledRepoPullStatusClosed,
-    ShTangledRepoPullStatusMerged,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> StatusStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::ShTangledRepoPullStatusOpen => "sh.tangled.repo.pull.status.open",
-            Self::ShTangledRepoPullStatusClosed => "sh.tangled.repo.pull.status.closed",
-            Self::ShTangledRepoPullStatusMerged => "sh.tangled.repo.pull.status.merged",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for StatusStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
-            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
-            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for StatusStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
-            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
-            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StatusStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for StatusStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for StatusStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for StatusStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for StatusStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for StatusStatus<'_> {
-    type Output = StatusStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StatusStatus::ShTangledRepoPullStatusOpen => {
-                StatusStatus::ShTangledRepoPullStatusOpen
-            }
-            StatusStatus::ShTangledRepoPullStatusClosed => {
-                StatusStatus::ShTangledRepoPullStatusClosed
-            }
-            StatusStatus::ShTangledRepoPullStatusMerged => {
-                StatusStatus::ShTangledRepoPullStatusMerged
-            }
-            StatusStatus::Other(v) => StatusStatus::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Status<'a>,
-}
-
-impl From<StatusGetRecordOutput<'_>> for Status<'_> {
-    fn from(output: StatusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Status<'_> {
-    const NSID: &'static str = "sh.tangled.repo.pull.status";
-    type Record = StatusRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StatusRecord;
-impl jacquard_common::xrpc::XrpcResp for StatusRecord {
-    const NSID: &'static str = "sh.tangled.repo.pull.status";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StatusRecord {
-    const NSID: &'static str = "sh.tangled.repo.pull.status";
-    type Record = StatusRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.pull.status"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_pull_status()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -25,6 +25,34 @@ pub struct OrderedList<'a> {
     pub start: std::option::Option<i64>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.orderedList"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_orderedList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.start {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "start",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod ordered_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -206,33 +234,5 @@ fn lexicon_doc_blog_pckt_block_orderedList() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.orderedList"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_orderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.start {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "start",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

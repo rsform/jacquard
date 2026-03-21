@@ -29,6 +29,144 @@ pub struct EventView<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchEvents<'a> {
+    ///Defaults to `10`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub location: std::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    ///(max length: 150)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub query: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub repository: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchEventsOutput<'a> {
+    #[serde(borrow)]
+    pub results: Vec<crate::community_lexicon::calendar::search_events::EventView<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchEventsError<'a> {
+    #[serde(rename = "InvalidRepository")]
+    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "SearchUnavailable")]
+    SearchUnavailable(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "SearchError")]
+    SearchError(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SearchEventsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidRepository(msg) => {
+                write!(f, "InvalidRepository")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::SearchUnavailable(msg) => {
+                write!(f, "SearchUnavailable")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::SearchError(msg) => {
+                write!(f, "SearchError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.searchEvents"
+    }
+    fn def_name() -> &'static str {
+        "eventView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_calendar_searchEvents()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///community.lexicon.calendar.searchEvents
+pub struct SearchEventsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchEventsResponse {
+    const NSID: &'static str = "community.lexicon.calendar.searchEvents";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchEventsOutput<'de>;
+    type Err<'de> = SearchEventsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchEvents<'a> {
+    const NSID: &'static str = "community.lexicon.calendar.searchEvents";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchEventsResponse;
+}
+
+/// Endpoint type for
+///community.lexicon.calendar.searchEvents
+pub struct SearchEventsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchEventsRequest {
+    const PATH: &'static str = "/xrpc/community.lexicon.calendar.searchEvents";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchEvents<'de>;
+    type Response = SearchEventsResponse;
+}
+
 pub mod event_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,67 +177,67 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountInterested;
-        type CountNotGoing;
         type Url;
         type CountGoing;
+        type CountInterested;
+        type CountNotGoing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountInterested = Unset;
-        type CountNotGoing = Unset;
         type Url = Unset;
         type CountGoing = Unset;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountInterested = Set<members::count_interested>;
-        type CountNotGoing = S::CountNotGoing;
-        type Url = S::Url;
-        type CountGoing = S::CountGoing;
-    }
-    ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
-    impl<S: State> State for SetCountNotGoing<S> {
-        type CountInterested = S::CountInterested;
-        type CountNotGoing = Set<members::count_not_going>;
-        type Url = S::Url;
-        type CountGoing = S::CountGoing;
+        type CountInterested = Unset;
+        type CountNotGoing = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CountInterested = S::CountInterested;
-        type CountNotGoing = S::CountNotGoing;
         type Url = Set<members::url>;
         type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
+        type CountNotGoing = S::CountNotGoing;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountGoing<S> {}
     impl<S: State> State for SetCountGoing<S> {
-        type CountInterested = S::CountInterested;
-        type CountNotGoing = S::CountNotGoing;
         type Url = S::Url;
         type CountGoing = Set<members::count_going>;
+        type CountInterested = S::CountInterested;
+        type CountNotGoing = S::CountNotGoing;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
+    impl<S: State> State for SetCountInterested<S> {
+        type Url = S::Url;
+        type CountGoing = S::CountGoing;
+        type CountInterested = Set<members::count_interested>;
+        type CountNotGoing = S::CountNotGoing;
+    }
+    ///State transition - sets the `count_not_going` field to Set
+    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
+    impl<S: State> State for SetCountNotGoing<S> {
+        type Url = S::Url;
+        type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
+        type CountNotGoing = Set<members::count_not_going>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
-        ///Marker type for the `count_not_going` field
-        pub struct count_not_going(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
+        ///Marker type for the `count_not_going` field
+        pub struct count_not_going(());
     }
 }
 
@@ -212,10 +350,10 @@ where
 impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
-    S::CountInterested: event_view_state::IsSet,
-    S::CountNotGoing: event_view_state::IsSet,
     S::Url: event_view_state::IsSet,
     S::CountGoing: event_view_state::IsSet,
+    S::CountInterested: event_view_state::IsSet,
+    S::CountNotGoing: event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EventView<'a> {
@@ -448,52 +586,8 @@ fn lexicon_doc_community_lexicon_calendar_searchEvents() -> ::jacquard_lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.calendar.searchEvents"
-    }
-    fn def_name() -> &'static str {
-        "eventView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_calendar_searchEvents()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(10i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchEvents<'a> {
-    ///Defaults to `10`. Min: 1. Max: 100.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub location: std::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
-    ///(max length: 150)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub query: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub repository: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 pub mod search_events_state {
@@ -625,98 +719,4 @@ where
             repository: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchEventsOutput<'a> {
-    #[serde(borrow)]
-    pub results: Vec<crate::community_lexicon::calendar::search_events::EventView<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchEventsError<'a> {
-    #[serde(rename = "InvalidRepository")]
-    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "SearchUnavailable")]
-    SearchUnavailable(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "SearchError")]
-    SearchError(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SearchEventsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidRepository(msg) => {
-                write!(f, "InvalidRepository")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::SearchUnavailable(msg) => {
-                write!(f, "SearchUnavailable")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::SearchError(msg) => {
-                write!(f, "SearchError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///community.lexicon.calendar.searchEvents
-pub struct SearchEventsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchEventsResponse {
-    const NSID: &'static str = "community.lexicon.calendar.searchEvents";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchEventsOutput<'de>;
-    type Err<'de> = SearchEventsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchEvents<'a> {
-    const NSID: &'static str = "community.lexicon.calendar.searchEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchEventsResponse;
-}
-
-/// Endpoint type for
-///community.lexicon.calendar.searchEvents
-pub struct SearchEventsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchEventsRequest {
-    const PATH: &'static str = "/xrpc/community.lexicon.calendar.searchEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchEvents<'de>;
-    type Response = SearchEventsResponse;
 }

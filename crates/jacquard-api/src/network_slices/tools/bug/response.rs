@@ -35,6 +35,217 @@ pub struct Response<'a> {
     pub status: ResponseStatus<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ResponseStatus<'a> {
+    Acknowledged,
+    Fixed,
+    Wontfix,
+    Duplicate,
+    Invalid,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ResponseStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Acknowledged => "acknowledged",
+            Self::Fixed => "fixed",
+            Self::Wontfix => "wontfix",
+            Self::Duplicate => "duplicate",
+            Self::Invalid => "invalid",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ResponseStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "acknowledged" => Self::Acknowledged,
+            "fixed" => Self::Fixed,
+            "wontfix" => Self::Wontfix,
+            "duplicate" => Self::Duplicate,
+            "invalid" => Self::Invalid,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ResponseStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "acknowledged" => Self::Acknowledged,
+            "fixed" => Self::Fixed,
+            "wontfix" => Self::Wontfix,
+            "duplicate" => Self::Duplicate,
+            "invalid" => Self::Invalid,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ResponseStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ResponseStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ResponseStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ResponseStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ResponseStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ResponseStatus<'_> {
+    type Output = ResponseStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ResponseStatus::Acknowledged => ResponseStatus::Acknowledged,
+            ResponseStatus::Fixed => ResponseStatus::Fixed,
+            ResponseStatus::Wontfix => ResponseStatus::Wontfix,
+            ResponseStatus::Duplicate => ResponseStatus::Duplicate,
+            ResponseStatus::Invalid => ResponseStatus::Invalid,
+            ResponseStatus::Other(v) => ResponseStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResponseGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Response<'a>,
+}
+
+impl<'a> Response<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ResponseRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ResponseRecord;
+impl jacquard_common::xrpc::XrpcResp for ResponseRecord {
+    const NSID: &'static str = "network.slices.tools.bug.response";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResponseGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
+    fn from(output: ResponseGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Response<'_> {
+    const NSID: &'static str = "network.slices.tools.bug.response";
+    type Record = ResponseRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ResponseRecord {
+    const NSID: &'static str = "network.slices.tools.bug.response";
+    type Record = ResponseRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.bug.response"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_bug_response()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.message {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod response_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -45,51 +256,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Status;
         type CreatedAt;
         type Bug;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Status = Unset;
         type CreatedAt = Unset;
         type Bug = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Bug = S::Bug;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type CreatedAt = S::CreatedAt;
-        type Bug = Set<members::bug>;
-        type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
         type CreatedAt = S::CreatedAt;
         type Bug = S::Bug;
-        type Status = Set<members::status>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type CreatedAt = Set<members::created_at>;
+        type Bug = S::Bug;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type Bug = Set<members::bug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `bug` field
         pub struct bug(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
@@ -219,9 +430,9 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
+    S::Status: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
     S::Bug: response_state::IsSet,
-    S::Status: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -250,217 +461,6 @@ where
             status: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Response<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ResponseRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ResponseStatus<'a> {
-    Acknowledged,
-    Fixed,
-    Wontfix,
-    Duplicate,
-    Invalid,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ResponseStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Acknowledged => "acknowledged",
-            Self::Fixed => "fixed",
-            Self::Wontfix => "wontfix",
-            Self::Duplicate => "duplicate",
-            Self::Invalid => "invalid",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ResponseStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "acknowledged" => Self::Acknowledged,
-            "fixed" => Self::Fixed,
-            "wontfix" => Self::Wontfix,
-            "duplicate" => Self::Duplicate,
-            "invalid" => Self::Invalid,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ResponseStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "acknowledged" => Self::Acknowledged,
-            "fixed" => Self::Fixed,
-            "wontfix" => Self::Wontfix,
-            "duplicate" => Self::Duplicate,
-            "invalid" => Self::Invalid,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ResponseStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ResponseStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ResponseStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ResponseStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ResponseStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ResponseStatus<'_> {
-    type Output = ResponseStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ResponseStatus::Acknowledged => ResponseStatus::Acknowledged,
-            ResponseStatus::Fixed => ResponseStatus::Fixed,
-            ResponseStatus::Wontfix => ResponseStatus::Wontfix,
-            ResponseStatus::Duplicate => ResponseStatus::Duplicate,
-            ResponseStatus::Invalid => ResponseStatus::Invalid,
-            ResponseStatus::Other(v) => ResponseStatus::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResponseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Response<'a>,
-}
-
-impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
-    fn from(output: ResponseGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Response<'_> {
-    const NSID: &'static str = "network.slices.tools.bug.response";
-    type Record = ResponseRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ResponseRecord;
-impl jacquard_common::xrpc::XrpcResp for ResponseRecord {
-    const NSID: &'static str = "network.slices.tools.bug.response";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResponseGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ResponseRecord {
-    const NSID: &'static str = "network.slices.tools.bug.response";
-    type Record = ResponseRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.bug.response"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_bug_response()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.message {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

@@ -22,6 +22,88 @@ pub struct GetEntryMetadataByName<'a> {
     pub entry_title: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEntryMetadataByNameOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub entry_uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_update: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetEntryMetadataByNameError<'a> {
+    /// If the associated name isn't registered in the author's repo, this error is returned
+    #[serde(rename = "NotFound")]
+    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetEntryMetadataByNameError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotFound(msg) => {
+                write!(f, "NotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.whtwnd.blog.getEntryMetadataByName
+pub struct GetEntryMetadataByNameResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
+    const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEntryMetadataByNameOutput<'de>;
+    type Err<'de> = GetEntryMetadataByNameError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<'a> {
+    const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEntryMetadataByNameResponse;
+}
+
+/// Endpoint type for
+///com.whtwnd.blog.getEntryMetadataByName
+pub struct GetEntryMetadataByNameRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEntryMetadataByName<'de>;
+    type Response = GetEntryMetadataByNameResponse;
+}
+
 pub mod get_entry_metadata_by_name_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -157,86 +239,4 @@ where
             entry_title: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEntryMetadataByNameOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub entry_uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_update: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEntryMetadataByNameError<'a> {
-    /// If the associated name isn't registered in the author's repo, this error is returned
-    #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetEntryMetadataByNameError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotFound(msg) => {
-                write!(f, "NotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.whtwnd.blog.getEntryMetadataByName
-pub struct GetEntryMetadataByNameResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
-    const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryMetadataByNameOutput<'de>;
-    type Err<'de> = GetEntryMetadataByNameError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<'a> {
-    const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEntryMetadataByNameResponse;
-}
-
-/// Endpoint type for
-///com.whtwnd.blog.getEntryMetadataByName
-pub struct GetEntryMetadataByNameRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
-    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryMetadataByName<'de>;
-    type Response = GetEntryMetadataByNameResponse;
 }

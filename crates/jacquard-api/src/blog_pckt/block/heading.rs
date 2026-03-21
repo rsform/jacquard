@@ -30,6 +30,45 @@ pub struct Heading<'a> {
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.heading"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_heading()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.level {
+            if *value > 6i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 6i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -113,44 +152,5 @@ fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.heading"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_heading()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.level {
-            if *value > 6i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 6i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_entry_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,91 @@ pub struct GetChapter<'a> {
     #[serde(default = "_default_entry_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub entry_limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetChapterOutput<'a> {
+    #[serde(borrow)]
+    pub chapter: crate::sh_weaver::notebook::ChapterView<'a>,
+    #[serde(borrow)]
+    pub entries: Vec<crate::sh_weaver::notebook::ChapterEntryView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetChapterError<'a> {
+    #[serde(rename = "ChapterNotFound")]
+    ChapterNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetChapterError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ChapterNotFound(msg) => {
+                write!(f, "ChapterNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getChapter
+pub struct GetChapterResponse;
+impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getChapter";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetChapterOutput<'de>;
+    type Err<'de> = GetChapterError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetChapter<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getChapter";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetChapterResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getChapter
+pub struct GetChapterRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetChapter<'de>;
+    type Response = GetChapterResponse;
+}
+
+fn _default_entry_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_chapter_state {
@@ -156,85 +237,4 @@ where
             entry_limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetChapterOutput<'a> {
-    #[serde(borrow)]
-    pub chapter: crate::sh_weaver::notebook::ChapterView<'a>,
-    #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::ChapterEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetChapterError<'a> {
-    #[serde(rename = "ChapterNotFound")]
-    ChapterNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetChapterError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::ChapterNotFound(msg) => {
-                write!(f, "ChapterNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.getChapter
-pub struct GetChapterResponse;
-impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getChapter";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetChapterOutput<'de>;
-    type Err<'de> = GetChapterError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetChapter<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getChapter";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetChapterResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getChapter
-pub struct GetChapterRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetChapter<'de>;
-    type Response = GetChapterResponse;
 }

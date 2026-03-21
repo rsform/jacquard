@@ -25,6 +25,84 @@ pub struct BlueskyPost<'a> {
     pub workout_uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BlueskyPostGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: BlueskyPost<'a>,
+}
+
+impl<'a> BlueskyPost<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BlueskyPostRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BlueskyPostRecord;
+impl jacquard_common::xrpc::XrpcResp for BlueskyPostRecord {
+    const NSID: &'static str = "app.fitsky.blueskyPost";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BlueskyPostGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BlueskyPostGetRecordOutput<'_>> for BlueskyPost<'_> {
+    fn from(output: BlueskyPostGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for BlueskyPost<'_> {
+    const NSID: &'static str = "app.fitsky.blueskyPost";
+    type Record = BlueskyPostRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BlueskyPostRecord {
+    const NSID: &'static str = "app.fitsky.blueskyPost";
+    type Record = BlueskyPostRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyPost<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.blueskyPost"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_blueskyPost()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod bluesky_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,50 +114,50 @@ pub mod bluesky_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type WorkoutUri;
-        type PostUri;
         type CreatedAt;
+        type PostUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type WorkoutUri = Unset;
-        type PostUri = Unset;
         type CreatedAt = Unset;
+        type PostUri = Unset;
     }
     ///State transition - sets the `workout_uri` field to Set
     pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
     impl<S: State> State for SetWorkoutUri<S> {
         type WorkoutUri = Set<members::workout_uri>;
+        type CreatedAt = S::CreatedAt;
         type PostUri = S::PostUri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `post_uri` field to Set
-    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostUri<S> {}
-    impl<S: State> State for SetPostUri<S> {
-        type WorkoutUri = S::WorkoutUri;
-        type PostUri = Set<members::post_uri>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type WorkoutUri = S::WorkoutUri;
-        type PostUri = S::PostUri;
         type CreatedAt = Set<members::created_at>;
+        type PostUri = S::PostUri;
+    }
+    ///State transition - sets the `post_uri` field to Set
+    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostUri<S> {}
+    impl<S: State> State for SetPostUri<S> {
+        type WorkoutUri = S::WorkoutUri;
+        type CreatedAt = S::CreatedAt;
+        type PostUri = Set<members::post_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `workout_uri` field
         pub struct workout_uri(());
-        ///Marker type for the `post_uri` field
-        pub struct post_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post_uri` field
+        pub struct post_uri(());
     }
 }
 
@@ -173,8 +251,8 @@ impl<'a, S> BlueskyPostBuilder<'a, S>
 where
     S: bluesky_post_state::State,
     S::WorkoutUri: bluesky_post_state::IsSet,
-    S::PostUri: bluesky_post_state::IsSet,
     S::CreatedAt: bluesky_post_state::IsSet,
+    S::PostUri: bluesky_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlueskyPost<'a> {
@@ -199,84 +277,6 @@ where
             workout_uri: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> BlueskyPost<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BlueskyPostRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BlueskyPostGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: BlueskyPost<'a>,
-}
-
-impl From<BlueskyPostGetRecordOutput<'_>> for BlueskyPost<'_> {
-    fn from(output: BlueskyPostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for BlueskyPost<'_> {
-    const NSID: &'static str = "app.fitsky.blueskyPost";
-    type Record = BlueskyPostRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BlueskyPostRecord;
-impl jacquard_common::xrpc::XrpcResp for BlueskyPostRecord {
-    const NSID: &'static str = "app.fitsky.blueskyPost";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BlueskyPostGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BlueskyPostRecord {
-    const NSID: &'static str = "app.fitsky.blueskyPost";
-    type Record = BlueskyPostRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyPost<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.blueskyPost"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_blueskyPost()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

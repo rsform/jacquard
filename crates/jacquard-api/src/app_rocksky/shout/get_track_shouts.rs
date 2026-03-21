@@ -20,6 +20,50 @@ pub struct GetTrackShouts<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTrackShoutsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+}
+
+/// Response type for
+///app.rocksky.shout.getTrackShouts
+pub struct GetTrackShoutsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTrackShoutsResponse {
+    const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTrackShoutsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrackShouts<'a> {
+    const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTrackShoutsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.shout.getTrackShouts
+pub struct GetTrackShoutsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTrackShoutsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.shout.getTrackShouts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTrackShouts<'de>;
+    type Response = GetTrackShoutsResponse;
+}
+
 pub mod get_track_shouts_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,48 +153,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTrackShoutsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-}
-
-/// Response type for
-///app.rocksky.shout.getTrackShouts
-pub struct GetTrackShoutsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTrackShoutsResponse {
-    const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTrackShoutsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrackShouts<'a> {
-    const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTrackShoutsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.shout.getTrackShouts
-pub struct GetTrackShoutsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTrackShoutsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.shout.getTrackShouts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTrackShouts<'de>;
-    type Response = GetTrackShoutsResponse;
 }

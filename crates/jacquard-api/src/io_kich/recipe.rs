@@ -26,6 +26,23 @@ pub mod review;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Defs<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Defs<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.recipe.defs"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_recipe_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_io_kich_recipe_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -55,22 +72,5 @@ fn lexicon_doc_io_kich_recipe_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Defs<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.recipe.defs"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_recipe_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

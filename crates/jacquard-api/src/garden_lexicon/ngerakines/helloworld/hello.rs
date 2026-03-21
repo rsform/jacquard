@@ -22,6 +22,49 @@ pub struct Hello<'a> {
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HelloOutput<'a> {
+    #[serde(borrow)]
+    pub message: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///garden.lexicon.ngerakines.helloworld.Hello
+pub struct HelloResponse;
+impl jacquard_common::xrpc::XrpcResp for HelloResponse {
+    const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = HelloOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
+    const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = HelloResponse;
+}
+
+/// Endpoint type for
+///garden.lexicon.ngerakines.helloworld.Hello
+pub struct HelloRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
+    const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.helloworld.Hello";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Hello<'de>;
+    type Response = HelloResponse;
+}
+
 pub mod hello_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -92,47 +135,4 @@ where
             subject: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HelloOutput<'a> {
-    #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///garden.lexicon.ngerakines.helloworld.Hello
-pub struct HelloResponse;
-impl jacquard_common::xrpc::XrpcResp for HelloResponse {
-    const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = HelloOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
-    const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = HelloResponse;
-}
-
-/// Endpoint type for
-///garden.lexicon.ngerakines.helloworld.Hello
-pub struct HelloRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
-    const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.helloworld.Hello";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Hello<'de>;
-    type Response = HelloResponse;
 }

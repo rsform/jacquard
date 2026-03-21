@@ -42,6 +42,84 @@ pub struct Engine<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EngineGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Engine<'a>,
+}
+
+impl<'a> Engine<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EngineRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EngineRecord;
+impl jacquard_common::xrpc::XrpcResp for EngineRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EngineGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EngineGetRecordOutput<'_>> for Engine<'_> {
+    fn from(output: EngineGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Engine<'_> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
+    type Record = EngineRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EngineRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
+    type Record = EngineRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Engine<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.engine"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_engine()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod engine_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -289,84 +367,6 @@ where
             websites: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Engine<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EngineRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EngineGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Engine<'a>,
-}
-
-impl From<EngineGetRecordOutput<'_>> for Engine<'_> {
-    fn from(output: EngineGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Engine<'_> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
-    type Record = EngineRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EngineRecord;
-impl jacquard_common::xrpc::XrpcResp for EngineRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EngineGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EngineRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.engine";
-    type Record = EngineRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Engine<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.engine"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_engine()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

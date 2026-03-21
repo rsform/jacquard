@@ -26,6 +26,50 @@ pub struct GetArtistShouts<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetArtistShoutsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+}
+
+/// Response type for
+///app.rocksky.shout.getArtistShouts
+pub struct GetArtistShoutsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetArtistShoutsResponse {
+    const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetArtistShoutsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistShouts<'a> {
+    const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetArtistShoutsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.shout.getArtistShouts
+pub struct GetArtistShoutsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetArtistShoutsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.shout.getArtistShouts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetArtistShouts<'de>;
+    type Response = GetArtistShoutsResponse;
+}
+
 pub mod get_artist_shouts_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,48 +189,4 @@ where
             uri: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetArtistShoutsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-}
-
-/// Response type for
-///app.rocksky.shout.getArtistShouts
-pub struct GetArtistShoutsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetArtistShoutsResponse {
-    const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetArtistShoutsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistShouts<'a> {
-    const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetArtistShoutsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.shout.getArtistShouts
-pub struct GetArtistShoutsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetArtistShoutsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.shout.getArtistShouts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetArtistShouts<'de>;
-    type Response = GetArtistShoutsResponse;
 }

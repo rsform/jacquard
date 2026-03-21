@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_period() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -36,6 +28,60 @@ pub struct GetTopArtists<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub period: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTopArtistsOutput<'a> {
+    #[serde(borrow)]
+    pub artists: Vec<crate::fm_teal::alpha::stats::ArtistView<'a>>,
+    ///Next page cursor
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///fm.teal.alpha.stats.getTopArtists
+pub struct GetTopArtistsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTopArtistsResponse {
+    const NSID: &'static str = "fm.teal.alpha.stats.getTopArtists";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTopArtistsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTopArtists<'a> {
+    const NSID: &'static str = "fm.teal.alpha.stats.getTopArtists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTopArtistsResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.stats.getTopArtists
+pub struct GetTopArtistsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTopArtistsRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getTopArtists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTopArtists<'de>;
+    type Response = GetTopArtistsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_period() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("all"))
 }
 
 pub mod get_top_artists_state {
@@ -143,50 +189,4 @@ where
             period: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTopArtistsOutput<'a> {
-    #[serde(borrow)]
-    pub artists: Vec<crate::fm_teal::alpha::stats::ArtistView<'a>>,
-    ///Next page cursor
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///fm.teal.alpha.stats.getTopArtists
-pub struct GetTopArtistsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTopArtistsResponse {
-    const NSID: &'static str = "fm.teal.alpha.stats.getTopArtists";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTopArtistsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTopArtists<'a> {
-    const NSID: &'static str = "fm.teal.alpha.stats.getTopArtists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTopArtistsResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.stats.getTopArtists
-pub struct GetTopArtistsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTopArtistsRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getTopArtists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTopArtists<'de>;
-    type Response = GetTopArtistsResponse;
 }

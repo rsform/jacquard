@@ -23,6 +23,83 @@ pub struct LiveNowConfig<'a> {
     pub domains: Vec<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetConfigOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub check_email_confirmed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub live_now: std::option::Option<
+        Vec<crate::app_bsky::unspecced::get_config::LiveNowConfig<'a>>,
+    >,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.getConfig"
+    }
+    fn def_name() -> &'static str {
+        "liveNowConfig"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_getConfig()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct GetConfig;
+/// Response type for
+///app.bsky.unspecced.getConfig
+pub struct GetConfigResponse;
+impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getConfig";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetConfigOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetConfig {
+    const NSID: &'static str = "app.bsky.unspecced.getConfig";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetConfigResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getConfig
+pub struct GetConfigRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getConfig";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetConfig;
+    type Response = GetConfigResponse;
+}
+
 pub mod live_now_config_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -244,81 +321,4 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.getConfig"
-    }
-    fn def_name() -> &'static str {
-        "liveNowConfig"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_getConfig()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetConfigOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub check_email_confirmed: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub live_now: std::option::Option<
-        Vec<crate::app_bsky::unspecced::get_config::LiveNowConfig<'a>>,
-    >,
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct GetConfig;
-/// Response type for
-///app.bsky.unspecced.getConfig
-pub struct GetConfigResponse;
-impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getConfig";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConfigOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetConfig {
-    const NSID: &'static str = "app.bsky.unspecced.getConfig";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetConfigResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getConfig
-pub struct GetConfigRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getConfig";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetConfig;
-    type Response = GetConfigResponse;
 }

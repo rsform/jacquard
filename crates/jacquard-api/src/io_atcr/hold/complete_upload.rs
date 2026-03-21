@@ -28,6 +28,180 @@ pub struct CompleteUpload<'a> {
     pub upload_id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CompleteUploadOutput<'a> {
+    ///The digest of the completed blob
+    #[serde(borrow)]
+    pub digest: jacquard_common::CowStr<'a>,
+    ///Always 'completed' on success
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CompleteUploadError<'a> {
+    #[serde(rename = "InvalidUploadId")]
+    InvalidUploadId(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidDigest")]
+    InvalidDigest(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "MissingParts")]
+    MissingParts(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "CompletionFailed")]
+    CompletionFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CompleteUploadError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidUploadId(msg) => {
+                write!(f, "InvalidUploadId")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidDigest(msg) => {
+                write!(f, "InvalidDigest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::MissingParts(msg) => {
+                write!(f, "MissingParts")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::CompletionFailed(msg) => {
+                write!(f, "CompletionFailed")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Information about a completed upload part
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PartInfo<'a> {
+    ///ETag returned when the part was uploaded
+    #[serde(borrow)]
+    pub etag: jacquard_common::CowStr<'a>,
+    ///Part sequence number (1-indexed)
+    pub part_number: i64,
+}
+
+/// Response type for
+///io.atcr.hold.completeUpload
+pub struct CompleteUploadResponse;
+impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
+    const NSID: &'static str = "io.atcr.hold.completeUpload";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CompleteUploadOutput<'de>;
+    type Err<'de> = CompleteUploadError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
+    const NSID: &'static str = "io.atcr.hold.completeUpload";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CompleteUploadResponse;
+}
+
+/// Endpoint type for
+///io.atcr.hold.completeUpload
+pub struct CompleteUploadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
+    const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CompleteUpload<'de>;
+    type Response = CompleteUploadResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.completeUpload"
+    }
+    fn def_name() -> &'static str {
+        "partInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_completeUpload()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.etag;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "etag",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.part_number;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "part_number",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod complete_upload_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -205,138 +379,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CompleteUploadOutput<'a> {
-    ///The digest of the completed blob
-    #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
-    ///Always 'completed' on success
-    #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CompleteUploadError<'a> {
-    #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidDigest")]
-    InvalidDigest(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "MissingParts")]
-    MissingParts(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "CompletionFailed")]
-    CompletionFailed(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CompleteUploadError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidUploadId(msg) => {
-                write!(f, "InvalidUploadId")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidDigest(msg) => {
-                write!(f, "InvalidDigest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::MissingParts(msg) => {
-                write!(f, "MissingParts")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::CompletionFailed(msg) => {
-                write!(f, "CompletionFailed")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///io.atcr.hold.completeUpload
-pub struct CompleteUploadResponse;
-impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
-    const NSID: &'static str = "io.atcr.hold.completeUpload";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CompleteUploadOutput<'de>;
-    type Err<'de> = CompleteUploadError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
-    const NSID: &'static str = "io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CompleteUploadResponse;
-}
-
-/// Endpoint type for
-///io.atcr.hold.completeUpload
-pub struct CompleteUploadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
-    const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CompleteUpload<'de>;
-    type Response = CompleteUploadResponse;
-}
-
-/// Information about a completed upload part
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PartInfo<'a> {
-    ///ETag returned when the part was uploaded
-    #[serde(borrow)]
-    pub etag: jacquard_common::CowStr<'a>,
-    ///Part sequence number (1-indexed)
-    pub part_number: i64,
-}
-
 pub mod part_info_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -347,37 +389,37 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Etag;
         type PartNumber;
+        type Etag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Etag = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `etag` field to Set
-    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEtag<S> {}
-    impl<S: State> State for SetEtag<S> {
-        type Etag = Set<members::etag>;
-        type PartNumber = S::PartNumber;
+        type Etag = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPartNumber<S> {}
     impl<S: State> State for SetPartNumber<S> {
-        type Etag = S::Etag;
         type PartNumber = Set<members::part_number>;
+        type Etag = S::Etag;
+    }
+    ///State transition - sets the `etag` field to Set
+    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEtag<S> {}
+    impl<S: State> State for SetEtag<S> {
+        type PartNumber = S::PartNumber;
+        type Etag = Set<members::etag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `etag` field
-        pub struct etag(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `etag` field
+        pub struct etag(());
     }
 }
 
@@ -450,8 +492,8 @@ where
 impl<'a, S> PartInfoBuilder<'a, S>
 where
     S: part_info_state::State,
-    S::Etag: part_info_state::IsSet,
     S::PartNumber: part_info_state::IsSet,
+    S::Etag: part_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PartInfo<'a> {
@@ -638,47 +680,5 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.completeUpload"
-    }
-    fn def_name() -> &'static str {
-        "partInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_completeUpload()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.etag;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "etag",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.part_number;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "part_number",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -22,6 +22,73 @@ pub struct Content<'a> {
     pub items: Vec<ContentItemsItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ContentItemsItem<'a> {
+    #[serde(rename = "fyi.questionable.richtext.text")]
+    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.blockquote")]
+    Blockquote(Box<crate::fyi_questionable::richtext::blockquote::Blockquote<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.bskyPost")]
+    BskyPost(Box<crate::fyi_questionable::richtext::bsky_post::BskyPost<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.code")]
+    Code(Box<crate::fyi_questionable::richtext::code::Code<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.header")]
+    Header(Box<crate::fyi_questionable::richtext::header::Header<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.horizontalRule")]
+    HorizontalRule(
+        Box<crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule<'a>>,
+    ),
+    #[serde(rename = "fyi.questionable.richtext.image")]
+    Image(Box<crate::fyi_questionable::richtext::image::Image<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.math")]
+    Math(Box<crate::fyi_questionable::richtext::math::Math<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.list")]
+    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.website")]
+    Website(Box<crate::fyi_questionable::richtext::website::Website<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.content"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_content()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.items;
+            #[allow(unused_comparisons)]
+            if value.len() > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "items",
+                    ),
+                    max: 1000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod content_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,43 +192,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContentItemsItem<'a> {
-    #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.blockquote")]
-    Blockquote(Box<crate::fyi_questionable::richtext::blockquote::Blockquote<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.bskyPost")]
-    BskyPost(Box<crate::fyi_questionable::richtext::bsky_post::BskyPost<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.code")]
-    Code(Box<crate::fyi_questionable::richtext::code::Code<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.header")]
-    Header(Box<crate::fyi_questionable::richtext::header::Header<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.horizontalRule")]
-    HorizontalRule(
-        Box<crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule<'a>>,
-    ),
-    #[serde(rename = "fyi.questionable.richtext.image")]
-    Image(Box<crate::fyi_questionable::richtext::image::Image<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.math")]
-    Math(Box<crate::fyi_questionable::richtext::math::Math<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.website")]
-    Website(Box<crate::fyi_questionable::richtext::website::Website<'a>>),
-}
-
 fn lexicon_doc_fyi_questionable_richtext_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -222,35 +252,5 @@ fn lexicon_doc_fyi_questionable_richtext_content() -> ::jacquard_lexicon::lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.content"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_content()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.items;
-            #[allow(unused_comparisons)]
-            if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items",
-                    ),
-                    max: 1000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

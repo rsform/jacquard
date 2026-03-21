@@ -28,6 +28,57 @@ pub struct ListItem<'a> {
     pub content: crate::app_offprint::block::text::Text<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BulletList<'a> {
+    ///List items
+    #[serde(borrow)]
+    pub children: Vec<crate::app_offprint::block::bullet_list::ListItem<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.bulletList"
+    }
+    fn def_name() -> &'static str {
+        "listItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_bulletList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BulletList<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.bulletList"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_bulletList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -251,40 +302,6 @@ fn lexicon_doc_app_offprint_block_bulletList() -> ::jacquard_lexicon::lexicon::L
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.bulletList"
-    }
-    fn def_name() -> &'static str {
-        "listItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_bulletList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BulletList<'a> {
-    ///List items
-    #[serde(borrow)]
-    pub children: Vec<crate::app_offprint::block::bullet_list::ListItem<'a>>,
-}
-
 pub mod bullet_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -389,22 +406,5 @@ where
             children: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BulletList<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.bulletList"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_bulletList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

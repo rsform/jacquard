@@ -26,6 +26,110 @@ pub struct Resolution<'a> {
     pub market: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolutionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Resolution<'a>,
+}
+
+impl<'a> Resolution<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ResolutionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ResolutionRecord;
+impl jacquard_common::xrpc::XrpcResp for ResolutionRecord {
+    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolutionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ResolutionGetRecordOutput<'_>> for Resolution<'_> {
+    fn from(output: ResolutionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Resolution<'_> {
+    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
+    type Record = ResolutionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ResolutionRecord {
+    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
+    type Record = ResolutionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resolution<'a> {
+    fn nsid() -> &'static str {
+        "za.co.ciaran.cumulus.resolution"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_za_co_ciaran_cumulus_resolution()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.answer;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "answer",
+                    ),
+                    max: 3usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.answer;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "answer",
+                    ),
+                    min: 2usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod resolution_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,49 +140,49 @@ pub mod resolution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Market;
         type Answer;
+        type Market;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Market = Unset;
         type Answer = Unset;
+        type Market = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
-        type Market = Set<members::market>;
-        type Answer = S::Answer;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
-        type Market = S::Market;
         type Answer = Set<members::answer>;
+        type Market = S::Market;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarket<S> {}
+    impl<S: State> State for SetMarket<S> {
+        type Answer = S::Answer;
+        type Market = Set<members::market>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Market = S::Market;
         type Answer = S::Answer;
+        type Market = S::Market;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `market` field
-        pub struct market(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `market` field
+        pub struct market(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -173,8 +277,8 @@ where
 impl<'a, S> ResolutionBuilder<'a, S>
 where
     S: resolution_state::State,
-    S::Market: resolution_state::IsSet,
     S::Answer: resolution_state::IsSet,
+    S::Market: resolution_state::IsSet,
     S::CreatedAt: resolution_state::IsSet,
 {
     /// Build the final struct
@@ -200,110 +304,6 @@ where
             market: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Resolution<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ResolutionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolutionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Resolution<'a>,
-}
-
-impl From<ResolutionGetRecordOutput<'_>> for Resolution<'_> {
-    fn from(output: ResolutionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Resolution<'_> {
-    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
-    type Record = ResolutionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ResolutionRecord;
-impl jacquard_common::xrpc::XrpcResp for ResolutionRecord {
-    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolutionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ResolutionRecord {
-    const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
-    type Record = ResolutionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resolution<'a> {
-    fn nsid() -> &'static str {
-        "za.co.ciaran.cumulus.resolution"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_za_co_ciaran_cumulus_resolution()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.answer;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
-                    max: 3usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.answer;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
-                    min: 2usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

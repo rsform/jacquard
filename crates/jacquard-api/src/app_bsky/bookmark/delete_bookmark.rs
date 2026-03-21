@@ -21,6 +21,71 @@ pub struct DeleteBookmark<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteBookmarkError<'a> {
+    /// The URI to be bookmarked is for an unsupported collection.
+    #[serde(rename = "UnsupportedCollection")]
+    UnsupportedCollection(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteBookmarkError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::UnsupportedCollection(msg) => {
+                write!(f, "UnsupportedCollection")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.bookmark.deleteBookmark
+pub struct DeleteBookmarkResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteBookmarkResponse {
+    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = DeleteBookmarkError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
+    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteBookmarkResponse;
+}
+
+/// Endpoint type for
+///app.bsky.bookmark.deleteBookmark
+pub struct DeleteBookmarkRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.bookmark.deleteBookmark";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteBookmark<'de>;
+    type Response = DeleteBookmarkResponse;
+}
+
 pub mod delete_bookmark_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,69 +189,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteBookmarkError<'a> {
-    /// The URI to be bookmarked is for an unsupported collection.
-    #[serde(rename = "UnsupportedCollection")]
-    UnsupportedCollection(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteBookmarkError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::UnsupportedCollection(msg) => {
-                write!(f, "UnsupportedCollection")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.bookmark.deleteBookmark
-pub struct DeleteBookmarkResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteBookmarkResponse {
-    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteBookmarkError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
-    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteBookmarkResponse;
-}
-
-/// Endpoint type for
-///app.bsky.bookmark.deleteBookmark
-pub struct DeleteBookmarkRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.bookmark.deleteBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteBookmark<'de>;
-    type Response = DeleteBookmarkResponse;
 }

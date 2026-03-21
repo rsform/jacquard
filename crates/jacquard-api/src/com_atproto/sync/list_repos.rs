@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(500i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,207 @@ pub struct ListRepos<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListReposOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub repos: Vec<crate::com_atproto::sync::list_repos::Repo<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Repo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub active: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Current repo commit CID
+    #[serde(borrow)]
+    pub head: jacquard_common::types::string::Cid<'a>,
+    pub rev: jacquard_common::types::string::Tid,
+    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<RepoStatus<'a>>,
+}
+
+/// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RepoStatus<'a> {
+    Takendown,
+    Suspended,
+    Deleted,
+    Deactivated,
+    Desynchronized,
+    Throttled,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RepoStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Takendown => "takendown",
+            Self::Suspended => "suspended",
+            Self::Deleted => "deleted",
+            Self::Deactivated => "deactivated",
+            Self::Desynchronized => "desynchronized",
+            Self::Throttled => "throttled",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RepoStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RepoStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RepoStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RepoStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RepoStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RepoStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RepoStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RepoStatus<'_> {
+    type Output = RepoStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RepoStatus::Takendown => RepoStatus::Takendown,
+            RepoStatus::Suspended => RepoStatus::Suspended,
+            RepoStatus::Deleted => RepoStatus::Deleted,
+            RepoStatus::Deactivated => RepoStatus::Deactivated,
+            RepoStatus::Desynchronized => RepoStatus::Desynchronized,
+            RepoStatus::Throttled => RepoStatus::Throttled,
+            RepoStatus::Other(v) => RepoStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.sync.listRepos
+pub struct ListReposResponse;
+impl jacquard_common::xrpc::XrpcResp for ListReposResponse {
+    const NSID: &'static str = "com.atproto.sync.listRepos";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListReposOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListRepos<'a> {
+    const NSID: &'static str = "com.atproto.sync.listRepos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListReposResponse;
+}
+
+/// Endpoint type for
+///com.atproto.sync.listRepos
+pub struct ListReposRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListReposRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.listRepos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListRepos<'de>;
+    type Response = ListReposResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.sync.listRepos"
+    }
+    fn def_name() -> &'static str {
+        "repo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_sync_listRepos()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(500i64)
 }
 
 pub mod list_repos_state {
@@ -118,77 +315,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListReposOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub repos: Vec<crate::com_atproto::sync::list_repos::Repo<'a>>,
-}
-
-/// Response type for
-///com.atproto.sync.listRepos
-pub struct ListReposResponse;
-impl jacquard_common::xrpc::XrpcResp for ListReposResponse {
-    const NSID: &'static str = "com.atproto.sync.listRepos";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListReposOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListRepos<'a> {
-    const NSID: &'static str = "com.atproto.sync.listRepos";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListReposResponse;
-}
-
-/// Endpoint type for
-///com.atproto.sync.listRepos
-pub struct ListReposRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListReposRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.sync.listRepos";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListRepos<'de>;
-    type Response = ListReposResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Repo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///Current repo commit CID
-    #[serde(borrow)]
-    pub head: jacquard_common::types::string::Cid<'a>,
-    pub rev: jacquard_common::types::string::Tid,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<RepoStatus<'a>>,
-}
-
 pub mod repo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -200,50 +326,50 @@ pub mod repo_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rev;
-        type Did;
         type Head;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rev = Unset;
-        type Did = Unset;
         type Head = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
         type Rev = Set<members::rev>;
+        type Head = S::Head;
         type Did = S::Did;
-        type Head = S::Head;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Rev = S::Rev;
-        type Did = Set<members::did>;
-        type Head = S::Head;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHead<S> {}
     impl<S: State> State for SetHead<S> {
         type Rev = S::Rev;
-        type Did = S::Did;
         type Head = Set<members::head>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Rev = S::Rev;
+        type Head = S::Head;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rev` field
         pub struct rev(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `head` field
         pub struct head(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -365,8 +491,8 @@ impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
     S::Rev: repo_state::IsSet,
-    S::Did: repo_state::IsSet,
     S::Head: repo_state::IsSet,
+    S::Did: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {
@@ -394,115 +520,6 @@ where
             rev: self.__unsafe_private_named.3.unwrap(),
             status: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RepoStatus<'a> {
-    Takendown,
-    Suspended,
-    Deleted,
-    Deactivated,
-    Desynchronized,
-    Throttled,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RepoStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Takendown => "takendown",
-            Self::Suspended => "suspended",
-            Self::Deleted => "deleted",
-            Self::Deactivated => "deactivated",
-            Self::Desynchronized => "desynchronized",
-            Self::Throttled => "throttled",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RepoStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "takendown" => Self::Takendown,
-            "suspended" => Self::Suspended,
-            "deleted" => Self::Deleted,
-            "deactivated" => Self::Deactivated,
-            "desynchronized" => Self::Desynchronized,
-            "throttled" => Self::Throttled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RepoStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "takendown" => Self::Takendown,
-            "suspended" => Self::Suspended,
-            "deleted" => Self::Deleted,
-            "deactivated" => Self::Deactivated,
-            "desynchronized" => Self::Desynchronized,
-            "throttled" => Self::Throttled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RepoStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RepoStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RepoStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RepoStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RepoStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RepoStatus<'_> {
-    type Output = RepoStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RepoStatus::Takendown => RepoStatus::Takendown,
-            RepoStatus::Suspended => RepoStatus::Suspended,
-            RepoStatus::Deleted => RepoStatus::Deleted,
-            RepoStatus::Deactivated => RepoStatus::Deactivated,
-            RepoStatus::Desynchronized => RepoStatus::Desynchronized,
-            RepoStatus::Throttled => RepoStatus::Throttled,
-            RepoStatus::Other(v) => RepoStatus::Other(v.into_static()),
         }
     }
 }
@@ -679,22 +696,5 @@ fn lexicon_doc_com_atproto_sync_listRepos() -> ::jacquard_lexicon::lexicon::Lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.sync.listRepos"
-    }
-    fn def_name() -> &'static str {
-        "repo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_sync_listRepos()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

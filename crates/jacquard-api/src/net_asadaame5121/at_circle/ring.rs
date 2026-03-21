@@ -35,240 +35,6 @@ pub struct Ring<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
-pub mod ring_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Title;
-        type Status;
-        type CreatedAt;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Title = Unset;
-        type Status = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Title = S::Title;
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Status = S::Status;
-        type CreatedAt = Set<members::created_at>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct RingBuilder<'a, S: ring_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<RingAcceptancePolicy<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<RingStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Ring<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RingBuilder<'a, ring_state::Empty> {
-        RingBuilder::new()
-    }
-}
-
-impl<'a> RingBuilder<'a, ring_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        RingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: ring_state::State> RingBuilder<'a, S> {
-    /// Set the `acceptancePolicy` field (optional)
-    pub fn acceptance_policy(
-        mut self,
-        value: impl Into<Option<RingAcceptancePolicy<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `acceptancePolicy` field to an Option value (optional)
-    pub fn maybe_acceptance_policy(
-        mut self,
-        value: Option<RingAcceptancePolicy<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> RingBuilder<'a, S>
-where
-    S: ring_state::State,
-    S::CreatedAt: ring_state::IsUnset,
-{
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> RingBuilder<'a, ring_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        RingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: ring_state::State> RingBuilder<'a, S> {
-    /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S> RingBuilder<'a, S>
-where
-    S: ring_state::State,
-    S::Status: ring_state::IsUnset,
-{
-    /// Set the `status` field (required)
-    pub fn status(
-        mut self,
-        value: impl Into<RingStatus<'a>>,
-    ) -> RingBuilder<'a, ring_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        RingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> RingBuilder<'a, S>
-where
-    S: ring_state::State,
-    S::Title: ring_state::IsUnset,
-{
-    /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> RingBuilder<'a, ring_state::SetTitle<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
-        RingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> RingBuilder<'a, S>
-where
-    S: ring_state::State,
-    S::Title: ring_state::IsSet,
-    S::Status: ring_state::IsSet,
-    S::CreatedAt: ring_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Ring<'a> {
-        Ring {
-            acceptance_policy: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Ring<'a> {
-        Ring {
-            acceptance_policy: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Ring<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RingRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// How new members are accepted
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RingAcceptancePolicy<'a> {
@@ -470,16 +236,17 @@ pub struct RingGetRecordOutput<'a> {
     pub value: Ring<'a>,
 }
 
-impl From<RingGetRecordOutput<'_>> for Ring<'_> {
-    fn from(output: RingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Ring<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RingRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Ring<'_> {
-    const NSID: &'static str = "net.asadaame5121.at-circle.ring";
-    type Record = RingRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -490,6 +257,18 @@ impl jacquard_common::xrpc::XrpcResp for RingRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = RingGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RingGetRecordOutput<'_>> for Ring<'_> {
+    fn from(output: RingGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Ring<'_> {
+    const NSID: &'static str = "net.asadaame5121.at-circle.ring";
+    type Record = RingRecord;
 }
 
 impl jacquard_common::types::collection::Collection for RingRecord {
@@ -598,6 +377,227 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ring<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod ring_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Status;
+        type Title;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Status = Unset;
+        type Title = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Title = Set<members::title>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `title` field
+        pub struct title(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RingBuilder<'a, S: ring_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<RingAcceptancePolicy<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RingStatus<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Ring<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RingBuilder<'a, ring_state::Empty> {
+        RingBuilder::new()
+    }
+}
+
+impl<'a> RingBuilder<'a, ring_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: ring_state::State> RingBuilder<'a, S> {
+    /// Set the `acceptancePolicy` field (optional)
+    pub fn acceptance_policy(
+        mut self,
+        value: impl Into<Option<RingAcceptancePolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `acceptancePolicy` field to an Option value (optional)
+    pub fn maybe_acceptance_policy(
+        mut self,
+        value: Option<RingAcceptancePolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RingBuilder<'a, S>
+where
+    S: ring_state::State,
+    S::CreatedAt: ring_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> RingBuilder<'a, ring_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: ring_state::State> RingBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> RingBuilder<'a, S>
+where
+    S: ring_state::State,
+    S::Status: ring_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<RingStatus<'a>>,
+    ) -> RingBuilder<'a, ring_state::SetStatus<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingBuilder<'a, S>
+where
+    S: ring_state::State,
+    S::Title: ring_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RingBuilder<'a, ring_state::SetTitle<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        RingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingBuilder<'a, S>
+where
+    S: ring_state::State,
+    S::CreatedAt: ring_state::IsSet,
+    S::Status: ring_state::IsSet,
+    S::Title: ring_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Ring<'a> {
+        Ring {
+            acceptance_policy: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            status: self.__unsafe_private_named.3.unwrap(),
+            title: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Ring<'a> {
+        Ring {
+            acceptance_policy: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            status: self.__unsafe_private_named.3.unwrap(),
+            title: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

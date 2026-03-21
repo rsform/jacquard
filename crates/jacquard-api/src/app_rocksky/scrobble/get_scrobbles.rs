@@ -29,6 +29,52 @@ pub struct GetScrobbles<'a> {
     pub offset: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetScrobblesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub scrobbles: std::option::Option<
+        Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>,
+    >,
+}
+
+/// Response type for
+///app.rocksky.scrobble.getScrobbles
+pub struct GetScrobblesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetScrobblesResponse {
+    const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetScrobblesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobbles<'a> {
+    const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetScrobblesResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.scrobble.getScrobbles
+pub struct GetScrobblesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobbles";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetScrobbles<'de>;
+    type Response = GetScrobblesResponse;
+}
+
 pub mod get_scrobbles_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -149,50 +195,4 @@ where
             offset: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetScrobblesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub scrobbles: std::option::Option<
-        Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>,
-    >,
-}
-
-/// Response type for
-///app.rocksky.scrobble.getScrobbles
-pub struct GetScrobblesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetScrobblesResponse {
-    const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobblesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobbles<'a> {
-    const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetScrobblesResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.scrobble.getScrobbles
-pub struct GetScrobblesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobbles";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobbles<'de>;
-    type Response = GetScrobblesResponse;
 }

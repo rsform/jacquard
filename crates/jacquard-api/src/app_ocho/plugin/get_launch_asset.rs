@@ -22,6 +22,62 @@ pub struct GetLaunchAsset<'a> {
     pub platform: jacquard_common::CowStr<'a>,
 }
 
+/// The launch asset for the plugin, which is the main JavaScript bundle.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLaunchAssetOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+/// Response type for
+///app.ocho.plugin.getLaunchAsset
+pub struct GetLaunchAssetResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
+    const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
+    const ENCODING: &'static str = "text/javascript";
+    type Output<'de> = GetLaunchAssetOutput;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetLaunchAssetOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
+    const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLaunchAssetResponse;
+}
+
+/// Endpoint type for
+///app.ocho.plugin.getLaunchAsset
+pub struct GetLaunchAssetRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchAssetRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.plugin.getLaunchAsset";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLaunchAsset<'de>;
+    type Response = GetLaunchAssetResponse;
+}
+
 pub mod get_launch_asset_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -32,37 +88,37 @@ pub mod get_launch_asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Platform;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Platform = S::Platform;
+        type Did = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Did = S::Did;
         type Platform = Set<members::platform>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Platform = S::Platform;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -135,8 +191,8 @@ where
 impl<'a, S> GetLaunchAssetBuilder<'a, S>
 where
     S: get_launch_asset_state::State,
-    S::Did: get_launch_asset_state::IsSet,
     S::Platform: get_launch_asset_state::IsSet,
+    S::Did: get_launch_asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetLaunchAsset<'a> {
@@ -145,60 +201,4 @@ where
             platform: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-/// The launch asset for the plugin, which is the main JavaScript bundle.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLaunchAssetOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-/// Response type for
-///app.ocho.plugin.getLaunchAsset
-pub struct GetLaunchAssetResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
-    const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
-    const ENCODING: &'static str = "text/javascript";
-    type Output<'de> = GetLaunchAssetOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(GetLaunchAssetOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
-    const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLaunchAssetResponse;
-}
-
-/// Endpoint type for
-///app.ocho.plugin.getLaunchAsset
-pub struct GetLaunchAssetRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchAssetRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.plugin.getLaunchAsset";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLaunchAsset<'de>;
-    type Response = GetLaunchAssetResponse;
 }

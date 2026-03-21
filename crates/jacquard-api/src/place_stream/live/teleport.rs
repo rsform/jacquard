@@ -28,6 +28,106 @@ pub struct Teleport<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TeleportGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Teleport<'a>,
+}
+
+impl<'a> Teleport<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TeleportRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TeleportRecord;
+impl jacquard_common::xrpc::XrpcResp for TeleportRecord {
+    const NSID: &'static str = "place.stream.live.teleport";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TeleportGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TeleportGetRecordOutput<'_>> for Teleport<'_> {
+    fn from(output: TeleportGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Teleport<'_> {
+    const NSID: &'static str = "place.stream.live.teleport";
+    type Record = TeleportRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TeleportRecord {
+    const NSID: &'static str = "place.stream.live.teleport";
+    type Record = TeleportRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Teleport<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.live.teleport"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_live_teleport()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.duration_seconds {
+            if *value > 32400i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration_seconds",
+                    ),
+                    max: 32400i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.duration_seconds {
+            if *value < 60i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration_seconds",
+                    ),
+                    min: 60i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod teleport_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -181,106 +281,6 @@ where
             streamer: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Teleport<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TeleportRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Teleport<'a>,
-}
-
-impl From<TeleportGetRecordOutput<'_>> for Teleport<'_> {
-    fn from(output: TeleportGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Teleport<'_> {
-    const NSID: &'static str = "place.stream.live.teleport";
-    type Record = TeleportRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TeleportRecord;
-impl jacquard_common::xrpc::XrpcResp for TeleportRecord {
-    const NSID: &'static str = "place.stream.live.teleport";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TeleportGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TeleportRecord {
-    const NSID: &'static str = "place.stream.live.teleport";
-    type Record = TeleportRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Teleport<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.live.teleport"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_live_teleport()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.duration_seconds {
-            if *value > 32400i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration_seconds",
-                    ),
-                    max: 32400i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.duration_seconds {
-            if *value < 60i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration_seconds",
-                    ),
-                    min: 60i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

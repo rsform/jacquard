@@ -20,6 +20,52 @@ pub struct GetActorCompatibility<'a> {
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorCompatibilityOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub compatibility: std::option::Option<
+        crate::app_rocksky::actor::CompatibilityViewBasic<'a>,
+    >,
+}
+
+/// Response type for
+///app.rocksky.actor.getActorCompatibility
+pub struct GetActorCompatibilityResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorCompatibilityResponse {
+    const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorCompatibilityOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorCompatibility<'a> {
+    const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorCompatibilityResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.actor.getActorCompatibility
+pub struct GetActorCompatibilityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorCompatibilityRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorCompatibility";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorCompatibility<'de>;
+    type Response = GetActorCompatibilityResponse;
+}
+
 pub mod get_actor_compatibility_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -112,50 +158,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorCompatibilityOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub compatibility: std::option::Option<
-        crate::app_rocksky::actor::CompatibilityViewBasic<'a>,
-    >,
-}
-
-/// Response type for
-///app.rocksky.actor.getActorCompatibility
-pub struct GetActorCompatibilityResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorCompatibilityResponse {
-    const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorCompatibilityOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorCompatibility<'a> {
-    const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorCompatibilityResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.actor.getActorCompatibility
-pub struct GetActorCompatibilityRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorCompatibilityRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorCompatibility";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorCompatibility<'de>;
-    type Response = GetActorCompatibilityResponse;
 }

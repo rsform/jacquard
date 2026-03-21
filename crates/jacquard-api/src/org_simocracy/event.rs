@@ -49,6 +49,163 @@ pub struct Event<'a> {
     pub user_message: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Event<'a>,
+}
+
+impl<'a> Event<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EventRecord;
+impl jacquard_common::xrpc::XrpcResp for EventRecord {
+    const NSID: &'static str = "org.simocracy.event";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EventGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EventGetRecordOutput<'_>> for Event<'_> {
+    fn from(output: EventGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Event<'_> {
+    const NSID: &'static str = "org.simocracy.event";
+    type Record = EventRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EventRecord {
+    const NSID: &'static str = "org.simocracy.event";
+    type Record = EventRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.event"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.content {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 5000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.proposal_title {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "proposal_title",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.sim_names;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sim_names",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.sim_uris {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sim_uris",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.user_message {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "user_message",
+                        ),
+                        max: 2000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -59,65 +216,65 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type ActorDid;
         type SimNames;
+        type ActorDid;
+        type Type;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type ActorDid = Unset;
         type SimNames = Unset;
+        type ActorDid = Unset;
+        type Type = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
+    ///State transition - sets the `sim_names` field to Set
+    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSimNames<S> {}
+    impl<S: State> State for SetSimNames<S> {
+        type SimNames = Set<members::sim_names>;
         type ActorDid = S::ActorDid;
-        type SimNames = S::SimNames;
+        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `actor_did` field to Set
     pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActorDid<S> {}
     impl<S: State> State for SetActorDid<S> {
-        type Type = S::Type;
-        type ActorDid = Set<members::actor_did>;
         type SimNames = S::SimNames;
+        type ActorDid = Set<members::actor_did>;
+        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `sim_names` field to Set
-    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSimNames<S> {}
-    impl<S: State> State for SetSimNames<S> {
-        type Type = S::Type;
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type SimNames = S::SimNames;
         type ActorDid = S::ActorDid;
-        type SimNames = Set<members::sim_names>;
+        type Type = Set<members::r#type>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type ActorDid = S::ActorDid;
         type SimNames = S::SimNames;
+        type ActorDid = S::ActorDid;
+        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `actor_did` field
-        pub struct actor_did(());
         ///Marker type for the `sim_names` field
         pub struct sim_names(());
+        ///Marker type for the `actor_did` field
+        pub struct actor_did(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -333,9 +490,9 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Type: event_state::IsSet,
-    S::ActorDid: event_state::IsSet,
     S::SimNames: event_state::IsSet,
+    S::ActorDid: event_state::IsSet,
+    S::Type: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct
@@ -373,163 +530,6 @@ where
             user_message: self.__unsafe_private_named.8,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
-}
-
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Event<'_> {
-    const NSID: &'static str = "org.simocracy.event";
-    type Record = EventRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EventRecord;
-impl jacquard_common::xrpc::XrpcResp for EventRecord {
-    const NSID: &'static str = "org.simocracy.event";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EventRecord {
-    const NSID: &'static str = "org.simocracy.event";
-    type Record = EventRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.event"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.content {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        max: 5000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.proposal_title {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "proposal_title",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.sim_names;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sim_names",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.sim_uris {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sim_uris",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.user_message {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "user_message",
-                        ),
-                        max: 2000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

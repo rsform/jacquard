@@ -42,6 +42,84 @@ pub struct Car<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CarGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Car<'a>,
+}
+
+impl<'a> Car<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CarRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CarRecord;
+impl jacquard_common::xrpc::XrpcResp for CarRecord {
+    const NSID: &'static str = "net.mmatt.vitals.car";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CarGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CarGetRecordOutput<'_>> for Car<'_> {
+    fn from(output: CarGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Car<'_> {
+    const NSID: &'static str = "net.mmatt.vitals.car";
+    type Record = CarRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CarRecord {
+    const NSID: &'static str = "net.mmatt.vitals.car";
+    type Record = CarRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Car<'a> {
+    fn nsid() -> &'static str {
+        "net.mmatt.vitals.car"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_mmatt_vitals_car()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod car_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -52,85 +130,85 @@ pub mod car_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CarTraveledDistance;
-        type CarPercentFuelRemaining;
         type CreatedAt;
-        type AmountRemaining;
+        type CarTraveledDistance;
         type CarFuelRange;
+        type CarPercentFuelRemaining;
+        type AmountRemaining;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CarTraveledDistance = Unset;
-        type CarPercentFuelRemaining = Unset;
         type CreatedAt = Unset;
-        type AmountRemaining = Unset;
+        type CarTraveledDistance = Unset;
         type CarFuelRange = Unset;
-    }
-    ///State transition - sets the `car_traveled_distance` field to Set
-    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
-    impl<S: State> State for SetCarTraveledDistance<S> {
-        type CarTraveledDistance = Set<members::car_traveled_distance>;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type CreatedAt = S::CreatedAt;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-    }
-    ///State transition - sets the `car_percent_fuel_remaining` field to Set
-    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
-    impl<S: State> State for SetCarPercentFuelRemaining<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
-        type CreatedAt = S::CreatedAt;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = Unset;
+        type AmountRemaining = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
         type CreatedAt = Set<members::created_at>;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-    }
-    ///State transition - sets the `amount_remaining` field to Set
-    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
-    impl<S: State> State for SetAmountRemaining<S> {
         type CarTraveledDistance = S::CarTraveledDistance;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type CreatedAt = S::CreatedAt;
-        type AmountRemaining = Set<members::amount_remaining>;
         type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+    }
+    ///State transition - sets the `car_traveled_distance` field to Set
+    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
+    impl<S: State> State for SetCarTraveledDistance<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = Set<members::car_traveled_distance>;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
     }
     ///State transition - sets the `car_fuel_range` field to Set
     pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
     impl<S: State> State for SetCarFuelRange<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
         type CreatedAt = S::CreatedAt;
-        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
         type CarFuelRange = Set<members::car_fuel_range>;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+    }
+    ///State transition - sets the `car_percent_fuel_remaining` field to Set
+    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
+    impl<S: State> State for SetCarPercentFuelRemaining<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type AmountRemaining = S::AmountRemaining;
+    }
+    ///State transition - sets the `amount_remaining` field to Set
+    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
+    impl<S: State> State for SetAmountRemaining<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = Set<members::amount_remaining>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `car_traveled_distance` field
-        pub struct car_traveled_distance(());
-        ///Marker type for the `car_percent_fuel_remaining` field
-        pub struct car_percent_fuel_remaining(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `amount_remaining` field
-        pub struct amount_remaining(());
+        ///Marker type for the `car_traveled_distance` field
+        pub struct car_traveled_distance(());
         ///Marker type for the `car_fuel_range` field
         pub struct car_fuel_range(());
+        ///Marker type for the `car_percent_fuel_remaining` field
+        pub struct car_percent_fuel_remaining(());
+        ///Marker type for the `amount_remaining` field
+        pub struct amount_remaining(());
     }
 }
 
@@ -314,11 +392,11 @@ where
 impl<'a, S> CarBuilder<'a, S>
 where
     S: car_state::State,
-    S::CarTraveledDistance: car_state::IsSet,
-    S::CarPercentFuelRemaining: car_state::IsSet,
     S::CreatedAt: car_state::IsSet,
-    S::AmountRemaining: car_state::IsSet,
+    S::CarTraveledDistance: car_state::IsSet,
     S::CarFuelRange: car_state::IsSet,
+    S::CarPercentFuelRemaining: car_state::IsSet,
+    S::AmountRemaining: car_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Car<'a> {
@@ -353,84 +431,6 @@ where
             created_at: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Car<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CarRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CarGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Car<'a>,
-}
-
-impl From<CarGetRecordOutput<'_>> for Car<'_> {
-    fn from(output: CarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Car<'_> {
-    const NSID: &'static str = "net.mmatt.vitals.car";
-    type Record = CarRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CarRecord;
-impl jacquard_common::xrpc::XrpcResp for CarRecord {
-    const NSID: &'static str = "net.mmatt.vitals.car";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CarGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CarRecord {
-    const NSID: &'static str = "net.mmatt.vitals.car";
-    type Record = CarRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Car<'a> {
-    fn nsid() -> &'static str {
-        "net.mmatt.vitals.car"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_mmatt_vitals_car()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

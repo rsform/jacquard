@@ -31,6 +31,89 @@ pub struct Host<'a> {
     pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListHosts<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Defaults to `200`. Min: 1. Max: 1000.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListHostsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
+    #[serde(borrow)]
+    pub hosts: Vec<crate::com_atproto::sync::list_hosts::Host<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Host<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.sync.listHosts"
+    }
+    fn def_name() -> &'static str {
+        "host"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_sync_listHosts()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///com.atproto.sync.listHosts
+pub struct ListHostsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
+    const NSID: &'static str = "com.atproto.sync.listHosts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListHostsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListHosts<'a> {
+    const NSID: &'static str = "com.atproto.sync.listHosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListHostsResponse;
+}
+
+/// Endpoint type for
+///com.atproto.sync.listHosts
+pub struct ListHostsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.listHosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListHosts<'de>;
+    type Response = ListHostsResponse;
+}
+
 fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -170,45 +253,8 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Host<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.sync.listHosts"
-    }
-    fn def_name() -> &'static str {
-        "host"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_sync_listHosts()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(200i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListHosts<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Defaults to `200`. Min: 1. Max: 1000.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
 }
 
 pub mod list_hosts_state {
@@ -298,50 +344,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListHostsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
-    #[serde(borrow)]
-    pub hosts: Vec<crate::com_atproto::sync::list_hosts::Host<'a>>,
-}
-
-/// Response type for
-///com.atproto.sync.listHosts
-pub struct ListHostsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
-    const NSID: &'static str = "com.atproto.sync.listHosts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListHostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListHosts<'a> {
-    const NSID: &'static str = "com.atproto.sync.listHosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListHostsResponse;
-}
-
-/// Endpoint type for
-///com.atproto.sync.listHosts
-pub struct ListHostsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.sync.listHosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListHosts<'de>;
-    type Response = ListHostsResponse;
 }

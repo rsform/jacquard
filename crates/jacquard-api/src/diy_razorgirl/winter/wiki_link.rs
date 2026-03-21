@@ -38,6 +38,219 @@ pub struct WikiLink<'a> {
     pub target_anchor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WikiLinkLinkType<'a> {
+    RelatedTo,
+    DependsOn,
+    Extends,
+    Contradicts,
+    IsExampleOf,
+    Supersedes,
+    References,
+    Defines,
+    IsPartOf,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WikiLinkLinkType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RelatedTo => "related-to",
+            Self::DependsOn => "depends-on",
+            Self::Extends => "extends",
+            Self::Contradicts => "contradicts",
+            Self::IsExampleOf => "is-example-of",
+            Self::Supersedes => "supersedes",
+            Self::References => "references",
+            Self::Defines => "defines",
+            Self::IsPartOf => "is-part-of",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WikiLinkLinkType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "related-to" => Self::RelatedTo,
+            "depends-on" => Self::DependsOn,
+            "extends" => Self::Extends,
+            "contradicts" => Self::Contradicts,
+            "is-example-of" => Self::IsExampleOf,
+            "supersedes" => Self::Supersedes,
+            "references" => Self::References,
+            "defines" => Self::Defines,
+            "is-part-of" => Self::IsPartOf,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WikiLinkLinkType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "related-to" => Self::RelatedTo,
+            "depends-on" => Self::DependsOn,
+            "extends" => Self::Extends,
+            "contradicts" => Self::Contradicts,
+            "is-example-of" => Self::IsExampleOf,
+            "supersedes" => Self::Supersedes,
+            "references" => Self::References,
+            "defines" => Self::Defines,
+            "is-part-of" => Self::IsPartOf,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WikiLinkLinkType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WikiLinkLinkType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WikiLinkLinkType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WikiLinkLinkType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WikiLinkLinkType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
+    type Output = WikiLinkLinkType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WikiLinkLinkType::RelatedTo => WikiLinkLinkType::RelatedTo,
+            WikiLinkLinkType::DependsOn => WikiLinkLinkType::DependsOn,
+            WikiLinkLinkType::Extends => WikiLinkLinkType::Extends,
+            WikiLinkLinkType::Contradicts => WikiLinkLinkType::Contradicts,
+            WikiLinkLinkType::IsExampleOf => WikiLinkLinkType::IsExampleOf,
+            WikiLinkLinkType::Supersedes => WikiLinkLinkType::Supersedes,
+            WikiLinkLinkType::References => WikiLinkLinkType::References,
+            WikiLinkLinkType::Defines => WikiLinkLinkType::Defines,
+            WikiLinkLinkType::IsPartOf => WikiLinkLinkType::IsPartOf,
+            WikiLinkLinkType::Other(v) => WikiLinkLinkType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WikiLinkGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: WikiLink<'a>,
+}
+
+impl<'a> WikiLink<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WikiLinkRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct WikiLinkRecord;
+impl jacquard_common::xrpc::XrpcResp for WikiLinkRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WikiLinkGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<WikiLinkGetRecordOutput<'_>> for WikiLink<'_> {
+    fn from(output: WikiLinkGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for WikiLink<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
+    type Record = WikiLinkRecord;
+}
+
+impl jacquard_common::types::collection::Collection for WikiLinkRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
+    type Record = WikiLinkRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.wikiLink"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_wikiLink()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.context {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "context",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod wiki_link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -48,65 +261,65 @@ pub mod wiki_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type LinkType;
         type Source;
+        type CreatedAt;
         type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type LinkType = Unset;
         type Source = Unset;
+        type CreatedAt = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type LinkType = S::LinkType;
-        type Source = S::Source;
-        type Target = S::Target;
     }
     ///State transition - sets the `link_type` field to Set
     pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLinkType<S> {}
     impl<S: State> State for SetLinkType<S> {
-        type CreatedAt = S::CreatedAt;
         type LinkType = Set<members::link_type>;
         type Source = S::Source;
+        type CreatedAt = S::CreatedAt;
         type Target = S::Target;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type CreatedAt = S::CreatedAt;
         type LinkType = S::LinkType;
         type Source = Set<members::source>;
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LinkType = S::LinkType;
+        type Source = S::Source;
+        type CreatedAt = Set<members::created_at>;
         type Target = S::Target;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
         type LinkType = S::LinkType;
         type Source = S::Source;
+        type CreatedAt = S::CreatedAt;
         type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
     }
@@ -278,9 +491,9 @@ impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
 impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
-    S::CreatedAt: wiki_link_state::IsSet,
     S::LinkType: wiki_link_state::IsSet,
     S::Source: wiki_link_state::IsSet,
+    S::CreatedAt: wiki_link_state::IsSet,
     S::Target: wiki_link_state::IsSet,
 {
     /// Build the final struct
@@ -314,219 +527,6 @@ where
             target_anchor: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> WikiLink<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WikiLinkRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WikiLinkLinkType<'a> {
-    RelatedTo,
-    DependsOn,
-    Extends,
-    Contradicts,
-    IsExampleOf,
-    Supersedes,
-    References,
-    Defines,
-    IsPartOf,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WikiLinkLinkType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::RelatedTo => "related-to",
-            Self::DependsOn => "depends-on",
-            Self::Extends => "extends",
-            Self::Contradicts => "contradicts",
-            Self::IsExampleOf => "is-example-of",
-            Self::Supersedes => "supersedes",
-            Self::References => "references",
-            Self::Defines => "defines",
-            Self::IsPartOf => "is-part-of",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WikiLinkLinkType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "related-to" => Self::RelatedTo,
-            "depends-on" => Self::DependsOn,
-            "extends" => Self::Extends,
-            "contradicts" => Self::Contradicts,
-            "is-example-of" => Self::IsExampleOf,
-            "supersedes" => Self::Supersedes,
-            "references" => Self::References,
-            "defines" => Self::Defines,
-            "is-part-of" => Self::IsPartOf,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WikiLinkLinkType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "related-to" => Self::RelatedTo,
-            "depends-on" => Self::DependsOn,
-            "extends" => Self::Extends,
-            "contradicts" => Self::Contradicts,
-            "is-example-of" => Self::IsExampleOf,
-            "supersedes" => Self::Supersedes,
-            "references" => Self::References,
-            "defines" => Self::Defines,
-            "is-part-of" => Self::IsPartOf,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WikiLinkLinkType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WikiLinkLinkType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WikiLinkLinkType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WikiLinkLinkType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WikiLinkLinkType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
-    type Output = WikiLinkLinkType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WikiLinkLinkType::RelatedTo => WikiLinkLinkType::RelatedTo,
-            WikiLinkLinkType::DependsOn => WikiLinkLinkType::DependsOn,
-            WikiLinkLinkType::Extends => WikiLinkLinkType::Extends,
-            WikiLinkLinkType::Contradicts => WikiLinkLinkType::Contradicts,
-            WikiLinkLinkType::IsExampleOf => WikiLinkLinkType::IsExampleOf,
-            WikiLinkLinkType::Supersedes => WikiLinkLinkType::Supersedes,
-            WikiLinkLinkType::References => WikiLinkLinkType::References,
-            WikiLinkLinkType::Defines => WikiLinkLinkType::Defines,
-            WikiLinkLinkType::IsPartOf => WikiLinkLinkType::IsPartOf,
-            WikiLinkLinkType::Other(v) => WikiLinkLinkType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WikiLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WikiLink<'a>,
-}
-
-impl From<WikiLinkGetRecordOutput<'_>> for WikiLink<'_> {
-    fn from(output: WikiLinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for WikiLink<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
-    type Record = WikiLinkRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct WikiLinkRecord;
-impl jacquard_common::xrpc::XrpcResp for WikiLinkRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = WikiLinkGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for WikiLinkRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
-    type Record = WikiLinkRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.wikiLink"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_wikiLink()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.context {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "context",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

@@ -18,6 +18,445 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocationElsewhere<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LocationHome<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LocationMathTextbook<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LocationOnSkin<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LocationSchool<'a> {}
+/// Describes an instance of the user drawing the Delta Rune symbol from Undertale/Deltarune.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Deltarune<'a> {
+    pub time: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tool: std::option::Option<DeltaruneTool<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#where: std::option::Option<DeltaruneWhere<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeltaruneTool<'a> {
+    #[serde(rename = "download.darkworld.deltarune#toolPen")]
+    ToolPen(Box<crate::download_darkworld::deltarune::ToolPen<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#toolPencil")]
+    ToolPencil(Box<crate::download_darkworld::deltarune::ToolPencil<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#toolMarker")]
+    ToolMarker(Box<crate::download_darkworld::deltarune::ToolMarker<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#toolFinger")]
+    ToolFinger(Box<crate::download_darkworld::deltarune::ToolFinger<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#toolOther")]
+    ToolOther(Box<crate::download_darkworld::deltarune::ToolOther<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeltaruneWhere<'a> {
+    #[serde(rename = "download.darkworld.deltarune#locationSchool")]
+    LocationSchool(Box<crate::download_darkworld::deltarune::LocationSchool<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#locationHome")]
+    LocationHome(Box<crate::download_darkworld::deltarune::LocationHome<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#locationMathTextbook")]
+    LocationMathTextbook(
+        Box<crate::download_darkworld::deltarune::LocationMathTextbook<'a>>,
+    ),
+    #[serde(rename = "download.darkworld.deltarune#locationOnSkin")]
+    LocationOnSkin(Box<crate::download_darkworld::deltarune::LocationOnSkin<'a>>),
+    #[serde(rename = "download.darkworld.deltarune#locationElsewhere")]
+    LocationElsewhere(Box<crate::download_darkworld::deltarune::LocationElsewhere<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeltaruneGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Deltarune<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolFinger<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolMarker<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolOther<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolPen<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolPencil<'a> {}
+impl<'a> Deltarune<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DeltaruneRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationElsewhere<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "locationElsewhere"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationHome<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "locationHome"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationMathTextbook<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "locationMathTextbook"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationOnSkin<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "locationOnSkin"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationSchool<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "locationSchool"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DeltaruneRecord;
+impl jacquard_common::xrpc::XrpcResp for DeltaruneRecord {
+    const NSID: &'static str = "download.darkworld.deltarune";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeltaruneGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DeltaruneGetRecordOutput<'_>> for Deltarune<'_> {
+    fn from(output: DeltaruneGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Deltarune<'_> {
+    const NSID: &'static str = "download.darkworld.deltarune";
+    type Record = DeltaruneRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DeltaruneRecord {
+    const NSID: &'static str = "download.darkworld.deltarune";
+    type Record = DeltaruneRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deltarune<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolFinger<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "toolFinger"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolMarker<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "toolMarker"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolOther<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "toolOther"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPen<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "toolPen"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPencil<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.deltarune"
+    }
+    fn def_name() -> &'static str {
+        "toolPencil"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_deltarune()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -243,165 +682,6 @@ fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationElsewhere<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "locationElsewhere"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationHome<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationHome<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "locationHome"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationMathTextbook<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationMathTextbook<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "locationMathTextbook"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationOnSkin<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationOnSkin<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "locationOnSkin"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationSchool<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationSchool<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "locationSchool"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Describes an instance of the user drawing the Delta Rune symbol from Undertale/Deltarune.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Deltarune<'a> {
-    pub time: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tool: std::option::Option<DeltaruneTool<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: std::option::Option<DeltaruneWhere<'a>>,
-}
-
 pub mod deltarune_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -536,285 +816,5 @@ where
             r#where: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Deltarune<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeltaruneRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeltaruneTool<'a> {
-    #[serde(rename = "download.darkworld.deltarune#toolPen")]
-    ToolPen(Box<crate::download_darkworld::deltarune::ToolPen<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#toolPencil")]
-    ToolPencil(Box<crate::download_darkworld::deltarune::ToolPencil<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#toolMarker")]
-    ToolMarker(Box<crate::download_darkworld::deltarune::ToolMarker<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#toolFinger")]
-    ToolFinger(Box<crate::download_darkworld::deltarune::ToolFinger<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#toolOther")]
-    ToolOther(Box<crate::download_darkworld::deltarune::ToolOther<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeltaruneWhere<'a> {
-    #[serde(rename = "download.darkworld.deltarune#locationSchool")]
-    LocationSchool(Box<crate::download_darkworld::deltarune::LocationSchool<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#locationHome")]
-    LocationHome(Box<crate::download_darkworld::deltarune::LocationHome<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#locationMathTextbook")]
-    LocationMathTextbook(
-        Box<crate::download_darkworld::deltarune::LocationMathTextbook<'a>>,
-    ),
-    #[serde(rename = "download.darkworld.deltarune#locationOnSkin")]
-    LocationOnSkin(Box<crate::download_darkworld::deltarune::LocationOnSkin<'a>>),
-    #[serde(rename = "download.darkworld.deltarune#locationElsewhere")]
-    LocationElsewhere(Box<crate::download_darkworld::deltarune::LocationElsewhere<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeltaruneGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Deltarune<'a>,
-}
-
-impl From<DeltaruneGetRecordOutput<'_>> for Deltarune<'_> {
-    fn from(output: DeltaruneGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Deltarune<'_> {
-    const NSID: &'static str = "download.darkworld.deltarune";
-    type Record = DeltaruneRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DeltaruneRecord;
-impl jacquard_common::xrpc::XrpcResp for DeltaruneRecord {
-    const NSID: &'static str = "download.darkworld.deltarune";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeltaruneGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DeltaruneRecord {
-    const NSID: &'static str = "download.darkworld.deltarune";
-    type Record = DeltaruneRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deltarune<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolFinger<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolFinger<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "toolFinger"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolMarker<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolMarker<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "toolMarker"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolOther<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolOther<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "toolOther"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolPen<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPen<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "toolPen"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolPencil<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPencil<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.deltarune"
-    }
-    fn def_name() -> &'static str {
-        "toolPencil"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_deltarune()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -124,6 +124,133 @@ impl jacquard_common::IntoStatic for IdentifierProvider<'_> {
     }
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Identifiers<'a> {
+    #[serde(borrow)]
+    pub identifiers: Vec<crate::social_lexical::works::identifiers::Identifier<'a>>,
+    ///
+    #[serde(borrow)]
+    pub work: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IdentifiersGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Identifiers<'a>,
+}
+
+impl<'a> Identifiers<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, IdentifiersRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifier<'a> {
+    fn nsid() -> &'static str {
+        "social.lexical.works.identifiers"
+    }
+    fn def_name() -> &'static str {
+        "identifier"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_lexical_works_identifiers()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct IdentifiersRecord;
+impl jacquard_common::xrpc::XrpcResp for IdentifiersRecord {
+    const NSID: &'static str = "social.lexical.works.identifiers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = IdentifiersGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<IdentifiersGetRecordOutput<'_>> for Identifiers<'_> {
+    fn from(output: IdentifiersGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Identifiers<'_> {
+    const NSID: &'static str = "social.lexical.works.identifiers";
+    type Record = IdentifiersRecord;
+}
+
+impl jacquard_common::types::collection::Collection for IdentifiersRecord {
+    const NSID: &'static str = "social.lexical.works.identifiers";
+    type Record = IdentifiersRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
+    fn nsid() -> &'static str {
+        "social.lexical.works.identifiers"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_lexical_works_identifiers()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.identifiers;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "identifiers",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_social_lexical_works_identifiers() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -276,42 +403,6 @@ fn lexicon_doc_social_lexical_works_identifiers() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifier<'a> {
-    fn nsid() -> &'static str {
-        "social.lexical.works.identifiers"
-    }
-    fn def_name() -> &'static str {
-        "identifier"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_lexical_works_identifiers()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Identifiers<'a> {
-    #[serde(borrow)]
-    pub identifiers: Vec<crate::social_lexical::works::identifiers::Identifier<'a>>,
-    ///
-    #[serde(borrow)]
-    pub work: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod identifiers_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -451,96 +542,5 @@ where
             work: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Identifiers<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, IdentifiersRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct IdentifiersGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Identifiers<'a>,
-}
-
-impl From<IdentifiersGetRecordOutput<'_>> for Identifiers<'_> {
-    fn from(output: IdentifiersGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Identifiers<'_> {
-    const NSID: &'static str = "social.lexical.works.identifiers";
-    type Record = IdentifiersRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct IdentifiersRecord;
-impl jacquard_common::xrpc::XrpcResp for IdentifiersRecord {
-    const NSID: &'static str = "social.lexical.works.identifiers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = IdentifiersGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for IdentifiersRecord {
-    const NSID: &'static str = "social.lexical.works.identifiers";
-    type Record = IdentifiersRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
-    fn nsid() -> &'static str {
-        "social.lexical.works.identifiers"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_lexical_works_identifiers()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.identifiers;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "identifiers",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

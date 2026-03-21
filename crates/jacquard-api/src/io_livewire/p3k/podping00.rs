@@ -25,6 +25,84 @@ pub struct Podping00<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Podping00GetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Podping00<'a>,
+}
+
+impl<'a> Podping00<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, Podping00Record>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct Podping00Record;
+impl jacquard_common::xrpc::XrpcResp for Podping00Record {
+    const NSID: &'static str = "io.livewire.p3k.podping00";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = Podping00GetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<Podping00GetRecordOutput<'_>> for Podping00<'_> {
+    fn from(output: Podping00GetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Podping00<'_> {
+    const NSID: &'static str = "io.livewire.p3k.podping00";
+    type Record = Podping00Record;
+}
+
+impl jacquard_common::types::collection::Collection for Podping00Record {
+    const NSID: &'static str = "io.livewire.p3k.podping00";
+    type Record = Podping00Record;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podping00<'a> {
+    fn nsid() -> &'static str {
+        "io.livewire.p3k.podping00"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_livewire_p3k_podping00()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod podping00_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             url: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Podping00<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, Podping00Record>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Podping00GetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Podping00<'a>,
-}
-
-impl From<Podping00GetRecordOutput<'_>> for Podping00<'_> {
-    fn from(output: Podping00GetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Podping00<'_> {
-    const NSID: &'static str = "io.livewire.p3k.podping00";
-    type Record = Podping00Record;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct Podping00Record;
-impl jacquard_common::xrpc::XrpcResp for Podping00Record {
-    const NSID: &'static str = "io.livewire.p3k.podping00";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = Podping00GetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for Podping00Record {
-    const NSID: &'static str = "io.livewire.p3k.podping00";
-    type Record = Podping00Record;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podping00<'a> {
-    fn nsid() -> &'static str {
-        "io.livewire.p3k.podping00"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_livewire_p3k_podping00()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

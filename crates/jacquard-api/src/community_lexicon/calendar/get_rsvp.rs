@@ -22,6 +22,89 @@ pub struct GetRsvp<'a> {
     pub identity: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRsvpOutput<'a> {
+    ///CID of the RSVP record.
+    #[serde(borrow)]
+    pub cid: jacquard_common::CowStr<'a>,
+    ///The RSVP record.
+    #[serde(borrow)]
+    pub record: crate::community_lexicon::calendar::rsvp::Rsvp<'a>,
+    ///AT-URI of the RSVP record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRsvpError<'a> {
+    #[serde(rename = "NotFound")]
+    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRsvpError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotFound(msg) => {
+                write!(f, "NotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///community.lexicon.calendar.getRSVP
+pub struct GetRsvpResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRsvpResponse {
+    const NSID: &'static str = "community.lexicon.calendar.getRSVP";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRsvpOutput<'de>;
+    type Err<'de> = GetRsvpError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRsvp<'a> {
+    const NSID: &'static str = "community.lexicon.calendar.getRSVP";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRsvpResponse;
+}
+
+/// Endpoint type for
+///community.lexicon.calendar.getRSVP
+pub struct GetRsvpRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRsvpRequest {
+    const PATH: &'static str = "/xrpc/community.lexicon.calendar.getRSVP";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRsvp<'de>;
+    type Response = GetRsvpResponse;
+}
+
 pub mod get_rsvp_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,87 +228,4 @@ where
             identity: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRsvpOutput<'a> {
-    ///CID of the RSVP record.
-    #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
-    ///The RSVP record.
-    #[serde(borrow)]
-    pub record: crate::community_lexicon::calendar::rsvp::Rsvp<'a>,
-    ///AT-URI of the RSVP record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRsvpError<'a> {
-    #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRsvpError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotFound(msg) => {
-                write!(f, "NotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///community.lexicon.calendar.getRSVP
-pub struct GetRsvpResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRsvpResponse {
-    const NSID: &'static str = "community.lexicon.calendar.getRSVP";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRsvpOutput<'de>;
-    type Err<'de> = GetRsvpError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRsvp<'a> {
-    const NSID: &'static str = "community.lexicon.calendar.getRSVP";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRsvpResponse;
-}
-
-/// Endpoint type for
-///community.lexicon.calendar.getRSVP
-pub struct GetRsvpRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRsvpRequest {
-    const PATH: &'static str = "/xrpc/community.lexicon.calendar.getRSVP";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRsvp<'de>;
-    type Response = GetRsvpResponse;
 }

@@ -25,6 +25,110 @@ pub struct Recommendations<'a> {
     pub streamers: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecommendationsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Recommendations<'a>,
+}
+
+impl<'a> Recommendations<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RecommendationsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RecommendationsRecord;
+impl jacquard_common::xrpc::XrpcResp for RecommendationsRecord {
+    const NSID: &'static str = "place.stream.live.recommendations";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RecommendationsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RecommendationsGetRecordOutput<'_>> for Recommendations<'_> {
+    fn from(output: RecommendationsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Recommendations<'_> {
+    const NSID: &'static str = "place.stream.live.recommendations";
+    type Record = RecommendationsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RecommendationsRecord {
+    const NSID: &'static str = "place.stream.live.recommendations";
+    type Record = RecommendationsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recommendations<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.live.recommendations"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_live_recommendations()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.streamers;
+            #[allow(unused_comparisons)]
+            if value.len() > 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streamers",
+                    ),
+                    max: 8usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.streamers;
+            #[allow(unused_comparisons)]
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streamers",
+                    ),
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod recommendations_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,110 +266,6 @@ where
             streamers: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Recommendations<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RecommendationsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecommendationsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Recommendations<'a>,
-}
-
-impl From<RecommendationsGetRecordOutput<'_>> for Recommendations<'_> {
-    fn from(output: RecommendationsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Recommendations<'_> {
-    const NSID: &'static str = "place.stream.live.recommendations";
-    type Record = RecommendationsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RecommendationsRecord;
-impl jacquard_common::xrpc::XrpcResp for RecommendationsRecord {
-    const NSID: &'static str = "place.stream.live.recommendations";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecommendationsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RecommendationsRecord {
-    const NSID: &'static str = "place.stream.live.recommendations";
-    type Record = RecommendationsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recommendations<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.live.recommendations"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_live_recommendations()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.streamers;
-            #[allow(unused_comparisons)]
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "streamers",
-                    ),
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.streamers;
-            #[allow(unused_comparisons)]
-            if value.len() < 0usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "streamers",
-                    ),
-                    min: 0usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

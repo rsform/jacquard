@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,96 @@ pub struct GetStarterPacksWithMembership<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStarterPacksWithMembershipOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub starter_packs_with_membership: Vec<
+        crate::app_bsky::graph::get_starter_packs_with_membership::StarterPackWithMembership<
+            'a,
+        >,
+    >,
+}
+
+/// A starter pack and an optional list item indicating membership of a target user to that starter pack.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StarterPackWithMembership<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    #[serde(borrow)]
+    pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
+}
+
+/// Response type for
+///app.bsky.graph.getStarterPacksWithMembership
+pub struct GetStarterPacksWithMembershipResponse;
+impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetStarterPacksWithMembershipOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMembership<'a> {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStarterPacksWithMembershipResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getStarterPacksWithMembership
+pub struct GetStarterPacksWithMembershipRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStarterPacksWithMembership<'de>;
+    type Response = GetStarterPacksWithMembershipResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackWithMembership<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.graph.getStarterPacksWithMembership"
+    }
+    fn def_name() -> &'static str {
+        "starterPackWithMembership"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_graph_getStarterPacksWithMembership()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_starter_packs_with_membership_state {
@@ -173,75 +259,6 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetStarterPacksWithMembershipOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub starter_packs_with_membership: Vec<
-        crate::app_bsky::graph::get_starter_packs_with_membership::StarterPackWithMembership<
-            'a,
-        >,
-    >,
-}
-
-/// Response type for
-///app.bsky.graph.getStarterPacksWithMembership
-pub struct GetStarterPacksWithMembershipResponse;
-impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
-    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStarterPacksWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMembership<'a> {
-    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetStarterPacksWithMembershipResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getStarterPacksWithMembership
-pub struct GetStarterPacksWithMembershipRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStarterPacksWithMembership<'de>;
-    type Response = GetStarterPacksWithMembershipResponse;
-}
-
-/// A starter pack and an optional list item indicating membership of a target user to that starter pack.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StarterPackWithMembership<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
-    #[serde(borrow)]
-    pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
 }
 
 pub mod starter_pack_with_membership_state {
@@ -520,22 +537,5 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackWithMembership<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.graph.getStarterPacksWithMembership"
-    }
-    fn def_name() -> &'static str {
-        "starterPackWithMembership"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_graph_getStarterPacksWithMembership()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

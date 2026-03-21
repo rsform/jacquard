@@ -313,6 +313,23 @@ impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
     }
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRights<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.metadata.contentRights"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_metadata_contentRights()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -493,22 +510,5 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRights<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.metadata.contentRights"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_metadata_contentRights()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

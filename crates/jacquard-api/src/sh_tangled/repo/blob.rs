@@ -30,6 +30,264 @@ pub struct LastCommit<'a> {
     pub when: jacquard_common::types::string::Datetime,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Blob<'a> {
+    #[serde(borrow)]
+    pub path: jacquard_common::CowStr<'a>,
+    /// Defaults to `false`.
+    #[serde(default = "_default_raw")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub raw: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BlobOutput<'a> {
+    ///File content (base64 encoded for binary files)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Content encoding
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub encoding: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether the file is binary
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_binary: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_commit: std::option::Option<crate::sh_tangled::repo::blob::LastCommit<'a>>,
+    ///MIME type of the file
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The file path
+    #[serde(borrow)]
+    pub path: jacquard_common::CowStr<'a>,
+    ///The git reference used
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+    ///File size in bytes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: std::option::Option<i64>,
+    ///Submodule information if path is a submodule
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub submodule: std::option::Option<crate::sh_tangled::repo::blob::Submodule<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum BlobError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Git reference not found
+    #[serde(rename = "RefNotFound")]
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// File not found at the specified path
+    #[serde(rename = "FileNotFound")]
+    FileNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for BlobError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RefNotFound(msg) => {
+                write!(f, "RefNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::FileNotFound(msg) => {
+                write!(f, "FileNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Signature<'a> {
+    ///Author email
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+    ///Author name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Author timestamp
+    pub when: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Submodule<'a> {
+    ///Branch to track in the submodule
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub branch: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Submodule name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Submodule repository URL
+    #[serde(borrow)]
+    pub url: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.blob"
+    }
+    fn def_name() -> &'static str {
+        "lastCommit"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_blob()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.blob
+pub struct BlobResponse;
+impl jacquard_common::xrpc::XrpcResp for BlobResponse {
+    const NSID: &'static str = "sh.tangled.repo.blob";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BlobOutput<'de>;
+    type Err<'de> = BlobError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
+    const NSID: &'static str = "sh.tangled.repo.blob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = BlobResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.blob
+pub struct BlobRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.blob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Blob<'de>;
+    type Response = BlobResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.blob"
+    }
+    fn def_name() -> &'static str {
+        "signature"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_blob()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Submodule<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.blob"
+    }
+    fn def_name() -> &'static str {
+        "submodule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_blob()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod last_commit_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,49 +298,49 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Hash;
+        type Message;
         type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Hash = Unset;
+        type Message = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Hash = S::Hash;
-        type When = S::When;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
-        type Message = S::Message;
         type Hash = Set<members::hash>;
+        type Message = S::Message;
+        type When = S::When;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Hash = S::Hash;
+        type Message = Set<members::message>;
         type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Message = S::Message;
         type Hash = S::Hash;
+        type Message = S::Message;
         type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `hash` field
         pub struct hash(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `when` field
         pub struct when(());
     }
@@ -197,8 +455,8 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
-    S::Message: last_commit_state::IsSet,
     S::Hash: last_commit_state::IsSet,
+    S::Message: last_commit_state::IsSet,
     S::When: last_commit_state::IsSet,
 {
     /// Build the final struct
@@ -586,48 +844,8 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.blob"
-    }
-    fn def_name() -> &'static str {
-        "lastCommit"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_blob()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_raw() -> std::option::Option<bool> {
     Some(false)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Blob<'a> {
-    #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
-    /// Defaults to `false`.
-    #[serde(default = "_default_raw")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub raw: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
 }
 
 pub mod blob_state {
@@ -640,51 +858,51 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
-        type Ref;
         type Repo;
+        type Ref;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
-        type Ref = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Path = Set<members::path>;
-        type Ref = S::Ref;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Path = S::Path;
-        type Ref = Set<members::r#ref>;
-        type Repo = S::Repo;
+        type Ref = Unset;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Path = S::Path;
-        type Ref = S::Ref;
         type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Ref = S::Ref;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -791,9 +1009,9 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
-    S::Path: blob_state::IsSet,
-    S::Ref: blob_state::IsSet,
     S::Repo: blob_state::IsSet,
+    S::Ref: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -806,165 +1024,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BlobOutput<'a> {
-    ///File content (base64 encoded for binary files)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Content encoding
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the file is binary
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_binary: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: std::option::Option<crate::sh_tangled::repo::blob::LastCommit<'a>>,
-    ///MIME type of the file
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The file path
-    #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
-    ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-    ///File size in bytes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
-    ///Submodule information if path is a submodule
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub submodule: std::option::Option<crate::sh_tangled::repo::blob::Submodule<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlobError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Git reference not found
-    #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// File not found at the specified path
-    #[serde(rename = "FileNotFound")]
-    FileNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for BlobError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RefNotFound(msg) => {
-                write!(f, "RefNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::FileNotFound(msg) => {
-                write!(f, "FileNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.blob
-pub struct BlobResponse;
-impl jacquard_common::xrpc::XrpcResp for BlobResponse {
-    const NSID: &'static str = "sh.tangled.repo.blob";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BlobOutput<'de>;
-    type Err<'de> = BlobError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
-    const NSID: &'static str = "sh.tangled.repo.blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = BlobResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.blob
-pub struct BlobRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.blob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Blob<'de>;
-    type Response = BlobResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
-    ///Author email
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-    ///Author name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
-    pub when: jacquard_common::types::string::Datetime,
-}
-
 pub mod signature_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -975,51 +1034,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Email;
         type When;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Email = Unset;
         type When = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Email = Set<members::email>;
-        type When = S::When;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Email = S::Email;
-        type When = Set<members::when>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Email = S::Email;
         type When = S::When;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Name = S::Name;
+        type Email = Set<members::email>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Name = S::Name;
+        type Email = S::Email;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -1112,9 +1171,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
+    S::Name: signature_state::IsSet,
     S::Email: signature_state::IsSet,
     S::When: signature_state::IsSet,
-    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -1139,64 +1198,5 @@ where
             when: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.blob"
-    }
-    fn def_name() -> &'static str {
-        "signature"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_blob()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Submodule<'a> {
-    ///Branch to track in the submodule
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub branch: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Submodule name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Submodule repository URL
-    #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Submodule<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.blob"
-    }
-    fn def_name() -> &'static str {
-        "submodule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_blob()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -39,6 +39,204 @@ pub struct Definition<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DefinitionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Definition<'a>,
+}
+
+impl<'a> Definition<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DefinitionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefinitionRecord;
+impl jacquard_common::xrpc::XrpcResp for DefinitionRecord {
+    const NSID: &'static str = "app.certified.badge.definition";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DefinitionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
+    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Definition<'_> {
+    const NSID: &'static str = "app.certified.badge.definition";
+    type Record = DefinitionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DefinitionRecord {
+    const NSID: &'static str = "app.certified.badge.definition";
+    type Record = DefinitionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
+    fn nsid() -> &'static str {
+        "app.certified.badge.definition"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_certified_badge_definition()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.allowed_issuers {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "allowed_issuers",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.badge_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "badge_type",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.icon;
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.icon;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/svg+xml",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string(), "image/svg+xml".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod definition_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -49,67 +247,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Icon;
         type Title;
-        type CreatedAt;
         type BadgeType;
+        type CreatedAt;
+        type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Icon = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
         type BadgeType = Unset;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Icon = Set<members::icon>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type BadgeType = S::BadgeType;
+        type CreatedAt = Unset;
+        type Icon = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Icon = S::Icon;
         type Title = Set<members::title>;
+        type BadgeType = S::BadgeType;
         type CreatedAt = S::CreatedAt;
-        type BadgeType = S::BadgeType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Icon = S::Icon;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
-        type Icon = S::Icon;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type BadgeType = Set<members::badge_type>;
+        type CreatedAt = S::CreatedAt;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type BadgeType = S::BadgeType;
+        type CreatedAt = Set<members::created_at>;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Title = S::Title;
+        type BadgeType = S::BadgeType;
+        type CreatedAt = S::CreatedAt;
+        type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
     }
 }
 
@@ -262,10 +460,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Icon: definition_state::IsSet,
     S::Title: definition_state::IsSet,
-    S::CreatedAt: definition_state::IsSet,
     S::BadgeType: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
+    S::Icon: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -296,204 +494,6 @@ where
             title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Definition<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DefinitionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DefinitionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Definition<'a>,
-}
-
-impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
-    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Definition<'_> {
-    const NSID: &'static str = "app.certified.badge.definition";
-    type Record = DefinitionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DefinitionRecord;
-impl jacquard_common::xrpc::XrpcResp for DefinitionRecord {
-    const NSID: &'static str = "app.certified.badge.definition";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DefinitionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DefinitionRecord {
-    const NSID: &'static str = "app.certified.badge.definition";
-    type Record = DefinitionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
-    fn nsid() -> &'static str {
-        "app.certified.badge.definition"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_certified_badge_definition()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.allowed_issuers {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "allowed_issuers",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.badge_type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "badge_type",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.icon;
-            {
-                let size = value.blob().size;
-                if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        max: 1048576usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.icon;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/webp",
-                    "image/svg+xml",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string(), "image/svg+xml".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

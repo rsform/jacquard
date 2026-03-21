@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct SearchProfilesTypeahead<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchProfilesTypeaheadOutput<'a> {
+    #[serde(borrow)]
+    pub profiles: Vec<crate::games_gamesgamesgamesgames::ProfileSummaryView<'a>>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.searchProfilesTypeahead
+pub struct SearchProfilesTypeaheadResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchProfilesTypeaheadResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchProfilesTypeaheadOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchProfilesTypeahead<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchProfilesTypeaheadResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.searchProfilesTypeahead
+pub struct SearchProfilesTypeaheadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchProfilesTypeaheadRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchProfilesTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchProfilesTypeahead<'de>;
+    type Response = SearchProfilesTypeaheadResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod search_profiles_typeahead_state {
@@ -141,46 +183,4 @@ where
             q: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchProfilesTypeaheadOutput<'a> {
-    #[serde(borrow)]
-    pub profiles: Vec<crate::games_gamesgamesgamesgames::ProfileSummaryView<'a>>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.searchProfilesTypeahead
-pub struct SearchProfilesTypeaheadResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchProfilesTypeaheadResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchProfilesTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchProfilesTypeahead<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchProfilesTypeaheadResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.searchProfilesTypeahead
-pub struct SearchProfilesTypeaheadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchProfilesTypeaheadRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchProfilesTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchProfilesTypeahead<'de>;
-    type Response = SearchProfilesTypeaheadResponse;
 }

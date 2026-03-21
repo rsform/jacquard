@@ -31,6 +31,173 @@ pub struct Role<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// The role being assigned.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RoleRole<'a> {
+    Moderator,
+    Owner,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RoleRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Moderator => "moderator",
+            Self::Owner => "owner",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RoleRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "moderator" => Self::Moderator,
+            "owner" => Self::Owner,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RoleRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "moderator" => Self::Moderator,
+            "owner" => Self::Owner,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RoleRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RoleRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RoleRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RoleRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RoleRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RoleRole<'_> {
+    type Output = RoleRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RoleRole::Moderator => RoleRole::Moderator,
+            RoleRole::Owner => RoleRole::Owner,
+            RoleRole::Other(v) => RoleRole::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RoleGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Role<'a>,
+}
+
+impl<'a> Role<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RoleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RoleRecord;
+impl jacquard_common::xrpc::XrpcResp for RoleRecord {
+    const NSID: &'static str = "app.protoimsg.chat.role";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RoleGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RoleGetRecordOutput<'_>> for Role<'_> {
+    fn from(output: RoleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Role<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.role";
+    type Record = RoleRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RoleRecord {
+    const NSID: &'static str = "app.protoimsg.chat.role";
+    type Record = RoleRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Role<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.role"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_role()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod role_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -41,67 +208,67 @@ pub mod role_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Role;
-        type Room;
         type CreatedAt;
+        type Room;
+        type Role;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Role = Unset;
-        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Role = S::Role;
-        type Room = S::Room;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Subject = S::Subject;
-        type Role = Set<members::role>;
-        type Room = S::Room;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Subject = S::Subject;
-        type Role = S::Role;
-        type Room = Set<members::room>;
-        type CreatedAt = S::CreatedAt;
+        type Room = Unset;
+        type Role = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Role = S::Role;
-        type Room = S::Room;
         type CreatedAt = Set<members::created_at>;
+        type Room = S::Room;
+        type Role = S::Role;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = Set<members::room>;
+        type Role = S::Role;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = S::Room;
+        type Role = Set<members::role>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = S::Room;
+        type Role = S::Role;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `role` field
-        pub struct role(());
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `room` field
+        pub struct room(());
+        ///Marker type for the `role` field
+        pub struct role(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -214,10 +381,10 @@ where
 impl<'a, S> RoleBuilder<'a, S>
 where
     S: role_state::State,
-    S::Subject: role_state::IsSet,
-    S::Role: role_state::IsSet,
-    S::Room: role_state::IsSet,
     S::CreatedAt: role_state::IsSet,
+    S::Room: role_state::IsSet,
+    S::Role: role_state::IsSet,
+    S::Subject: role_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Role<'a> {
@@ -244,173 +411,6 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Role<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RoleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// The role being assigned.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RoleRole<'a> {
-    Moderator,
-    Owner,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RoleRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Moderator => "moderator",
-            Self::Owner => "owner",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RoleRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "moderator" => Self::Moderator,
-            "owner" => Self::Owner,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RoleRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "moderator" => Self::Moderator,
-            "owner" => Self::Owner,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RoleRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RoleRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RoleRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RoleRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RoleRole<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RoleRole<'_> {
-    type Output = RoleRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RoleRole::Moderator => RoleRole::Moderator,
-            RoleRole::Owner => RoleRole::Owner,
-            RoleRole::Other(v) => RoleRole::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RoleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Role<'a>,
-}
-
-impl From<RoleGetRecordOutput<'_>> for Role<'_> {
-    fn from(output: RoleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Role<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.role";
-    type Record = RoleRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RoleRecord;
-impl jacquard_common::xrpc::XrpcResp for RoleRecord {
-    const NSID: &'static str = "app.protoimsg.chat.role";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RoleGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RoleRecord {
-    const NSID: &'static str = "app.protoimsg.chat.role";
-    type Record = RoleRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Role<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.role"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_role()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

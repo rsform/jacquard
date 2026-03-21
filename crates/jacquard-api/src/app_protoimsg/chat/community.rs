@@ -30,6 +30,195 @@ pub struct CommunityGroup<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// A member in a community group.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CommunityMember<'a> {
+    ///When this member was added.
+    pub added_at: jacquard_common::types::string::Datetime,
+    ///The member's DID.
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+/// The user's community list. Portable across any app implementing the Lexicon.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Community<'a> {
+    ///Named groups of community members, like AIM's buddy list categories.
+    #[serde(borrow)]
+    pub groups: Vec<crate::app_protoimsg::chat::community::CommunityGroup<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CommunityGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Community<'a>,
+}
+
+impl<'a> Community<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CommunityRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityGroup<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.community"
+    }
+    fn def_name() -> &'static str {
+        "communityGroup"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_community()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.members;
+            #[allow(unused_comparisons)]
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "members",
+                    ),
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityMember<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.community"
+    }
+    fn def_name() -> &'static str {
+        "communityMember"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_community()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CommunityRecord;
+impl jacquard_common::xrpc::XrpcResp for CommunityRecord {
+    const NSID: &'static str = "app.protoimsg.chat.community";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CommunityGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CommunityGetRecordOutput<'_>> for Community<'_> {
+    fn from(output: CommunityGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Community<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.community";
+    type Record = CommunityRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CommunityRecord {
+    const NSID: &'static str = "app.protoimsg.chat.community";
+    type Record = CommunityRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Community<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.community"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_community()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.groups;
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "groups",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_community_group_is_inner_circle() -> std::option::Option<bool> {
     Some(false)
 }
@@ -44,37 +233,37 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Members;
         type Name;
+        type Members;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Members = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembers<S> {}
-    impl<S: State> State for SetMembers<S> {
-        type Members = Set<members::members>;
-        type Name = S::Name;
+        type Members = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Members = S::Members;
         type Name = Set<members::name>;
+        type Members = S::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Name = S::Name;
+        type Members = Set<members::members>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `members` field
+        pub struct members(());
     }
 }
 
@@ -163,8 +352,8 @@ where
 impl<'a, S> CommunityGroupBuilder<'a, S>
 where
     S: community_group_state::State,
-    S::Members: community_group_state::IsSet,
     S::Name: community_group_state::IsSet,
+    S::Members: community_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityGroup<'a> {
@@ -391,69 +580,6 @@ fn lexicon_doc_app_protoimsg_chat_community() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityGroup<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.community"
-    }
-    fn def_name() -> &'static str {
-        "communityGroup"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_community()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.members;
-            #[allow(unused_comparisons)]
-            if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "members",
-                    ),
-                    max: 500usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A member in a community group.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunityMember<'a> {
-    ///When this member was added.
-    pub added_at: jacquard_common::types::string::Datetime,
-    ///The member's DID.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod community_member_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -594,41 +720,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityMember<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.community"
-    }
-    fn def_name() -> &'static str {
-        "communityMember"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_community()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The user's community list. Portable across any app implementing the Lexicon.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Community<'a> {
-    ///Named groups of community members, like AIM's buddy list categories.
-    #[serde(borrow)]
-    pub groups: Vec<crate::app_protoimsg::chat::community::CommunityGroup<'a>>,
-}
-
 pub mod community_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -733,96 +824,5 @@ where
             groups: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Community<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CommunityRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Community<'a>,
-}
-
-impl From<CommunityGetRecordOutput<'_>> for Community<'_> {
-    fn from(output: CommunityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Community<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.community";
-    type Record = CommunityRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CommunityRecord;
-impl jacquard_common::xrpc::XrpcResp for CommunityRecord {
-    const NSID: &'static str = "app.protoimsg.chat.community";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommunityGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CommunityRecord {
-    const NSID: &'static str = "app.protoimsg.chat.community";
-    type Record = CommunityRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Community<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.community"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_community()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.groups;
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "groups",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

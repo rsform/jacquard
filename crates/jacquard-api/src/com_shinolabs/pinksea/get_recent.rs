@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct GetRecent {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecentOutput<'a> {
+    #[serde(borrow)]
+    pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
+}
+
+/// Response type for
+///com.shinolabs.pinksea.getRecent
+pub struct GetRecentResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRecentResponse {
+    const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRecentOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetRecent {
+    const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecentResponse;
+}
+
+/// Endpoint type for
+///com.shinolabs.pinksea.getRecent
+pub struct GetRecentRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecentRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getRecent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecent;
+    type Response = GetRecentResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_recent_state {
@@ -116,46 +158,4 @@ where
             since: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecentOutput<'a> {
-    #[serde(borrow)]
-    pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
-}
-
-/// Response type for
-///com.shinolabs.pinksea.getRecent
-pub struct GetRecentResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRecentResponse {
-    const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecentOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetRecent {
-    const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRecentResponse;
-}
-
-/// Endpoint type for
-///com.shinolabs.pinksea.getRecent
-pub struct GetRecentRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRecentRequest {
-    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getRecent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecent;
-    type Response = GetRecentResponse;
 }

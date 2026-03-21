@@ -30,6 +30,84 @@ pub struct ListingRecord<'a> {
     pub value: std::option::Option<crate::place_atwork::listing::Listing<'a>>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListings<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identity: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListingsOutput<'a> {
+    #[serde(borrow)]
+    pub listings: Vec<crate::place_atwork::get_listings::ListingRecord<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
+    fn nsid() -> &'static str {
+        "place.atwork.getListings"
+    }
+    fn def_name() -> &'static str {
+        "listingRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_atwork_getListings()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///place.atwork.getListings
+pub struct GetListingsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetListingsResponse {
+    const NSID: &'static str = "place.atwork.getListings";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetListingsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetListings<'a> {
+    const NSID: &'static str = "place.atwork.getListings";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListingsResponse;
+}
+
+/// Endpoint type for
+///place.atwork.getListings
+pub struct GetListingsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {
+    const PATH: &'static str = "/xrpc/place.atwork.getListings";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListings<'de>;
+    type Response = GetListingsResponse;
+}
+
 pub mod listing_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -347,42 +425,6 @@ fn lexicon_doc_place_atwork_getListings() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
-    fn nsid() -> &'static str {
-        "place.atwork.getListings"
-    }
-    fn def_name() -> &'static str {
-        "listingRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_atwork_getListings()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identity: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod get_listings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -470,46 +512,4 @@ where
             tag: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListingsOutput<'a> {
-    #[serde(borrow)]
-    pub listings: Vec<crate::place_atwork::get_listings::ListingRecord<'a>>,
-}
-
-/// Response type for
-///place.atwork.getListings
-pub struct GetListingsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetListingsResponse {
-    const NSID: &'static str = "place.atwork.getListings";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListingsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetListings<'a> {
-    const NSID: &'static str = "place.atwork.getListings";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetListingsResponse;
-}
-
-/// Endpoint type for
-///place.atwork.getListings
-pub struct GetListingsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {
-    const PATH: &'static str = "/xrpc/place.atwork.getListings";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetListings<'de>;
-    type Response = GetListingsResponse;
 }

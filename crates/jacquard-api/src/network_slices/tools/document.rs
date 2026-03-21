@@ -26,6 +26,547 @@ pub struct CodeBlock<'a> {
     pub lang: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// A heading block (h1-h3) with optional inline formatting
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Heading<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<
+        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+    >,
+    pub level: i64,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+/// An embedded image with alt text
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ImageEmbed<'a> {
+    ///Alt text for accessibility
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Document<'a> {
+    ///Document content as array of blocks
+    #[serde(borrow)]
+    pub blocks: Vec<DocumentBlocksItem<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///URL-friendly identifier, unique per author
+    #[serde(borrow)]
+    pub slug: jacquard_common::CowStr<'a>,
+    ///Document title
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DocumentBlocksItem<'a> {
+    #[serde(rename = "network.slices.tools.document#paragraph")]
+    Paragraph(Box<crate::network_slices::tools::document::Paragraph<'a>>),
+    #[serde(rename = "network.slices.tools.document#heading")]
+    Heading(Box<crate::network_slices::tools::document::Heading<'a>>),
+    #[serde(rename = "network.slices.tools.document#codeBlock")]
+    CodeBlock(Box<crate::network_slices::tools::document::CodeBlock<'a>>),
+    #[serde(rename = "network.slices.tools.document#quote")]
+    Quote(Box<crate::network_slices::tools::document::Quote<'a>>),
+    #[serde(rename = "network.slices.tools.document#tangledEmbed")]
+    TangledEmbed(Box<crate::network_slices::tools::document::TangledEmbed<'a>>),
+    #[serde(rename = "network.slices.tools.document#imageEmbed")]
+    ImageEmbed(Box<crate::network_slices::tools::document::ImageEmbed<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Document<'a>,
+}
+
+/// A paragraph block with optional inline formatting
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Paragraph<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<
+        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+    >,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+/// A blockquote with optional inline formatting
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Quote<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<
+        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
+    >,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+/// An embedded Tangled repo card
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TangledEmbed<'a> {
+    ///The repo owner's handle
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    ///The repository name
+    #[serde(borrow)]
+    pub repo: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Document<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DocumentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "codeBlock"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.code;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "code",
+                    ),
+                    max: 20000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.lang {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lang",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "heading"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value > 3i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 3i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "imageEmbed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alt {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.image;
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.image;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentRecord;
+impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
+    const NSID: &'static str = "network.slices.tools.document";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DocumentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
+    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Document<'_> {
+    const NSID: &'static str = "network.slices.tools.document";
+    type Record = DocumentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DocumentRecord {
+    const NSID: &'static str = "network.slices.tools.document";
+    type Record = DocumentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.slug;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slug",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "paragraph"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "quote"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledEmbed<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.document"
+    }
+    fn def_name() -> &'static str {
+        "tangledEmbed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_document()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.handle;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "handle",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.repo;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repo",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_network_slices_tools_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -512,71 +1053,6 @@ fn lexicon_doc_network_slices_tools_document() -> ::jacquard_lexicon::lexicon::L
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "codeBlock"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.code;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "code",
-                    ),
-                    max: 20000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.lang {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lang",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A heading block (h1-h3) with optional inline formatting
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Heading<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<
-        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
-    >,
-    pub level: i64,
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
 pub mod heading_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -743,81 +1219,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "heading"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 3i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An embedded image with alt text
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageEmbed<'a> {
-    ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub image: jacquard_common::types::blob::BlobRef<'a>,
-}
-
 pub mod image_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -939,105 +1340,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "imageEmbed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alt {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.image;
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.image;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Document<'a> {
-    ///Document content as array of blocks
-    #[serde(borrow)]
-    pub blocks: Vec<DocumentBlocksItem<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///URL-friendly identifier, unique per author
-    #[serde(borrow)]
-    pub slug: jacquard_common::CowStr<'a>,
-    ///Document title
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod document_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1048,67 +1350,67 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
-        type CreatedAt;
         type Title;
         type Slug;
+        type CreatedAt;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Blocks = S::Blocks;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Slug = S::Slug;
+        type CreatedAt = Unset;
+        type Blocks = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Blocks = S::Blocks;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type Slug = S::Slug;
+        type CreatedAt = S::CreatedAt;
+        type Blocks = S::Blocks;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Blocks = S::Blocks;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type Slug = Set<members::slug>;
+        type CreatedAt = S::CreatedAt;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Slug = S::Slug;
+        type CreatedAt = Set<members::created_at>;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Title = S::Title;
+        type Slug = S::Slug;
+        type CreatedAt = S::CreatedAt;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -1241,10 +1543,10 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Blocks: document_state::IsSet,
-    S::CreatedAt: document_state::IsSet,
     S::Title: document_state::IsSet,
     S::Slug: document_state::IsSet,
+    S::CreatedAt: document_state::IsSet,
+    S::Blocks: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -1273,307 +1575,5 @@ where
             updated_at: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Document<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DocumentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DocumentBlocksItem<'a> {
-    #[serde(rename = "network.slices.tools.document#paragraph")]
-    Paragraph(Box<crate::network_slices::tools::document::Paragraph<'a>>),
-    #[serde(rename = "network.slices.tools.document#heading")]
-    Heading(Box<crate::network_slices::tools::document::Heading<'a>>),
-    #[serde(rename = "network.slices.tools.document#codeBlock")]
-    CodeBlock(Box<crate::network_slices::tools::document::CodeBlock<'a>>),
-    #[serde(rename = "network.slices.tools.document#quote")]
-    Quote(Box<crate::network_slices::tools::document::Quote<'a>>),
-    #[serde(rename = "network.slices.tools.document#tangledEmbed")]
-    TangledEmbed(Box<crate::network_slices::tools::document::TangledEmbed<'a>>),
-    #[serde(rename = "network.slices.tools.document#imageEmbed")]
-    ImageEmbed(Box<crate::network_slices::tools::document::ImageEmbed<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Document<'a>,
-}
-
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Document<'_> {
-    const NSID: &'static str = "network.slices.tools.document";
-    type Record = DocumentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DocumentRecord;
-impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
-    const NSID: &'static str = "network.slices.tools.document";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DocumentRecord {
-    const NSID: &'static str = "network.slices.tools.document";
-    type Record = DocumentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.slug;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A paragraph block with optional inline formatting
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Paragraph<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<
-        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
-    >,
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "paragraph"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A blockquote with optional inline formatting
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<
-        Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
-    >,
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "quote"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An embedded Tangled repo card
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TangledEmbed<'a> {
-    ///The repo owner's handle
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    ///The repository name
-    #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledEmbed<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.document"
-    }
-    fn def_name() -> &'static str {
-        "tangledEmbed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_document()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.handle;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "handle",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.repo;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repo",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

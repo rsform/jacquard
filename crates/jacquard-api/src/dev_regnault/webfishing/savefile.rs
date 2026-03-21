@@ -24,6 +24,84 @@ pub struct Savefile<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SavefileGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Savefile<'a>,
+}
+
+impl<'a> Savefile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SavefileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SavefileRecord;
+impl jacquard_common::xrpc::XrpcResp for SavefileRecord {
+    const NSID: &'static str = "dev.regnault.webfishing.savefile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SavefileGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SavefileGetRecordOutput<'_>> for Savefile<'_> {
+    fn from(output: SavefileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Savefile<'_> {
+    const NSID: &'static str = "dev.regnault.webfishing.savefile";
+    type Record = SavefileRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SavefileRecord {
+    const NSID: &'static str = "dev.regnault.webfishing.savefile";
+    type Record = SavefileRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Savefile<'a> {
+    fn nsid() -> &'static str {
+        "dev.regnault.webfishing.savefile"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_regnault_webfishing_savefile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod savefile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,37 +112,37 @@ pub mod savefile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -137,8 +215,8 @@ where
 impl<'a, S> SavefileBuilder<'a, S>
 where
     S: savefile_state::State,
-    S::Uri: savefile_state::IsSet,
     S::Name: savefile_state::IsSet,
+    S::Uri: savefile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Savefile<'a> {
@@ -161,84 +239,6 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Savefile<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SavefileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SavefileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Savefile<'a>,
-}
-
-impl From<SavefileGetRecordOutput<'_>> for Savefile<'_> {
-    fn from(output: SavefileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Savefile<'_> {
-    const NSID: &'static str = "dev.regnault.webfishing.savefile";
-    type Record = SavefileRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SavefileRecord;
-impl jacquard_common::xrpc::XrpcResp for SavefileRecord {
-    const NSID: &'static str = "dev.regnault.webfishing.savefile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SavefileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SavefileRecord {
-    const NSID: &'static str = "dev.regnault.webfishing.savefile";
-    type Record = SavefileRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Savefile<'a> {
-    fn nsid() -> &'static str {
-        "dev.regnault.webfishing.savefile"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_regnault_webfishing_savefile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

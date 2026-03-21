@@ -25,6 +25,23 @@ pub struct Markdoc<'a> {
     pub markdoc: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdoc<'a> {
+    fn nsid() -> &'static str {
+        "art.cllctv.content.markdoc"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_art_cllctv_content_markdoc()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_art_cllctv_content_markdoc() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -88,22 +105,5 @@ fn lexicon_doc_art_cllctv_content_markdoc() -> ::jacquard_lexicon::lexicon::Lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdoc<'a> {
-    fn nsid() -> &'static str {
-        "art.cllctv.content.markdoc"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_art_cllctv_content_markdoc()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

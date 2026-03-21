@@ -20,6 +20,112 @@ pub struct ListSecrets<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListSecretsOutput<'a> {
+    #[serde(borrow)]
+    pub secrets: Vec<crate::sh_tangled::repo::list_secrets::Secret<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Secret<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub key: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///sh.tangled.repo.listSecrets
+pub struct ListSecretsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListSecretsResponse {
+    const NSID: &'static str = "sh.tangled.repo.listSecrets";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListSecretsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListSecrets<'a> {
+    const NSID: &'static str = "sh.tangled.repo.listSecrets";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListSecretsResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.listSecrets
+pub struct ListSecretsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.listSecrets";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListSecrets<'de>;
+    type Response = ListSecretsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.listSecrets"
+    }
+    fn def_name() -> &'static str {
+        "secret"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_listSecrets()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod list_secrets_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -111,69 +217,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListSecretsOutput<'a> {
-    #[serde(borrow)]
-    pub secrets: Vec<crate::sh_tangled::repo::list_secrets::Secret<'a>>,
-}
-
-/// Response type for
-///sh.tangled.repo.listSecrets
-pub struct ListSecretsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListSecretsResponse {
-    const NSID: &'static str = "sh.tangled.repo.listSecrets";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListSecretsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListSecrets<'a> {
-    const NSID: &'static str = "sh.tangled.repo.listSecrets";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListSecretsResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.listSecrets
-pub struct ListSecretsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.listSecrets";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListSecrets<'de>;
-    type Response = ListSecretsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Secret<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub created_by: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod secret_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -184,65 +227,65 @@ pub mod secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
-        type Key;
         type CreatedBy;
+        type Key;
+        type Repo;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
-        type Key = Unset;
         type CreatedBy = Unset;
+        type Key = Unset;
+        type Repo = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type CreatedBy = Set<members::created_by>;
         type Key = S::Key;
-        type CreatedBy = S::CreatedBy;
+        type Repo = S::Repo;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Repo = S::Repo;
-        type Key = Set<members::key>;
         type CreatedBy = S::CreatedBy;
+        type Key = Set<members::key>;
+        type Repo = S::Repo;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Repo = S::Repo;
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type CreatedBy = S::CreatedBy;
         type Key = S::Key;
-        type CreatedBy = Set<members::created_by>;
+        type Repo = Set<members::repo>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type Key = S::Key;
         type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type Repo = S::Repo;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -357,9 +400,9 @@ where
 impl<'a, S> SecretBuilder<'a, S>
 where
     S: secret_state::State,
-    S::Repo: secret_state::IsSet,
-    S::Key: secret_state::IsSet,
     S::CreatedBy: secret_state::IsSet,
+    S::Key: secret_state::IsSet,
+    S::Repo: secret_state::IsSet,
     S::CreatedAt: secret_state::IsSet,
 {
     /// Build the final struct
@@ -538,48 +581,5 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.listSecrets"
-    }
-    fn def_name() -> &'static str {
-        "secret"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_listSecrets()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

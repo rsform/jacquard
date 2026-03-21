@@ -21,6 +21,89 @@ pub struct CreateDraft<'a> {
     pub draft: crate::app_bsky::draft::Draft<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateDraftOutput<'a> {
+    ///The ID of the created draft.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateDraftError<'a> {
+    /// Trying to insert a new draft when the limit was already reached.
+    #[serde(rename = "DraftLimitReached")]
+    DraftLimitReached(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CreateDraftError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::DraftLimitReached(msg) => {
+                write!(f, "DraftLimitReached")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.draft.createDraft
+pub struct CreateDraftResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateDraftResponse {
+    const NSID: &'static str = "app.bsky.draft.createDraft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateDraftOutput<'de>;
+    type Err<'de> = CreateDraftError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
+    const NSID: &'static str = "app.bsky.draft.createDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateDraftResponse;
+}
+
+/// Endpoint type for
+///app.bsky.draft.createDraft
+pub struct CreateDraftRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateDraftRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.draft.createDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateDraft<'de>;
+    type Response = CreateDraftResponse;
+}
+
 pub mod create_draft_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,87 +205,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateDraftOutput<'a> {
-    ///The ID of the created draft.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateDraftError<'a> {
-    /// Trying to insert a new draft when the limit was already reached.
-    #[serde(rename = "DraftLimitReached")]
-    DraftLimitReached(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CreateDraftError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::DraftLimitReached(msg) => {
-                write!(f, "DraftLimitReached")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.draft.createDraft
-pub struct CreateDraftResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateDraftResponse {
-    const NSID: &'static str = "app.bsky.draft.createDraft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateDraftOutput<'de>;
-    type Err<'de> = CreateDraftError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
-    const NSID: &'static str = "app.bsky.draft.createDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateDraftResponse;
-}
-
-/// Endpoint type for
-///app.bsky.draft.createDraft
-pub struct CreateDraftRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateDraftRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.draft.createDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateDraft<'de>;
-    type Response = CreateDraftResponse;
 }

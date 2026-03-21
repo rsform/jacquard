@@ -114,6 +114,511 @@ pub struct Scrobble<'a> {
     pub youtube_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScrobbleGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Scrobble<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScrobbleViewBasic<'a> {
+    ///The album of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the album.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ///The artist of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the artist.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ///The album art URL of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The timestamp when the scrobble was created.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The unique identifier of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub liked: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub likes_count: std::option::Option<i64>,
+    ///The SHA256 hash of the scrobble data.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The title of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The handle of the user who created the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The avatar URL of the user who created the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user_avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The display name of the user who created the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user_display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScrobbleViewDetailed<'a> {
+    ///The album of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the album.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ///The artist of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the artist.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artists: std::option::Option<
+        Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
+    >,
+    ///The album art URL of the song.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The timestamp when the scrobble was created.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The unique identifier of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The number of listeners
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub listeners: std::option::Option<i64>,
+    ///The number of scrobbles for this song
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub scrobbles: std::option::Option<i64>,
+    ///The SHA256 hash of the scrobble data.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The title of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URI of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///The handle of the user who created the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Scrobble<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ScrobbleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ScrobbleRecord;
+impl jacquard_common::xrpc::XrpcResp for ScrobbleRecord {
+    const NSID: &'static str = "app.rocksky.scrobble";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ScrobbleGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ScrobbleGetRecordOutput<'_>> for Scrobble<'_> {
+    fn from(output: ScrobbleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Scrobble<'_> {
+    const NSID: &'static str = "app.rocksky.scrobble";
+    type Record = ScrobbleRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ScrobbleRecord {
+    const NSID: &'static str = "app.rocksky.scrobble";
+    type Record = ScrobbleRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.scrobble"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_scrobble()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.album;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "album",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.album;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "album",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.album_art {
+            {
+                let size = value.blob().size;
+                if size > 2000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "album_art",
+                        ),
+                        max: 2000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.album_art {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "album_art",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.album_artist;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "album_artist",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.album_artist;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "album_artist",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.artist;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "artist",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.artist;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "artist",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.composer {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "composer",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.copyright_message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "copyright_message",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.disc_number {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "disc_number",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.duration;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.genre {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "genre",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.label {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.lyrics {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lyrics",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.track_number {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "track_number",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.wiki {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "wiki",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.scrobble.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewBasic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_scrobble_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.scrobble.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewDetailed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_scrobble_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod scrobble_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,105 +629,105 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type AlbumArtist;
-        type CreatedAt;
         type Title;
-        type Duration;
+        type Artist;
         type Album;
+        type AlbumArtist;
+        type Duration;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type AlbumArtist = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
-        type Duration = Unset;
+        type Artist = Unset;
         type Album = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type AlbumArtist = S::AlbumArtist;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type Album = S::Album;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
-    impl<S: State> State for SetAlbumArtist<S> {
-        type Artist = S::Artist;
-        type AlbumArtist = Set<members::album_artist>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type Album = S::Album;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Duration = S::Duration;
-        type Album = S::Album;
+        type AlbumArtist = Unset;
+        type Duration = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
-        type Duration = S::Duration;
-        type Album = S::Album;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
         type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Duration = Set<members::duration>;
         type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Artist = Set<members::artist>;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `album` field to Set
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
-        type Duration = S::Duration;
+        type Artist = S::Artist;
         type Album = Set<members::album>;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
+    impl<S: State> State for SetAlbumArtist<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = Set<members::album_artist>;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = Set<members::duration>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `album` field
         pub struct album(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -745,12 +1250,12 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
 impl<'a, S> ScrobbleBuilder<'a, S>
 where
     S: scrobble_state::State,
-    S::Artist: scrobble_state::IsSet,
-    S::AlbumArtist: scrobble_state::IsSet,
-    S::CreatedAt: scrobble_state::IsSet,
     S::Title: scrobble_state::IsSet,
-    S::Duration: scrobble_state::IsSet,
+    S::Artist: scrobble_state::IsSet,
     S::Album: scrobble_state::IsSet,
+    S::AlbumArtist: scrobble_state::IsSet,
+    S::Duration: scrobble_state::IsSet,
+    S::CreatedAt: scrobble_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scrobble<'a> {
@@ -819,338 +1324,6 @@ where
             youtube_link: self.__unsafe_private_named.24,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Scrobble<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ScrobbleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScrobbleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Scrobble<'a>,
-}
-
-impl From<ScrobbleGetRecordOutput<'_>> for Scrobble<'_> {
-    fn from(output: ScrobbleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Scrobble<'_> {
-    const NSID: &'static str = "app.rocksky.scrobble";
-    type Record = ScrobbleRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ScrobbleRecord;
-impl jacquard_common::xrpc::XrpcResp for ScrobbleRecord {
-    const NSID: &'static str = "app.rocksky.scrobble";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ScrobbleGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ScrobbleRecord {
-    const NSID: &'static str = "app.rocksky.scrobble";
-    type Record = ScrobbleRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.scrobble"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_scrobble()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.album;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "album",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.album;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "album",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.album_art {
-            {
-                let size = value.blob().size;
-                if size > 2000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "album_art",
-                        ),
-                        max: 2000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.album_art {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "album_art",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.album_artist;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "album_artist",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.album_artist;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "album_artist",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.artist;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.artist;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.composer {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "composer",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.copyright_message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "copyright_message",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.disc_number {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disc_number",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.duration;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.genre {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "genre",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.label {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.lyrics {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lyrics",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.track_number {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "track_number",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.wiki {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "wiki",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -1697,76 +1870,6 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
             map
         },
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScrobbleViewBasic<'a> {
-    ///The album of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///The artist of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///The album art URL of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The timestamp when the scrobble was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The unique identifier of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub liked: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub likes_count: std::option::Option<i64>,
-    ///The SHA256 hash of the scrobble data.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The title of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The handle of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The avatar URL of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user_avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The display name of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user_display_name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -2398,108 +2501,5 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.scrobble.defs"
-    }
-    fn def_name() -> &'static str {
-        "scrobbleViewBasic"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_scrobble_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScrobbleViewDetailed<'a> {
-    ///The album of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///The artist of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artists: std::option::Option<
-        Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
-    >,
-    ///The album art URL of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The timestamp when the scrobble was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The unique identifier of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The number of listeners
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub listeners: std::option::Option<i64>,
-    ///The number of scrobbles for this song
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scrobbles: std::option::Option<i64>,
-    ///The SHA256 hash of the scrobble data.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The title of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URI of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///The handle of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.scrobble.defs"
-    }
-    fn def_name() -> &'static str {
-        "scrobbleViewDetailed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_scrobble_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

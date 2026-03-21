@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,55 @@ pub struct GetListMutes<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListMutesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
+}
+
+/// Response type for
+///app.bsky.graph.getListMutes
+pub struct GetListMutesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetListMutesResponse {
+    const NSID: &'static str = "app.bsky.graph.getListMutes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetListMutesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetListMutes<'a> {
+    const NSID: &'static str = "app.bsky.graph.getListMutes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListMutesResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getListMutes
+pub struct GetListMutesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListMutesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getListMutes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListMutes<'de>;
+    type Response = GetListMutesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_list_mutes_state {
@@ -116,49 +161,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListMutesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
-}
-
-/// Response type for
-///app.bsky.graph.getListMutes
-pub struct GetListMutesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetListMutesResponse {
-    const NSID: &'static str = "app.bsky.graph.getListMutes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListMutesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetListMutes<'a> {
-    const NSID: &'static str = "app.bsky.graph.getListMutes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetListMutesResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getListMutes
-pub struct GetListMutesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetListMutesRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getListMutes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetListMutes<'de>;
-    type Response = GetListMutesResponse;
 }

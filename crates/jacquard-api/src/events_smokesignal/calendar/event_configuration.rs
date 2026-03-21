@@ -32,6 +32,96 @@ pub struct EventConfiguration<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventConfigurationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: EventConfiguration<'a>,
+}
+
+impl<'a> EventConfiguration<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EventConfigurationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EventConfigurationRecord;
+impl jacquard_common::xrpc::XrpcResp for EventConfigurationRecord {
+    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EventConfigurationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EventConfigurationGetRecordOutput<'_>> for EventConfiguration<'_> {
+    fn from(output: EventConfigurationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for EventConfiguration<'_> {
+    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
+    type Record = EventConfigurationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EventConfigurationRecord {
+    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
+    type Record = EventConfigurationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventConfiguration<'a> {
+    fn nsid() -> &'static str {
+        "events.smokesignal.calendar.eventConfiguration"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_events_smokesignal_calendar_eventConfiguration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.rsvp_redirect_url {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rsvp_redirect_url",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod event_configuration_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -152,96 +242,6 @@ where
             rsvp_redirect_url: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> EventConfiguration<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EventConfigurationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventConfigurationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: EventConfiguration<'a>,
-}
-
-impl From<EventConfigurationGetRecordOutput<'_>> for EventConfiguration<'_> {
-    fn from(output: EventConfigurationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for EventConfiguration<'_> {
-    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
-    type Record = EventConfigurationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EventConfigurationRecord;
-impl jacquard_common::xrpc::XrpcResp for EventConfigurationRecord {
-    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventConfigurationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EventConfigurationRecord {
-    const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
-    type Record = EventConfigurationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventConfiguration<'a> {
-    fn nsid() -> &'static str {
-        "events.smokesignal.calendar.eventConfiguration"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_events_smokesignal_calendar_eventConfiguration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.rsvp_redirect_url {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rsvp_redirect_url",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

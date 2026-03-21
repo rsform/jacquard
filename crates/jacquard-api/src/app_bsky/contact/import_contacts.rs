@@ -25,146 +25,6 @@ pub struct ImportContacts<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
-pub mod import_contacts_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Token;
-        type Contacts;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Token = Unset;
-        type Contacts = Unset;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Token = Set<members::token>;
-        type Contacts = S::Contacts;
-    }
-    ///State transition - sets the `contacts` field to Set
-    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContacts<S> {}
-    impl<S: State> State for SetContacts<S> {
-        type Token = S::Token;
-        type Contacts = Set<members::contacts>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `token` field
-        pub struct token(());
-        ///Marker type for the `contacts` field
-        pub struct contacts(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ImportContactsBuilder<'a, S: import_contacts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> ImportContacts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImportContactsBuilder<'a, import_contacts_state::Empty> {
-        ImportContactsBuilder::new()
-    }
-}
-
-impl<'a> ImportContactsBuilder<'a, import_contacts_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ImportContactsBuilder<'a, S>
-where
-    S: import_contacts_state::State,
-    S::Contacts: import_contacts_state::IsUnset,
-{
-    /// Set the `contacts` field (required)
-    pub fn contacts(
-        mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> ImportContactsBuilder<'a, import_contacts_state::SetContacts<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ImportContactsBuilder<'a, S>
-where
-    S: import_contacts_state::State,
-    S::Token: import_contacts_state::IsUnset,
-{
-    /// Set the `token` field (required)
-    pub fn token(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> ImportContactsBuilder<'a, import_contacts_state::SetToken<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ImportContactsBuilder<'a, S>
-where
-    S: import_contacts_state::State,
-    S::Token: import_contacts_state::IsSet,
-    S::Contacts: import_contacts_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> ImportContacts<'a> {
-        ImportContacts {
-            contacts: self.__unsafe_private_named.0.unwrap(),
-            token: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> ImportContacts<'a> {
-        ImportContacts {
-            contacts: self.__unsafe_private_named.0.unwrap(),
-            token: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -282,4 +142,144 @@ impl jacquard_common::xrpc::XrpcEndpoint for ImportContactsRequest {
     );
     type Request<'de> = ImportContacts<'de>;
     type Response = ImportContactsResponse;
+}
+
+pub mod import_contacts_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Contacts;
+        type Token;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Contacts = Unset;
+        type Token = Unset;
+    }
+    ///State transition - sets the `contacts` field to Set
+    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContacts<S> {}
+    impl<S: State> State for SetContacts<S> {
+        type Contacts = Set<members::contacts>;
+        type Token = S::Token;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type Contacts = S::Contacts;
+        type Token = Set<members::token>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `contacts` field
+        pub struct contacts(());
+        ///Marker type for the `token` field
+        pub struct token(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImportContactsBuilder<'a, S: import_contacts_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ImportContacts<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImportContactsBuilder<'a, import_contacts_state::Empty> {
+        ImportContactsBuilder::new()
+    }
+}
+
+impl<'a> ImportContactsBuilder<'a, import_contacts_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImportContactsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImportContactsBuilder<'a, S>
+where
+    S: import_contacts_state::State,
+    S::Contacts: import_contacts_state::IsUnset,
+{
+    /// Set the `contacts` field (required)
+    pub fn contacts(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> ImportContactsBuilder<'a, import_contacts_state::SetContacts<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImportContactsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImportContactsBuilder<'a, S>
+where
+    S: import_contacts_state::State,
+    S::Token: import_contacts_state::IsUnset,
+{
+    /// Set the `token` field (required)
+    pub fn token(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ImportContactsBuilder<'a, import_contacts_state::SetToken<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ImportContactsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImportContactsBuilder<'a, S>
+where
+    S: import_contacts_state::State,
+    S::Contacts: import_contacts_state::IsSet,
+    S::Token: import_contacts_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ImportContacts<'a> {
+        ImportContacts {
+            contacts: self.__unsafe_private_named.0.unwrap(),
+            token: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ImportContacts<'a> {
+        ImportContacts {
+            contacts: self.__unsafe_private_named.0.unwrap(),
+            token: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }

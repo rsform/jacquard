@@ -19,6 +19,371 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bold<'a> {}
+/// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ByteSlice<'a> {
+    pub byte_end: i64,
+    pub byte_start: i64,
+}
+
+/// Facet feature for inline code.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Code<'a> {}
+/// Facet feature for highlighted text.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Highlight<'a> {}
+/// Facet feature for italic text
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Italic<'a> {}
+/// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Link<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::UriValue<'a>,
+}
+
+/// Annotation of a sub-string within rich text.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Facet<'a> {
+    #[serde(borrow)]
+    pub features: Vec<FacetFeaturesItem<'a>>,
+    #[serde(borrow)]
+    pub index: crate::fyi_questionable::richtext::facet::ByteSlice<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FacetFeaturesItem<'a> {
+    #[serde(rename = "fyi.questionable.richtext.facet#link")]
+    Link(Box<crate::fyi_questionable::richtext::facet::Link<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#mention")]
+    Mention(Box<crate::fyi_questionable::richtext::facet::Mention<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#code")]
+    Code(Box<crate::fyi_questionable::richtext::facet::Code<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#highlight")]
+    Highlight(Box<crate::fyi_questionable::richtext::facet::Highlight<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#underline")]
+    Underline(Box<crate::fyi_questionable::richtext::facet::Underline<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#strikethrough")]
+    Strikethrough(Box<crate::fyi_questionable::richtext::facet::Strikethrough<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#bold")]
+    Bold(Box<crate::fyi_questionable::richtext::facet::Bold<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.facet#italic")]
+    Italic(Box<crate::fyi_questionable::richtext::facet::Italic<'a>>),
+}
+
+/// Facet feature for mentioning a did.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Mention<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+/// Facet feature for strikethrough markup
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Strikethrough<'a> {}
+/// Facet feature for underline markup
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Underline<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "bold"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "byteSlice"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.byte_end;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "byte_end",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.byte_start;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "byte_start",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "code"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "highlight"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "italic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "link"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mention<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "mention"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "strikethrough"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "underline"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_fyi_questionable_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -319,40 +684,6 @@ fn lexicon_doc_fyi_questionable_richtext_facet() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "bold"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ByteSlice<'a> {
-    pub byte_end: i64,
-    pub byte_start: i64,
-}
-
 pub mod byte_slice_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -490,157 +821,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "byteSlice"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.byte_end;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "byte_end",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.byte_start;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "byte_start",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Facet feature for inline code.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Code<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "code"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for highlighted text.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Highlight<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "highlight"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for italic text
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Italic<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "italic"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -746,42 +926,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "link"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Annotation of a sub-string within rich text.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Facet<'a> {
-    #[serde(borrow)]
-    pub features: Vec<FacetFeaturesItem<'a>>,
-    #[serde(borrow)]
-    pub index: crate::fyi_questionable::richtext::facet::ByteSlice<'a>,
-}
-
 pub mod facet_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -792,37 +936,37 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Index = S::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Features = S::Features;
         type Index = Set<members::index>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Index = S::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
@@ -895,8 +1039,8 @@ where
 impl<'a, S> FacetBuilder<'a, S>
 where
     S: facet_state::State,
-    S::Features: facet_state::IsSet,
     S::Index: facet_state::IsSet,
+    S::Features: facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Facet<'a> {
@@ -920,71 +1064,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum FacetFeaturesItem<'a> {
-    #[serde(rename = "fyi.questionable.richtext.facet#link")]
-    Link(Box<crate::fyi_questionable::richtext::facet::Link<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#mention")]
-    Mention(Box<crate::fyi_questionable::richtext::facet::Mention<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#code")]
-    Code(Box<crate::fyi_questionable::richtext::facet::Code<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#highlight")]
-    Highlight(Box<crate::fyi_questionable::richtext::facet::Highlight<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#underline")]
-    Underline(Box<crate::fyi_questionable::richtext::facet::Underline<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#strikethrough")]
-    Strikethrough(Box<crate::fyi_questionable::richtext::facet::Strikethrough<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#bold")]
-    Bold(Box<crate::fyi_questionable::richtext::facet::Bold<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.facet#italic")]
-    Italic(Box<crate::fyi_questionable::richtext::facet::Italic<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for mentioning a did.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Mention<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod mention_state {
@@ -1089,84 +1168,5 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mention<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "mention"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for strikethrough markup
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Strikethrough<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "strikethrough"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Facet feature for underline markup
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Underline<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "underline"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -25,6 +25,121 @@ pub struct RepostMutes<'a> {
     pub subjects: Vec<crate::net_mimonelu::klearsky::repost_mutes::Subject<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RepostMutesGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: RepostMutes<'a>,
+}
+
+/// A DID added to repost-mute list and the timestamp when it was added.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Subject<'a> {
+    ///Timestamp when this DID was added to the mute list.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///DID of the user whose reposts are muted.
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+impl<'a> RepostMutes<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RepostMutesRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RepostMutesRecord;
+impl jacquard_common::xrpc::XrpcResp for RepostMutesRecord {
+    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RepostMutesGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RepostMutesGetRecordOutput<'_>> for RepostMutes<'_> {
+    fn from(output: RepostMutesGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for RepostMutes<'_> {
+    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
+    type Record = RepostMutesRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RepostMutesRecord {
+    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
+    type Record = RepostMutesRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepostMutes<'a> {
+    fn nsid() -> &'static str {
+        "net.mimonelu.klearsky.repostMutes"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_mimonelu_klearsky_repostMutes()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subject<'a> {
+    fn nsid() -> &'static str {
+        "net.mimonelu.klearsky.repostMutes"
+    }
+    fn def_name() -> &'static str {
+        "subject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_mimonelu_klearsky_repostMutes()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod repost_mutes_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,37 +150,37 @@ pub mod repost_mutes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subjects;
         type CreatedAt;
+        type Subjects;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subjects = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type Subjects = Set<members::subjects>;
-        type CreatedAt = S::CreatedAt;
+        type Subjects = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subjects = S::Subjects;
         type CreatedAt = Set<members::created_at>;
+        type Subjects = S::Subjects;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
     }
 }
 
@@ -140,8 +255,8 @@ where
 impl<'a, S> RepostMutesBuilder<'a, S>
 where
     S: repost_mutes_state::State,
-    S::Subjects: repost_mutes_state::IsSet,
     S::CreatedAt: repost_mutes_state::IsSet,
+    S::Subjects: repost_mutes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepostMutes<'a> {
@@ -164,84 +279,6 @@ where
             subjects: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> RepostMutes<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RepostMutesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RepostMutesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: RepostMutes<'a>,
-}
-
-impl From<RepostMutesGetRecordOutput<'_>> for RepostMutes<'_> {
-    fn from(output: RepostMutesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for RepostMutes<'_> {
-    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
-    type Record = RepostMutesRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RepostMutesRecord;
-impl jacquard_common::xrpc::XrpcResp for RepostMutesRecord {
-    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RepostMutesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RepostMutesRecord {
-    const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
-    type Record = RepostMutesRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepostMutes<'a> {
-    fn nsid() -> &'static str {
-        "net.mimonelu.klearsky.repostMutes"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_mimonelu_klearsky_repostMutes()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -395,26 +432,6 @@ fn lexicon_doc_net_mimonelu_klearsky_repostMutes() -> ::jacquard_lexicon::lexico
     }
 }
 
-/// A DID added to repost-mute list and the timestamp when it was added.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Subject<'a> {
-    ///Timestamp when this DID was added to the mute list.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the user whose reposts are muted.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -425,37 +442,37 @@ pub mod subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
         type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -528,8 +545,8 @@ where
 impl<'a, S> SubjectBuilder<'a, S>
 where
     S: subject_state::State,
-    S::Did: subject_state::IsSet,
     S::CreatedAt: subject_state::IsSet,
+    S::Did: subject_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subject<'a> {
@@ -552,22 +569,5 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subject<'a> {
-    fn nsid() -> &'static str {
-        "net.mimonelu.klearsky.repostMutes"
-    }
-    fn def_name() -> &'static str {
-        "subject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_mimonelu_klearsky_repostMutes()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

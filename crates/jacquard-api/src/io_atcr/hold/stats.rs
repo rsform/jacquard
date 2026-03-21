@@ -38,6 +38,121 @@ pub struct Stats<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Stats<'a>,
+}
+
+impl<'a> Stats<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StatsRecord;
+impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+    const NSID: &'static str = "io.atcr.hold.stats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
+    fn from(output: StatsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Stats<'_> {
+    const NSID: &'static str = "io.atcr.hold.stats";
+    type Record = StatsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StatsRecord {
+    const NSID: &'static str = "io.atcr.hold.stats";
+    type Record = StatsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.stats"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_stats()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.pull_count;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pull_count",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.push_count;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "push_count",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.repository;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -48,85 +163,85 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PushCount;
+        type PullCount;
         type OwnerDid;
         type Repository;
         type UpdatedAt;
-        type PushCount;
-        type PullCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PushCount = Unset;
+        type PullCount = Unset;
         type OwnerDid = Unset;
         type Repository = Unset;
         type UpdatedAt = Unset;
-        type PushCount = Unset;
-        type PullCount = Unset;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type OwnerDid = Set<members::owner_did>;
-        type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type OwnerDid = S::OwnerDid;
-        type Repository = Set<members::repository>;
-        type UpdatedAt = S::UpdatedAt;
-        type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type OwnerDid = S::OwnerDid;
-        type Repository = S::Repository;
-        type UpdatedAt = Set<members::updated_at>;
-        type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
     }
     ///State transition - sets the `push_count` field to Set
     pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPushCount<S> {}
     impl<S: State> State for SetPushCount<S> {
+        type PushCount = Set<members::push_count>;
+        type PullCount = S::PullCount;
         type OwnerDid = S::OwnerDid;
         type Repository = S::Repository;
         type UpdatedAt = S::UpdatedAt;
-        type PushCount = Set<members::push_count>;
-        type PullCount = S::PullCount;
     }
     ///State transition - sets the `pull_count` field to Set
     pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPullCount<S> {}
     impl<S: State> State for SetPullCount<S> {
+        type PushCount = S::PushCount;
+        type PullCount = Set<members::pull_count>;
         type OwnerDid = S::OwnerDid;
         type Repository = S::Repository;
         type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
         type PushCount = S::PushCount;
-        type PullCount = Set<members::pull_count>;
+        type PullCount = S::PullCount;
+        type OwnerDid = Set<members::owner_did>;
+        type Repository = S::Repository;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type PushCount = S::PushCount;
+        type PullCount = S::PullCount;
+        type OwnerDid = S::OwnerDid;
+        type Repository = Set<members::repository>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type PushCount = S::PushCount;
+        type PullCount = S::PullCount;
+        type OwnerDid = S::OwnerDid;
+        type Repository = S::Repository;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `push_count` field
+        pub struct push_count(());
+        ///Marker type for the `pull_count` field
+        pub struct pull_count(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `push_count` field
-        pub struct push_count(());
-        ///Marker type for the `pull_count` field
-        pub struct pull_count(());
     }
 }
 
@@ -299,11 +414,11 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
+    S::PushCount: stats_state::IsSet,
+    S::PullCount: stats_state::IsSet,
     S::OwnerDid: stats_state::IsSet,
     S::Repository: stats_state::IsSet,
     S::UpdatedAt: stats_state::IsSet,
-    S::PushCount: stats_state::IsSet,
-    S::PullCount: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -336,121 +451,6 @@ where
             updated_at: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Stats<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stats<'a>,
-}
-
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Stats<'_> {
-    const NSID: &'static str = "io.atcr.hold.stats";
-    type Record = StatsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
-    const NSID: &'static str = "io.atcr.hold.stats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StatsRecord {
-    const NSID: &'static str = "io.atcr.hold.stats";
-    type Record = StatsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.stats"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_stats()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.pull_count;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pull_count",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.push_count;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "push_count",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.repository;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

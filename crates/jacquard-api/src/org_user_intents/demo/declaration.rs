@@ -24,6 +24,143 @@ pub struct Intent<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
+/// TODO
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Declaration<'a> {
+    ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub bulk_dataset: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Bridging account data or interactions into distinct social web protocol ecosystems
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub protocol_bridging: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Public access to or replay of account data as part of archiving and preservation efforts
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub public_access_archive: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///Use of account data as input to machine learning models which could be used to generate synthetic content or interactions
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub synthetic_content_generation: std::option::Option<
+        crate::org_user_intents::demo::declaration::Intent<'a>,
+    >,
+    ///
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeclarationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Declaration<'a>,
+}
+
+impl<'a> Declaration<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Intent<'a> {
+    fn nsid() -> &'static str {
+        "org.user-intents.demo.declaration"
+    }
+    fn def_name() -> &'static str {
+        "intent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_user_intents_demo_declaration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DeclarationRecord;
+impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
+    const NSID: &'static str = "org.user-intents.demo.declaration";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeclarationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
+    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Declaration<'_> {
+    const NSID: &'static str = "org.user-intents.demo.declaration";
+    type Record = DeclarationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DeclarationRecord {
+    const NSID: &'static str = "org.user-intents.demo.declaration";
+    type Record = DeclarationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
+    fn nsid() -> &'static str {
+        "org.user-intents.demo.declaration"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_user_intents_demo_declaration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod intent_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -282,65 +419,6 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> ::jacquard_lexicon::lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Intent<'a> {
-    fn nsid() -> &'static str {
-        "org.user-intents.demo.declaration"
-    }
-    fn def_name() -> &'static str {
-        "intent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_user_intents_demo_declaration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// TODO
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Declaration<'a> {
-    ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub bulk_dataset: std::option::Option<
-        crate::org_user_intents::demo::declaration::Intent<'a>,
-    >,
-    ///Bridging account data or interactions into distinct social web protocol ecosystems
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub protocol_bridging: std::option::Option<
-        crate::org_user_intents::demo::declaration::Intent<'a>,
-    >,
-    ///Public access to or replay of account data as part of archiving and preservation efforts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub public_access_archive: std::option::Option<
-        crate::org_user_intents::demo::declaration::Intent<'a>,
-    >,
-    ///Use of account data as input to machine learning models which could be used to generate synthetic content or interactions
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub synthetic_content_generation: std::option::Option<
-        crate::org_user_intents::demo::declaration::Intent<'a>,
-    >,
-    ///
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod declaration_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -517,83 +595,5 @@ where
             updated_at: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclarationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Declaration<'a>,
-}
-
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
-    const NSID: &'static str = "org.user-intents.demo.declaration";
-    type Record = DeclarationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DeclarationRecord;
-impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
-    const NSID: &'static str = "org.user-intents.demo.declaration";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DeclarationRecord {
-    const NSID: &'static str = "org.user-intents.demo.declaration";
-    type Record = DeclarationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
-    fn nsid() -> &'static str {
-        "org.user-intents.demo.declaration"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_user_intents_demo_declaration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

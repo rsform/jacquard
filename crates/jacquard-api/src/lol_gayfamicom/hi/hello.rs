@@ -26,6 +26,84 @@ pub struct Hello<'a> {
     pub hello: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HelloGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Hello<'a>,
+}
+
+impl<'a> Hello<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, HelloRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct HelloRecord;
+impl jacquard_common::xrpc::XrpcResp for HelloRecord {
+    const NSID: &'static str = "lol.gayfamicom.hi.hello";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = HelloGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<HelloGetRecordOutput<'_>> for Hello<'_> {
+    fn from(output: HelloGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Hello<'_> {
+    const NSID: &'static str = "lol.gayfamicom.hi.hello";
+    type Record = HelloRecord;
+}
+
+impl jacquard_common::types::collection::Collection for HelloRecord {
+    const NSID: &'static str = "lol.gayfamicom.hi.hello";
+    type Record = HelloRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hello<'a> {
+    fn nsid() -> &'static str {
+        "lol.gayfamicom.hi.hello"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_lol_gayfamicom_hi_hello()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod hello_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,84 +211,6 @@ where
             hello: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Hello<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, HelloRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HelloGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Hello<'a>,
-}
-
-impl From<HelloGetRecordOutput<'_>> for Hello<'_> {
-    fn from(output: HelloGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Hello<'_> {
-    const NSID: &'static str = "lol.gayfamicom.hi.hello";
-    type Record = HelloRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct HelloRecord;
-impl jacquard_common::xrpc::XrpcResp for HelloRecord {
-    const NSID: &'static str = "lol.gayfamicom.hi.hello";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = HelloGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for HelloRecord {
-    const NSID: &'static str = "lol.gayfamicom.hi.hello";
-    type Record = HelloRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hello<'a> {
-    fn nsid() -> &'static str {
-        "lol.gayfamicom.hi.hello"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_lol_gayfamicom_hi_hello()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

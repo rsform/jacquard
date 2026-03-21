@@ -33,6 +33,152 @@ pub struct Avatar<'a> {
     pub src: jacquard_common::types::value::Data<'a>,
 }
 
+/// Size token.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AvatarSize<'a> {
+    Xsmall,
+    Small,
+    Medium,
+    Large,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AvatarSize<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Xsmall => "xsmall",
+            Self::Small => "small",
+            Self::Medium => "medium",
+            Self::Large => "large",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AvatarSize<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "xsmall" => Self::Xsmall,
+            "small" => Self::Small,
+            "medium" => Self::Medium,
+            "large" => Self::Large,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AvatarSize<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "xsmall" => Self::Xsmall,
+            "small" => Self::Small,
+            "medium" => Self::Medium,
+            "large" => Self::Large,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AvatarSize<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AvatarSize<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AvatarSize<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AvatarSize<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AvatarSize<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AvatarSize<'_> {
+    type Output = AvatarSize<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AvatarSize::Xsmall => AvatarSize::Xsmall,
+            AvatarSize::Small => AvatarSize::Small,
+            AvatarSize::Medium => AvatarSize::Medium,
+            AvatarSize::Large => AvatarSize::Large,
+            AvatarSize::Other(v) => AvatarSize::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AvatarOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///org.atsui.Avatar
+pub struct AvatarResponse;
+impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
+    const NSID: &'static str = "org.atsui.Avatar";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AvatarOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
+    const NSID: &'static str = "org.atsui.Avatar";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AvatarResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Avatar
+pub struct AvatarRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Avatar";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Avatar<'de>;
+    type Response = AvatarResponse;
+}
+
 pub mod avatar_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -190,150 +336,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Size token.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AvatarSize<'a> {
-    Xsmall,
-    Small,
-    Medium,
-    Large,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> AvatarSize<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Xsmall => "xsmall",
-            Self::Small => "small",
-            Self::Medium => "medium",
-            Self::Large => "large",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AvatarSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "xsmall" => Self::Xsmall,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for AvatarSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "xsmall" => Self::Xsmall,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AvatarSize<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for AvatarSize<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for AvatarSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for AvatarSize<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for AvatarSize<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for AvatarSize<'_> {
-    type Output = AvatarSize<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AvatarSize::Xsmall => AvatarSize::Xsmall,
-            AvatarSize::Small => AvatarSize::Small,
-            AvatarSize::Medium => AvatarSize::Medium,
-            AvatarSize::Large => AvatarSize::Large,
-            AvatarSize::Other(v) => AvatarSize::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AvatarOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Avatar
-pub struct AvatarResponse;
-impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
-    const NSID: &'static str = "org.atsui.Avatar";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AvatarOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
-    const NSID: &'static str = "org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = AvatarResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Avatar
-pub struct AvatarRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Avatar<'de>;
-    type Response = AvatarResponse;
 }

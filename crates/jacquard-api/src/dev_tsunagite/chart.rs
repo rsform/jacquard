@@ -43,6 +43,153 @@ pub struct Chart<'a> {
     pub song: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ChartDifficulty<'a> {
+    #[serde(rename = "dev.tsunagite.difficulty")]
+    Difficulty(Box<crate::dev_tsunagite::difficulty::Difficulty<'a>>),
+    #[serde(rename = "dev.tsunagite.types#typedRef")]
+    TypesTypedRef(Box<crate::dev_tsunagite::types::TypedRef<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChartGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Chart<'a>,
+}
+
+impl<'a> Chart<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ChartRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChartRecord;
+impl jacquard_common::xrpc::XrpcResp for ChartRecord {
+    const NSID: &'static str = "dev.tsunagite.chart";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ChartGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ChartGetRecordOutput<'_>> for Chart<'_> {
+    fn from(output: ChartGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Chart<'_> {
+    const NSID: &'static str = "dev.tsunagite.chart";
+    type Record = ChartRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ChartRecord {
+    const NSID: &'static str = "dev.tsunagite.chart";
+    type Record = ChartRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chart<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.chart"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_chart()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.jacket {
+            {
+                let size = value.blob().size;
+                if size > 8000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        max: 8000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.jacket {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "jacket",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod chart_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -53,8 +200,8 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Song;
         type Difficulty;
+        type Song;
         type Game;
         type Rating;
     }
@@ -62,26 +209,26 @@ pub mod chart_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Song = Unset;
         type Difficulty = Unset;
+        type Song = Unset;
         type Game = Unset;
         type Rating = Unset;
-    }
-    ///State transition - sets the `song` field to Set
-    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSong<S> {}
-    impl<S: State> State for SetSong<S> {
-        type Song = Set<members::song>;
-        type Difficulty = S::Difficulty;
-        type Game = S::Game;
-        type Rating = S::Rating;
     }
     ///State transition - sets the `difficulty` field to Set
     pub struct SetDifficulty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDifficulty<S> {}
     impl<S: State> State for SetDifficulty<S> {
-        type Song = S::Song;
         type Difficulty = Set<members::difficulty>;
+        type Song = S::Song;
+        type Game = S::Game;
+        type Rating = S::Rating;
+    }
+    ///State transition - sets the `song` field to Set
+    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSong<S> {}
+    impl<S: State> State for SetSong<S> {
+        type Difficulty = S::Difficulty;
+        type Song = Set<members::song>;
         type Game = S::Game;
         type Rating = S::Rating;
     }
@@ -89,8 +236,8 @@ pub mod chart_state {
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Song = S::Song;
         type Difficulty = S::Difficulty;
+        type Song = S::Song;
         type Game = Set<members::game>;
         type Rating = S::Rating;
     }
@@ -98,18 +245,18 @@ pub mod chart_state {
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
-        type Song = S::Song;
         type Difficulty = S::Difficulty;
+        type Song = S::Song;
         type Game = S::Game;
         type Rating = Set<members::rating>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `song` field
-        pub struct song(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
+        ///Marker type for the `song` field
+        pub struct song(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `rating` field
@@ -286,8 +433,8 @@ where
 impl<'a, S> ChartBuilder<'a, S>
 where
     S: chart_state::State,
-    S::Song: chart_state::IsSet,
     S::Difficulty: chart_state::IsSet,
+    S::Song: chart_state::IsSet,
     S::Game: chart_state::IsSet,
     S::Rating: chart_state::IsSet,
 {
@@ -322,153 +469,6 @@ where
             song: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Chart<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ChartRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ChartDifficulty<'a> {
-    #[serde(rename = "dev.tsunagite.difficulty")]
-    Difficulty(Box<crate::dev_tsunagite::difficulty::Difficulty<'a>>),
-    #[serde(rename = "dev.tsunagite.types#typedRef")]
-    TypesTypedRef(Box<crate::dev_tsunagite::types::TypedRef<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChartGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Chart<'a>,
-}
-
-impl From<ChartGetRecordOutput<'_>> for Chart<'_> {
-    fn from(output: ChartGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Chart<'_> {
-    const NSID: &'static str = "dev.tsunagite.chart";
-    type Record = ChartRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ChartRecord;
-impl jacquard_common::xrpc::XrpcResp for ChartRecord {
-    const NSID: &'static str = "dev.tsunagite.chart";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ChartGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ChartRecord {
-    const NSID: &'static str = "dev.tsunagite.chart";
-    type Record = ChartRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chart<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.chart"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_chart()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.jacket {
-            {
-                let size = value.blob().size;
-                if size > 8000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "jacket",
-                        ),
-                        max: 8000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.jacket {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/jxl",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "jacket",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/jxl".to_string(), "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

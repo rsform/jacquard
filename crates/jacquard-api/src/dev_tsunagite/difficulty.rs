@@ -27,6 +27,84 @@ pub struct Difficulty<'a> {
     pub name: jacquard_common::types::value::Data<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DifficultyGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Difficulty<'a>,
+}
+
+impl<'a> Difficulty<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DifficultyRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DifficultyRecord;
+impl jacquard_common::xrpc::XrpcResp for DifficultyRecord {
+    const NSID: &'static str = "dev.tsunagite.difficulty";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DifficultyGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DifficultyGetRecordOutput<'_>> for Difficulty<'_> {
+    fn from(output: DifficultyGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Difficulty<'_> {
+    const NSID: &'static str = "dev.tsunagite.difficulty";
+    type Record = DifficultyRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DifficultyRecord {
+    const NSID: &'static str = "dev.tsunagite.difficulty";
+    type Record = DifficultyRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Difficulty<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.difficulty"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_difficulty()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod difficulty_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -148,84 +226,6 @@ where
             name: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Difficulty<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DifficultyRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DifficultyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Difficulty<'a>,
-}
-
-impl From<DifficultyGetRecordOutput<'_>> for Difficulty<'_> {
-    fn from(output: DifficultyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Difficulty<'_> {
-    const NSID: &'static str = "dev.tsunagite.difficulty";
-    type Record = DifficultyRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DifficultyRecord;
-impl jacquard_common::xrpc::XrpcResp for DifficultyRecord {
-    const NSID: &'static str = "dev.tsunagite.difficulty";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DifficultyGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DifficultyRecord {
-    const NSID: &'static str = "dev.tsunagite.difficulty";
-    type Record = DifficultyRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Difficulty<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.difficulty"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_difficulty()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

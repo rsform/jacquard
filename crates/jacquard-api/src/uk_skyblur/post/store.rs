@@ -29,6 +29,54 @@ pub struct Store<'a> {
     pub visibility: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StoreOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub success: bool,
+}
+
+/// Response type for
+///uk.skyblur.post.store
+pub struct StoreResponse;
+impl jacquard_common::xrpc::XrpcResp for StoreResponse {
+    const NSID: &'static str = "uk.skyblur.post.store";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StoreOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Store<'a> {
+    const NSID: &'static str = "uk.skyblur.post.store";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = StoreResponse;
+}
+
+/// Endpoint type for
+///uk.skyblur.post.store
+pub struct StoreRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for StoreRequest {
+    const PATH: &'static str = "/xrpc/uk.skyblur.post.store";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Store<'de>;
+    type Response = StoreResponse;
+}
+
 pub mod store_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,51 +87,51 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Visibility;
         type Text;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Visibility = Unset;
         type Text = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Text = S::Text;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Visibility = S::Visibility;
-        type Text = Set<members::text>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type Visibility = S::Visibility;
         type Text = S::Text;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Uri = S::Uri;
+        type Visibility = Set<members::visibility>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Uri = S::Uri;
+        type Visibility = S::Visibility;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -196,9 +244,9 @@ where
 impl<'a, S> StoreBuilder<'a, S>
 where
     S: store_state::State,
+    S::Uri: store_state::IsSet,
     S::Visibility: store_state::IsSet,
     S::Text: store_state::IsSet,
-    S::Uri: store_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Store<'a> {
@@ -226,52 +274,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StoreOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub success: bool,
-}
-
-/// Response type for
-///uk.skyblur.post.store
-pub struct StoreResponse;
-impl jacquard_common::xrpc::XrpcResp for StoreResponse {
-    const NSID: &'static str = "uk.skyblur.post.store";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StoreOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Store<'a> {
-    const NSID: &'static str = "uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = StoreResponse;
-}
-
-/// Endpoint type for
-///uk.skyblur.post.store
-pub struct StoreRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for StoreRequest {
-    const PATH: &'static str = "/xrpc/uk.skyblur.post.store";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Store<'de>;
-    type Response = StoreResponse;
 }

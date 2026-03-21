@@ -44,10 +44,6 @@ pub struct StartSync<'a> {
     pub slice: jacquard_common::CowStr<'a>,
 }
 
-fn _default_start_sync_skip_validation() -> std::option::Option<bool> {
-    Some(false)
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -97,4 +93,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     );
     type Request<'de> = StartSync<'de>;
     type Response = StartSyncResponse;
+}
+
+fn _default_start_sync_skip_validation() -> std::option::Option<bool> {
+    Some(false)
 }

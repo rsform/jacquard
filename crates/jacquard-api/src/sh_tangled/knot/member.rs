@@ -25,6 +25,84 @@ pub struct Member<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MemberGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Member<'a>,
+}
+
+impl<'a> Member<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MemberRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MemberRecord;
+impl jacquard_common::xrpc::XrpcResp for MemberRecord {
+    const NSID: &'static str = "sh.tangled.knot.member";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MemberGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MemberGetRecordOutput<'_>> for Member<'_> {
+    fn from(output: MemberGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Member<'_> {
+    const NSID: &'static str = "sh.tangled.knot.member";
+    type Record = MemberRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MemberRecord {
+    const NSID: &'static str = "sh.tangled.knot.member";
+    type Record = MemberRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.knot.member"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_knot_member()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod member_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,51 +113,51 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Domain;
         type CreatedAt;
         type Subject;
-        type Domain;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Domain = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-        type Domain = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
-        type Domain = S::Domain;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
-        type Domain = S::Domain;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
+        type Domain = Set<members::domain>;
         type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
-        type Domain = Set<members::domain>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Domain = S::Domain;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `domain` field
+        pub struct domain(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `domain` field
-        pub struct domain(());
     }
 }
 
@@ -172,9 +250,9 @@ where
 impl<'a, S> MemberBuilder<'a, S>
 where
     S: member_state::State,
+    S::Domain: member_state::IsSet,
     S::CreatedAt: member_state::IsSet,
     S::Subject: member_state::IsSet,
-    S::Domain: member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Member<'a> {
@@ -199,84 +277,6 @@ where
             subject: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Member<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MemberRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MemberGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Member<'a>,
-}
-
-impl From<MemberGetRecordOutput<'_>> for Member<'_> {
-    fn from(output: MemberGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Member<'_> {
-    const NSID: &'static str = "sh.tangled.knot.member";
-    type Record = MemberRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MemberRecord;
-impl jacquard_common::xrpc::XrpcResp for MemberRecord {
-    const NSID: &'static str = "sh.tangled.knot.member";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MemberGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MemberRecord {
-    const NSID: &'static str = "sh.tangled.knot.member";
-    type Record = MemberRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.knot.member"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_knot_member()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

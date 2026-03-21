@@ -23,6 +23,137 @@ pub struct RemoveOptions<'a> {
     pub scope: RemoveOptionsScope<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RemoveOptionsScope<'a> {
+    Instance,
+    Personal,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RemoveOptionsScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Instance => "instance",
+            Self::Personal => "personal",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RemoveOptionsScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RemoveOptionsScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RemoveOptionsScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RemoveOptionsScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RemoveOptionsScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RemoveOptionsScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RemoveOptionsScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RemoveOptionsScope<'_> {
+    type Output = RemoveOptionsScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RemoveOptionsScope::Instance => RemoveOptionsScope::Instance,
+            RemoveOptionsScope::Personal => RemoveOptionsScope::Personal,
+            RemoveOptionsScope::Other(v) => RemoveOptionsScope::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RemoveOptionsOutput<'a> {}
+/// Response type for
+///tools.ozone.setting.removeOptions
+pub struct RemoveOptionsResponse;
+impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
+    const NSID: &'static str = "tools.ozone.setting.removeOptions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RemoveOptionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
+    const NSID: &'static str = "tools.ozone.setting.removeOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RemoveOptionsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.setting.removeOptions
+pub struct RemoveOptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.setting.removeOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveOptions<'de>;
+    type Response = RemoveOptionsResponse;
+}
+
 pub mod remove_options_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,135 +292,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RemoveOptionsScope<'a> {
-    Instance,
-    Personal,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RemoveOptionsScope<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Instance => "instance",
-            Self::Personal => "personal",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RemoveOptionsScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "instance" => Self::Instance,
-            "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RemoveOptionsScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "instance" => Self::Instance,
-            "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RemoveOptionsScope<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RemoveOptionsScope<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RemoveOptionsScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RemoveOptionsScope<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RemoveOptionsScope<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RemoveOptionsScope<'_> {
-    type Output = RemoveOptionsScope<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RemoveOptionsScope::Instance => RemoveOptionsScope::Instance,
-            RemoveOptionsScope::Personal => RemoveOptionsScope::Personal,
-            RemoveOptionsScope::Other(v) => RemoveOptionsScope::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RemoveOptionsOutput<'a> {}
-/// Response type for
-///tools.ozone.setting.removeOptions
-pub struct RemoveOptionsResponse;
-impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
-    const NSID: &'static str = "tools.ozone.setting.removeOptions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
-    const NSID: &'static str = "tools.ozone.setting.removeOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = RemoveOptionsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.setting.removeOptions
-pub struct RemoveOptionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.setting.removeOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = RemoveOptions<'de>;
-    type Response = RemoveOptionsResponse;
 }

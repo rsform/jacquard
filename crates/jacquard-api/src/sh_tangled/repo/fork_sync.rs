@@ -31,6 +31,36 @@ pub struct ForkSync<'a> {
     pub source: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.forkSync
+pub struct ForkSyncResponse;
+impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
+    const NSID: &'static str = "sh.tangled.repo.forkSync";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ForkSync<'a> {
+    const NSID: &'static str = "sh.tangled.repo.forkSync";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ForkSyncResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.forkSync
+pub struct ForkSyncRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.forkSync";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ForkSync<'de>;
+    type Response = ForkSyncResponse;
+}
+
 pub mod fork_sync_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,66 +72,66 @@ pub mod fork_sync_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Source;
         type Branch;
         type Name;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Source = Unset;
         type Branch = Unset;
         type Name = Unset;
+        type Source = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Did = Set<members::did>;
+        type Branch = S::Branch;
+        type Name = S::Name;
         type Source = S::Source;
-        type Branch = S::Branch;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Did = S::Did;
-        type Source = Set<members::source>;
-        type Branch = S::Branch;
-        type Name = S::Name;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
         type Did = S::Did;
-        type Source = S::Source;
         type Branch = Set<members::branch>;
         type Name = S::Name;
+        type Source = S::Source;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Did = S::Did;
-        type Source = S::Source;
         type Branch = S::Branch;
         type Name = Set<members::name>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Did = S::Did;
+        type Branch = S::Branch;
+        type Name = S::Name;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `branch` field
         pub struct branch(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -215,9 +245,9 @@ impl<'a, S> ForkSyncBuilder<'a, S>
 where
     S: fork_sync_state::State,
     S::Did: fork_sync_state::IsSet,
-    S::Source: fork_sync_state::IsSet,
     S::Branch: fork_sync_state::IsSet,
     S::Name: fork_sync_state::IsSet,
+    S::Source: fork_sync_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ForkSync<'a> {
@@ -245,34 +275,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.forkSync
-pub struct ForkSyncResponse;
-impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
-    const NSID: &'static str = "sh.tangled.repo.forkSync";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ForkSync<'a> {
-    const NSID: &'static str = "sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ForkSyncResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.forkSync
-pub struct ForkSyncRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.forkSync";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = ForkSync<'de>;
-    type Response = ForkSyncResponse;
 }

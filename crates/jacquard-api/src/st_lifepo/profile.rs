@@ -28,6 +28,84 @@ pub struct LifeEvent<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Profile<'a> {
+    #[serde(borrow)]
+    pub actor: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileOutput<'a> {
+    #[serde(borrow)]
+    pub bio: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub life_events: Vec<crate::st_lifepo::profile::LifeEvent<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LifeEvent<'a> {
+    fn nsid() -> &'static str {
+        "st.lifepo.profile"
+    }
+    fn def_name() -> &'static str {
+        "lifeEvent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_st_lifepo_profile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///st.lifepo.profile
+pub struct ProfileResponse;
+impl jacquard_common::xrpc::XrpcResp for ProfileResponse {
+    const NSID: &'static str = "st.lifepo.profile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProfileOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Profile<'a> {
+    const NSID: &'static str = "st.lifepo.profile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ProfileResponse;
+}
+
+/// Endpoint type for
+///st.lifepo.profile
+pub struct ProfileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ProfileRequest {
+    const PATH: &'static str = "/xrpc/st.lifepo.profile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Profile<'de>;
+    type Response = ProfileResponse;
+}
+
 pub mod life_event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,37 +116,37 @@ pub mod life_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartDate;
         type Title;
+        type StartDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartDate = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type StartDate = Set<members::start_date>;
-        type Title = S::Title;
+        type StartDate = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type StartDate = S::StartDate;
         type Title = Set<members::title>;
+        type StartDate = S::StartDate;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Title = S::Title;
+        type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
     }
 }
 
@@ -181,8 +259,8 @@ where
 impl<'a, S> LifeEventBuilder<'a, S>
 where
     S: life_event_state::State,
-    S::StartDate: life_event_state::IsSet,
     S::Title: life_event_state::IsSet,
+    S::StartDate: life_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LifeEvent<'a> {
@@ -363,38 +441,6 @@ fn lexicon_doc_st_lifepo_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LifeEvent<'a> {
-    fn nsid() -> &'static str {
-        "st.lifepo.profile"
-    }
-    fn def_name() -> &'static str {
-        "lifeEvent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_st_lifepo_profile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Profile<'a> {
-    #[serde(borrow)]
-    pub actor: jacquard_common::CowStr<'a>,
-}
-
 pub mod profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -482,50 +528,4 @@ where
             actor: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileOutput<'a> {
-    #[serde(borrow)]
-    pub bio: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub life_events: Vec<crate::st_lifepo::profile::LifeEvent<'a>>,
-}
-
-/// Response type for
-///st.lifepo.profile
-pub struct ProfileResponse;
-impl jacquard_common::xrpc::XrpcResp for ProfileResponse {
-    const NSID: &'static str = "st.lifepo.profile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Profile<'a> {
-    const NSID: &'static str = "st.lifepo.profile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ProfileResponse;
-}
-
-/// Endpoint type for
-///st.lifepo.profile
-pub struct ProfileRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ProfileRequest {
-    const PATH: &'static str = "/xrpc/st.lifepo.profile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Profile<'de>;
-    type Response = ProfileResponse;
 }

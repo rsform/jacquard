@@ -50,6 +50,151 @@ pub struct CreateAccount<'a> {
     pub verification_phone: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAccountOutput<'a> {
+    #[serde(borrow)]
+    pub access_jwt: jacquard_common::CowStr<'a>,
+    ///The DID of the new account.
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Complete DID document.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(borrow)]
+    pub refresh_jwt: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateAccountError<'a> {
+    #[serde(rename = "InvalidHandle")]
+    InvalidHandle(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidPassword")]
+    InvalidPassword(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidInviteCode")]
+    InvalidInviteCode(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "HandleNotAvailable")]
+    HandleNotAvailable(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "UnsupportedDomain")]
+    UnsupportedDomain(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "UnresolvableDid")]
+    UnresolvableDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "IncompatibleDidDoc")]
+    IncompatibleDidDoc(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CreateAccountError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidHandle(msg) => {
+                write!(f, "InvalidHandle")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidPassword(msg) => {
+                write!(f, "InvalidPassword")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidInviteCode(msg) => {
+                write!(f, "InvalidInviteCode")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::HandleNotAvailable(msg) => {
+                write!(f, "HandleNotAvailable")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::UnsupportedDomain(msg) => {
+                write!(f, "UnsupportedDomain")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::UnresolvableDid(msg) => {
+                write!(f, "UnresolvableDid")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::IncompatibleDidDoc(msg) => {
+                write!(f, "IncompatibleDidDoc")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.server.createAccount
+pub struct CreateAccountResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
+    const NSID: &'static str = "com.atproto.server.createAccount";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateAccountOutput<'de>;
+    type Err<'de> = CreateAccountError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAccount<'a> {
+    const NSID: &'static str = "com.atproto.server.createAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateAccountResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.createAccount
+pub struct CreateAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateAccount<'de>;
+    type Response = CreateAccountResponse;
+}
+
 pub mod create_account_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -333,149 +478,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateAccountOutput<'a> {
-    #[serde(borrow)]
-    pub access_jwt: jacquard_common::CowStr<'a>,
-    ///The DID of the new account.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///Complete DID document.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(borrow)]
-    pub refresh_jwt: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateAccountError<'a> {
-    #[serde(rename = "InvalidHandle")]
-    InvalidHandle(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidPassword")]
-    InvalidPassword(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidInviteCode")]
-    InvalidInviteCode(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "HandleNotAvailable")]
-    HandleNotAvailable(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "UnsupportedDomain")]
-    UnsupportedDomain(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "UnresolvableDid")]
-    UnresolvableDid(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "IncompatibleDidDoc")]
-    IncompatibleDidDoc(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CreateAccountError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidHandle(msg) => {
-                write!(f, "InvalidHandle")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidPassword(msg) => {
-                write!(f, "InvalidPassword")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidInviteCode(msg) => {
-                write!(f, "InvalidInviteCode")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::HandleNotAvailable(msg) => {
-                write!(f, "HandleNotAvailable")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::UnsupportedDomain(msg) => {
-                write!(f, "UnsupportedDomain")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::UnresolvableDid(msg) => {
-                write!(f, "UnresolvableDid")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::IncompatibleDidDoc(msg) => {
-                write!(f, "IncompatibleDidDoc")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.server.createAccount
-pub struct CreateAccountResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
-    const NSID: &'static str = "com.atproto.server.createAccount";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateAccountOutput<'de>;
-    type Err<'de> = CreateAccountError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAccount<'a> {
-    const NSID: &'static str = "com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateAccountResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.createAccount
-pub struct CreateAccountRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateAccount<'de>;
-    type Response = CreateAccountResponse;
 }

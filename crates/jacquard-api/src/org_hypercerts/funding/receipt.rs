@@ -57,6 +57,171 @@ pub struct Receipt<'a> {
     pub transaction_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiptGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Receipt<'a>,
+}
+
+impl<'a> Receipt<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReceiptRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ReceiptRecord;
+impl jacquard_common::xrpc::XrpcResp for ReceiptRecord {
+    const NSID: &'static str = "org.hypercerts.funding.receipt";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ReceiptGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReceiptGetRecordOutput<'_>> for Receipt<'_> {
+    fn from(output: ReceiptGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Receipt<'_> {
+    const NSID: &'static str = "org.hypercerts.funding.receipt";
+    type Record = ReceiptRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ReceiptRecord {
+    const NSID: &'static str = "org.hypercerts.funding.receipt";
+    type Record = ReceiptRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.funding.receipt"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_funding_receipt()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.amount;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "amount",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.currency;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "currency",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.payment_network {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "payment_network",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.payment_rail {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "payment_rail",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.to;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "to",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.transaction_id {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transaction_id",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod receipt_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -67,85 +232,85 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Amount;
-        type To;
-        type From;
         type Currency;
+        type To;
         type CreatedAt;
+        type Amount;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Amount = Unset;
-        type To = Unset;
-        type From = Unset;
         type Currency = Unset;
+        type To = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type Amount = Set<members::amount>;
-        type To = S::To;
-        type From = S::From;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type Amount = S::Amount;
-        type To = Set<members::to>;
-        type From = S::From;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type Amount = S::Amount;
-        type To = S::To;
-        type From = Set<members::from>;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
+        type Amount = Unset;
+        type From = Unset;
     }
     ///State transition - sets the `currency` field to Set
     pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrency<S> {}
     impl<S: State> State for SetCurrency<S> {
-        type Amount = S::Amount;
-        type To = S::To;
-        type From = S::From;
         type Currency = Set<members::currency>;
+        type To = S::To;
         type CreatedAt = S::CreatedAt;
+        type Amount = S::Amount;
+        type From = S::From;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTo<S> {}
+    impl<S: State> State for SetTo<S> {
+        type Currency = S::Currency;
+        type To = Set<members::to>;
+        type CreatedAt = S::CreatedAt;
+        type Amount = S::Amount;
+        type From = S::From;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Amount = S::Amount;
-        type To = S::To;
-        type From = S::From;
         type Currency = S::Currency;
+        type To = S::To;
         type CreatedAt = Set<members::created_at>;
+        type Amount = S::Amount;
+        type From = S::From;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type Currency = S::Currency;
+        type To = S::To;
+        type CreatedAt = S::CreatedAt;
+        type Amount = Set<members::amount>;
+        type From = S::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFrom<S> {}
+    impl<S: State> State for SetFrom<S> {
+        type Currency = S::Currency;
+        type To = S::To;
+        type CreatedAt = S::CreatedAt;
+        type Amount = S::Amount;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `amount` field
-        pub struct amount(());
-        ///Marker type for the `to` field
-        pub struct to(());
-        ///Marker type for the `from` field
-        pub struct from(());
         ///Marker type for the `currency` field
         pub struct currency(());
+        ///Marker type for the `to` field
+        pub struct to(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
@@ -407,11 +572,11 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S> ReceiptBuilder<'a, S>
 where
     S: receipt_state::State,
-    S::Amount: receipt_state::IsSet,
-    S::To: receipt_state::IsSet,
-    S::From: receipt_state::IsSet,
     S::Currency: receipt_state::IsSet,
+    S::To: receipt_state::IsSet,
     S::CreatedAt: receipt_state::IsSet,
+    S::Amount: receipt_state::IsSet,
+    S::From: receipt_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Receipt<'a> {
@@ -452,171 +617,6 @@ where
             transaction_id: self.__unsafe_private_named.10,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Receipt<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReceiptRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReceiptGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Receipt<'a>,
-}
-
-impl From<ReceiptGetRecordOutput<'_>> for Receipt<'_> {
-    fn from(output: ReceiptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Receipt<'_> {
-    const NSID: &'static str = "org.hypercerts.funding.receipt";
-    type Record = ReceiptRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ReceiptRecord;
-impl jacquard_common::xrpc::XrpcResp for ReceiptRecord {
-    const NSID: &'static str = "org.hypercerts.funding.receipt";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReceiptGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ReceiptRecord {
-    const NSID: &'static str = "org.hypercerts.funding.receipt";
-    type Record = ReceiptRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Receipt<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.funding.receipt"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_funding_receipt()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.amount;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "amount",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.currency;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "currency",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.payment_network {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "payment_network",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.payment_rail {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "payment_rail",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.to;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "to",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.transaction_id {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transaction_id",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

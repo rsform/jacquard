@@ -48,6 +48,344 @@ pub struct Quiz<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuizGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Quiz<'a>,
+}
+
+/// Reference to a question with its point value
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuestionRef<'a> {
+    ///A custom name for this question, as opposed to its number
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Points awarded for complete correctness Defaults to `1`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_question_ref_points")]
+    pub points: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub question: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// A round within a quiz
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Round<'a> {
+    ///Ordered list of questions in this round
+    #[serde(borrow)]
+    pub questions: Vec<crate::pub_quizzy::quiz::QuestionRef<'a>>,
+    ///Optional title for this round (requires locale if set)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Quiz<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, QuizRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct QuizRecord;
+impl jacquard_common::xrpc::XrpcResp for QuizRecord {
+    const NSID: &'static str = "pub.quizzy.quiz";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QuizGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<QuizGetRecordOutput<'_>> for Quiz<'_> {
+    fn from(output: QuizGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Quiz<'_> {
+    const NSID: &'static str = "pub.quizzy.quiz";
+    type Record = QuizRecord;
+}
+
+impl jacquard_common::types::collection::Collection for QuizRecord {
+    const NSID: &'static str = "pub.quizzy.quiz";
+    type Record = QuizRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quiz"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quiz()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 3000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.locales;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "locales",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.locales;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "locales",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.rounds;
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rounds",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.rounds;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rounds",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quiz"
+    }
+    fn def_name() -> &'static str {
+        "questionRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quiz()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 16usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 16usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 160usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 160usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.points {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "points",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quiz"
+    }
+    fn def_name() -> &'static str {
+        "round"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quiz()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.questions;
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "questions",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.questions;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "questions",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.title {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.title {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_quiz_has_audio() -> std::option::Option<bool> {
     Some(false)
 }
@@ -67,66 +405,66 @@ pub mod quiz_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Locales;
-        type Timestamp;
-        type Title;
         type Rounds;
+        type Title;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Locales = Unset;
-        type Timestamp = Unset;
-        type Title = Unset;
         type Rounds = Unset;
+        type Title = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocales<S> {}
     impl<S: State> State for SetLocales<S> {
         type Locales = Set<members::locales>;
-        type Timestamp = S::Timestamp;
+        type Rounds = S::Rounds;
         type Title = S::Title;
-        type Rounds = S::Rounds;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Locales = S::Locales;
-        type Timestamp = Set<members::timestamp>;
-        type Title = S::Title;
-        type Rounds = S::Rounds;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Locales = S::Locales;
         type Timestamp = S::Timestamp;
-        type Title = Set<members::title>;
-        type Rounds = S::Rounds;
     }
     ///State transition - sets the `rounds` field to Set
     pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRounds<S> {}
     impl<S: State> State for SetRounds<S> {
         type Locales = S::Locales;
-        type Timestamp = S::Timestamp;
-        type Title = S::Title;
         type Rounds = Set<members::rounds>;
+        type Title = S::Title;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Locales = S::Locales;
+        type Rounds = S::Rounds;
+        type Title = Set<members::title>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Locales = S::Locales;
+        type Rounds = S::Rounds;
+        type Title = S::Title;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `locales` field
         pub struct locales(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `rounds` field
         pub struct rounds(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -308,9 +646,9 @@ impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
     S::Locales: quiz_state::IsSet,
-    S::Timestamp: quiz_state::IsSet,
-    S::Title: quiz_state::IsSet,
     S::Rounds: quiz_state::IsSet,
+    S::Title: quiz_state::IsSet,
+    S::Timestamp: quiz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quiz<'a> {
@@ -345,166 +683,6 @@ where
             title: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Quiz<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, QuizRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Quiz<'a>,
-}
-
-impl From<QuizGetRecordOutput<'_>> for Quiz<'_> {
-    fn from(output: QuizGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Quiz<'_> {
-    const NSID: &'static str = "pub.quizzy.quiz";
-    type Record = QuizRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct QuizRecord;
-impl jacquard_common::xrpc::XrpcResp for QuizRecord {
-    const NSID: &'static str = "pub.quizzy.quiz";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for QuizRecord {
-    const NSID: &'static str = "pub.quizzy.quiz";
-    type Record = QuizRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quiz"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quiz()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.locales;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locales",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.locales;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locales",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.rounds;
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rounds",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.rounds;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rounds",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -815,31 +993,6 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
     }
 }
 
-/// Reference to a question with its point value
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QuestionRef<'a> {
-    ///A custom name for this question, as opposed to its number
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Points awarded for complete correctness Defaults to `1`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_question_ref_points")]
-    pub points: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub question: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 fn _default_question_ref_points() -> std::option::Option<i64> {
     Some(1i64)
 }
@@ -984,86 +1137,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quiz"
-    }
-    fn def_name() -> &'static str {
-        "questionRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quiz()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 16usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.name {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 160usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 160usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.points {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "points",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A round within a quiz
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Round<'a> {
-    ///Ordered list of questions in this round
-    #[serde(borrow)]
-    pub questions: Vec<crate::pub_quizzy::quiz::QuestionRef<'a>>,
-    ///Optional title for this round (requires locale if set)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod round_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1185,78 +1258,5 @@ where
             title: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quiz"
-    }
-    fn def_name() -> &'static str {
-        "round"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quiz()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.questions;
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "questions",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.questions;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "questions",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.title {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.title {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

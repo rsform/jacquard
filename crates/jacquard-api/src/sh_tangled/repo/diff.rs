@@ -22,6 +22,116 @@ pub struct Diff<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DiffOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DiffError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Git reference not found
+    #[serde(rename = "RefNotFound")]
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DiffError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RefNotFound(msg) => {
+                write!(f, "RefNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.diff
+pub struct DiffResponse;
+impl jacquard_common::xrpc::XrpcResp for DiffResponse {
+    const NSID: &'static str = "sh.tangled.repo.diff";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = DiffOutput;
+    type Err<'de> = DiffError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(DiffOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Diff<'a> {
+    const NSID: &'static str = "sh.tangled.repo.diff";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DiffResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.diff
+pub struct DiffRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.diff";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Diff<'de>;
+    type Response = DiffResponse;
+}
+
 pub mod diff_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,114 +255,4 @@ where
             repo: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DiffOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DiffError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Git reference not found
-    #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DiffError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RefNotFound(msg) => {
-                write!(f, "RefNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.diff
-pub struct DiffResponse;
-impl jacquard_common::xrpc::XrpcResp for DiffResponse {
-    const NSID: &'static str = "sh.tangled.repo.diff";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = DiffOutput;
-    type Err<'de> = DiffError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(DiffOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Diff<'a> {
-    const NSID: &'static str = "sh.tangled.repo.diff";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = DiffResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.diff
-pub struct DiffRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.diff";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Diff<'de>;
-    type Response = DiffResponse;
 }

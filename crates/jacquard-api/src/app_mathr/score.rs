@@ -31,6 +31,142 @@ pub struct Score<'a> {
     pub total_successes: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScoreGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Score<'a>,
+}
+
+impl<'a> Score<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ScoreRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ScoreRecord;
+impl jacquard_common::xrpc::XrpcResp for ScoreRecord {
+    const NSID: &'static str = "app.mathr.score";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ScoreGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ScoreGetRecordOutput<'_>> for Score<'_> {
+    fn from(output: ScoreGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Score<'_> {
+    const NSID: &'static str = "app.mathr.score";
+    type Record = ScoreRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ScoreRecord {
+    const NSID: &'static str = "app.mathr.score";
+    type Record = ScoreRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Score<'a> {
+    fn nsid() -> &'static str {
+        "app.mathr.score"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_mathr_score()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.level;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.percentage {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percentage",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.percentage {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percentage",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.total_challenges;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_challenges",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.total_successes;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_successes",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod score_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -41,67 +177,67 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type TotalChallenges;
         type TotalSuccesses;
         type Level;
-        type TotalChallenges;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type TotalChallenges = Unset;
         type TotalSuccesses = Unset;
         type Level = Unset;
-        type TotalChallenges = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalSuccesses = Set<members::total_successes>;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type Level = Set<members::level>;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type Level = S::Level;
-        type TotalChallenges = Set<members::total_challenges>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type TotalChallenges = S::TotalChallenges;
         type TotalSuccesses = S::TotalSuccesses;
         type Level = S::Level;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type CreatedAt = S::CreatedAt;
+        type TotalChallenges = Set<members::total_challenges>;
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
+    impl<S: State> State for SetTotalSuccesses<S> {
+        type CreatedAt = S::CreatedAt;
         type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = Set<members::created_at>;
+        type TotalSuccesses = Set<members::total_successes>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type CreatedAt = S::CreatedAt;
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -228,10 +364,10 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
+    S::CreatedAt: score_state::IsSet,
+    S::TotalChallenges: score_state::IsSet,
     S::TotalSuccesses: score_state::IsSet,
     S::Level: score_state::IsSet,
-    S::TotalChallenges: score_state::IsSet,
-    S::CreatedAt: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
@@ -260,142 +396,6 @@ where
             total_successes: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Score<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ScoreRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Score<'a>,
-}
-
-impl From<ScoreGetRecordOutput<'_>> for Score<'_> {
-    fn from(output: ScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Score<'_> {
-    const NSID: &'static str = "app.mathr.score";
-    type Record = ScoreRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ScoreRecord;
-impl jacquard_common::xrpc::XrpcResp for ScoreRecord {
-    const NSID: &'static str = "app.mathr.score";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ScoreGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ScoreRecord {
-    const NSID: &'static str = "app.mathr.score";
-    type Record = ScoreRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Score<'a> {
-    fn nsid() -> &'static str {
-        "app.mathr.score"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_mathr_score()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.percentage {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percentage",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.percentage {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percentage",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_challenges;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_challenges",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_successes;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_successes",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

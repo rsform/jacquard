@@ -36,6 +36,164 @@ pub struct ContentTypes<'a> {
     pub reposts: std::option::Option<bool>,
 }
 
+/// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListMute<'a> {
+    ///Types of content to mute from accounts on this list
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_types: std::option::Option<
+        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
+    >,
+    ///When the mute was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///When this mute expires. If not set, mute is permanent
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Optional reason for muting this list
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///AT-URI of the list to mute (app.bsky.graph.list record)
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::AtUri<'a>,
+    ///Specific feeds where this mute should apply. If empty, applies to all feeds
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub target_feeds: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListMuteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ListMute<'a>,
+}
+
+impl<'a> ListMute<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ListMuteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.graph.listMute"
+    }
+    fn def_name() -> &'static str {
+        "contentTypes"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_graph_listMute()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListMuteRecord;
+impl jacquard_common::xrpc::XrpcResp for ListMuteRecord {
+    const NSID: &'static str = "net.anisota.graph.listMute";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListMuteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ListMuteGetRecordOutput<'_>> for ListMute<'_> {
+    fn from(output: ListMuteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for ListMute<'_> {
+    const NSID: &'static str = "net.anisota.graph.listMute";
+    type Record = ListMuteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ListMuteRecord {
+    const NSID: &'static str = "net.anisota.graph.listMute";
+    type Record = ListMuteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.graph.listMute"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_graph_listMute()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.reason {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reason",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.target_feeds {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "target_feeds",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_content_types_posts() -> std::option::Option<bool> {
     Some(true)
 }
@@ -291,62 +449,6 @@ fn lexicon_doc_net_anisota_graph_listMute() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.graph.listMute"
-    }
-    fn def_name() -> &'static str {
-        "contentTypes"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_graph_listMute()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListMute<'a> {
-    ///Types of content to mute from accounts on this list
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_types: std::option::Option<
-        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
-    >,
-    ///When the mute was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///When this mute expires. If not set, mute is permanent
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Optional reason for muting this list
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT-URI of the list to mute (app.bsky.graph.list record)
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::AtUri<'a>,
-    ///Specific feeds where this mute should apply. If empty, applies to all feeds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub target_feeds: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-}
-
 pub mod list_mute_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -357,37 +459,37 @@ pub mod list_mute_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -537,8 +639,8 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 impl<'a, S> ListMuteBuilder<'a, S>
 where
     S: list_mute_state::State,
-    S::CreatedAt: list_mute_state::IsSet,
     S::Subject: list_mute_state::IsSet,
+    S::CreatedAt: list_mute_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListMute<'a> {
@@ -569,107 +671,5 @@ where
             target_feeds: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ListMute<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListMuteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListMuteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ListMute<'a>,
-}
-
-impl From<ListMuteGetRecordOutput<'_>> for ListMute<'_> {
-    fn from(output: ListMuteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for ListMute<'_> {
-    const NSID: &'static str = "net.anisota.graph.listMute";
-    type Record = ListMuteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ListMuteRecord;
-impl jacquard_common::xrpc::XrpcResp for ListMuteRecord {
-    const NSID: &'static str = "net.anisota.graph.listMute";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListMuteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ListMuteRecord {
-    const NSID: &'static str = "net.anisota.graph.listMute";
-    type Record = ListMuteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.graph.listMute"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_graph_listMute()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.reason {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reason",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.target_feeds {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target_feeds",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

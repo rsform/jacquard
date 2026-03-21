@@ -56,6 +56,210 @@ pub struct Evaluation<'a> {
     pub summary: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EvaluationContentItem<'a> {
+    #[serde(rename = "org.hypercerts.defs#uri")]
+    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    #[serde(rename = "org.hypercerts.defs#smallBlob")]
+    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EvaluationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Evaluation<'a>,
+}
+
+/// Overall score for an evaluation on a numeric scale.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Score<'a> {
+    ///Maximum value of the scale, e.g. 5 or 10.
+    pub max: i64,
+    ///Minimum value of the scale, e.g. 0 or 1.
+    pub min: i64,
+    ///Score within the inclusive range [min, max].
+    pub value: i64,
+}
+
+impl<'a> Evaluation<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EvaluationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EvaluationRecord;
+impl jacquard_common::xrpc::XrpcResp for EvaluationRecord {
+    const NSID: &'static str = "org.hypercerts.context.evaluation";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EvaluationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EvaluationGetRecordOutput<'_>> for Evaluation<'_> {
+    fn from(output: EvaluationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Evaluation<'_> {
+    const NSID: &'static str = "org.hypercerts.context.evaluation";
+    type Record = EvaluationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EvaluationRecord {
+    const NSID: &'static str = "org.hypercerts.context.evaluation";
+    type Record = EvaluationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.context.evaluation"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_context_evaluation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.content {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.evaluators;
+            #[allow(unused_comparisons)]
+            if value.len() > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "evaluators",
+                    ),
+                    max: 1000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.measurements {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "measurements",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.summary;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "summary",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.summary;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "summary",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Score<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.context.evaluation"
+    }
+    fn def_name() -> &'static str {
+        "score"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_context_evaluation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod evaluation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -67,50 +271,50 @@ pub mod evaluation_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Evaluators;
-        type CreatedAt;
         type Summary;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Evaluators = Unset;
-        type CreatedAt = Unset;
         type Summary = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluators` field to Set
     pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluators<S> {}
     impl<S: State> State for SetEvaluators<S> {
         type Evaluators = Set<members::evaluators>;
+        type Summary = S::Summary;
         type CreatedAt = S::CreatedAt;
-        type Summary = S::Summary;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Evaluators = S::Evaluators;
-        type CreatedAt = Set<members::created_at>;
-        type Summary = S::Summary;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
         type Evaluators = S::Evaluators;
-        type CreatedAt = S::CreatedAt;
         type Summary = Set<members::summary>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Evaluators = S::Evaluators;
+        type Summary = S::Summary;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `evaluators` field
         pub struct evaluators(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -306,8 +510,8 @@ impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
     S::Evaluators: evaluation_state::IsSet,
-    S::CreatedAt: evaluation_state::IsSet,
     S::Summary: evaluation_state::IsSet,
+    S::CreatedAt: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -342,172 +546,6 @@ where
             summary: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Evaluation<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EvaluationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum EvaluationContentItem<'a> {
-    #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
-    #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Evaluation<'a>,
-}
-
-impl From<EvaluationGetRecordOutput<'_>> for Evaluation<'_> {
-    fn from(output: EvaluationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Evaluation<'_> {
-    const NSID: &'static str = "org.hypercerts.context.evaluation";
-    type Record = EvaluationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EvaluationRecord;
-impl jacquard_common::xrpc::XrpcResp for EvaluationRecord {
-    const NSID: &'static str = "org.hypercerts.context.evaluation";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EvaluationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EvaluationRecord {
-    const NSID: &'static str = "org.hypercerts.context.evaluation";
-    type Record = EvaluationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.context.evaluation"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_context_evaluation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.content {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.evaluators;
-            #[allow(unused_comparisons)]
-            if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evaluators",
-                    ),
-                    max: 1000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.measurements {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "measurements",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.summary;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "summary",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.summary;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "summary",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 
@@ -752,27 +790,6 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexico
     }
 }
 
-/// Overall score for an evaluation on a numeric scale.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Score<'a> {
-    ///Maximum value of the scale, e.g. 5 or 10.
-    pub max: i64,
-    ///Minimum value of the scale, e.g. 0 or 1.
-    pub min: i64,
-    ///Score within the inclusive range [min, max].
-    pub value: i64,
-}
-
 pub mod score_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -783,51 +800,51 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Min;
         type Max;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Min = Unset;
         type Max = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Min = S::Min;
-        type Max = S::Max;
+        type Value = Unset;
     }
     ///State transition - sets the `min` field to Set
     pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMin<S> {}
     impl<S: State> State for SetMin<S> {
-        type Value = S::Value;
         type Min = Set<members::min>;
         type Max = S::Max;
+        type Value = S::Value;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMax<S> {}
     impl<S: State> State for SetMax<S> {
-        type Value = S::Value;
         type Min = S::Min;
         type Max = Set<members::max>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Min = S::Min;
+        type Max = S::Max;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `min` field
         pub struct min(());
         ///Marker type for the `max` field
         pub struct max(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -920,9 +937,9 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Value: score_state::IsSet,
     S::Min: score_state::IsSet,
     S::Max: score_state::IsSet,
+    S::Value: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
@@ -947,22 +964,5 @@ where
             value: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Score<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.context.evaluation"
-    }
-    fn def_name() -> &'static str {
-        "score"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_context_evaluation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -25,6 +25,219 @@ pub struct CardItem<'a> {
     pub r#ref: crate::com_deckbelcher::CardRef<'a>,
 }
 
+/// A deck saved to the list.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeckItem<'a> {
+    ///Timestamp when this item was added to the list.
+    pub added_at: jacquard_common::types::string::Datetime,
+    ///Reference to the deck record.
+    #[serde(borrow)]
+    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// A curated list of cards and/or decks.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct List<'a> {
+    ///Timestamp when the list was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Description of the list.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<crate::com_deckbelcher::richtext::Document<'a>>,
+    ///Items in the list.
+    #[serde(borrow)]
+    pub items: Vec<ListItemsItem<'a>>,
+    ///Name of the list.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Timestamp when the list was last updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemsItem<'a> {
+    #[serde(rename = "com.deckbelcher.collection.list#cardItem")]
+    CardItem(Box<crate::com_deckbelcher::collection::list::CardItem<'a>>),
+    #[serde(rename = "com.deckbelcher.collection.list#deckItem")]
+    DeckItem(Box<crate::com_deckbelcher::collection::list::DeckItem<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: List<'a>,
+}
+
+impl<'a> List<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardItem<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.collection.list"
+    }
+    fn def_name() -> &'static str {
+        "cardItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_collection_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeckItem<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.collection.list"
+    }
+    fn def_name() -> &'static str {
+        "deckItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_collection_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListRecord;
+impl jacquard_common::xrpc::XrpcResp for ListRecord {
+    const NSID: &'static str = "com.deckbelcher.collection.list";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ListGetRecordOutput<'_>> for List<'_> {
+    fn from(output: ListGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for List<'_> {
+    const NSID: &'static str = "com.deckbelcher.collection.list";
+    type Record = ListRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ListRecord {
+    const NSID: &'static str = "com.deckbelcher.collection.list";
+    type Record = ListRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.collection.list"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_collection_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1280usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 1280usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod card_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,37 +248,37 @@ pub mod card_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Ref;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Ref = S::Ref;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type AddedAt = S::AddedAt;
         type Ref = Set<members::r#ref>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Ref = S::Ref;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -138,8 +351,8 @@ where
 impl<'a, S> CardItemBuilder<'a, S>
 where
     S: card_item_state::State,
-    S::AddedAt: card_item_state::IsSet,
     S::Ref: card_item_state::IsSet,
+    S::AddedAt: card_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardItem<'a> {
@@ -415,43 +628,6 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardItem<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.collection.list"
-    }
-    fn def_name() -> &'static str {
-        "cardItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_collection_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A deck saved to the list.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeckItem<'a> {
-    ///Timestamp when this item was added to the list.
-    pub added_at: jacquard_common::types::string::Datetime,
-    ///Reference to the deck record.
-    #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod deck_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -462,37 +638,37 @@ pub mod deck_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type AddedAt;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type AddedAt = S::AddedAt;
+        type Ref = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Ref = S::Ref;
         type AddedAt = Set<members::added_at>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type AddedAt = S::AddedAt;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -565,8 +741,8 @@ where
 impl<'a, S> DeckItemBuilder<'a, S>
 where
     S: deck_item_state::State,
-    S::Ref: deck_item_state::IsSet,
     S::AddedAt: deck_item_state::IsSet,
+    S::Ref: deck_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeckItem<'a> {
@@ -592,53 +768,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeckItem<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.collection.list"
-    }
-    fn def_name() -> &'static str {
-        "deckItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_collection_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A curated list of cards and/or decks.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct List<'a> {
-    ///Timestamp when the list was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Description of the list.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<crate::com_deckbelcher::richtext::Document<'a>>,
-    ///Items in the list.
-    #[serde(borrow)]
-    pub items: Vec<ListItemsItem<'a>>,
-    ///Name of the list.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Timestamp when the list was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -649,51 +778,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
         type Items;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
         type Items = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Items = S::Items;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Items = S::Items;
+        type Name = S::Name;
     }
     ///State transition - sets the `items` field to Set
     pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItems<S> {}
     impl<S: State> State for SetItems<S> {
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Items = Set<members::items>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Items = S::Items;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `items` field
         pub struct items(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -826,9 +955,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Name: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
     S::Items: list_state::IsSet,
+    S::Name: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -857,134 +986,5 @@ where
             updated_at: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemsItem<'a> {
-    #[serde(rename = "com.deckbelcher.collection.list#cardItem")]
-    CardItem(Box<crate::com_deckbelcher::collection::list::CardItem<'a>>),
-    #[serde(rename = "com.deckbelcher.collection.list#deckItem")]
-    DeckItem(Box<crate::com_deckbelcher::collection::list::DeckItem<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
-}
-
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for List<'_> {
-    const NSID: &'static str = "com.deckbelcher.collection.list";
-    type Record = ListRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ListRecord;
-impl jacquard_common::xrpc::XrpcResp for ListRecord {
-    const NSID: &'static str = "com.deckbelcher.collection.list";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ListRecord {
-    const NSID: &'static str = "com.deckbelcher.collection.list";
-    type Record = ListRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.collection.list"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_collection_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 1280usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

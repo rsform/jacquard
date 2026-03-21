@@ -67,6 +67,216 @@ pub struct ProfileView<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+/// Preferences for an user's publishing scopes.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublishingScopesPref<'a> {
+    ///What publishing scope to mark a clip as by default
+    #[serde(borrow)]
+    pub default_scope: PublishingScopesPrefDefaultScope<'a>,
+}
+
+/// What publishing scope to mark a clip as by default
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PublishingScopesPrefDefaultScope<'a> {
+    Public,
+    Unlisted,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PublishingScopesPrefDefaultScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PublishingScopesPrefDefaultScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PublishingScopesPrefDefaultScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for PublishingScopesPrefDefaultScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for PublishingScopesPrefDefaultScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for PublishingScopesPrefDefaultScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PublishingScopesPrefDefaultScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for PublishingScopesPrefDefaultScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for PublishingScopesPrefDefaultScope<'_> {
+    type Output = PublishingScopesPrefDefaultScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PublishingScopesPrefDefaultScope::Public => {
+                PublishingScopesPrefDefaultScope::Public
+            }
+            PublishingScopesPrefDefaultScope::Unlisted => {
+                PublishingScopesPrefDefaultScope::Unlisted
+            }
+            PublishingScopesPrefDefaultScope::Other(v) => {
+                PublishingScopesPrefDefaultScope::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+    fn nsid() -> &'static str {
+        "social.clippr.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_clippr_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.display_name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.display_name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingScopesPref<'a> {
+    fn nsid() -> &'static str {
+        "social.clippr.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "publishingScopesPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_clippr_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod profile_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -77,51 +287,51 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type DisplayName;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type DisplayName = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
         type DisplayName = Set<members::display_name>;
         type Did = S::Did;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type DisplayName = S::DisplayName;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -274,9 +484,9 @@ where
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Handle: profile_view_state::IsSet,
     S::DisplayName: profile_view_state::IsSet,
     S::Did: profile_view_state::IsSet,
+    S::Handle: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
@@ -538,215 +748,5 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
-    fn nsid() -> &'static str {
-        "social.clippr.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_clippr_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.display_name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.display_name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Preferences for an user's publishing scopes.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishingScopesPref<'a> {
-    ///What publishing scope to mark a clip as by default
-    #[serde(borrow)]
-    pub default_scope: PublishingScopesPrefDefaultScope<'a>,
-}
-
-/// What publishing scope to mark a clip as by default
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PublishingScopesPrefDefaultScope<'a> {
-    Public,
-    Unlisted,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> PublishingScopesPrefDefaultScope<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Unlisted => "unlisted",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for PublishingScopesPrefDefaultScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for PublishingScopesPrefDefaultScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PublishingScopesPrefDefaultScope<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for PublishingScopesPrefDefaultScope<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for PublishingScopesPrefDefaultScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for PublishingScopesPrefDefaultScope<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for PublishingScopesPrefDefaultScope<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for PublishingScopesPrefDefaultScope<'_> {
-    type Output = PublishingScopesPrefDefaultScope<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PublishingScopesPrefDefaultScope::Public => {
-                PublishingScopesPrefDefaultScope::Public
-            }
-            PublishingScopesPrefDefaultScope::Unlisted => {
-                PublishingScopesPrefDefaultScope::Unlisted
-            }
-            PublishingScopesPrefDefaultScope::Other(v) => {
-                PublishingScopesPrefDefaultScope::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingScopesPref<'a> {
-    fn nsid() -> &'static str {
-        "social.clippr.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "publishingScopesPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_clippr_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

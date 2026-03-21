@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -33,6 +29,55 @@ pub struct SearchActors<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///app.bsky.actor.searchActors
+pub struct SearchActorsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
+    const NSID: &'static str = "app.bsky.actor.searchActors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchActorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
+    const NSID: &'static str = "app.bsky.actor.searchActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchActorsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.actor.searchActors
+pub struct SearchActorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.searchActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActors<'de>;
+    type Response = SearchActorsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_actors_state {
@@ -155,49 +200,4 @@ where
             term: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///app.bsky.actor.searchActors
-pub struct SearchActorsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
-    const NSID: &'static str = "app.bsky.actor.searchActors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
-    const NSID: &'static str = "app.bsky.actor.searchActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchActorsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.actor.searchActors
-pub struct SearchActorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.actor.searchActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActors<'de>;
-    type Response = SearchActorsResponse;
 }

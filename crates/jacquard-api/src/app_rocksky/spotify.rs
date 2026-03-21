@@ -50,6 +50,23 @@ pub struct SpotifyTrackView<'a> {
     pub preview_url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpotifyTrackView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.spotify.defs"
+    }
+    fn def_name() -> &'static str {
+        "spotifyTrackView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_spotify_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_rocksky_spotify_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -193,22 +210,5 @@ fn lexicon_doc_app_rocksky_spotify_defs() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpotifyTrackView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.spotify.defs"
-    }
-    fn def_name() -> &'static str {
-        "spotifyTrackView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_spotify_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

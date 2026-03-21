@@ -23,6 +23,52 @@ pub struct GetFolders<'a> {
     pub limit: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFoldersOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub folders: std::option::Option<
+        Vec<crate::app_blebbit::authr::folder::FolderView<'a>>,
+    >,
+}
+
+/// Response type for
+///app.blebbit.authr.folder.getFolders
+pub struct GetFoldersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFoldersResponse {
+    const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFoldersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolders<'a> {
+    const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFoldersResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.folder.getFolders
+pub struct GetFoldersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFoldersRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolders";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFolders<'de>;
+    type Response = GetFoldersResponse;
+}
+
 pub mod get_folders_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -110,50 +156,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFoldersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub folders: std::option::Option<
-        Vec<crate::app_blebbit::authr::folder::FolderView<'a>>,
-    >,
-}
-
-/// Response type for
-///app.blebbit.authr.folder.getFolders
-pub struct GetFoldersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFoldersResponse {
-    const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFoldersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolders<'a> {
-    const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFoldersResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.folder.getFolders
-pub struct GetFoldersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFoldersRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolders";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFolders<'de>;
-    type Response = GetFoldersResponse;
 }

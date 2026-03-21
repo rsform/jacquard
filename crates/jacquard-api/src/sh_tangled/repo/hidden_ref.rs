@@ -28,6 +28,60 @@ pub struct HiddenRef<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HiddenRefOutput<'a> {
+    ///Error message if creation failed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The created hidden ref name
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether the hidden ref was created successfully
+    pub success: bool,
+}
+
+/// Response type for
+///sh.tangled.repo.hiddenRef
+pub struct HiddenRefResponse;
+impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
+    const NSID: &'static str = "sh.tangled.repo.hiddenRef";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = HiddenRefOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for HiddenRef<'a> {
+    const NSID: &'static str = "sh.tangled.repo.hiddenRef";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = HiddenRefResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.hiddenRef
+pub struct HiddenRefRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = HiddenRef<'de>;
+    type Response = HiddenRefResponse;
+}
+
 pub mod hidden_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,50 +93,50 @@ pub mod hidden_ref_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ForkRef;
-        type RemoteRef;
         type Repo;
+        type RemoteRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ForkRef = Unset;
-        type RemoteRef = Unset;
         type Repo = Unset;
+        type RemoteRef = Unset;
     }
     ///State transition - sets the `fork_ref` field to Set
     pub struct SetForkRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForkRef<S> {}
     impl<S: State> State for SetForkRef<S> {
         type ForkRef = Set<members::fork_ref>;
+        type Repo = S::Repo;
         type RemoteRef = S::RemoteRef;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `remote_ref` field to Set
-    pub struct SetRemoteRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRemoteRef<S> {}
-    impl<S: State> State for SetRemoteRef<S> {
-        type ForkRef = S::ForkRef;
-        type RemoteRef = Set<members::remote_ref>;
-        type Repo = S::Repo;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type ForkRef = S::ForkRef;
-        type RemoteRef = S::RemoteRef;
         type Repo = Set<members::repo>;
+        type RemoteRef = S::RemoteRef;
+    }
+    ///State transition - sets the `remote_ref` field to Set
+    pub struct SetRemoteRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemoteRef<S> {}
+    impl<S: State> State for SetRemoteRef<S> {
+        type ForkRef = S::ForkRef;
+        type Repo = S::Repo;
+        type RemoteRef = Set<members::remote_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `fork_ref` field
         pub struct fork_ref(());
-        ///Marker type for the `remote_ref` field
-        pub struct remote_ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `remote_ref` field
+        pub struct remote_ref(());
     }
 }
 
@@ -176,8 +230,8 @@ impl<'a, S> HiddenRefBuilder<'a, S>
 where
     S: hidden_ref_state::State,
     S::ForkRef: hidden_ref_state::IsSet,
-    S::RemoteRef: hidden_ref_state::IsSet,
     S::Repo: hidden_ref_state::IsSet,
+    S::RemoteRef: hidden_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HiddenRef<'a> {
@@ -203,58 +257,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HiddenRefOutput<'a> {
-    ///Error message if creation failed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The created hidden ref name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the hidden ref was created successfully
-    pub success: bool,
-}
-
-/// Response type for
-///sh.tangled.repo.hiddenRef
-pub struct HiddenRefResponse;
-impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
-    const NSID: &'static str = "sh.tangled.repo.hiddenRef";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = HiddenRefOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for HiddenRef<'a> {
-    const NSID: &'static str = "sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = HiddenRefResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.hiddenRef
-pub struct HiddenRefRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = HiddenRef<'de>;
-    type Response = HiddenRefResponse;
 }

@@ -31,6 +31,245 @@ pub struct Artist<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// A recording of a song or musical work: the performance captured in a specific format
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Recording<'a> {
+    #[serde(borrow)]
+    pub artists: Vec<crate::ch_indiemusi::alpha::recording::Artist<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub audio_file: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///Duration of the recording in seconds
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duration: std::option::Option<i64>,
+    ///ISRC (International Standard Recording Code) with which the recording is registered
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub master_owner: std::option::Option<
+        crate::ch_indiemusi::alpha::recording::MasterOwnerInfo<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub song: std::option::Option<crate::ch_indiemusi::alpha::song::Song<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordingGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Recording<'a>,
+}
+
+/// Information about the master owner
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MasterOwnerInfo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub master_owner: std::option::Option<
+        crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Recording<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RecordingRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.recording"
+    }
+    fn def_name() -> &'static str {
+        "artist"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_recording()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RecordingRecord;
+impl jacquard_common::xrpc::XrpcResp for RecordingRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.recording";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RecordingGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RecordingGetRecordOutput<'_>> for Recording<'_> {
+    fn from(output: RecordingGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Recording<'_> {
+    const NSID: &'static str = "ch.indiemusi.alpha.recording";
+    type Record = RecordingRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RecordingRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.recording";
+    type Record = RecordingRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.recording"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_recording()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.artists;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "artists",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.isrc {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 12usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "isrc",
+                    ),
+                    max: 12usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwnerInfo<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.recording"
+    }
+    fn def_name() -> &'static str {
+        "masterOwnerInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_recording()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_ch_indiemusi_alpha_recording() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -303,73 +542,6 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.recording"
-    }
-    fn def_name() -> &'static str {
-        "artist"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_recording()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A recording of a song or musical work: the performance captured in a specific format
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Recording<'a> {
-    #[serde(borrow)]
-    pub artists: Vec<crate::ch_indiemusi::alpha::recording::Artist<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub audio_file: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///Duration of the recording in seconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
-    ///ISRC (International Standard Recording Code) with which the recording is registered
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub master_owner: std::option::Option<
-        crate::ch_indiemusi::alpha::recording::MasterOwnerInfo<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub song: std::option::Option<crate::ch_indiemusi::alpha::song::Song<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-}
-
 pub mod recording_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -612,177 +784,5 @@ where
             title: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Recording<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RecordingRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Recording<'a>,
-}
-
-impl From<RecordingGetRecordOutput<'_>> for Recording<'_> {
-    fn from(output: RecordingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Recording<'_> {
-    const NSID: &'static str = "ch.indiemusi.alpha.recording";
-    type Record = RecordingRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RecordingRecord;
-impl jacquard_common::xrpc::XrpcResp for RecordingRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.recording";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecordingGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RecordingRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.recording";
-    type Record = RecordingRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.recording"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_recording()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.artists;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artists",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.isrc {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 12usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "isrc",
-                    ),
-                    max: 12usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Information about the master owner
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MasterOwnerInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub master_owner: std::option::Option<
-        crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwnerInfo<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.recording"
-    }
-    fn def_name() -> &'static str {
-        "masterOwnerInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_recording()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

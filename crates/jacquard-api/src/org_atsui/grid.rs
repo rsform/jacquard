@@ -29,147 +29,6 @@ pub struct Grid<'a> {
     pub gap: std::option::Option<GridGap<'a>>,
 }
 
-fn _default_grid_columns() -> std::option::Option<i64> {
-    Some(3i64)
-}
-
-pub mod grid_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Children;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Children = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct GridBuilder<'a, S: grid_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<GridGap<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Grid<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GridBuilder<'a, grid_state::Empty> {
-        GridBuilder::new()
-    }
-}
-
-impl<'a> GridBuilder<'a, grid_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        GridBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> GridBuilder<'a, S>
-where
-    S: grid_state::State,
-    S::Children: grid_state::IsUnset,
-{
-    /// Set the `children` field (required)
-    pub fn children(
-        mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
-    ) -> GridBuilder<'a, grid_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        GridBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: grid_state::State> GridBuilder<'a, S> {
-    /// Set the `columns` field (optional)
-    pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `columns` field to an Option value (optional)
-    pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S: grid_state::State> GridBuilder<'a, S> {
-    /// Set the `gap` field (optional)
-    pub fn gap(mut self, value: impl Into<Option<GridGap<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `gap` field to an Option value (optional)
-    pub fn maybe_gap(mut self, value: Option<GridGap<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S> GridBuilder<'a, S>
-where
-    S: grid_state::State,
-    S::Children: grid_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Grid<'a> {
-        Grid {
-            children: self.__unsafe_private_named.0.unwrap(),
-            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
-            gap: self.__unsafe_private_named.2,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Grid<'a> {
-        Grid {
-            children: self.__unsafe_private_named.0.unwrap(),
-            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
-            gap: self.__unsafe_private_named.2,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 /// Space between children.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GridGap<'a> {
@@ -314,4 +173,145 @@ impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     );
     type Request<'de> = Grid<'de>;
     type Response = GridResponse;
+}
+
+fn _default_grid_columns() -> std::option::Option<i64> {
+    Some(3i64)
+}
+
+pub mod grid_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Children;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Children = Unset;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Children = Set<members::children>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `children` field
+        pub struct children(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GridBuilder<'a, S: grid_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<GridGap<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Grid<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GridBuilder<'a, grid_state::Empty> {
+        GridBuilder::new()
+    }
+}
+
+impl<'a> GridBuilder<'a, grid_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GridBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GridBuilder<'a, S>
+where
+    S: grid_state::State,
+    S::Children: grid_state::IsUnset,
+{
+    /// Set the `children` field (required)
+    pub fn children(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> GridBuilder<'a, grid_state::SetChildren<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GridBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: grid_state::State> GridBuilder<'a, S> {
+    /// Set the `columns` field (optional)
+    pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `columns` field to an Option value (optional)
+    pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: grid_state::State> GridBuilder<'a, S> {
+    /// Set the `gap` field (optional)
+    pub fn gap(mut self, value: impl Into<Option<GridGap<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `gap` field to an Option value (optional)
+    pub fn maybe_gap(mut self, value: Option<GridGap<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GridBuilder<'a, S>
+where
+    S: grid_state::State,
+    S::Children: grid_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Grid<'a> {
+        Grid {
+            children: self.__unsafe_private_named.0.unwrap(),
+            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
+            gap: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Grid<'a> {
+        Grid {
+            children: self.__unsafe_private_named.0.unwrap(),
+            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
+            gap: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }

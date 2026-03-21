@@ -20,6 +20,58 @@ pub struct DescribeRepo<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DescribeRepoOutput<'a> {
+    ///List of all the collections (NSIDs) for which this repo contains at least one record.
+    #[serde(borrow)]
+    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///The complete DID document for this account.
+    #[serde(borrow)]
+    pub did_doc: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    ///Indicates if handle is currently valid (resolves bi-directionally)
+    pub handle_is_correct: bool,
+}
+
+/// Response type for
+///com.atproto.repo.describeRepo
+pub struct DescribeRepoResponse;
+impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
+    const NSID: &'static str = "com.atproto.repo.describeRepo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DescribeRepoOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DescribeRepo<'a> {
+    const NSID: &'static str = "com.atproto.repo.describeRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DescribeRepoResponse;
+}
+
+/// Endpoint type for
+///com.atproto.repo.describeRepo
+pub struct DescribeRepoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DescribeRepo<'de>;
+    type Response = DescribeRepoResponse;
+}
+
 pub mod describe_repo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,56 +161,4 @@ where
             repo: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DescribeRepoOutput<'a> {
-    ///List of all the collections (NSIDs) for which this repo contains at least one record.
-    #[serde(borrow)]
-    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///The complete DID document for this account.
-    #[serde(borrow)]
-    pub did_doc: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    ///Indicates if handle is currently valid (resolves bi-directionally)
-    pub handle_is_correct: bool,
-}
-
-/// Response type for
-///com.atproto.repo.describeRepo
-pub struct DescribeRepoResponse;
-impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
-    const NSID: &'static str = "com.atproto.repo.describeRepo";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeRepoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DescribeRepo<'a> {
-    const NSID: &'static str = "com.atproto.repo.describeRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = DescribeRepoResponse;
-}
-
-/// Endpoint type for
-///com.atproto.repo.describeRepo
-pub struct DescribeRepoRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeRepo<'de>;
-    type Response = DescribeRepoResponse;
 }

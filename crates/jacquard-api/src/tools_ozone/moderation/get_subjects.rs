@@ -20,6 +20,48 @@ pub struct GetSubjects<'a> {
     pub subjects: Vec<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSubjectsOutput<'a> {
+    #[serde(borrow)]
+    pub subjects: Vec<crate::tools_ozone::moderation::SubjectView<'a>>,
+}
+
+/// Response type for
+///tools.ozone.moderation.getSubjects
+pub struct GetSubjectsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSubjectsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getSubjects";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSubjectsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubjects<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.getSubjects";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSubjectsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.getSubjects
+pub struct GetSubjectsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getSubjects";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSubjects<'de>;
+    type Response = GetSubjectsResponse;
+}
+
 pub mod get_subjects_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,46 +149,4 @@ where
             subjects: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSubjectsOutput<'a> {
-    #[serde(borrow)]
-    pub subjects: Vec<crate::tools_ozone::moderation::SubjectView<'a>>,
-}
-
-/// Response type for
-///tools.ozone.moderation.getSubjects
-pub struct GetSubjectsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSubjectsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.getSubjects";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSubjectsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubjects<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.getSubjects";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSubjectsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.getSubjects
-pub struct GetSubjectsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getSubjects";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSubjects<'de>;
-    type Response = GetSubjectsResponse;
 }

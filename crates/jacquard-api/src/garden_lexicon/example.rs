@@ -32,6 +32,84 @@ pub struct Example<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExampleGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Example<'a>,
+}
+
+impl<'a> Example<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExampleRecord;
+impl jacquard_common::xrpc::XrpcResp for ExampleRecord {
+    const NSID: &'static str = "garden.lexicon.example";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ExampleGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
+    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Example<'_> {
+    const NSID: &'static str = "garden.lexicon.example";
+    type Record = ExampleRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ExampleRecord {
+    const NSID: &'static str = "garden.lexicon.example";
+    type Record = ExampleRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.example"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_example()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod example_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,51 +120,51 @@ pub mod example_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
-        type Value;
         type CreatedAt;
+        type Value;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
-        type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Lexicon = Set<members::lexicon>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Lexicon = S::Lexicon;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
+        type Value = Unset;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lexicon = S::Lexicon;
-        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = S::Value;
+        type Lexicon = S::Lexicon;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Value = Set<members::value>;
+        type Lexicon = S::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type CreatedAt = S::CreatedAt;
+        type Value = S::Value;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -199,9 +277,9 @@ where
 impl<'a, S> ExampleBuilder<'a, S>
 where
     S: example_state::State,
-    S::Lexicon: example_state::IsSet,
-    S::Value: example_state::IsSet,
     S::CreatedAt: example_state::IsSet,
+    S::Value: example_state::IsSet,
+    S::Lexicon: example_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Example<'a> {
@@ -228,84 +306,6 @@ where
             value: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Example<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Example<'a>,
-}
-
-impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
-    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Example<'_> {
-    const NSID: &'static str = "garden.lexicon.example";
-    type Record = ExampleRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ExampleRecord;
-impl jacquard_common::xrpc::XrpcResp for ExampleRecord {
-    const NSID: &'static str = "garden.lexicon.example";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExampleGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ExampleRecord {
-    const NSID: &'static str = "garden.lexicon.example";
-    type Record = ExampleRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.example"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_example()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

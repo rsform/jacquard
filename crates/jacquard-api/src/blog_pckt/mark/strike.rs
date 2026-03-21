@@ -18,6 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Strike<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strike<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.mark.strike"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_mark_strike()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_mark_strike() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -43,22 +60,5 @@ fn lexicon_doc_blog_pckt_mark_strike() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strike<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.mark.strike"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_mark_strike()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

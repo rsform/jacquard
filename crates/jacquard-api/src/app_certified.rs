@@ -27,6 +27,36 @@ pub struct Did<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Did<'a> {
+    fn nsid() -> &'static str {
+        "app.certified.defs"
+    }
+    fn def_name() -> &'static str {
+        "did"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_certified_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.did;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "did",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod did_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -186,35 +216,5 @@ fn lexicon_doc_app_certified_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Did<'a> {
-    fn nsid() -> &'static str {
-        "app.certified.defs"
-    }
-    fn def_name() -> &'static str {
-        "did"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_certified_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.did;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "did",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

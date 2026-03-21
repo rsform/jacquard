@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_path() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from(""))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -40,6 +32,134 @@ pub struct Log<'a> {
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LogOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Git reference not found
+    #[serde(rename = "RefNotFound")]
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Path not found in repository
+    #[serde(rename = "PathNotFound")]
+    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for LogError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RefNotFound(msg) => {
+                write!(f, "RefNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::PathNotFound(msg) => {
+                write!(f, "PathNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.log
+pub struct LogResponse;
+impl jacquard_common::xrpc::XrpcResp for LogResponse {
+    const NSID: &'static str = "sh.tangled.repo.log";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = LogOutput;
+    type Err<'de> = LogError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(LogOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
+    const NSID: &'static str = "sh.tangled.repo.log";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = LogResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.log
+pub struct LogRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Log<'de>;
+    type Response = LogResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_path() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from(""))
 }
 
 pub mod log_state {
@@ -216,124 +336,4 @@ where
             repo: self.__unsafe_private_named.4.unwrap(),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LogOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Git reference not found
-    #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Path not found in repository
-    #[serde(rename = "PathNotFound")]
-    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for LogError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RefNotFound(msg) => {
-                write!(f, "RefNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::PathNotFound(msg) => {
-                write!(f, "PathNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.log
-pub struct LogResponse;
-impl jacquard_common::xrpc::XrpcResp for LogResponse {
-    const NSID: &'static str = "sh.tangled.repo.log";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = LogOutput;
-    type Err<'de> = LogError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(LogOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
-    const NSID: &'static str = "sh.tangled.repo.log";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = LogResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.log
-pub struct LogRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Log<'de>;
-    type Response = LogResponse;
 }

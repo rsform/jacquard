@@ -28,6 +28,36 @@ pub struct Delete<'a> {
     pub rkey: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.delete
+pub struct DeleteResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
+    const NSID: &'static str = "sh.tangled.repo.delete";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Delete<'a> {
+    const NSID: &'static str = "sh.tangled.repo.delete";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.delete
+pub struct DeleteRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Delete<'de>;
+    type Response = DeleteResponse;
+}
+
 pub mod delete_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +68,51 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Name;
         type Rkey;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Name = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Name = S::Name;
-        type Rkey = S::Rkey;
+        type Did = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Did = S::Did;
         type Name = Set<members::name>;
         type Rkey = S::Rkey;
+        type Did = S::Did;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
         type Name = S::Name;
         type Rkey = Set<members::rkey>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Name = S::Name;
+        type Rkey = S::Rkey;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -175,9 +205,9 @@ where
 impl<'a, S> DeleteBuilder<'a, S>
 where
     S: delete_state::State,
-    S::Did: delete_state::IsSet,
     S::Name: delete_state::IsSet,
     S::Rkey: delete_state::IsSet,
+    S::Did: delete_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Delete<'a> {
@@ -203,34 +233,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.delete
-pub struct DeleteResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
-    const NSID: &'static str = "sh.tangled.repo.delete";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Delete<'a> {
-    const NSID: &'static str = "sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.delete
-pub struct DeleteRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Delete<'de>;
-    type Response = DeleteResponse;
 }

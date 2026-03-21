@@ -5,22 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_above() -> std::option::Option<bool> {
-    Some(true)
-}
-
-fn _default_below() -> std::option::Option<i64> {
-    Some(6i64)
-}
-
-fn _default_branching_factor() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("oldest"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -51,6 +35,132 @@ pub struct GetPostThreadV2<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostThreadV2Output<'a> {
+    ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
+    pub has_other_replies: bool,
+    ///A flat list of thread items. The depth of each item is indicated by the depth property inside the item.
+    #[serde(borrow)]
+    pub thread: Vec<crate::app_bsky::unspecced::get_post_thread_v2::ThreadItem<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItem<'a> {
+    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
+    pub depth: i64,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ThreadItemValue<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThreadItemValue<'a> {
+    #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
+    ThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
+    #[serde(rename = "app.bsky.unspecced.defs#threadItemNoUnauthenticated")]
+    ThreadItemNoUnauthenticated(
+        Box<crate::app_bsky::unspecced::ThreadItemNoUnauthenticated<'a>>,
+    ),
+    #[serde(rename = "app.bsky.unspecced.defs#threadItemNotFound")]
+    ThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
+    #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
+    ThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
+}
+
+/// Response type for
+///app.bsky.unspecced.getPostThreadV2
+pub struct GetPostThreadV2Response;
+impl jacquard_common::xrpc::XrpcResp for GetPostThreadV2Response {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPostThreadV2Output<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadV2<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPostThreadV2Response;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getPostThreadV2
+pub struct GetPostThreadV2Request;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadV2";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPostThreadV2<'de>;
+    type Response = GetPostThreadV2Response;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.getPostThreadV2"
+    }
+    fn def_name() -> &'static str {
+        "threadItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_getPostThreadV2()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_above() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_below() -> std::option::Option<i64> {
+    Some(6i64)
+}
+
+fn _default_branching_factor() -> std::option::Option<i64> {
+    Some(10i64)
+}
+
+fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("oldest"))
 }
 
 pub mod get_post_thread_v2_state {
@@ -207,74 +317,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPostThreadV2Output<'a> {
-    ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
-    pub has_other_replies: bool,
-    ///A flat list of thread items. The depth of each item is indicated by the depth property inside the item.
-    #[serde(borrow)]
-    pub thread: Vec<crate::app_bsky::unspecced::get_post_thread_v2::ThreadItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getPostThreadV2
-pub struct GetPostThreadV2Response;
-impl jacquard_common::xrpc::XrpcResp for GetPostThreadV2Response {
-    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadV2Output<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadV2<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPostThreadV2Response;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getPostThreadV2
-pub struct GetPostThreadV2Request;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPostThreadV2<'de>;
-    type Response = GetPostThreadV2Response;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItem<'a> {
-    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
-    pub depth: i64,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ThreadItemValue<'a>,
-}
-
 pub mod thread_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -285,51 +327,51 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type Uri;
         type Depth;
+        type Uri;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type Uri = Unset;
         type Depth = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Uri = S::Uri;
-        type Depth = S::Depth;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
-        type Uri = Set<members::uri>;
-        type Depth = S::Depth;
+        type Uri = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
-        type Value = S::Value;
-        type Uri = S::Uri;
         type Depth = Set<members::depth>;
+        type Uri = S::Uri;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Depth = S::Depth;
+        type Uri = Set<members::uri>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Depth = S::Depth;
+        type Uri = S::Uri;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -422,9 +464,9 @@ where
 impl<'a, S> ThreadItemBuilder<'a, S>
 where
     S: thread_item_state::State,
-    S::Value: thread_item_state::IsSet,
-    S::Uri: thread_item_state::IsSet,
     S::Depth: thread_item_state::IsSet,
+    S::Uri: thread_item_state::IsSet,
+    S::Value: thread_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItem<'a> {
@@ -450,31 +492,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadItemValue<'a> {
-    #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
-    ThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
-    #[serde(rename = "app.bsky.unspecced.defs#threadItemNoUnauthenticated")]
-    ThreadItemNoUnauthenticated(
-        Box<crate::app_bsky::unspecced::ThreadItemNoUnauthenticated<'a>>,
-    ),
-    #[serde(rename = "app.bsky.unspecced.defs#threadItemNotFound")]
-    ThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
-    #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
-    ThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
 }
 
 fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -658,22 +675,5 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> ::jacquard_lexicon::lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.getPostThreadV2"
-    }
-    fn def_name() -> &'static str {
-        "threadItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_getPostThreadV2()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

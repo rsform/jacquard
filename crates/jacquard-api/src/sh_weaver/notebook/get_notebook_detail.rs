@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_entry_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,91 @@ pub struct GetNotebookDetail<'a> {
     pub entry_limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetNotebookDetailOutput<'a> {
+    #[serde(borrow)]
+    pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetNotebookDetailError<'a> {
+    #[serde(rename = "NotebookNotFound")]
+    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetNotebookDetailError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotebookNotFound(msg) => {
+                write!(f, "NotebookNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getNotebookDetail
+pub struct GetNotebookDetailResponse;
+impl jacquard_common::xrpc::XrpcResp for GetNotebookDetailResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetNotebookDetailOutput<'de>;
+    type Err<'de> = GetNotebookDetailError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookDetail<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetNotebookDetailResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getNotebookDetail
+pub struct GetNotebookDetailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookDetailRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookDetail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetNotebookDetail<'de>;
+    type Response = GetNotebookDetailResponse;
+}
+
+fn _default_entry_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_notebook_detail_state {
@@ -156,85 +237,4 @@ where
             notebook: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetNotebookDetailOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetNotebookDetailError<'a> {
-    #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetNotebookDetailError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotebookNotFound(msg) => {
-                write!(f, "NotebookNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.getNotebookDetail
-pub struct GetNotebookDetailResponse;
-impl jacquard_common::xrpc::XrpcResp for GetNotebookDetailResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookDetailOutput<'de>;
-    type Err<'de> = GetNotebookDetailError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookDetail<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetNotebookDetailResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getNotebookDetail
-pub struct GetNotebookDetailRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookDetailRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookDetail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebookDetail<'de>;
-    type Response = GetNotebookDetailResponse;
 }

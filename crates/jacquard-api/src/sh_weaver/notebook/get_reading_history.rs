@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_status() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -36,6 +28,100 @@ pub struct GetReadingHistory<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetReadingHistoryOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub history: Vec<
+        crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReadingHistoryItem<'a> {
+    ///The entry the user was last reading.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub current_entry: std::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    #[serde(borrow)]
+    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getReadingHistory
+pub struct GetReadingHistoryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetReadingHistoryResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetReadingHistoryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetReadingHistory<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetReadingHistoryResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getReadingHistory
+pub struct GetReadingHistoryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getReadingHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetReadingHistory<'de>;
+    type Response = GetReadingHistoryResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReadingHistoryItem<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.getReadingHistory"
+    }
+    fn def_name() -> &'static str {
+        "readingHistoryItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_getReadingHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_status() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("all"))
 }
 
 pub mod get_reading_history_state {
@@ -143,75 +229,6 @@ where
             status: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetReadingHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub history: Vec<
-        crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>,
-    >,
-}
-
-/// Response type for
-///sh.weaver.notebook.getReadingHistory
-pub struct GetReadingHistoryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetReadingHistoryResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetReadingHistoryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetReadingHistory<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetReadingHistoryResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getReadingHistory
-pub struct GetReadingHistoryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getReadingHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetReadingHistory<'de>;
-    type Response = GetReadingHistoryResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReadingHistoryItem<'a> {
-    ///The entry the user was last reading.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub current_entry: std::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-    #[serde(borrow)]
-    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
 }
 
 pub mod reading_history_item_state {
@@ -513,22 +530,5 @@ fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReadingHistoryItem<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.getReadingHistory"
-    }
-    fn def_name() -> &'static str {
-        "readingHistoryItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_getReadingHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

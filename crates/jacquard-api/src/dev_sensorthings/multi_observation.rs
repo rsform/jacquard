@@ -51,6 +51,394 @@ pub struct MultiObservation<'a> {
     pub thing: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Quality flag applying to the composite observation as a whole
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MultiObservationResultQuality<'a> {
+    Good,
+    Suspect,
+    Missing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MultiObservationResultQuality<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Good => "dev.sensorthings.quality#good",
+            Self::Suspect => "dev.sensorthings.quality#suspect",
+            Self::Missing => "dev.sensorthings.quality#missing",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MultiObservationResultQuality<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "dev.sensorthings.quality#good" => Self::Good,
+            "dev.sensorthings.quality#suspect" => Self::Suspect,
+            "dev.sensorthings.quality#missing" => Self::Missing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MultiObservationResultQuality<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "dev.sensorthings.quality#good" => Self::Good,
+            "dev.sensorthings.quality#suspect" => Self::Suspect,
+            "dev.sensorthings.quality#missing" => Self::Missing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MultiObservationResultQuality<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MultiObservationResultQuality<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MultiObservationResultQuality<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MultiObservationResultQuality<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MultiObservationResultQuality<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MultiObservationResultQuality<'_> {
+    type Output = MultiObservationResultQuality<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MultiObservationResultQuality::Good => MultiObservationResultQuality::Good,
+            MultiObservationResultQuality::Suspect => {
+                MultiObservationResultQuality::Suspect
+            }
+            MultiObservationResultQuality::Missing => {
+                MultiObservationResultQuality::Missing
+            }
+            MultiObservationResultQuality::Other(v) => {
+                MultiObservationResultQuality::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiObservationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: MultiObservation<'a>,
+}
+
+/// A single result within a composite observation, fully self-describing.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiObservationEntry<'a> {
+    ///AT-URI of the dev.sensorthings.observedProperty record
+    #[serde(borrow)]
+    pub observed_property: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub result: MultiObservationEntryResult<'a>,
+    ///Quality flag for this specific entry, if different from the composite quality
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub result_quality: std::option::Option<MultiObservationEntryResultQuality<'a>>,
+    ///Scale factor for this entry's numeric result. Default 0.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub result_scale_factor: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub unit_of_measurement: crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum MultiObservationEntryResult<'a> {}
+/// Quality flag for this specific entry, if different from the composite quality
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MultiObservationEntryResultQuality<'a> {
+    Good,
+    Suspect,
+    Missing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MultiObservationEntryResultQuality<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Good => "dev.sensorthings.quality#good",
+            Self::Suspect => "dev.sensorthings.quality#suspect",
+            Self::Missing => "dev.sensorthings.quality#missing",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MultiObservationEntryResultQuality<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "dev.sensorthings.quality#good" => Self::Good,
+            "dev.sensorthings.quality#suspect" => Self::Suspect,
+            "dev.sensorthings.quality#missing" => Self::Missing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MultiObservationEntryResultQuality<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "dev.sensorthings.quality#good" => Self::Good,
+            "dev.sensorthings.quality#suspect" => Self::Suspect,
+            "dev.sensorthings.quality#missing" => Self::Missing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MultiObservationEntryResultQuality<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MultiObservationEntryResultQuality<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MultiObservationEntryResultQuality<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MultiObservationEntryResultQuality<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MultiObservationEntryResultQuality<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MultiObservationEntryResultQuality<'_> {
+    type Output = MultiObservationEntryResultQuality<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MultiObservationEntryResultQuality::Good => {
+                MultiObservationEntryResultQuality::Good
+            }
+            MultiObservationEntryResultQuality::Suspect => {
+                MultiObservationEntryResultQuality::Suspect
+            }
+            MultiObservationEntryResultQuality::Missing => {
+                MultiObservationEntryResultQuality::Missing
+            }
+            MultiObservationEntryResultQuality::Other(v) => {
+                MultiObservationEntryResultQuality::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> MultiObservation<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MultiObservationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MultiObservationRecord;
+impl jacquard_common::xrpc::XrpcResp for MultiObservationRecord {
+    const NSID: &'static str = "dev.sensorthings.multiObservation";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MultiObservationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MultiObservationGetRecordOutput<'_>> for MultiObservation<'_> {
+    fn from(output: MultiObservationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for MultiObservation<'_> {
+    const NSID: &'static str = "dev.sensorthings.multiObservation";
+    type Record = MultiObservationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MultiObservationRecord {
+    const NSID: &'static str = "dev.sensorthings.multiObservation";
+    type Record = MultiObservationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
+    fn nsid() -> &'static str {
+        "dev.sensorthings.multiObservation"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_sensorthings_multiObservation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.derived_from {
+            #[allow(unused_comparisons)]
+            if value.len() > 16usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "derived_from",
+                    ),
+                    max: 16usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.entries;
+            #[allow(unused_comparisons)]
+            if value.len() > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "entries",
+                    ),
+                    max: 32usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.result_quality {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "result_quality",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiObservationEntry<'a> {
+    fn nsid() -> &'static str {
+        "dev.sensorthings.multiObservation"
+    }
+    fn def_name() -> &'static str {
+        "multiObservationEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_sensorthings_multiObservation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.result_quality {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "result_quality",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod multi_observation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -61,65 +449,65 @@ pub mod multi_observation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PhenomenonTime;
-        type Thing;
         type Sensor;
+        type Thing;
+        type PhenomenonTime;
         type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PhenomenonTime = Unset;
-        type Thing = Unset;
         type Sensor = Unset;
+        type Thing = Unset;
+        type PhenomenonTime = Unset;
         type Entries = Unset;
     }
-    ///State transition - sets the `phenomenon_time` field to Set
-    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
-    impl<S: State> State for SetPhenomenonTime<S> {
-        type PhenomenonTime = Set<members::phenomenon_time>;
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSensor<S> {}
+    impl<S: State> State for SetSensor<S> {
+        type Sensor = Set<members::sensor>;
         type Thing = S::Thing;
-        type Sensor = S::Sensor;
+        type PhenomenonTime = S::PhenomenonTime;
         type Entries = S::Entries;
     }
     ///State transition - sets the `thing` field to Set
     pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThing<S> {}
     impl<S: State> State for SetThing<S> {
-        type PhenomenonTime = S::PhenomenonTime;
-        type Thing = Set<members::thing>;
         type Sensor = S::Sensor;
+        type Thing = Set<members::thing>;
+        type PhenomenonTime = S::PhenomenonTime;
         type Entries = S::Entries;
     }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSensor<S> {}
-    impl<S: State> State for SetSensor<S> {
-        type PhenomenonTime = S::PhenomenonTime;
+    ///State transition - sets the `phenomenon_time` field to Set
+    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
+    impl<S: State> State for SetPhenomenonTime<S> {
+        type Sensor = S::Sensor;
         type Thing = S::Thing;
-        type Sensor = Set<members::sensor>;
+        type PhenomenonTime = Set<members::phenomenon_time>;
         type Entries = S::Entries;
     }
     ///State transition - sets the `entries` field to Set
     pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntries<S> {}
     impl<S: State> State for SetEntries<S> {
-        type PhenomenonTime = S::PhenomenonTime;
-        type Thing = S::Thing;
         type Sensor = S::Sensor;
+        type Thing = S::Thing;
+        type PhenomenonTime = S::PhenomenonTime;
         type Entries = Set<members::entries>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `phenomenon_time` field
-        pub struct phenomenon_time(());
-        ///Marker type for the `thing` field
-        pub struct thing(());
         ///Marker type for the `sensor` field
         pub struct sensor(());
+        ///Marker type for the `thing` field
+        pub struct thing(());
+        ///Marker type for the `phenomenon_time` field
+        pub struct phenomenon_time(());
         ///Marker type for the `entries` field
         pub struct entries(());
     }
@@ -318,9 +706,9 @@ where
 impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
-    S::PhenomenonTime: multi_observation_state::IsSet,
-    S::Thing: multi_observation_state::IsSet,
     S::Sensor: multi_observation_state::IsSet,
+    S::Thing: multi_observation_state::IsSet,
+    S::PhenomenonTime: multi_observation_state::IsSet,
     S::Entries: multi_observation_state::IsSet,
 {
     /// Build the final struct
@@ -356,221 +744,6 @@ where
             thing: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> MultiObservation<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MultiObservationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Quality flag applying to the composite observation as a whole
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MultiObservationResultQuality<'a> {
-    Good,
-    Suspect,
-    Missing,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MultiObservationResultQuality<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Good => "dev.sensorthings.quality#good",
-            Self::Suspect => "dev.sensorthings.quality#suspect",
-            Self::Missing => "dev.sensorthings.quality#missing",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MultiObservationResultQuality<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MultiObservationResultQuality<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MultiObservationResultQuality<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MultiObservationResultQuality<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MultiObservationResultQuality<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MultiObservationResultQuality<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MultiObservationResultQuality<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MultiObservationResultQuality<'_> {
-    type Output = MultiObservationResultQuality<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MultiObservationResultQuality::Good => MultiObservationResultQuality::Good,
-            MultiObservationResultQuality::Suspect => {
-                MultiObservationResultQuality::Suspect
-            }
-            MultiObservationResultQuality::Missing => {
-                MultiObservationResultQuality::Missing
-            }
-            MultiObservationResultQuality::Other(v) => {
-                MultiObservationResultQuality::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiObservationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: MultiObservation<'a>,
-}
-
-impl From<MultiObservationGetRecordOutput<'_>> for MultiObservation<'_> {
-    fn from(output: MultiObservationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for MultiObservation<'_> {
-    const NSID: &'static str = "dev.sensorthings.multiObservation";
-    type Record = MultiObservationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MultiObservationRecord;
-impl jacquard_common::xrpc::XrpcResp for MultiObservationRecord {
-    const NSID: &'static str = "dev.sensorthings.multiObservation";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MultiObservationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MultiObservationRecord {
-    const NSID: &'static str = "dev.sensorthings.multiObservation";
-    type Record = MultiObservationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
-    fn nsid() -> &'static str {
-        "dev.sensorthings.multiObservation"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_sensorthings_multiObservation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.derived_from {
-            #[allow(unused_comparisons)]
-            if value.len() > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "derived_from",
-                    ),
-                    max: 16usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.entries;
-            #[allow(unused_comparisons)]
-            if value.len() > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entries",
-                    ),
-                    max: 32usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.result_quality {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "result_quality",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -910,35 +1083,6 @@ fn lexicon_doc_dev_sensorthings_multiObservation() -> ::jacquard_lexicon::lexico
     }
 }
 
-/// A single result within a composite observation, fully self-describing.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiObservationEntry<'a> {
-    ///AT-URI of the dev.sensorthings.observedProperty record
-    #[serde(borrow)]
-    pub observed_property: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub result: MultiObservationEntryResult<'a>,
-    ///Quality flag for this specific entry, if different from the composite quality
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub result_quality: std::option::Option<MultiObservationEntryResultQuality<'a>>,
-    ///Scale factor for this entry's numeric result. Default 0.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub result_scale_factor: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub unit_of_measurement: crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
-}
-
 pub mod multi_observation_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -949,51 +1093,51 @@ pub mod multi_observation_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UnitOfMeasurement;
-        type ObservedProperty;
         type Result;
+        type ObservedProperty;
+        type UnitOfMeasurement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UnitOfMeasurement = Unset;
-        type ObservedProperty = Unset;
         type Result = Unset;
-    }
-    ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type UnitOfMeasurement = Set<members::unit_of_measurement>;
-        type ObservedProperty = S::ObservedProperty;
-        type Result = S::Result;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservedProperty = Set<members::observed_property>;
-        type Result = S::Result;
+        type ObservedProperty = Unset;
+        type UnitOfMeasurement = Unset;
     }
     ///State transition - sets the `result` field to Set
     pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResult<S> {}
     impl<S: State> State for SetResult<S> {
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservedProperty = S::ObservedProperty;
         type Result = Set<members::result>;
+        type ObservedProperty = S::ObservedProperty;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type Result = S::Result;
+        type ObservedProperty = Set<members::observed_property>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+    }
+    ///State transition - sets the `unit_of_measurement` field to Set
+    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
+    impl<S: State> State for SetUnitOfMeasurement<S> {
+        type Result = S::Result;
+        type ObservedProperty = S::ObservedProperty;
+        type UnitOfMeasurement = Set<members::unit_of_measurement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unit_of_measurement` field
-        pub struct unit_of_measurement(());
-        ///Marker type for the `observed_property` field
-        pub struct observed_property(());
         ///Marker type for the `result` field
         pub struct result(());
+        ///Marker type for the `observed_property` field
+        pub struct observed_property(());
+        ///Marker type for the `unit_of_measurement` field
+        pub struct unit_of_measurement(());
     }
 }
 
@@ -1131,9 +1275,9 @@ where
 impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
-    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
-    S::ObservedProperty: multi_observation_entry_state::IsSet,
     S::Result: multi_observation_entry_state::IsSet,
+    S::ObservedProperty: multi_observation_entry_state::IsSet,
+    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {
@@ -1162,149 +1306,5 @@ where
             unit_of_measurement: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum MultiObservationEntryResult<'a> {}
-/// Quality flag for this specific entry, if different from the composite quality
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MultiObservationEntryResultQuality<'a> {
-    Good,
-    Suspect,
-    Missing,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MultiObservationEntryResultQuality<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Good => "dev.sensorthings.quality#good",
-            Self::Suspect => "dev.sensorthings.quality#suspect",
-            Self::Missing => "dev.sensorthings.quality#missing",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MultiObservationEntryResultQuality<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MultiObservationEntryResultQuality<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MultiObservationEntryResultQuality<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MultiObservationEntryResultQuality<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MultiObservationEntryResultQuality<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MultiObservationEntryResultQuality<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MultiObservationEntryResultQuality<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MultiObservationEntryResultQuality<'_> {
-    type Output = MultiObservationEntryResultQuality<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MultiObservationEntryResultQuality::Good => {
-                MultiObservationEntryResultQuality::Good
-            }
-            MultiObservationEntryResultQuality::Suspect => {
-                MultiObservationEntryResultQuality::Suspect
-            }
-            MultiObservationEntryResultQuality::Missing => {
-                MultiObservationEntryResultQuality::Missing
-            }
-            MultiObservationEntryResultQuality::Other(v) => {
-                MultiObservationEntryResultQuality::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiObservationEntry<'a> {
-    fn nsid() -> &'static str {
-        "dev.sensorthings.multiObservation"
-    }
-    fn def_name() -> &'static str {
-        "multiObservationEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_sensorthings_multiObservation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.result_quality {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "result_quality",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

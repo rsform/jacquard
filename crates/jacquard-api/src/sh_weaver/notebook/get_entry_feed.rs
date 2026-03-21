@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_algorithm() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("chronological"))
-}
-
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -42,6 +34,59 @@ pub struct GetEntryFeed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEntryFeedOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feed: Vec<crate::sh_weaver::notebook::FeedEntryView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getEntryFeed
+pub struct GetEntryFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEntryFeedResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEntryFeedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryFeed<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEntryFeedResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getEntryFeed
+pub struct GetEntryFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEntryFeed<'de>;
+    type Response = GetEntryFeedResponse;
+}
+
+fn _default_algorithm() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("chronological"))
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_entry_feed_state {
@@ -194,49 +239,4 @@ where
             tags: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEntryFeedOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<crate::sh_weaver::notebook::FeedEntryView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getEntryFeed
-pub struct GetEntryFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEntryFeedResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryFeed<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEntryFeedResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getEntryFeed
-pub struct GetEntryFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryFeed<'de>;
-    type Response = GetEntryFeedResponse;
 }

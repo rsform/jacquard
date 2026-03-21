@@ -20,6 +20,83 @@ pub struct GetDraft<'a> {
     pub tid: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetDraftOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_unthread::document::put_draft::DraftView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetDraftError<'a> {
+    #[serde(rename = "DraftNotFound")]
+    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetDraftError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::DraftNotFound(msg) => {
+                write!(f, "DraftNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///at.unthread.document.getDraft
+pub struct GetDraftResponse;
+impl jacquard_common::xrpc::XrpcResp for GetDraftResponse {
+    const NSID: &'static str = "at.unthread.document.getDraft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetDraftOutput<'de>;
+    type Err<'de> = GetDraftError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetDraft<'a> {
+    const NSID: &'static str = "at.unthread.document.getDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetDraftResponse;
+}
+
+/// Endpoint type for
+///at.unthread.document.getDraft
+pub struct GetDraftRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetDraftRequest {
+    const PATH: &'static str = "/xrpc/at.unthread.document.getDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetDraft<'de>;
+    type Response = GetDraftResponse;
+}
+
 pub mod get_draft_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,81 +184,4 @@ where
             tid: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetDraftOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_unthread::document::put_draft::DraftView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetDraftError<'a> {
-    #[serde(rename = "DraftNotFound")]
-    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetDraftError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::DraftNotFound(msg) => {
-                write!(f, "DraftNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///at.unthread.document.getDraft
-pub struct GetDraftResponse;
-impl jacquard_common::xrpc::XrpcResp for GetDraftResponse {
-    const NSID: &'static str = "at.unthread.document.getDraft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetDraftOutput<'de>;
-    type Err<'de> = GetDraftError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetDraft<'a> {
-    const NSID: &'static str = "at.unthread.document.getDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetDraftResponse;
-}
-
-/// Endpoint type for
-///at.unthread.document.getDraft
-pub struct GetDraftRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetDraftRequest {
-    const PATH: &'static str = "/xrpc/at.unthread.document.getDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetDraft<'de>;
-    type Response = GetDraftResponse;
 }

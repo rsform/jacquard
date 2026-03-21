@@ -32,6 +32,721 @@ pub struct AspectRatio<'a> {
     pub width: i64,
 }
 
+/// A view of a collection with author profile and item count
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionView<'a> {
+    ///Collection owner profile
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///CID of the collection record
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///Timestamp when the collection was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Collection description
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Timestamp when the collection was indexed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Whether the collection is publicly visible Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_collection_view_is_public")]
+    pub is_public: std::option::Option<bool>,
+    ///Number of items in the collection
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub item_count: std::option::Option<i64>,
+    ///Collection name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///AT-URI of the collection record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// A view of a drawing post with author profile and metadata
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PostView<'a> {
+    ///Aspect ratio of the image
+    #[serde(borrow)]
+    pub aspect_ratio: crate::tech_tokimeki::kaku::AspectRatio<'a>,
+    ///Author profile
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///CID of the post record
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///Timestamp when the post was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///URL of the drawing image
+    #[serde(borrow)]
+    pub image: jacquard_common::types::string::UriValue<'a>,
+    ///Timestamp when the post was indexed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Reference to linked Bluesky post
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub linked_post: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Counts of each reaction type
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reaction_counts: std::option::Option<
+        crate::tech_tokimeki::kaku::ReactionCounts<'a>,
+    >,
+    ///Tags for categorization
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Optional description or title
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///AT-URI of the post record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    ///Current user's reaction to this post
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_reaction: std::option::Option<
+        crate::tech_tokimeki::kaku::ReactionType<'a>,
+    >,
+}
+
+/// Counts of each reaction type on a post
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionCounts<'a> {
+    ///Count of kami (godly) reactions Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reaction_counts_kami")]
+    pub kami: std::option::Option<i64>,
+    ///Count of kawaii (cute) reactions Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reaction_counts_kawaii")]
+    pub kawaii: std::option::Option<i64>,
+    ///Count of sugoi (amazing) reactions Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reaction_counts_sugoi")]
+    pub sugoi: std::option::Option<i64>,
+    ///Count of suki (like) reactions Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reaction_counts_suki")]
+    pub suki: std::option::Option<i64>,
+    ///Count of tasukaru (helpful) reactions Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_reaction_counts_tasukaru")]
+    pub tasukaru: std::option::Option<i64>,
+}
+
+/// Type of reaction to a post
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReactionType<'a> {
+    Suki,
+    Tasukaru,
+    Sugoi,
+    Kawaii,
+    Kami,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReactionType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Suki => "suki",
+            Self::Tasukaru => "tasukaru",
+            Self::Sugoi => "sugoi",
+            Self::Kawaii => "kawaii",
+            Self::Kami => "kami",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReactionType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "suki" => Self::Suki,
+            "tasukaru" => Self::Tasukaru,
+            "sugoi" => Self::Sugoi,
+            "kawaii" => Self::Kawaii,
+            "kami" => Self::Kami,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReactionType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "suki" => Self::Suki,
+            "tasukaru" => Self::Tasukaru,
+            "sugoi" => Self::Sugoi,
+            "kawaii" => Self::Kawaii,
+            "kami" => Self::Kami,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for ReactionType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for ReactionType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for ReactionType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReactionType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for ReactionType<'_> {
+    type Output = ReactionType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReactionType::Suki => ReactionType::Suki,
+            ReactionType::Tasukaru => ReactionType::Tasukaru,
+            ReactionType::Sugoi => ReactionType::Sugoi,
+            ReactionType::Kawaii => ReactionType::Kawaii,
+            ReactionType::Kami => ReactionType::Kami,
+            ReactionType::Other(v) => ReactionType::Other(v.into_static()),
+        }
+    }
+}
+
+/// A view of a Bluesky reply to a linked post
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReplyView<'a> {
+    ///Reply author profile
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///CID of the Bluesky reply
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///Timestamp when the reply was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Reply text content
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+    ///AT-URI of the Bluesky reply
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// A view of a response to a drawing request
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RequestResponseView<'a> {
+    ///Response author profile
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///CID of the response record
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///Timestamp when the response was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Optional message to the requester
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The drawing post submitted as response
+    #[serde(borrow)]
+    pub post: crate::tech_tokimeki::kaku::PostView<'a>,
+    ///AT-URI of the response record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// A view of a drawing request with author profile and response count
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RequestView<'a> {
+    ///Request author profile
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    ///CID of the request record
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///Timestamp when the request was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Timestamp when the request was indexed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Whether the request is still accepting responses
+    pub is_open: bool,
+    ///URLs of reference images for the request
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reference_images: std::option::Option<
+        Vec<jacquard_common::types::string::UriValue<'a>>,
+    >,
+    ///Number of responses to this request
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub response_count: std::option::Option<i64>,
+    ///Tags for categorization
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Specific artist the request is directed to
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub target_actor: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ///Description of what to draw
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+    ///AT-URI of the request record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.height;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.width;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "width",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "collectionView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 200usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 200usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 50usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 50usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "postView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 8usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.text {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.text {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionCounts<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "reactionCounts"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyView<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "replyView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponseView<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "requestResponseView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.message {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 150usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 150usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestView<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.defs"
+    }
+    fn def_name() -> &'static str {
+        "requestView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.reference_images {
+            #[allow(unused_comparisons)]
+            if value.len() > 4usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reference_images",
+                    ),
+                    max: 4usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 8usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod aspect_ratio_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,37 +757,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
@@ -142,8 +857,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -1264,90 +1979,6 @@ fn lexicon_doc_tech_tokimeki_kaku_defs() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "aspectRatio"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.height;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.width;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A view of a collection with author profile and item count
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionView<'a> {
-    ///Collection owner profile
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///CID of the collection record
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///Timestamp when the collection was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Collection description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp when the collection was indexed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Whether the collection is publicly visible Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_collection_view_is_public")]
-    pub is_public: std::option::Option<bool>,
-    ///Number of items in the collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_count: std::option::Option<i64>,
-    ///Collection name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///AT-URI of the collection record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 fn _default_collection_view_is_public() -> std::option::Option<bool> {
     Some(true)
 }
@@ -1363,84 +1994,84 @@ pub mod collection_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Name;
-        type Author;
-        type Cid;
         type Uri;
+        type Cid;
+        type Author;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Name = Unset;
-        type Author = Unset;
-        type Cid = Unset;
         type Uri = Unset;
+        type Cid = Unset;
+        type Author = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Author = S::Author;
+        type Uri = S::Uri;
         type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
         type Author = S::Author;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Author = S::Author;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1652,10 +2283,10 @@ impl<'a, S> CollectionViewBuilder<'a, S>
 where
     S: collection_view_state::State,
     S::CreatedAt: collection_view_state::IsSet,
-    S::Name: collection_view_state::IsSet,
-    S::Author: collection_view_state::IsSet,
-    S::Cid: collection_view_state::IsSet,
     S::Uri: collection_view_state::IsSet,
+    S::Cid: collection_view_state::IsSet,
+    S::Author: collection_view_state::IsSet,
+    S::Name: collection_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionView<'a> {
@@ -1695,146 +2326,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "collectionView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 200usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 50usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 50usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A view of a drawing post with author profile and metadata
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PostView<'a> {
-    ///Aspect ratio of the image
-    #[serde(borrow)]
-    pub aspect_ratio: crate::tech_tokimeki::kaku::AspectRatio<'a>,
-    ///Author profile
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///CID of the post record
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///Timestamp when the post was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///URL of the drawing image
-    #[serde(borrow)]
-    pub image: jacquard_common::types::string::UriValue<'a>,
-    ///Timestamp when the post was indexed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Reference to linked Bluesky post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub linked_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///Counts of each reaction type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reaction_counts: std::option::Option<
-        crate::tech_tokimeki::kaku::ReactionCounts<'a>,
-    >,
-    ///Tags for categorization
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Optional description or title
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT-URI of the post record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///Current user's reaction to this post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_reaction: std::option::Option<
-        crate::tech_tokimeki::kaku::ReactionType<'a>,
-    >,
-}
-
 pub mod post_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1845,103 +2336,103 @@ pub mod post_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Uri;
         type Author;
         type AspectRatio;
         type Cid;
+        type Uri;
+        type CreatedAt;
         type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Uri = Unset;
         type Author = Unset;
         type AspectRatio = Unset;
         type Cid = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type AspectRatio = S::AspectRatio;
-        type Cid = S::Cid;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type AspectRatio = S::AspectRatio;
-        type Cid = S::Cid;
-        type Image = S::Image;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
         type AspectRatio = S::AspectRatio;
         type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
         type Image = S::Image;
     }
     ///State transition - sets the `aspect_ratio` field to Set
     pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
     impl<S: State> State for SetAspectRatio<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type Author = S::Author;
         type AspectRatio = Set<members::aspect_ratio>;
         type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
         type Image = S::Image;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type Author = S::Author;
         type AspectRatio = S::AspectRatio;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Author = S::Author;
+        type AspectRatio = S::AspectRatio;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Author = S::Author;
+        type AspectRatio = S::AspectRatio;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
         type Image = S::Image;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type Author = S::Author;
         type AspectRatio = S::AspectRatio;
         type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
         type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `aspect_ratio` field
         pub struct aspect_ratio(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `image` field
         pub struct image(());
     }
@@ -2226,11 +2717,11 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
-    S::CreatedAt: post_view_state::IsSet,
-    S::Uri: post_view_state::IsSet,
     S::Author: post_view_state::IsSet,
     S::AspectRatio: post_view_state::IsSet,
     S::Cid: post_view_state::IsSet,
+    S::Uri: post_view_state::IsSet,
+    S::CreatedAt: post_view_state::IsSet,
     S::Image: post_view_state::IsSet,
 {
     /// Build the final struct
@@ -2277,100 +2768,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "postView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.text {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.text {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Counts of each reaction type on a post
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionCounts<'a> {
-    ///Count of kami (godly) reactions Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reaction_counts_kami")]
-    pub kami: std::option::Option<i64>,
-    ///Count of kawaii (cute) reactions Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reaction_counts_kawaii")]
-    pub kawaii: std::option::Option<i64>,
-    ///Count of sugoi (amazing) reactions Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reaction_counts_sugoi")]
-    pub sugoi: std::option::Option<i64>,
-    ///Count of suki (like) reactions Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reaction_counts_suki")]
-    pub suki: std::option::Option<i64>,
-    ///Count of tasukaru (helpful) reactions Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_reaction_counts_tasukaru")]
-    pub tasukaru: std::option::Option<i64>,
-}
-
 fn _default_reaction_counts_kami() -> std::option::Option<i64> {
     Some(0i64)
 }
@@ -2404,150 +2801,6 @@ impl Default for ReactionCounts<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionCounts<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "reactionCounts"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Type of reaction to a post
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReactionType<'a> {
-    Suki,
-    Tasukaru,
-    Sugoi,
-    Kawaii,
-    Kami,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ReactionType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Suki => "suki",
-            Self::Tasukaru => "tasukaru",
-            Self::Sugoi => "sugoi",
-            Self::Kawaii => "kawaii",
-            Self::Kami => "kami",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ReactionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "suki" => Self::Suki,
-            "tasukaru" => Self::Tasukaru,
-            "sugoi" => Self::Sugoi,
-            "kawaii" => Self::Kawaii,
-            "kami" => Self::Kami,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ReactionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "suki" => Self::Suki,
-            "tasukaru" => Self::Tasukaru,
-            "sugoi" => Self::Sugoi,
-            "kawaii" => Self::Kawaii,
-            "kami" => Self::Kami,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ReactionType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for ReactionType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for ReactionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ReactionType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for ReactionType<'_> {
-    type Output = ReactionType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReactionType::Suki => ReactionType::Suki,
-            ReactionType::Tasukaru => ReactionType::Tasukaru,
-            ReactionType::Sugoi => ReactionType::Sugoi,
-            ReactionType::Kawaii => ReactionType::Kawaii,
-            ReactionType::Kami => ReactionType::Kami,
-            ReactionType::Other(v) => ReactionType::Other(v.into_static()),
-        }
-    }
-}
-
-/// A view of a Bluesky reply to a linked post
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyView<'a> {
-    ///Reply author profile
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///CID of the Bluesky reply
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///Timestamp when the reply was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Reply text content
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-    ///AT-URI of the Bluesky reply
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod reply_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2558,85 +2811,85 @@ pub mod reply_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
+        type Text;
+        type Author;
         type CreatedAt;
         type Cid;
-        type Uri;
-        type Author;
-        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
+        type Text = Unset;
+        type Author = Unset;
         type CreatedAt = Unset;
         type Cid = Unset;
-        type Uri = Unset;
-        type Author = Unset;
-        type Text = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Text = S::Text;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
-        type Author = S::Author;
         type Text = S::Text;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
+        type Author = S::Author;
         type CreatedAt = S::CreatedAt;
         type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Text = S::Text;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
+        type Uri = S::Uri;
+        type Text = Set<members::text>;
+        type Author = S::Author;
         type CreatedAt = S::CreatedAt;
         type Cid = S::Cid;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
         type Uri = S::Uri;
+        type Text = S::Text;
+        type Author = Set<members::author>;
+        type CreatedAt = S::CreatedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Text = S::Text;
         type Author = S::Author;
-        type Text = Set<members::text>;
+        type CreatedAt = Set<members::created_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Text = S::Text;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `text` field
-        pub struct text(());
     }
 }
 
@@ -2769,11 +3022,11 @@ where
 impl<'a, S> ReplyViewBuilder<'a, S>
 where
     S: reply_view_state::State,
+    S::Uri: reply_view_state::IsSet,
+    S::Text: reply_view_state::IsSet,
+    S::Author: reply_view_state::IsSet,
     S::CreatedAt: reply_view_state::IsSet,
     S::Cid: reply_view_state::IsSet,
-    S::Uri: reply_view_state::IsSet,
-    S::Author: reply_view_state::IsSet,
-    S::Text: reply_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyView<'a> {
@@ -2805,88 +3058,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyView<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "replyView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A view of a response to a drawing request
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestResponseView<'a> {
-    ///Response author profile
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///CID of the response record
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///Timestamp when the response was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Optional message to the requester
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The drawing post submitted as response
-    #[serde(borrow)]
-    pub post: crate::tech_tokimeki::kaku::PostView<'a>,
-    ///AT-URI of the response record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod request_response_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2897,83 +3068,83 @@ pub mod request_response_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Post;
-        type Author;
         type Cid;
+        type Uri;
+        type Author;
+        type Post;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Post = Unset;
-        type Author = Unset;
         type Cid = Unset;
+        type Uri = Unset;
+        type Author = Unset;
+        type Post = Unset;
         type CreatedAt = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Post = S::Post;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Author = S::Author;
         type Post = S::Post;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Uri = S::Uri;
-        type Post = Set<members::post>;
-        type Author = S::Author;
-        type Cid = S::Cid;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Post = S::Post;
-        type Author = Set<members::author>;
         type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = Set<members::author>;
+        type Post = S::Post;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Cid = S::Cid;
         type Uri = S::Uri;
-        type Post = S::Post;
         type Author = S::Author;
-        type Cid = Set<members::cid>;
+        type Post = Set<members::post>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type Post = S::Post;
-        type Author = S::Author;
         type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Post = S::Post;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `post` field
-        pub struct post(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `post` field
+        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -3125,10 +3296,10 @@ where
 impl<'a, S> RequestResponseViewBuilder<'a, S>
 where
     S: request_response_view_state::State,
-    S::Uri: request_response_view_state::IsSet,
-    S::Post: request_response_view_state::IsSet,
-    S::Author: request_response_view_state::IsSet,
     S::Cid: request_response_view_state::IsSet,
+    S::Uri: request_response_view_state::IsSet,
+    S::Author: request_response_view_state::IsSet,
+    S::Post: request_response_view_state::IsSet,
     S::CreatedAt: request_response_view_state::IsSet,
 {
     /// Build the final struct
@@ -3163,104 +3334,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponseView<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "requestResponseView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.message {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 150usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A view of a drawing request with author profile and response count
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestView<'a> {
-    ///Request author profile
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    ///CID of the request record
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///Timestamp when the request was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Timestamp when the request was indexed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Whether the request is still accepting responses
-    pub is_open: bool,
-    ///URLs of reference images for the request
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reference_images: std::option::Option<
-        Vec<jacquard_common::types::string::UriValue<'a>>,
-    >,
-    ///Number of responses to this request
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub response_count: std::option::Option<i64>,
-    ///Tags for categorization
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Specific artist the request is directed to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub target_actor: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    ///Description of what to draw
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-    ///AT-URI of the request record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod request_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3272,104 +3345,104 @@ pub mod request_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type IsOpen;
-        type Uri;
         type Text;
-        type Author;
         type CreatedAt;
+        type IsOpen;
+        type Author;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type IsOpen = Unset;
-        type Uri = Unset;
         type Text = Unset;
-        type Author = Unset;
         type CreatedAt = Unset;
+        type IsOpen = Unset;
+        type Author = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
         type IsOpen = S::IsOpen;
+        type Author = S::Author;
         type Uri = S::Uri;
-        type Text = S::Text;
-        type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `is_open` field to Set
-    pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsOpen<S> {}
-    impl<S: State> State for SetIsOpen<S> {
-        type Cid = S::Cid;
-        type IsOpen = Set<members::is_open>;
-        type Uri = S::Uri;
-        type Text = S::Text;
-        type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type IsOpen = S::IsOpen;
-        type Uri = Set<members::uri>;
-        type Text = S::Text;
-        type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Cid = S::Cid;
-        type IsOpen = S::IsOpen;
-        type Uri = S::Uri;
         type Text = Set<members::text>;
-        type Author = S::Author;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
         type IsOpen = S::IsOpen;
+        type Author = S::Author;
         type Uri = S::Uri;
-        type Text = S::Text;
-        type Author = Set<members::author>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Cid = S::Cid;
-        type IsOpen = S::IsOpen;
-        type Uri = S::Uri;
         type Text = S::Text;
-        type Author = S::Author;
         type CreatedAt = Set<members::created_at>;
+        type IsOpen = S::IsOpen;
+        type Author = S::Author;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `is_open` field to Set
+    pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsOpen<S> {}
+    impl<S: State> State for SetIsOpen<S> {
+        type Cid = S::Cid;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type IsOpen = Set<members::is_open>;
+        type Author = S::Author;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type IsOpen = S::IsOpen;
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type IsOpen = S::IsOpen;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `is_open` field
-        pub struct is_open(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `is_open` field
+        pub struct is_open(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -3629,11 +3702,11 @@ impl<'a, S> RequestViewBuilder<'a, S>
 where
     S: request_view_state::State,
     S::Cid: request_view_state::IsSet,
-    S::IsOpen: request_view_state::IsSet,
-    S::Uri: request_view_state::IsSet,
     S::Text: request_view_state::IsSet,
-    S::Author: request_view_state::IsSet,
     S::CreatedAt: request_view_state::IsSet,
+    S::IsOpen: request_view_state::IsSet,
+    S::Author: request_view_state::IsSet,
+    S::Uri: request_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestView<'a> {
@@ -3674,78 +3747,5 @@ where
             uri: self.__unsafe_private_named.10.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestView<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.defs"
-    }
-    fn def_name() -> &'static str {
-        "requestView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.reference_images {
-            #[allow(unused_comparisons)]
-            if value.len() > 4usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reference_images",
-                    ),
-                    max: 4usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

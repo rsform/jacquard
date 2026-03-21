@@ -18,19 +18,6 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Example<'a> {}
-impl<'a> Example<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,
@@ -52,16 +39,17 @@ pub struct ExampleGetRecordOutput<'a> {
     pub value: Example<'a>,
 }
 
-impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
-    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Example<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Example<'_> {
-    const NSID: &'static str = "garden.lexicon.stunning-leafcutter.example";
-    type Record = ExampleRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -72,6 +60,18 @@ impl jacquard_common::xrpc::XrpcResp for ExampleRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ExampleGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
+    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Example<'_> {
+    const NSID: &'static str = "garden.lexicon.stunning-leafcutter.example";
+    type Record = ExampleRecord;
 }
 
 impl jacquard_common::types::collection::Collection for ExampleRecord {

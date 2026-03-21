@@ -32,6 +32,594 @@ pub struct Card<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// Game format for a deck.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Format<'a> {
+    Standard,
+    Pioneer,
+    Modern,
+    Legacy,
+    Vintage,
+    Pauper,
+    Commander,
+    Duel,
+    Paupercommander,
+    Predh,
+    Oathbreaker,
+    Brawl,
+    Standardbrawl,
+    Historic,
+    Timeless,
+    Alchemy,
+    Gladiator,
+    Premodern,
+    Oldschool,
+    Draft,
+    Penny,
+    Cube,
+    Kitchentable,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Format<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Standard => "standard",
+            Self::Pioneer => "pioneer",
+            Self::Modern => "modern",
+            Self::Legacy => "legacy",
+            Self::Vintage => "vintage",
+            Self::Pauper => "pauper",
+            Self::Commander => "commander",
+            Self::Duel => "duel",
+            Self::Paupercommander => "paupercommander",
+            Self::Predh => "predh",
+            Self::Oathbreaker => "oathbreaker",
+            Self::Brawl => "brawl",
+            Self::Standardbrawl => "standardbrawl",
+            Self::Historic => "historic",
+            Self::Timeless => "timeless",
+            Self::Alchemy => "alchemy",
+            Self::Gladiator => "gladiator",
+            Self::Premodern => "premodern",
+            Self::Oldschool => "oldschool",
+            Self::Draft => "draft",
+            Self::Penny => "penny",
+            Self::Cube => "cube",
+            Self::Kitchentable => "kitchentable",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Format<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "standard" => Self::Standard,
+            "pioneer" => Self::Pioneer,
+            "modern" => Self::Modern,
+            "legacy" => Self::Legacy,
+            "vintage" => Self::Vintage,
+            "pauper" => Self::Pauper,
+            "commander" => Self::Commander,
+            "duel" => Self::Duel,
+            "paupercommander" => Self::Paupercommander,
+            "predh" => Self::Predh,
+            "oathbreaker" => Self::Oathbreaker,
+            "brawl" => Self::Brawl,
+            "standardbrawl" => Self::Standardbrawl,
+            "historic" => Self::Historic,
+            "timeless" => Self::Timeless,
+            "alchemy" => Self::Alchemy,
+            "gladiator" => Self::Gladiator,
+            "premodern" => Self::Premodern,
+            "oldschool" => Self::Oldschool,
+            "draft" => Self::Draft,
+            "penny" => Self::Penny,
+            "cube" => Self::Cube,
+            "kitchentable" => Self::Kitchentable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Format<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "standard" => Self::Standard,
+            "pioneer" => Self::Pioneer,
+            "modern" => Self::Modern,
+            "legacy" => Self::Legacy,
+            "vintage" => Self::Vintage,
+            "pauper" => Self::Pauper,
+            "commander" => Self::Commander,
+            "duel" => Self::Duel,
+            "paupercommander" => Self::Paupercommander,
+            "predh" => Self::Predh,
+            "oathbreaker" => Self::Oathbreaker,
+            "brawl" => Self::Brawl,
+            "standardbrawl" => Self::Standardbrawl,
+            "historic" => Self::Historic,
+            "timeless" => Self::Timeless,
+            "alchemy" => Self::Alchemy,
+            "gladiator" => Self::Gladiator,
+            "premodern" => Self::Premodern,
+            "oldschool" => Self::Oldschool,
+            "draft" => Self::Draft,
+            "penny" => Self::Penny,
+            "cube" => Self::Cube,
+            "kitchentable" => Self::Kitchentable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Format<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Format<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Format<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Format<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Format<'_> {
+    type Output = Format<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Format::Standard => Format::Standard,
+            Format::Pioneer => Format::Pioneer,
+            Format::Modern => Format::Modern,
+            Format::Legacy => Format::Legacy,
+            Format::Vintage => Format::Vintage,
+            Format::Pauper => Format::Pauper,
+            Format::Commander => Format::Commander,
+            Format::Duel => Format::Duel,
+            Format::Paupercommander => Format::Paupercommander,
+            Format::Predh => Format::Predh,
+            Format::Oathbreaker => Format::Oathbreaker,
+            Format::Brawl => Format::Brawl,
+            Format::Standardbrawl => Format::Standardbrawl,
+            Format::Historic => Format::Historic,
+            Format::Timeless => Format::Timeless,
+            Format::Alchemy => Format::Alchemy,
+            Format::Gladiator => Format::Gladiator,
+            Format::Premodern => Format::Premodern,
+            Format::Oldschool => Format::Oldschool,
+            Format::Draft => Format::Draft,
+            Format::Penny => Format::Penny,
+            Format::Cube => Format::Cube,
+            Format::Kitchentable => Format::Kitchentable,
+            Format::Other(v) => Format::Other(v.into_static()),
+        }
+    }
+}
+
+/// A Magic: The Gathering decklist.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct List<'a> {
+    ///Array of cards in the decklist.
+    #[serde(borrow)]
+    pub cards: Vec<crate::com_deckbelcher::deck::list::Card<'a>>,
+    ///Timestamp when the decklist was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Format of the deck.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub format: std::option::Option<crate::com_deckbelcher::deck::list::Format<'a>>,
+    ///Name of the decklist.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Deck primer with strategy, combos, and card choices.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub primer: std::option::Option<ListPrimer<'a>>,
+    ///Timestamp when the decklist was last updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListPrimer<'a> {
+    #[serde(rename = "com.deckbelcher.richtext#document")]
+    RichtextDocument(Box<crate::com_deckbelcher::richtext::Document<'a>>),
+    #[serde(rename = "com.deckbelcher.deck.list#primerUri")]
+    PrimerUri(Box<crate::com_deckbelcher::deck::list::PrimerUri<'a>>),
+    #[serde(rename = "com.deckbelcher.deck.list#primerRef")]
+    PrimerRef(Box<crate::com_deckbelcher::deck::list::PrimerRef<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: List<'a>,
+}
+
+/// Primer in a separate ATProto record. For use with any longform writing lexicon.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimerRef<'a> {
+    #[serde(borrow)]
+    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// External primer content. Typically a URL, but any valid URI scheme.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimerUri<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::CowStr<'a>,
+}
+
+/// Which section of the deck this card belongs to. Extensible to support format-specific sections.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Section<'a> {
+    Mainboard,
+    Sideboard,
+    Maybeboard,
+    Commander,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Section<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Mainboard => "mainboard",
+            Self::Sideboard => "sideboard",
+            Self::Maybeboard => "maybeboard",
+            Self::Commander => "commander",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Section<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "mainboard" => Self::Mainboard,
+            "sideboard" => Self::Sideboard,
+            "maybeboard" => Self::Maybeboard,
+            "commander" => Self::Commander,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Section<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "mainboard" => Self::Mainboard,
+            "sideboard" => Self::Sideboard,
+            "maybeboard" => Self::Maybeboard,
+            "commander" => Self::Commander,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Section<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Section<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Section<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Section<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Section<'_> {
+    type Output = Section<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Section::Mainboard => Section::Mainboard,
+            Section::Sideboard => Section::Sideboard,
+            Section::Maybeboard => Section::Maybeboard,
+            Section::Commander => Section::Commander,
+            Section::Other(v) => Section::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> List<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.deck.list"
+    }
+    fn def_name() -> &'static str {
+        "card"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_deck_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.quantity;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListRecord;
+impl jacquard_common::xrpc::XrpcResp for ListRecord {
+    const NSID: &'static str = "com.deckbelcher.deck.list";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ListGetRecordOutput<'_>> for List<'_> {
+    fn from(output: ListGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for List<'_> {
+    const NSID: &'static str = "com.deckbelcher.deck.list";
+    type Record = ListRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ListRecord {
+    const NSID: &'static str = "com.deckbelcher.deck.list";
+    type Record = ListRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.deck.list"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_deck_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1280usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 1280usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerRef<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.deck.list"
+    }
+    fn def_name() -> &'static str {
+        "primerRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_deck_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.deck.list"
+    }
+    fn def_name() -> &'static str {
+        "primerUri"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_deck_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.uri;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uri",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.uri;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "uri",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod card_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,49 +630,49 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Section;
         type Ref;
+        type Section;
         type Quantity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Section = Unset;
         type Ref = Unset;
+        type Section = Unset;
         type Quantity = Unset;
-    }
-    ///State transition - sets the `section` field to Set
-    pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSection<S> {}
-    impl<S: State> State for SetSection<S> {
-        type Section = Set<members::section>;
-        type Ref = S::Ref;
-        type Quantity = S::Quantity;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Section = S::Section;
         type Ref = Set<members::r#ref>;
+        type Section = S::Section;
+        type Quantity = S::Quantity;
+    }
+    ///State transition - sets the `section` field to Set
+    pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSection<S> {}
+    impl<S: State> State for SetSection<S> {
+        type Ref = S::Ref;
+        type Section = Set<members::section>;
         type Quantity = S::Quantity;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
-        type Section = S::Section;
         type Ref = S::Ref;
+        type Section = S::Section;
         type Quantity = Set<members::quantity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `section` field
-        pub struct section(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `section` field
+        pub struct section(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
     }
@@ -199,8 +787,8 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
-    S::Section: card_state::IsSet,
     S::Ref: card_state::IsSet,
+    S::Section: card_state::IsSet,
     S::Quantity: card_state::IsSet,
 {
     /// Build the final struct
@@ -577,269 +1165,6 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> ::jacquard_lexicon::lexicon::Lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.deck.list"
-    }
-    fn def_name() -> &'static str {
-        "card"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_deck_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.quantity;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 128usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Game format for a deck.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Format<'a> {
-    Standard,
-    Pioneer,
-    Modern,
-    Legacy,
-    Vintage,
-    Pauper,
-    Commander,
-    Duel,
-    Paupercommander,
-    Predh,
-    Oathbreaker,
-    Brawl,
-    Standardbrawl,
-    Historic,
-    Timeless,
-    Alchemy,
-    Gladiator,
-    Premodern,
-    Oldschool,
-    Draft,
-    Penny,
-    Cube,
-    Kitchentable,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Format<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Standard => "standard",
-            Self::Pioneer => "pioneer",
-            Self::Modern => "modern",
-            Self::Legacy => "legacy",
-            Self::Vintage => "vintage",
-            Self::Pauper => "pauper",
-            Self::Commander => "commander",
-            Self::Duel => "duel",
-            Self::Paupercommander => "paupercommander",
-            Self::Predh => "predh",
-            Self::Oathbreaker => "oathbreaker",
-            Self::Brawl => "brawl",
-            Self::Standardbrawl => "standardbrawl",
-            Self::Historic => "historic",
-            Self::Timeless => "timeless",
-            Self::Alchemy => "alchemy",
-            Self::Gladiator => "gladiator",
-            Self::Premodern => "premodern",
-            Self::Oldschool => "oldschool",
-            Self::Draft => "draft",
-            Self::Penny => "penny",
-            Self::Cube => "cube",
-            Self::Kitchentable => "kitchentable",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Format<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "standard" => Self::Standard,
-            "pioneer" => Self::Pioneer,
-            "modern" => Self::Modern,
-            "legacy" => Self::Legacy,
-            "vintage" => Self::Vintage,
-            "pauper" => Self::Pauper,
-            "commander" => Self::Commander,
-            "duel" => Self::Duel,
-            "paupercommander" => Self::Paupercommander,
-            "predh" => Self::Predh,
-            "oathbreaker" => Self::Oathbreaker,
-            "brawl" => Self::Brawl,
-            "standardbrawl" => Self::Standardbrawl,
-            "historic" => Self::Historic,
-            "timeless" => Self::Timeless,
-            "alchemy" => Self::Alchemy,
-            "gladiator" => Self::Gladiator,
-            "premodern" => Self::Premodern,
-            "oldschool" => Self::Oldschool,
-            "draft" => Self::Draft,
-            "penny" => Self::Penny,
-            "cube" => Self::Cube,
-            "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Format<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "standard" => Self::Standard,
-            "pioneer" => Self::Pioneer,
-            "modern" => Self::Modern,
-            "legacy" => Self::Legacy,
-            "vintage" => Self::Vintage,
-            "pauper" => Self::Pauper,
-            "commander" => Self::Commander,
-            "duel" => Self::Duel,
-            "paupercommander" => Self::Paupercommander,
-            "predh" => Self::Predh,
-            "oathbreaker" => Self::Oathbreaker,
-            "brawl" => Self::Brawl,
-            "standardbrawl" => Self::Standardbrawl,
-            "historic" => Self::Historic,
-            "timeless" => Self::Timeless,
-            "alchemy" => Self::Alchemy,
-            "gladiator" => Self::Gladiator,
-            "premodern" => Self::Premodern,
-            "oldschool" => Self::Oldschool,
-            "draft" => Self::Draft,
-            "penny" => Self::Penny,
-            "cube" => Self::Cube,
-            "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Format<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Format<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Format<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Format<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Format<'_> {
-    type Output = Format<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Format::Standard => Format::Standard,
-            Format::Pioneer => Format::Pioneer,
-            Format::Modern => Format::Modern,
-            Format::Legacy => Format::Legacy,
-            Format::Vintage => Format::Vintage,
-            Format::Pauper => Format::Pauper,
-            Format::Commander => Format::Commander,
-            Format::Duel => Format::Duel,
-            Format::Paupercommander => Format::Paupercommander,
-            Format::Predh => Format::Predh,
-            Format::Oathbreaker => Format::Oathbreaker,
-            Format::Brawl => Format::Brawl,
-            Format::Standardbrawl => Format::Standardbrawl,
-            Format::Historic => Format::Historic,
-            Format::Timeless => Format::Timeless,
-            Format::Alchemy => Format::Alchemy,
-            Format::Gladiator => Format::Gladiator,
-            Format::Premodern => Format::Premodern,
-            Format::Oldschool => Format::Oldschool,
-            Format::Draft => Format::Draft,
-            Format::Penny => Format::Penny,
-            Format::Cube => Format::Cube,
-            Format::Kitchentable => Format::Kitchentable,
-            Format::Other(v) => Format::Other(v.into_static()),
-        }
-    }
-}
-
-/// A Magic: The Gathering decklist.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct List<'a> {
-    ///Array of cards in the decklist.
-    #[serde(borrow)]
-    pub cards: Vec<crate::com_deckbelcher::deck::list::Card<'a>>,
-    ///Timestamp when the decklist was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Format of the deck.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub format: std::option::Option<crate::com_deckbelcher::deck::list::Format<'a>>,
-    ///Name of the decklist.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Deck primer with strategy, combos, and card choices.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub primer: std::option::Option<ListPrimer<'a>>,
-    ///Timestamp when the decklist was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -850,51 +1175,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Cards;
         type Name;
+        type Cards;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Cards = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Cards = S::Cards;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `cards` field to Set
-    pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCards<S> {}
-    impl<S: State> State for SetCards<S> {
-        type CreatedAt = S::CreatedAt;
-        type Cards = Set<members::cards>;
-        type Name = S::Name;
+        type Cards = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Cards = S::Cards;
         type Name = Set<members::name>;
+        type Cards = S::Cards;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `cards` field to Set
+    pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCards<S> {}
+    impl<S: State> State for SetCards<S> {
+        type Name = S::Name;
+        type Cards = Set<members::cards>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Cards = S::Cards;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `cards` field
-        pub struct cards(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `cards` field
+        pub struct cards(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1041,9 +1366,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::CreatedAt: list_state::IsSet,
-    S::Cards: list_state::IsSet,
     S::Name: list_state::IsSet,
+    S::Cards: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -1075,154 +1400,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListPrimer<'a> {
-    #[serde(rename = "com.deckbelcher.richtext#document")]
-    RichtextDocument(Box<crate::com_deckbelcher::richtext::Document<'a>>),
-    #[serde(rename = "com.deckbelcher.deck.list#primerUri")]
-    PrimerUri(Box<crate::com_deckbelcher::deck::list::PrimerUri<'a>>),
-    #[serde(rename = "com.deckbelcher.deck.list#primerRef")]
-    PrimerRef(Box<crate::com_deckbelcher::deck::list::PrimerRef<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
-}
-
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for List<'_> {
-    const NSID: &'static str = "com.deckbelcher.deck.list";
-    type Record = ListRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ListRecord;
-impl jacquard_common::xrpc::XrpcResp for ListRecord {
-    const NSID: &'static str = "com.deckbelcher.deck.list";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ListRecord {
-    const NSID: &'static str = "com.deckbelcher.deck.list";
-    type Record = ListRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.deck.list"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_deck_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 1280usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Primer in a separate ATProto record. For use with any longform writing lexicon.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimerRef<'a> {
-    #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod primer_ref_state {
@@ -1326,183 +1503,6 @@ where
         PrimerRef {
             r#ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerRef<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.deck.list"
-    }
-    fn def_name() -> &'static str {
-        "primerRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_deck_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// External primer content. Typically a URL, but any valid URI scheme.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimerUri<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.deck.list"
-    }
-    fn def_name() -> &'static str {
-        "primerUri"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_deck_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.uri;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uri",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.uri;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "uri",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Which section of the deck this card belongs to. Extensible to support format-specific sections.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Section<'a> {
-    Mainboard,
-    Sideboard,
-    Maybeboard,
-    Commander,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Section<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Mainboard => "mainboard",
-            Self::Sideboard => "sideboard",
-            Self::Maybeboard => "maybeboard",
-            Self::Commander => "commander",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Section<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "mainboard" => Self::Mainboard,
-            "sideboard" => Self::Sideboard,
-            "maybeboard" => Self::Maybeboard,
-            "commander" => Self::Commander,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Section<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "mainboard" => Self::Mainboard,
-            "sideboard" => Self::Sideboard,
-            "maybeboard" => Self::Maybeboard,
-            "commander" => Self::Commander,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Section<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Section<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Section<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Section<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Section<'_> {
-    type Output = Section<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Section::Mainboard => Section::Mainboard,
-            Section::Sideboard => Section::Sideboard,
-            Section::Maybeboard => Section::Maybeboard,
-            Section::Commander => Section::Commander,
-            Section::Other(v) => Section::Other(v.into_static()),
         }
     }
 }

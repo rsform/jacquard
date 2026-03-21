@@ -36,6 +36,164 @@ pub struct ContentTypes<'a> {
     pub reposts: std::option::Option<bool>,
 }
 
+/// A record for muting content from a specific account with fine-grained control over content types and duration
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Mute<'a> {
+    ///Types of content to mute from this account
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_types: std::option::Option<
+        crate::net_anisota::graph::mute::ContentTypes<'a>,
+    >,
+    ///When the mute was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///When this mute expires. If not set, mute is permanent
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Optional reason for muting this account
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///DID of the account to mute
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::Did<'a>,
+    ///Specific feeds where this mute should apply. If empty, applies to all feeds
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub target_feeds: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MuteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Mute<'a>,
+}
+
+impl<'a> Mute<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MuteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.graph.mute"
+    }
+    fn def_name() -> &'static str {
+        "contentTypes"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_graph_mute()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MuteRecord;
+impl jacquard_common::xrpc::XrpcResp for MuteRecord {
+    const NSID: &'static str = "net.anisota.graph.mute";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MuteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MuteGetRecordOutput<'_>> for Mute<'_> {
+    fn from(output: MuteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Mute<'_> {
+    const NSID: &'static str = "net.anisota.graph.mute";
+    type Record = MuteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MuteRecord {
+    const NSID: &'static str = "net.anisota.graph.mute";
+    type Record = MuteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.graph.mute"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_graph_mute()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.reason {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reason",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.target_feeds {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "target_feeds",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_content_types_posts() -> std::option::Option<bool> {
     Some(true)
 }
@@ -291,62 +449,6 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.graph.mute"
-    }
-    fn def_name() -> &'static str {
-        "contentTypes"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_graph_mute()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A record for muting content from a specific account with fine-grained control over content types and duration
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Mute<'a> {
-    ///Types of content to mute from this account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_types: std::option::Option<
-        crate::net_anisota::graph::mute::ContentTypes<'a>,
-    >,
-    ///When the mute was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///When this mute expires. If not set, mute is permanent
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Optional reason for muting this account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of the account to mute
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
-    ///Specific feeds where this mute should apply. If empty, applies to all feeds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub target_feeds: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-}
-
 pub mod mute_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -569,107 +671,5 @@ where
             target_feeds: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Mute<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MuteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MuteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Mute<'a>,
-}
-
-impl From<MuteGetRecordOutput<'_>> for Mute<'_> {
-    fn from(output: MuteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Mute<'_> {
-    const NSID: &'static str = "net.anisota.graph.mute";
-    type Record = MuteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MuteRecord;
-impl jacquard_common::xrpc::XrpcResp for MuteRecord {
-    const NSID: &'static str = "net.anisota.graph.mute";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MuteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MuteRecord {
-    const NSID: &'static str = "net.anisota.graph.mute";
-    type Record = MuteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.graph.mute"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_graph_mute()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.reason {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reason",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.target_feeds {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target_feeds",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

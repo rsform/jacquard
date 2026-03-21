@@ -20,6 +20,49 @@ pub struct GetHandleFromDid<'a> {
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetHandleFromDidOutput<'a> {
+    ///The handle.
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+/// Response type for
+///com.shinolabs.pinksea.getHandleFromDid
+pub struct GetHandleFromDidResponse;
+impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
+    const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetHandleFromDidOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
+    const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetHandleFromDidResponse;
+}
+
+/// Endpoint type for
+///com.shinolabs.pinksea.getHandleFromDid
+pub struct GetHandleFromDidRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetHandleFromDid<'de>;
+    type Response = GetHandleFromDidResponse;
+}
+
 pub mod get_handle_from_did_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetHandleFromDidOutput<'a> {
-    ///The handle.
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-}
-
-/// Response type for
-///com.shinolabs.pinksea.getHandleFromDid
-pub struct GetHandleFromDidResponse;
-impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
-    const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetHandleFromDidOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
-    const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetHandleFromDidResponse;
-}
-
-/// Endpoint type for
-///com.shinolabs.pinksea.getHandleFromDid
-pub struct GetHandleFromDidRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
-    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetHandleFromDid<'de>;
-    type Response = GetHandleFromDidResponse;
 }

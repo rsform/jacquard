@@ -29,6 +29,117 @@ pub struct EventView<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEvent<'a> {
+    #[serde(borrow)]
+    pub record_key: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub repository: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEventOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetEventError<'a> {
+    #[serde(rename = "NotFound")]
+    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetEventError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotFound(msg) => {
+                write!(f, "NotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.getEvent"
+    }
+    fn def_name() -> &'static str {
+        "eventView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_calendar_getEvent()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///community.lexicon.calendar.getEvent
+pub struct GetEventResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
+    const NSID: &'static str = "community.lexicon.calendar.getEvent";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEventOutput<'de>;
+    type Err<'de> = GetEventError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEvent<'a> {
+    const NSID: &'static str = "community.lexicon.calendar.getEvent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEventResponse;
+}
+
+/// Endpoint type for
+///community.lexicon.calendar.getEvent
+pub struct GetEventRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
+    const PATH: &'static str = "/xrpc/community.lexicon.calendar.getEvent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEvent<'de>;
+    type Response = GetEventResponse;
+}
+
 pub mod event_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -414,40 +525,6 @@ fn lexicon_doc_community_lexicon_calendar_getEvent() -> ::jacquard_lexicon::lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.calendar.getEvent"
-    }
-    fn def_name() -> &'static str {
-        "eventView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_calendar_getEvent()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEvent<'a> {
-    #[serde(borrow)]
-    pub record_key: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub repository: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod get_event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -458,37 +535,37 @@ pub mod get_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type RecordKey;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type RecordKey = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type RecordKey = S::RecordKey;
+        type Repository = Unset;
     }
     ///State transition - sets the `record_key` field to Set
     pub struct SetRecordKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordKey<S> {}
     impl<S: State> State for SetRecordKey<S> {
-        type Repository = S::Repository;
         type RecordKey = Set<members::record_key>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type RecordKey = S::RecordKey;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `record_key` field
         pub struct record_key(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -561,8 +638,8 @@ where
 impl<'a, S> GetEventBuilder<'a, S>
 where
     S: get_event_state::State,
-    S::Repository: get_event_state::IsSet,
     S::RecordKey: get_event_state::IsSet,
+    S::Repository: get_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetEvent<'a> {
@@ -571,81 +648,4 @@ where
             repository: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEventOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEventError<'a> {
-    #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetEventError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotFound(msg) => {
-                write!(f, "NotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///community.lexicon.calendar.getEvent
-pub struct GetEventResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
-    const NSID: &'static str = "community.lexicon.calendar.getEvent";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEventOutput<'de>;
-    type Err<'de> = GetEventError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEvent<'a> {
-    const NSID: &'static str = "community.lexicon.calendar.getEvent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEventResponse;
-}
-
-/// Endpoint type for
-///community.lexicon.calendar.getEvent
-pub struct GetEventRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
-    const PATH: &'static str = "/xrpc/community.lexicon.calendar.getEvent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEvent<'de>;
-    type Response = GetEventResponse;
 }

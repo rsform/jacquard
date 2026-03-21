@@ -20,6 +20,83 @@ pub struct ResolveHandle<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveHandleOutput<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveHandleError<'a> {
+    /// The resolution process confirmed that the handle does not resolve to any DID.
+    #[serde(rename = "HandleNotFound")]
+    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveHandleError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::HandleNotFound(msg) => {
+                write!(f, "HandleNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.identity.resolveHandle
+pub struct ResolveHandleResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
+    const NSID: &'static str = "com.atproto.identity.resolveHandle";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveHandleOutput<'de>;
+    type Err<'de> = ResolveHandleError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
+    const NSID: &'static str = "com.atproto.identity.resolveHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveHandleResponse;
+}
+
+/// Endpoint type for
+///com.atproto.identity.resolveHandle
+pub struct ResolveHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveHandle<'de>;
+    type Response = ResolveHandleResponse;
+}
+
 pub mod resolve_handle_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,81 +186,4 @@ where
             handle: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveHandleOutput<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveHandleError<'a> {
-    /// The resolution process confirmed that the handle does not resolve to any DID.
-    #[serde(rename = "HandleNotFound")]
-    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveHandleError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::HandleNotFound(msg) => {
-                write!(f, "HandleNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.identity.resolveHandle
-pub struct ResolveHandleResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
-    const NSID: &'static str = "com.atproto.identity.resolveHandle";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveHandleOutput<'de>;
-    type Err<'de> = ResolveHandleError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
-    const NSID: &'static str = "com.atproto.identity.resolveHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveHandleResponse;
-}
-
-/// Endpoint type for
-///com.atproto.identity.resolveHandle
-pub struct ResolveHandleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveHandle<'de>;
-    type Response = ResolveHandleResponse;
 }

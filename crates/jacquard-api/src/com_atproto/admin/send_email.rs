@@ -32,6 +32,51 @@ pub struct SendEmail<'a> {
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SendEmailOutput<'a> {
+    pub sent: bool,
+}
+
+/// Response type for
+///com.atproto.admin.sendEmail
+pub struct SendEmailResponse;
+impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
+    const NSID: &'static str = "com.atproto.admin.sendEmail";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SendEmailOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
+    const NSID: &'static str = "com.atproto.admin.sendEmail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SendEmailResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.sendEmail
+pub struct SendEmailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.sendEmail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendEmail<'de>;
+    type Response = SendEmailResponse;
+}
+
 pub mod send_email_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,51 +87,51 @@ pub mod send_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type RecipientDid;
         type Content;
         type SenderDid;
-        type RecipientDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type RecipientDid = Unset;
         type Content = Unset;
         type SenderDid = Unset;
-        type RecipientDid = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type SenderDid = S::SenderDid;
-        type RecipientDid = S::RecipientDid;
-    }
-    ///State transition - sets the `sender_did` field to Set
-    pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSenderDid<S> {}
-    impl<S: State> State for SetSenderDid<S> {
-        type Content = S::Content;
-        type SenderDid = Set<members::sender_did>;
-        type RecipientDid = S::RecipientDid;
     }
     ///State transition - sets the `recipient_did` field to Set
     pub struct SetRecipientDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecipientDid<S> {}
     impl<S: State> State for SetRecipientDid<S> {
+        type RecipientDid = Set<members::recipient_did>;
         type Content = S::Content;
         type SenderDid = S::SenderDid;
-        type RecipientDid = Set<members::recipient_did>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type RecipientDid = S::RecipientDid;
+        type Content = Set<members::content>;
+        type SenderDid = S::SenderDid;
+    }
+    ///State transition - sets the `sender_did` field to Set
+    pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSenderDid<S> {}
+    impl<S: State> State for SetSenderDid<S> {
+        type RecipientDid = S::RecipientDid;
+        type Content = S::Content;
+        type SenderDid = Set<members::sender_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `recipient_did` field
+        pub struct recipient_did(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `sender_did` field
         pub struct sender_did(());
-        ///Marker type for the `recipient_did` field
-        pub struct recipient_did(());
     }
 }
 
@@ -213,9 +258,9 @@ impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
 impl<'a, S> SendEmailBuilder<'a, S>
 where
     S: send_email_state::State,
+    S::RecipientDid: send_email_state::IsSet,
     S::Content: send_email_state::IsSet,
     S::SenderDid: send_email_state::IsSet,
-    S::RecipientDid: send_email_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SendEmail<'a> {
@@ -245,49 +290,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SendEmailOutput<'a> {
-    pub sent: bool,
-}
-
-/// Response type for
-///com.atproto.admin.sendEmail
-pub struct SendEmailResponse;
-impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
-    const NSID: &'static str = "com.atproto.admin.sendEmail";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SendEmailOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
-    const NSID: &'static str = "com.atproto.admin.sendEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SendEmailResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.sendEmail
-pub struct SendEmailRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.sendEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SendEmail<'de>;
-    type Response = SendEmailResponse;
 }

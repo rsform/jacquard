@@ -53,6 +53,107 @@ pub struct CreateWebhook<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateWebhookOutput<'a> {
+    #[serde(borrow)]
+    pub webhook: crate::place_stream::server::Webhook<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateWebhookError<'a> {
+    /// The provided webhook URL is invalid or unreachable.
+    #[serde(rename = "InvalidUrl")]
+    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// A webhook with this URL already exists for this user.
+    #[serde(rename = "DuplicateWebhook")]
+    DuplicateWebhook(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The user has reached their maximum number of webhooks.
+    #[serde(rename = "TooManyWebhooks")]
+    TooManyWebhooks(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CreateWebhookError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidUrl(msg) => {
+                write!(f, "InvalidUrl")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DuplicateWebhook(msg) => {
+                write!(f, "DuplicateWebhook")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::TooManyWebhooks(msg) => {
+                write!(f, "TooManyWebhooks")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.server.createWebhook
+pub struct CreateWebhookResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
+    const NSID: &'static str = "place.stream.server.createWebhook";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateWebhookOutput<'de>;
+    type Err<'de> = CreateWebhookError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
+    const NSID: &'static str = "place.stream.server.createWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateWebhookResponse;
+}
+
+/// Endpoint type for
+///place.stream.server.createWebhook
+pub struct CreateWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateWebhook<'de>;
+    type Response = CreateWebhookResponse;
+}
+
 fn _default_create_webhook_active() -> std::option::Option<bool> {
     Some(false)
 }
@@ -344,105 +445,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateWebhookOutput<'a> {
-    #[serde(borrow)]
-    pub webhook: crate::place_stream::server::Webhook<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateWebhookError<'a> {
-    /// The provided webhook URL is invalid or unreachable.
-    #[serde(rename = "InvalidUrl")]
-    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// A webhook with this URL already exists for this user.
-    #[serde(rename = "DuplicateWebhook")]
-    DuplicateWebhook(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The user has reached their maximum number of webhooks.
-    #[serde(rename = "TooManyWebhooks")]
-    TooManyWebhooks(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CreateWebhookError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidUrl(msg) => {
-                write!(f, "InvalidUrl")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::DuplicateWebhook(msg) => {
-                write!(f, "DuplicateWebhook")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::TooManyWebhooks(msg) => {
-                write!(f, "TooManyWebhooks")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.server.createWebhook
-pub struct CreateWebhookResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
-    const NSID: &'static str = "place.stream.server.createWebhook";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateWebhookOutput<'de>;
-    type Err<'de> = CreateWebhookError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
-    const NSID: &'static str = "place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateWebhookResponse;
-}
-
-/// Endpoint type for
-///place.stream.server.createWebhook
-pub struct CreateWebhookRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
-    const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateWebhook<'de>;
-    type Response = CreateWebhookResponse;
 }

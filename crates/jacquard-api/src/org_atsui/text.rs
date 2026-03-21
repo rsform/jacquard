@@ -21,6 +21,53 @@ pub struct Text<'a> {
     pub children: jacquard_common::types::value::Data<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TextOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///org.atsui.Text
+pub struct TextResponse;
+impl jacquard_common::xrpc::XrpcResp for TextResponse {
+    const NSID: &'static str = "org.atsui.Text";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TextOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Text<'a> {
+    const NSID: &'static str = "org.atsui.Text";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = TextResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Text
+pub struct TextRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TextRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Text";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Text<'de>;
+    type Response = TextResponse;
+}
+
 pub mod text_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,51 +171,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TextOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Text
-pub struct TextResponse;
-impl jacquard_common::xrpc::XrpcResp for TextResponse {
-    const NSID: &'static str = "org.atsui.Text";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TextOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Text<'a> {
-    const NSID: &'static str = "org.atsui.Text";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = TextResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Text
-pub struct TextRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for TextRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Text";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Text<'de>;
-    type Response = TextResponse;
 }

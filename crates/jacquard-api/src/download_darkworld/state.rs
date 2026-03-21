@@ -27,6 +27,258 @@ pub struct Favorite<'a> {
     pub game: Vec<jacquard_common::CowStr<'a>>,
 }
 
+/// The record used by darkworld.download to determine the website's content.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct State<'a> {
+    ///The user's favorites/likes/preferences.
+    #[serde(borrow)]
+    pub favorite: crate::download_darkworld::state::Favorite<'a>,
+    ///Describe the site's content/look.
+    #[serde(borrow)]
+    pub site: crate::download_darkworld::state::Site<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: State<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Site<'a> {
+    ///Swap out Kris with Susie in the prophecy panel.
+    pub susie_prophecy: bool,
+    ///TBD
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title_colors: std::option::Option<SiteTitleColors<'a>>,
+}
+
+/// TBD
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SiteTitleColors<'a> {
+    Enby,
+    Trans,
+    Pan,
+    Latvia,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SiteTitleColors<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Enby => "enby",
+            Self::Trans => "trans",
+            Self::Pan => "pan",
+            Self::Latvia => "latvia",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SiteTitleColors<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "enby" => Self::Enby,
+            "trans" => Self::Trans,
+            "pan" => Self::Pan,
+            "latvia" => Self::Latvia,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SiteTitleColors<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "enby" => Self::Enby,
+            "trans" => Self::Trans,
+            "pan" => Self::Pan,
+            "latvia" => Self::Latvia,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SiteTitleColors<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SiteTitleColors<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SiteTitleColors<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SiteTitleColors<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SiteTitleColors<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SiteTitleColors<'_> {
+    type Output = SiteTitleColors<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SiteTitleColors::Enby => SiteTitleColors::Enby,
+            SiteTitleColors::Trans => SiteTitleColors::Trans,
+            SiteTitleColors::Pan => SiteTitleColors::Pan,
+            SiteTitleColors::Latvia => SiteTitleColors::Latvia,
+            SiteTitleColors::Other(v) => SiteTitleColors::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> State<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorite<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.state"
+    }
+    fn def_name() -> &'static str {
+        "favorite"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_state()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StateRecord;
+impl jacquard_common::xrpc::XrpcResp for StateRecord {
+    const NSID: &'static str = "download.darkworld.state";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StateGetRecordOutput<'_>> for State<'_> {
+    fn from(output: StateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for State<'_> {
+    const NSID: &'static str = "download.darkworld.state";
+    type Record = StateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StateRecord {
+    const NSID: &'static str = "download.darkworld.state";
+    type Record = StateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.state"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_state()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Site<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.state"
+    }
+    fn def_name() -> &'static str {
+        "site"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_state()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod favorite_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,67 +289,67 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Game;
         type Album;
+        type Game;
         type DeltaruneCharacter;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Game = Unset;
         type Album = Unset;
+        type Game = Unset;
         type DeltaruneCharacter = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Game = S::Game;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Artist = S::Artist;
-        type Game = Set<members::game>;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = Unset;
     }
     ///State transition - sets the `album` field to Set
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
-        type Game = S::Game;
         type Album = Set<members::album>;
+        type Game = S::Game;
         type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Album = S::Album;
+        type Game = Set<members::game>;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = S::Artist;
     }
     ///State transition - sets the `deltarune_character` field to Set
     pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
     impl<S: State> State for SetDeltaruneCharacter<S> {
-        type Artist = S::Artist;
-        type Game = S::Game;
         type Album = S::Album;
+        type Game = S::Game;
         type DeltaruneCharacter = Set<members::deltarune_character>;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Album = S::Album;
+        type Game = S::Game;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `album` field
         pub struct album(());
+        ///Marker type for the `game` field
+        pub struct game(());
         ///Marker type for the `deltarune_character` field
         pub struct deltarune_character(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
@@ -210,10 +462,10 @@ where
 impl<'a, S> FavoriteBuilder<'a, S>
 where
     S: favorite_state::State,
-    S::Artist: favorite_state::IsSet,
-    S::Game: favorite_state::IsSet,
     S::Album: favorite_state::IsSet,
+    S::Game: favorite_state::IsSet,
     S::DeltaruneCharacter: favorite_state::IsSet,
+    S::Artist: favorite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorite<'a> {
@@ -468,44 +720,6 @@ fn lexicon_doc_download_darkworld_state() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorite<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.state"
-    }
-    fn def_name() -> &'static str {
-        "favorite"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_state()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The record used by darkworld.download to determine the website's content.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct State<'a> {
-    ///The user's favorites/likes/preferences.
-    #[serde(borrow)]
-    pub favorite: crate::download_darkworld::state::Favorite<'a>,
-    ///Describe the site's content/look.
-    #[serde(borrow)]
-    pub site: crate::download_darkworld::state::Site<'a>,
-}
-
 pub mod state_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -646,104 +860,6 @@ where
     }
 }
 
-impl<'a> State<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: State<'a>,
-}
-
-impl From<StateGetRecordOutput<'_>> for State<'_> {
-    fn from(output: StateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for State<'_> {
-    const NSID: &'static str = "download.darkworld.state";
-    type Record = StateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StateRecord;
-impl jacquard_common::xrpc::XrpcResp for StateRecord {
-    const NSID: &'static str = "download.darkworld.state";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StateRecord {
-    const NSID: &'static str = "download.darkworld.state";
-    type Record = StateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.state"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_state()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Site<'a> {
-    ///Swap out Kris with Susie in the prophecy panel.
-    pub susie_prophecy: bool,
-    ///TBD
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title_colors: std::option::Option<SiteTitleColors<'a>>,
-}
-
 pub mod site_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -865,121 +981,5 @@ where
             title_colors: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-/// TBD
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SiteTitleColors<'a> {
-    Enby,
-    Trans,
-    Pan,
-    Latvia,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SiteTitleColors<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Enby => "enby",
-            Self::Trans => "trans",
-            Self::Pan => "pan",
-            Self::Latvia => "latvia",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SiteTitleColors<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "enby" => Self::Enby,
-            "trans" => Self::Trans,
-            "pan" => Self::Pan,
-            "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SiteTitleColors<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "enby" => Self::Enby,
-            "trans" => Self::Trans,
-            "pan" => Self::Pan,
-            "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SiteTitleColors<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SiteTitleColors<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SiteTitleColors<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SiteTitleColors<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SiteTitleColors<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SiteTitleColors<'_> {
-    type Output = SiteTitleColors<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SiteTitleColors::Enby => SiteTitleColors::Enby,
-            SiteTitleColors::Trans => SiteTitleColors::Trans,
-            SiteTitleColors::Pan => SiteTitleColors::Pan,
-            SiteTitleColors::Latvia => SiteTitleColors::Latvia,
-            SiteTitleColors::Other(v) => SiteTitleColors::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Site<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.state"
-    }
-    fn def_name() -> &'static str {
-        "site"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_state()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_create_available() -> std::option::Option<bool> {
-    Some(true)
-}
-
-fn _default_include_used() -> std::option::Option<bool> {
-    Some(true)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +24,90 @@ pub struct GetAccountInviteCodes {
     #[serde(default = "_default_include_used")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_used: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountInviteCodesOutput<'a> {
+    #[serde(borrow)]
+    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetAccountInviteCodesError<'a> {
+    #[serde(rename = "DuplicateCreate")]
+    DuplicateCreate(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetAccountInviteCodesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::DuplicateCreate(msg) => {
+                write!(f, "DuplicateCreate")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.server.getAccountInviteCodes
+pub struct GetAccountInviteCodesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
+    const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetAccountInviteCodesOutput<'de>;
+    type Err<'de> = GetAccountInviteCodesError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
+    const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountInviteCodesResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.getAccountInviteCodes
+pub struct GetAccountInviteCodesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.getAccountInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountInviteCodes;
+    type Response = GetAccountInviteCodesResponse;
+}
+
+fn _default_create_available() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_include_used() -> std::option::Option<bool> {
+    Some(true)
 }
 
 pub mod get_account_invite_codes_state {
@@ -113,80 +189,4 @@ where
             include_used: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAccountInviteCodesOutput<'a> {
-    #[serde(borrow)]
-    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetAccountInviteCodesError<'a> {
-    #[serde(rename = "DuplicateCreate")]
-    DuplicateCreate(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetAccountInviteCodesError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::DuplicateCreate(msg) => {
-                write!(f, "DuplicateCreate")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.server.getAccountInviteCodes
-pub struct GetAccountInviteCodesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
-    const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountInviteCodesOutput<'de>;
-    type Err<'de> = GetAccountInviteCodesError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
-    const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetAccountInviteCodesResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.getAccountInviteCodes
-pub struct GetAccountInviteCodesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.getAccountInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAccountInviteCodes;
-    type Response = GetAccountInviteCodesResponse;
 }

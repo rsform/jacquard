@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,56 @@ pub struct GetLiveUsers {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLiveUsersOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub streams: std::option::Option<
+        Vec<crate::place_stream::livestream::LivestreamView<'a>>,
+    >,
+}
+
+/// Response type for
+///place.stream.live.getLiveUsers
+pub struct GetLiveUsersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLiveUsersResponse {
+    const NSID: &'static str = "place.stream.live.getLiveUsers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLiveUsersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetLiveUsers {
+    const NSID: &'static str = "place.stream.live.getLiveUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLiveUsersResponse;
+}
+
+/// Endpoint type for
+///place.stream.live.getLiveUsers
+pub struct GetLiveUsersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.getLiveUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLiveUsers;
+    type Response = GetLiveUsersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_live_users_state {
@@ -116,50 +162,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLiveUsersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub streams: std::option::Option<
-        Vec<crate::place_stream::livestream::LivestreamView<'a>>,
-    >,
-}
-
-/// Response type for
-///place.stream.live.getLiveUsers
-pub struct GetLiveUsersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLiveUsersResponse {
-    const NSID: &'static str = "place.stream.live.getLiveUsers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLiveUsersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetLiveUsers {
-    const NSID: &'static str = "place.stream.live.getLiveUsers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLiveUsersResponse;
-}
-
-/// Endpoint type for
-///place.stream.live.getLiveUsers
-pub struct GetLiveUsersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
-    const PATH: &'static str = "/xrpc/place.stream.live.getLiveUsers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLiveUsers;
-    type Response = GetLiveUsersResponse;
 }

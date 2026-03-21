@@ -31,6 +31,176 @@ pub struct GridImage<'a> {
     pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ImageGrid<'a> {
+    ///Aspect ratio mode
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub aspect_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Grid caption
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Number of rows in the grid
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub grid_rows: std::option::Option<i64>,
+    ///Array of images in the grid (2-6)
+    #[serde(borrow)]
+    pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GridImage<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.imageGrid"
+    }
+    fn def_name() -> &'static str {
+        "gridImage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_imageGrid()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alt {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "alt",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.blob {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.blob {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageGrid<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.imageGrid"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_imageGrid()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.grid_rows {
+            if *value > 2i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "grid_rows",
+                    ),
+                    max: 2i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.grid_rows {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "grid_rows",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() > 6usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    max: 6usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    min: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_offprint_block_imageGrid() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -181,111 +351,6 @@ fn lexicon_doc_app_offprint_block_imageGrid() -> ::jacquard_lexicon::lexicon::Le
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GridImage<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.imageGrid"
-    }
-    fn def_name() -> &'static str {
-        "gridImage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_imageGrid()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alt {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "alt",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.blob {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.blob {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageGrid<'a> {
-    ///Aspect ratio mode
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Grid caption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of rows in the grid
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub grid_rows: std::option::Option<i64>,
-    ///Array of images in the grid (2-6)
-    #[serde(borrow)]
-    pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
 }
 
 pub mod image_grid_state {
@@ -449,70 +514,5 @@ where
             images: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageGrid<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.imageGrid"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_imageGrid()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.grid_rows {
-            if *value > 2i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "grid_rows",
-                    ),
-                    max: 2i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.grid_rows {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "grid_rows",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() > 6usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    max: 6usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    min: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

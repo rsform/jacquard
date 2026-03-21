@@ -42,6 +42,284 @@ pub struct Notification<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Grouped notifications (e.g., '5 people liked your entry').
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotificationGroup<'a> {
+    ///Most recent actors (up to 5).
+    #[serde(borrow)]
+    pub actors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    pub count: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_read: std::option::Option<bool>,
+    pub most_recent_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub reason: crate::sh_weaver::notification::NotificationReason<'a>,
+    #[serde(borrow)]
+    pub subject: NotificationGroupSubject<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum NotificationGroupSubject<'a> {
+    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
+    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
+    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
+    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
+}
+
+/// Why this notification was generated.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NotificationReason<'a> {
+    Like,
+    Bookmark,
+    Follow,
+    FollowAccept,
+    Subscribe,
+    SubscribeAccept,
+    CollaborationInvite,
+    CollaborationAccept,
+    NewEntry,
+    EntryUpdate,
+    Mention,
+    Tag,
+    Comment,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> NotificationReason<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Like => "like",
+            Self::Bookmark => "bookmark",
+            Self::Follow => "follow",
+            Self::FollowAccept => "followAccept",
+            Self::Subscribe => "subscribe",
+            Self::SubscribeAccept => "subscribeAccept",
+            Self::CollaborationInvite => "collaborationInvite",
+            Self::CollaborationAccept => "collaborationAccept",
+            Self::NewEntry => "newEntry",
+            Self::EntryUpdate => "entryUpdate",
+            Self::Mention => "mention",
+            Self::Tag => "tag",
+            Self::Comment => "comment",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for NotificationReason<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "like" => Self::Like,
+            "bookmark" => Self::Bookmark,
+            "follow" => Self::Follow,
+            "followAccept" => Self::FollowAccept,
+            "subscribe" => Self::Subscribe,
+            "subscribeAccept" => Self::SubscribeAccept,
+            "collaborationInvite" => Self::CollaborationInvite,
+            "collaborationAccept" => Self::CollaborationAccept,
+            "newEntry" => Self::NewEntry,
+            "entryUpdate" => Self::EntryUpdate,
+            "mention" => Self::Mention,
+            "tag" => Self::Tag,
+            "comment" => Self::Comment,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for NotificationReason<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "like" => Self::Like,
+            "bookmark" => Self::Bookmark,
+            "follow" => Self::Follow,
+            "followAccept" => Self::FollowAccept,
+            "subscribe" => Self::Subscribe,
+            "subscribeAccept" => Self::SubscribeAccept,
+            "collaborationInvite" => Self::CollaborationInvite,
+            "collaborationAccept" => Self::CollaborationAccept,
+            "newEntry" => Self::NewEntry,
+            "entryUpdate" => Self::EntryUpdate,
+            "mention" => Self::Mention,
+            "tag" => Self::Tag,
+            "comment" => Self::Comment,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for NotificationReason<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for NotificationReason<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for NotificationReason<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for NotificationReason<'_> {
+    type Output = NotificationReason<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            NotificationReason::Like => NotificationReason::Like,
+            NotificationReason::Bookmark => NotificationReason::Bookmark,
+            NotificationReason::Follow => NotificationReason::Follow,
+            NotificationReason::FollowAccept => NotificationReason::FollowAccept,
+            NotificationReason::Subscribe => NotificationReason::Subscribe,
+            NotificationReason::SubscribeAccept => NotificationReason::SubscribeAccept,
+            NotificationReason::CollaborationInvite => {
+                NotificationReason::CollaborationInvite
+            }
+            NotificationReason::CollaborationAccept => {
+                NotificationReason::CollaborationAccept
+            }
+            NotificationReason::NewEntry => NotificationReason::NewEntry,
+            NotificationReason::EntryUpdate => NotificationReason::EntryUpdate,
+            NotificationReason::Mention => NotificationReason::Mention,
+            NotificationReason::Tag => NotificationReason::Tag,
+            NotificationReason::Comment => NotificationReason::Comment,
+            NotificationReason::Other(v) => NotificationReason::Other(v.into_static()),
+        }
+    }
+}
+
+/// New content from a notebook subscription.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscriptionUpdateView<'a> {
+    ///New entries since last check.
+    #[serde(borrow)]
+    pub new_entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    pub updated_at: jacquard_common::types::string::Datetime,
+    ///Entries that were updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub updated_entries: std::option::Option<
+        Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    >,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "notification"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationGroup<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "notificationGroup"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.actors;
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "actors",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscriptionUpdateView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "subscriptionUpdateView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod notification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -52,105 +330,105 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Author;
+        type Cid;
+        type Uri;
+        type Reason;
         type IsRead;
         type IndexedAt;
-        type Author;
-        type Uri;
-        type Cid;
-        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Author = Unset;
+        type Cid = Unset;
+        type Uri = Unset;
+        type Reason = Unset;
         type IsRead = Unset;
         type IndexedAt = Unset;
-        type Author = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
-        type Reason = Unset;
-    }
-    ///State transition - sets the `is_read` field to Set
-    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsRead<S> {}
-    impl<S: State> State for SetIsRead<S> {
-        type IsRead = Set<members::is_read>;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IsRead = S::IsRead;
-        type IndexedAt = Set<members::indexed_at>;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Author = Set<members::author>;
-        type Uri = S::Uri;
         type Cid = S::Cid;
+        type Uri = S::Uri;
         type Reason = S::Reason;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
         type IsRead = S::IsRead;
         type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
         type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
         type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
         type Reason = S::Reason;
+        type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Reason = Set<members::reason>;
         type IsRead = S::IsRead;
         type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `is_read` field to Set
+    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsRead<S> {}
+    impl<S: State> State for SetIsRead<S> {
         type Author = S::Author;
-        type Uri = S::Uri;
         type Cid = S::Cid;
-        type Reason = Set<members::reason>;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
+        type IsRead = Set<members::is_read>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Reason = S::Reason;
+        type IsRead = S::IsRead;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
     }
 }
 
@@ -343,12 +621,12 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
+    S::Author: notification_state::IsSet,
+    S::Cid: notification_state::IsSet,
+    S::Uri: notification_state::IsSet,
+    S::Reason: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
     S::IndexedAt: notification_state::IsSet,
-    S::Author: notification_state::IsSet,
-    S::Uri: notification_state::IsSet,
-    S::Cid: notification_state::IsSet,
-    S::Reason: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -776,49 +1054,6 @@ fn lexicon_doc_sh_weaver_notification_defs() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "notification"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Grouped notifications (e.g., '5 people liked your entry').
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotificationGroup<'a> {
-    ///Most recent actors (up to 5).
-    #[serde(borrow)]
-    pub actors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    pub count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_read: std::option::Option<bool>,
-    pub most_recent_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub reason: crate::sh_weaver::notification::NotificationReason<'a>,
-    #[serde(borrow)]
-    pub subject: NotificationGroupSubject<'a>,
-}
-
 pub mod notification_group_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -829,85 +1064,85 @@ pub mod notification_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Reason;
         type Count;
-        type MostRecentAt;
-        type Subject;
         type Actors;
+        type MostRecentAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Reason = Unset;
         type Count = Unset;
-        type MostRecentAt = Unset;
-        type Subject = Unset;
         type Actors = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-        type Subject = S::Subject;
-        type Actors = S::Actors;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Reason = S::Reason;
-        type Count = Set<members::count>;
-        type MostRecentAt = S::MostRecentAt;
-        type Subject = S::Subject;
-        type Actors = S::Actors;
-    }
-    ///State transition - sets the `most_recent_at` field to Set
-    pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
-    impl<S: State> State for SetMostRecentAt<S> {
-        type Reason = S::Reason;
-        type Count = S::Count;
-        type MostRecentAt = Set<members::most_recent_at>;
-        type Subject = S::Subject;
-        type Actors = S::Actors;
+        type MostRecentAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
         type Reason = S::Reason;
         type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-        type Subject = Set<members::subject>;
         type Actors = S::Actors;
+        type MostRecentAt = S::MostRecentAt;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Subject = S::Subject;
+        type Reason = Set<members::reason>;
+        type Count = S::Count;
+        type Actors = S::Actors;
+        type MostRecentAt = S::MostRecentAt;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Subject = S::Subject;
+        type Reason = S::Reason;
+        type Count = Set<members::count>;
+        type Actors = S::Actors;
+        type MostRecentAt = S::MostRecentAt;
     }
     ///State transition - sets the `actors` field to Set
     pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActors<S> {}
     impl<S: State> State for SetActors<S> {
+        type Subject = S::Subject;
         type Reason = S::Reason;
         type Count = S::Count;
-        type MostRecentAt = S::MostRecentAt;
-        type Subject = S::Subject;
         type Actors = Set<members::actors>;
+        type MostRecentAt = S::MostRecentAt;
+    }
+    ///State transition - sets the `most_recent_at` field to Set
+    pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
+    impl<S: State> State for SetMostRecentAt<S> {
+        type Subject = S::Subject;
+        type Reason = S::Reason;
+        type Count = S::Count;
+        type Actors = S::Actors;
+        type MostRecentAt = Set<members::most_recent_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `count` field
         pub struct count(());
-        ///Marker type for the `most_recent_at` field
-        pub struct most_recent_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `actors` field
         pub struct actors(());
+        ///Marker type for the `most_recent_at` field
+        pub struct most_recent_at(());
     }
 }
 
@@ -1054,11 +1289,11 @@ where
 impl<'a, S> NotificationGroupBuilder<'a, S>
 where
     S: notification_group_state::State,
+    S::Subject: notification_group_state::IsSet,
     S::Reason: notification_group_state::IsSet,
     S::Count: notification_group_state::IsSet,
-    S::MostRecentAt: notification_group_state::IsSet,
-    S::Subject: notification_group_state::IsSet,
     S::Actors: notification_group_state::IsSet,
+    S::MostRecentAt: notification_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotificationGroup<'a> {
@@ -1092,224 +1327,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum NotificationGroupSubject<'a> {
-    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
-    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
-    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
-    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationGroup<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "notificationGroup"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.actors;
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "actors",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Why this notification was generated.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NotificationReason<'a> {
-    Like,
-    Bookmark,
-    Follow,
-    FollowAccept,
-    Subscribe,
-    SubscribeAccept,
-    CollaborationInvite,
-    CollaborationAccept,
-    NewEntry,
-    EntryUpdate,
-    Mention,
-    Tag,
-    Comment,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> NotificationReason<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Like => "like",
-            Self::Bookmark => "bookmark",
-            Self::Follow => "follow",
-            Self::FollowAccept => "followAccept",
-            Self::Subscribe => "subscribe",
-            Self::SubscribeAccept => "subscribeAccept",
-            Self::CollaborationInvite => "collaborationInvite",
-            Self::CollaborationAccept => "collaborationAccept",
-            Self::NewEntry => "newEntry",
-            Self::EntryUpdate => "entryUpdate",
-            Self::Mention => "mention",
-            Self::Tag => "tag",
-            Self::Comment => "comment",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for NotificationReason<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "like" => Self::Like,
-            "bookmark" => Self::Bookmark,
-            "follow" => Self::Follow,
-            "followAccept" => Self::FollowAccept,
-            "subscribe" => Self::Subscribe,
-            "subscribeAccept" => Self::SubscribeAccept,
-            "collaborationInvite" => Self::CollaborationInvite,
-            "collaborationAccept" => Self::CollaborationAccept,
-            "newEntry" => Self::NewEntry,
-            "entryUpdate" => Self::EntryUpdate,
-            "mention" => Self::Mention,
-            "tag" => Self::Tag,
-            "comment" => Self::Comment,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for NotificationReason<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "like" => Self::Like,
-            "bookmark" => Self::Bookmark,
-            "follow" => Self::Follow,
-            "followAccept" => Self::FollowAccept,
-            "subscribe" => Self::Subscribe,
-            "subscribeAccept" => Self::SubscribeAccept,
-            "collaborationInvite" => Self::CollaborationInvite,
-            "collaborationAccept" => Self::CollaborationAccept,
-            "newEntry" => Self::NewEntry,
-            "entryUpdate" => Self::EntryUpdate,
-            "mention" => Self::Mention,
-            "tag" => Self::Tag,
-            "comment" => Self::Comment,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for NotificationReason<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for NotificationReason<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for NotificationReason<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for NotificationReason<'_> {
-    type Output = NotificationReason<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            NotificationReason::Like => NotificationReason::Like,
-            NotificationReason::Bookmark => NotificationReason::Bookmark,
-            NotificationReason::Follow => NotificationReason::Follow,
-            NotificationReason::FollowAccept => NotificationReason::FollowAccept,
-            NotificationReason::Subscribe => NotificationReason::Subscribe,
-            NotificationReason::SubscribeAccept => NotificationReason::SubscribeAccept,
-            NotificationReason::CollaborationInvite => {
-                NotificationReason::CollaborationInvite
-            }
-            NotificationReason::CollaborationAccept => {
-                NotificationReason::CollaborationAccept
-            }
-            NotificationReason::NewEntry => NotificationReason::NewEntry,
-            NotificationReason::EntryUpdate => NotificationReason::EntryUpdate,
-            NotificationReason::Mention => NotificationReason::Mention,
-            NotificationReason::Tag => NotificationReason::Tag,
-            NotificationReason::Comment => NotificationReason::Comment,
-            NotificationReason::Other(v) => NotificationReason::Other(v.into_static()),
-        }
-    }
-}
-
-/// New content from a notebook subscription.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscriptionUpdateView<'a> {
-    ///New entries since last check.
-    #[serde(borrow)]
-    pub new_entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-    pub updated_at: jacquard_common::types::string::Datetime,
-    ///Entries that were updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub updated_entries: std::option::Option<
-        Vec<crate::sh_weaver::notebook::EntryView<'a>>,
-    >,
-}
-
 pub mod subscription_update_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1320,49 +1337,49 @@ pub mod subscription_update_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NewEntries;
         type UpdatedAt;
+        type NewEntries;
         type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NewEntries = Unset;
         type UpdatedAt = Unset;
+        type NewEntries = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `new_entries` field to Set
-    pub struct SetNewEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNewEntries<S> {}
-    impl<S: State> State for SetNewEntries<S> {
-        type NewEntries = Set<members::new_entries>;
-        type UpdatedAt = S::UpdatedAt;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type NewEntries = S::NewEntries;
         type UpdatedAt = Set<members::updated_at>;
+        type NewEntries = S::NewEntries;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `new_entries` field to Set
+    pub struct SetNewEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNewEntries<S> {}
+    impl<S: State> State for SetNewEntries<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type NewEntries = Set<members::new_entries>;
         type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type NewEntries = S::NewEntries;
         type UpdatedAt = S::UpdatedAt;
+        type NewEntries = S::NewEntries;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `new_entries` field
-        pub struct new_entries(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `new_entries` field
+        pub struct new_entries(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
     }
@@ -1489,8 +1506,8 @@ impl<'a, S: subscription_update_view_state::State> SubscriptionUpdateViewBuilder
 impl<'a, S> SubscriptionUpdateViewBuilder<'a, S>
 where
     S: subscription_update_view_state::State,
-    S::NewEntries: subscription_update_view_state::IsSet,
     S::UpdatedAt: subscription_update_view_state::IsSet,
+    S::NewEntries: subscription_update_view_state::IsSet,
     S::Notebook: subscription_update_view_state::IsSet,
 {
     /// Build the final struct
@@ -1518,22 +1535,5 @@ where
             updated_entries: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscriptionUpdateView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "subscriptionUpdateView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -24,6 +24,53 @@ pub struct PostEmbed<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PostEmbedOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///mov.danabra.PostEmbed
+pub struct PostEmbedResponse;
+impl jacquard_common::xrpc::XrpcResp for PostEmbedResponse {
+    const NSID: &'static str = "mov.danabra.PostEmbed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PostEmbedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PostEmbed<'a> {
+    const NSID: &'static str = "mov.danabra.PostEmbed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PostEmbedResponse;
+}
+
+/// Endpoint type for
+///mov.danabra.PostEmbed
+pub struct PostEmbedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PostEmbedRequest {
+    const PATH: &'static str = "/xrpc/mov.danabra.PostEmbed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PostEmbed<'de>;
+    type Response = PostEmbedResponse;
+}
+
 pub mod post_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -143,51 +190,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PostEmbedOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///mov.danabra.PostEmbed
-pub struct PostEmbedResponse;
-impl jacquard_common::xrpc::XrpcResp for PostEmbedResponse {
-    const NSID: &'static str = "mov.danabra.PostEmbed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostEmbedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PostEmbed<'a> {
-    const NSID: &'static str = "mov.danabra.PostEmbed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PostEmbedResponse;
-}
-
-/// Endpoint type for
-///mov.danabra.PostEmbed
-pub struct PostEmbedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PostEmbedRequest {
-    const PATH: &'static str = "/xrpc/mov.danabra.PostEmbed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PostEmbed<'de>;
-    type Response = PostEmbedResponse;
 }

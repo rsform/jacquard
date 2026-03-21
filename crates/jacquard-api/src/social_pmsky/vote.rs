@@ -45,6 +45,84 @@ pub struct Vote<'a> {
     pub val: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VoteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Vote<'a>,
+}
+
+impl<'a> Vote<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct VoteRecord;
+impl jacquard_common::xrpc::XrpcResp for VoteRecord {
+    const NSID: &'static str = "social.pmsky.vote";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = VoteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
+    fn from(output: VoteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Vote<'_> {
+    const NSID: &'static str = "social.pmsky.vote";
+    type Record = VoteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for VoteRecord {
+    const NSID: &'static str = "social.pmsky.vote";
+    type Record = VoteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
+    fn nsid() -> &'static str {
+        "social.pmsky.vote"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_pmsky_vote()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod vote_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -55,67 +133,67 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
-        type Cts;
         type Val;
+        type Src;
         type Uri;
+        type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
-        type Cts = Unset;
         type Val = Unset;
+        type Src = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Cts = S::Cts;
-        type Val = S::Val;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Src = S::Src;
-        type Cts = Set<members::cts>;
-        type Val = S::Val;
-        type Uri = S::Uri;
+        type Cts = Unset;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Src = S::Src;
-        type Cts = S::Cts;
         type Val = Set<members::val>;
+        type Src = S::Src;
         type Uri = S::Uri;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Val = S::Val;
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Cts = S::Cts;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Src = S::Src;
-        type Cts = S::Cts;
         type Val = S::Val;
+        type Src = S::Src;
         type Uri = Set<members::uri>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Val = S::Val;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
-        ///Marker type for the `cts` field
-        pub struct cts(());
         ///Marker type for the `val` field
         pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
     }
 }
 
@@ -302,10 +380,10 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Src: vote_state::IsSet,
-    S::Cts: vote_state::IsSet,
     S::Val: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
+    S::Cts: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -340,84 +418,6 @@ where
             val: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
-}
-
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Vote<'_> {
-    const NSID: &'static str = "social.pmsky.vote";
-    type Record = VoteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct VoteRecord;
-impl jacquard_common::xrpc::XrpcResp for VoteRecord {
-    const NSID: &'static str = "social.pmsky.vote";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for VoteRecord {
-    const NSID: &'static str = "social.pmsky.vote";
-    type Record = VoteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
-    fn nsid() -> &'static str {
-        "social.pmsky.vote"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_pmsky_vote()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

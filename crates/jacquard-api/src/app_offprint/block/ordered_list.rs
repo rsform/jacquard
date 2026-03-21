@@ -28,6 +28,61 @@ pub struct ListItem<'a> {
     pub content: crate::app_offprint::block::text::Text<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OrderedList<'a> {
+    ///List items
+    #[serde(borrow)]
+    pub children: Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
+    ///Starting number for the list Defaults to `1`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_ordered_list_start")]
+    pub start: std::option::Option<i64>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.orderedList"
+    }
+    fn def_name() -> &'static str {
+        "listItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_orderedList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.orderedList"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_orderedList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -264,44 +319,6 @@ fn lexicon_doc_app_offprint_block_orderedList() -> ::jacquard_lexicon::lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.orderedList"
-    }
-    fn def_name() -> &'static str {
-        "listItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_orderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OrderedList<'a> {
-    ///List items
-    #[serde(borrow)]
-    pub children: Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
-    ///Starting number for the list Defaults to `1`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_ordered_list_start")]
-    pub start: std::option::Option<i64>,
-}
-
 fn _default_ordered_list_start() -> std::option::Option<i64> {
     Some(1i64)
 }
@@ -426,22 +443,5 @@ where
             start: self.__unsafe_private_named.1.or_else(|| Some(1i64)),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.orderedList"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_orderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

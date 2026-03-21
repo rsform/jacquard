@@ -36,6 +36,84 @@ pub struct Post<'a> {
     pub label: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PostGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Post<'a>,
+}
+
+impl<'a> Post<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PostRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PostRecord;
+impl jacquard_common::xrpc::XrpcResp for PostRecord {
+    const NSID: &'static str = "blue.rito.label.auto.post";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PostGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PostGetRecordOutput<'_>> for Post<'_> {
+    fn from(output: PostGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Post<'_> {
+    const NSID: &'static str = "blue.rito.label.auto.post";
+    type Record = PostRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PostRecord {
+    const NSID: &'static str = "blue.rito.label.auto.post";
+    type Record = PostRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
+    fn nsid() -> &'static str {
+        "blue.rito.label.auto.post"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_rito_label_auto_post()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -46,85 +124,85 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type AppliedTo;
         type Condition;
+        type AppliedTo;
         type DurationInHours;
         type Label;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type AppliedTo = Unset;
         type Condition = Unset;
+        type AppliedTo = Unset;
         type DurationInHours = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type AppliedTo = S::AppliedTo;
-        type Condition = S::Condition;
-        type DurationInHours = S::DurationInHours;
-        type Label = S::Label;
-    }
-    ///State transition - sets the `applied_to` field to Set
-    pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
-    impl<S: State> State for SetAppliedTo<S> {
-        type CreatedAt = S::CreatedAt;
-        type AppliedTo = Set<members::applied_to>;
-        type Condition = S::Condition;
-        type DurationInHours = S::DurationInHours;
-        type Label = S::Label;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `condition` field to Set
     pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCondition<S> {}
     impl<S: State> State for SetCondition<S> {
-        type CreatedAt = S::CreatedAt;
-        type AppliedTo = S::AppliedTo;
         type Condition = Set<members::condition>;
+        type AppliedTo = S::AppliedTo;
         type DurationInHours = S::DurationInHours;
         type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `applied_to` field to Set
+    pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
+    impl<S: State> State for SetAppliedTo<S> {
+        type Condition = S::Condition;
+        type AppliedTo = Set<members::applied_to>;
+        type DurationInHours = S::DurationInHours;
+        type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `duration_in_hours` field to Set
     pub struct SetDurationInHours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDurationInHours<S> {}
     impl<S: State> State for SetDurationInHours<S> {
-        type CreatedAt = S::CreatedAt;
-        type AppliedTo = S::AppliedTo;
         type Condition = S::Condition;
+        type AppliedTo = S::AppliedTo;
         type DurationInHours = Set<members::duration_in_hours>;
         type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type CreatedAt = S::CreatedAt;
-        type AppliedTo = S::AppliedTo;
         type Condition = S::Condition;
+        type AppliedTo = S::AppliedTo;
         type DurationInHours = S::DurationInHours;
         type Label = Set<members::label>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Condition = S::Condition;
+        type AppliedTo = S::AppliedTo;
+        type DurationInHours = S::DurationInHours;
+        type Label = S::Label;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `applied_to` field
-        pub struct applied_to(());
         ///Marker type for the `condition` field
         pub struct condition(());
+        ///Marker type for the `applied_to` field
+        pub struct applied_to(());
         ///Marker type for the `duration_in_hours` field
         pub struct duration_in_hours(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -274,11 +352,11 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
-    S::AppliedTo: post_state::IsSet,
     S::Condition: post_state::IsSet,
+    S::AppliedTo: post_state::IsSet,
     S::DurationInHours: post_state::IsSet,
     S::Label: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -309,84 +387,6 @@ where
             label: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PostRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
-}
-
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Post<'_> {
-    const NSID: &'static str = "blue.rito.label.auto.post";
-    type Record = PostRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PostRecord;
-impl jacquard_common::xrpc::XrpcResp for PostRecord {
-    const NSID: &'static str = "blue.rito.label.auto.post";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PostRecord {
-    const NSID: &'static str = "blue.rito.label.auto.post";
-    type Record = PostRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
-    fn nsid() -> &'static str {
-        "blue.rito.label.auto.post"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_rito_label_auto_post()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

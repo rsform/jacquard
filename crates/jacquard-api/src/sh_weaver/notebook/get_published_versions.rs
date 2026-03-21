@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_include_content() -> std::option::Option<bool> {
-    Some(false)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,63 @@ pub struct GetPublishedVersions<'a> {
     #[serde(default = "_default_include_content")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_content: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPublishedVersionsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub canonical: std::option::Option<
+        crate::sh_weaver::notebook::PublishedVersionView<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_divergence: std::option::Option<bool>,
+    ///Full entry records if includeContent=true
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub records: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    #[serde(borrow)]
+    pub versions: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getPublishedVersions
+pub struct GetPublishedVersionsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPublishedVersionsResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPublishedVersionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPublishedVersions<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPublishedVersionsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getPublishedVersions
+pub struct GetPublishedVersionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPublishedVersions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPublishedVersions<'de>;
+    type Response = GetPublishedVersionsResponse;
+}
+
+fn _default_include_content() -> std::option::Option<bool> {
+    Some(false)
 }
 
 pub mod get_published_versions_state {
@@ -135,57 +188,4 @@ where
             include_content: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPublishedVersionsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub canonical: std::option::Option<
-        crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_divergence: std::option::Option<bool>,
-    ///Full entry records if includeContent=true
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub records: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    #[serde(borrow)]
-    pub versions: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getPublishedVersions
-pub struct GetPublishedVersionsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPublishedVersionsResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPublishedVersionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPublishedVersions<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPublishedVersionsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getPublishedVersions
-pub struct GetPublishedVersionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPublishedVersions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPublishedVersions<'de>;
-    type Response = GetPublishedVersionsResponse;
 }

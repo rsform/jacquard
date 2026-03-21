@@ -25,6 +25,105 @@ pub struct GetRelationships<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRelationshipsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(borrow)]
+    pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRelationshipsOutputRelationshipsItem<'a> {
+    #[serde(rename = "app.bsky.graph.defs#relationship")]
+    Relationship(Box<crate::app_bsky::graph::Relationship<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#notFoundActor")]
+    NotFoundActor(Box<crate::app_bsky::graph::NotFoundActor<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRelationshipsError<'a> {
+    /// the primary actor at-identifier could not be resolved
+    #[serde(rename = "ActorNotFound")]
+    ActorNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRelationshipsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ActorNotFound(msg) => {
+                write!(f, "ActorNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.graph.getRelationships
+pub struct GetRelationshipsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
+    const NSID: &'static str = "app.bsky.graph.getRelationships";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRelationshipsOutput<'de>;
+    type Err<'de> = GetRelationshipsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRelationships<'a> {
+    const NSID: &'static str = "app.bsky.graph.getRelationships";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRelationshipsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getRelationships
+pub struct GetRelationshipsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getRelationships";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRelationships<'de>;
+    type Response = GetRelationshipsResponse;
+}
+
 pub mod get_relationships_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -135,103 +234,4 @@ where
             others: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRelationshipsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(borrow)]
-    pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRelationshipsOutputRelationshipsItem<'a> {
-    #[serde(rename = "app.bsky.graph.defs#relationship")]
-    Relationship(Box<crate::app_bsky::graph::Relationship<'a>>),
-    #[serde(rename = "app.bsky.graph.defs#notFoundActor")]
-    NotFoundActor(Box<crate::app_bsky::graph::NotFoundActor<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRelationshipsError<'a> {
-    /// the primary actor at-identifier could not be resolved
-    #[serde(rename = "ActorNotFound")]
-    ActorNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRelationshipsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::ActorNotFound(msg) => {
-                write!(f, "ActorNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.graph.getRelationships
-pub struct GetRelationshipsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
-    const NSID: &'static str = "app.bsky.graph.getRelationships";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRelationshipsOutput<'de>;
-    type Err<'de> = GetRelationshipsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRelationships<'a> {
-    const NSID: &'static str = "app.bsky.graph.getRelationships";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRelationshipsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getRelationships
-pub struct GetRelationshipsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getRelationships";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRelationships<'de>;
-    type Response = GetRelationshipsResponse;
 }

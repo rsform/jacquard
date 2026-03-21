@@ -32,6 +32,122 @@ pub struct FeatureOfInterest<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FeatureOfInterestGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: FeatureOfInterest<'a>,
+}
+
+impl<'a> FeatureOfInterest<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FeatureOfInterestRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FeatureOfInterestRecord;
+impl jacquard_common::xrpc::XrpcResp for FeatureOfInterestRecord {
+    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FeatureOfInterestGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FeatureOfInterestGetRecordOutput<'_>> for FeatureOfInterest<'_> {
+    fn from(output: FeatureOfInterestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for FeatureOfInterest<'_> {
+    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
+    type Record = FeatureOfInterestRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FeatureOfInterestRecord {
+    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
+    type Record = FeatureOfInterestRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeatureOfInterest<'a> {
+    fn nsid() -> &'static str {
+        "dev.sensorthings.featureOfInterest"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_sensorthings_featureOfInterest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.encoding_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "encoding_type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod feature_of_interest_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,67 +158,67 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EncodingType;
-        type Feature;
-        type Name;
         type CreatedAt;
+        type Feature;
+        type EncodingType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EncodingType = Unset;
-        type Feature = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
-    impl<S: State> State for SetEncodingType<S> {
-        type EncodingType = Set<members::encoding_type>;
-        type Feature = S::Feature;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `feature` field to Set
-    pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeature<S> {}
-    impl<S: State> State for SetFeature<S> {
-        type EncodingType = S::EncodingType;
-        type Feature = Set<members::feature>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type EncodingType = S::EncodingType;
-        type Feature = S::Feature;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Feature = Unset;
+        type EncodingType = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EncodingType = S::EncodingType;
-        type Feature = S::Feature;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Feature = S::Feature;
+        type EncodingType = S::EncodingType;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `feature` field to Set
+    pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeature<S> {}
+    impl<S: State> State for SetFeature<S> {
+        type CreatedAt = S::CreatedAt;
+        type Feature = Set<members::feature>;
+        type EncodingType = S::EncodingType;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
+    impl<S: State> State for SetEncodingType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Feature = S::Feature;
+        type EncodingType = Set<members::encoding_type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Feature = S::Feature;
+        type EncodingType = S::EncodingType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
-        ///Marker type for the `feature` field
-        pub struct feature(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `feature` field
+        pub struct feature(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -235,10 +351,10 @@ where
 impl<'a, S> FeatureOfInterestBuilder<'a, S>
 where
     S: feature_of_interest_state::State,
-    S::EncodingType: feature_of_interest_state::IsSet,
-    S::Feature: feature_of_interest_state::IsSet,
-    S::Name: feature_of_interest_state::IsSet,
     S::CreatedAt: feature_of_interest_state::IsSet,
+    S::Feature: feature_of_interest_state::IsSet,
+    S::EncodingType: feature_of_interest_state::IsSet,
+    S::Name: feature_of_interest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FeatureOfInterest<'a> {
@@ -267,122 +383,6 @@ where
             name: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> FeatureOfInterest<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FeatureOfInterestRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FeatureOfInterestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FeatureOfInterest<'a>,
-}
-
-impl From<FeatureOfInterestGetRecordOutput<'_>> for FeatureOfInterest<'_> {
-    fn from(output: FeatureOfInterestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for FeatureOfInterest<'_> {
-    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
-    type Record = FeatureOfInterestRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FeatureOfInterestRecord;
-impl jacquard_common::xrpc::XrpcResp for FeatureOfInterestRecord {
-    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FeatureOfInterestGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FeatureOfInterestRecord {
-    const NSID: &'static str = "dev.sensorthings.featureOfInterest";
-    type Record = FeatureOfInterestRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeatureOfInterest<'a> {
-    fn nsid() -> &'static str {
-        "dev.sensorthings.featureOfInterest"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_sensorthings_featureOfInterest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.encoding_type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "encoding_type",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

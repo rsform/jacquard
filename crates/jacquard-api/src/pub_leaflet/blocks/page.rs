@@ -22,6 +22,23 @@ pub struct Page<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.page"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_page()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_pub_leaflet_blocks_page() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -66,22 +83,5 @@ fn lexicon_doc_pub_leaflet_blocks_page() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.blocks.page"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_blocks_page()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -50,6 +50,154 @@ pub struct Registration<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RegistrationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Registration<'a>,
+}
+
+impl<'a> Registration<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RegistrationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RegistrationRecord;
+impl jacquard_common::xrpc::XrpcResp for RegistrationRecord {
+    const NSID: &'static str = "org.passingreads.book.registration";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RegistrationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RegistrationGetRecordOutput<'_>> for Registration<'_> {
+    fn from(output: RegistrationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Registration<'_> {
+    const NSID: &'static str = "org.passingreads.book.registration";
+    type Record = RegistrationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RegistrationRecord {
+    const NSID: &'static str = "org.passingreads.book.registration";
+    type Record = RegistrationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Registration<'a> {
+    fn nsid() -> &'static str {
+        "org.passingreads.book.registration"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_passingreads_book_registration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cover {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.cover {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod registration_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -60,151 +208,151 @@ pub mod registration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BookId;
+        type Did;
+        type PublicationId;
         type Authors;
         type BookSig;
-        type BookPub;
+        type BookId;
         type Title;
-        type Did;
         type OccurredAt;
-        type PublicationId;
+        type BookPub;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BookId = Unset;
+        type Did = Unset;
+        type PublicationId = Unset;
         type Authors = Unset;
         type BookSig = Unset;
-        type BookPub = Unset;
+        type BookId = Unset;
         type Title = Unset;
-        type Did = Unset;
         type OccurredAt = Unset;
-        type PublicationId = Unset;
-    }
-    ///State transition - sets the `book_id` field to Set
-    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookId<S> {}
-    impl<S: State> State for SetBookId<S> {
-        type BookId = Set<members::book_id>;
-        type Authors = S::Authors;
-        type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
-        type Title = S::Title;
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type PublicationId = S::PublicationId;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type BookId = S::BookId;
-        type Authors = Set<members::authors>;
-        type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
-        type Title = S::Title;
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type PublicationId = S::PublicationId;
-    }
-    ///State transition - sets the `book_sig` field to Set
-    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookSig<S> {}
-    impl<S: State> State for SetBookSig<S> {
-        type BookId = S::BookId;
-        type Authors = S::Authors;
-        type BookSig = Set<members::book_sig>;
-        type BookPub = S::BookPub;
-        type Title = S::Title;
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type PublicationId = S::PublicationId;
-    }
-    ///State transition - sets the `book_pub` field to Set
-    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookPub<S> {}
-    impl<S: State> State for SetBookPub<S> {
-        type BookId = S::BookId;
-        type Authors = S::Authors;
-        type BookSig = S::BookSig;
-        type BookPub = Set<members::book_pub>;
-        type Title = S::Title;
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type PublicationId = S::PublicationId;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type BookId = S::BookId;
-        type Authors = S::Authors;
-        type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
-        type Title = Set<members::title>;
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type PublicationId = S::PublicationId;
+        type BookPub = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type BookId = S::BookId;
-        type Authors = S::Authors;
-        type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
-        type Title = S::Title;
         type Did = Set<members::did>;
-        type OccurredAt = S::OccurredAt;
         type PublicationId = S::PublicationId;
-    }
-    ///State transition - sets the `occurred_at` field to Set
-    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
-    impl<S: State> State for SetOccurredAt<S> {
-        type BookId = S::BookId;
         type Authors = S::Authors;
         type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
+        type BookId = S::BookId;
         type Title = S::Title;
-        type Did = S::Did;
-        type OccurredAt = Set<members::occurred_at>;
-        type PublicationId = S::PublicationId;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
     }
     ///State transition - sets the `publication_id` field to Set
     pub struct SetPublicationId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublicationId<S> {}
     impl<S: State> State for SetPublicationId<S> {
-        type BookId = S::BookId;
+        type Did = S::Did;
+        type PublicationId = Set<members::publication_id>;
         type Authors = S::Authors;
         type BookSig = S::BookSig;
-        type BookPub = S::BookPub;
+        type BookId = S::BookId;
         type Title = S::Title;
-        type Did = S::Did;
         type OccurredAt = S::OccurredAt;
-        type PublicationId = Set<members::publication_id>;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = Set<members::authors>;
+        type BookSig = S::BookSig;
+        type BookId = S::BookId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_sig` field to Set
+    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookSig<S> {}
+    impl<S: State> State for SetBookSig<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = S::Authors;
+        type BookSig = Set<members::book_sig>;
+        type BookId = S::BookId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_id` field to Set
+    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookId<S> {}
+    impl<S: State> State for SetBookId<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type BookId = Set<members::book_id>;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type BookId = S::BookId;
+        type Title = Set<members::title>;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `occurred_at` field to Set
+    pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
+    impl<S: State> State for SetOccurredAt<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type BookId = S::BookId;
+        type Title = S::Title;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookPub = S::BookPub;
+    }
+    ///State transition - sets the `book_pub` field to Set
+    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookPub<S> {}
+    impl<S: State> State for SetBookPub<S> {
+        type Did = S::Did;
+        type PublicationId = S::PublicationId;
+        type Authors = S::Authors;
+        type BookSig = S::BookSig;
+        type BookId = S::BookId;
+        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
+        type BookPub = Set<members::book_pub>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book_id` field
-        pub struct book_id(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `publication_id` field
+        pub struct publication_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `book_sig` field
         pub struct book_sig(());
-        ///Marker type for the `book_pub` field
-        pub struct book_pub(());
+        ///Marker type for the `book_id` field
+        pub struct book_id(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
-        ///Marker type for the `publication_id` field
-        pub struct publication_id(());
+        ///Marker type for the `book_pub` field
+        pub struct book_pub(());
     }
 }
 
@@ -448,14 +596,14 @@ where
 impl<'a, S> RegistrationBuilder<'a, S>
 where
     S: registration_state::State,
-    S::BookId: registration_state::IsSet,
+    S::Did: registration_state::IsSet,
+    S::PublicationId: registration_state::IsSet,
     S::Authors: registration_state::IsSet,
     S::BookSig: registration_state::IsSet,
-    S::BookPub: registration_state::IsSet,
+    S::BookId: registration_state::IsSet,
     S::Title: registration_state::IsSet,
-    S::Did: registration_state::IsSet,
     S::OccurredAt: registration_state::IsSet,
-    S::PublicationId: registration_state::IsSet,
+    S::BookPub: registration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Registration<'a> {
@@ -494,154 +642,6 @@ where
             title: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Registration<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RegistrationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RegistrationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Registration<'a>,
-}
-
-impl From<RegistrationGetRecordOutput<'_>> for Registration<'_> {
-    fn from(output: RegistrationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Registration<'_> {
-    const NSID: &'static str = "org.passingreads.book.registration";
-    type Record = RegistrationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RegistrationRecord;
-impl jacquard_common::xrpc::XrpcResp for RegistrationRecord {
-    const NSID: &'static str = "org.passingreads.book.registration";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RegistrationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RegistrationRecord {
-    const NSID: &'static str = "org.passingreads.book.registration";
-    type Record = RegistrationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Registration<'a> {
-    fn nsid() -> &'static str {
-        "org.passingreads.book.registration"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_passingreads_book_registration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cover {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.cover {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

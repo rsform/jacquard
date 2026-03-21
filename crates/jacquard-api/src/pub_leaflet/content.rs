@@ -22,6 +22,42 @@ pub struct Content<'a> {
     pub pages: Vec<ContentPagesItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ContentPagesItem<'a> {
+    #[serde(rename = "pub.leaflet.pages.linearDocument")]
+    LinearDocument(Box<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>),
+    #[serde(rename = "pub.leaflet.pages.canvas")]
+    Canvas(Box<crate::pub_leaflet::pages::canvas::Canvas<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.content"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_content()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod content_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,25 +161,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContentPagesItem<'a> {
-    #[serde(rename = "pub.leaflet.pages.linearDocument")]
-    LinearDocument(Box<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>),
-    #[serde(rename = "pub.leaflet.pages.canvas")]
-    Canvas(Box<crate::pub_leaflet::pages::canvas::Canvas<'a>>),
-}
-
 fn lexicon_doc_pub_leaflet_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -195,22 +212,5 @@ fn lexicon_doc_pub_leaflet_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.content"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_content()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

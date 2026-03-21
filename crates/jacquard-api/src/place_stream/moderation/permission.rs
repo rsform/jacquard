@@ -31,6 +31,84 @@ pub struct Permission<'a> {
     pub permissions: Vec<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Permission<'a>,
+}
+
+impl<'a> Permission<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PermissionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PermissionRecord;
+impl jacquard_common::xrpc::XrpcResp for PermissionRecord {
+    const NSID: &'static str = "place.stream.moderation.permission";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PermissionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PermissionGetRecordOutput<'_>> for Permission<'_> {
+    fn from(output: PermissionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Permission<'_> {
+    const NSID: &'static str = "place.stream.moderation.permission";
+    type Record = PermissionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PermissionRecord {
+    const NSID: &'static str = "place.stream.moderation.permission";
+    type Record = PermissionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.moderation.permission"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_moderation_permission()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod permission_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,50 +120,50 @@ pub mod permission_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Moderator;
         type Permissions;
+        type Moderator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Moderator = Unset;
         type Permissions = Unset;
+        type Moderator = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Permissions = S::Permissions;
         type Moderator = S::Moderator;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `moderator` field to Set
-    pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModerator<S> {}
-    impl<S: State> State for SetModerator<S> {
-        type CreatedAt = S::CreatedAt;
-        type Moderator = Set<members::moderator>;
-        type Permissions = S::Permissions;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
         type CreatedAt = S::CreatedAt;
-        type Moderator = S::Moderator;
         type Permissions = Set<members::permissions>;
+        type Moderator = S::Moderator;
+    }
+    ///State transition - sets the `moderator` field to Set
+    pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModerator<S> {}
+    impl<S: State> State for SetModerator<S> {
+        type CreatedAt = S::CreatedAt;
+        type Permissions = S::Permissions;
+        type Moderator = Set<members::moderator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `moderator` field
-        pub struct moderator(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `moderator` field
+        pub struct moderator(());
     }
 }
 
@@ -199,8 +277,8 @@ impl<'a, S> PermissionBuilder<'a, S>
 where
     S: permission_state::State,
     S::CreatedAt: permission_state::IsSet,
-    S::Moderator: permission_state::IsSet,
     S::Permissions: permission_state::IsSet,
+    S::Moderator: permission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Permission<'a> {
@@ -227,84 +305,6 @@ where
             permissions: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Permission<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PermissionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Permission<'a>,
-}
-
-impl From<PermissionGetRecordOutput<'_>> for Permission<'_> {
-    fn from(output: PermissionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Permission<'_> {
-    const NSID: &'static str = "place.stream.moderation.permission";
-    type Record = PermissionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PermissionRecord;
-impl jacquard_common::xrpc::XrpcResp for PermissionRecord {
-    const NSID: &'static str = "place.stream.moderation.permission";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PermissionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PermissionRecord {
-    const NSID: &'static str = "place.stream.moderation.permission";
-    type Record = PermissionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.moderation.permission"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_moderation_permission()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

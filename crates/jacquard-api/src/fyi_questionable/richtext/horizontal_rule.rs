@@ -18,6 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HorizontalRule<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HorizontalRule<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.horizontalRule"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_horizontalRule()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_fyi_questionable_richtext_horizontalRule() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -45,22 +62,5 @@ fn lexicon_doc_fyi_questionable_richtext_horizontalRule() -> ::jacquard_lexicon:
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HorizontalRule<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.horizontalRule"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_horizontalRule()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

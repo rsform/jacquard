@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct GetSimilarNotebooks<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSimilarNotebooksOutput<'a> {
+    #[serde(borrow)]
+    pub notebooks: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getSimilarNotebooks
+pub struct GetSimilarNotebooksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSimilarNotebooksResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSimilarNotebooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarNotebooks<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSimilarNotebooksResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getSimilarNotebooks
+pub struct GetSimilarNotebooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarNotebooksRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSimilarNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSimilarNotebooks<'de>;
+    type Response = GetSimilarNotebooksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod get_similar_notebooks_state {
@@ -132,46 +174,4 @@ where
             notebook: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSimilarNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getSimilarNotebooks
-pub struct GetSimilarNotebooksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSimilarNotebooksResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSimilarNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarNotebooks<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSimilarNotebooksResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getSimilarNotebooks
-pub struct GetSimilarNotebooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarNotebooksRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSimilarNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSimilarNotebooks<'de>;
-    type Response = GetSimilarNotebooksResponse;
 }

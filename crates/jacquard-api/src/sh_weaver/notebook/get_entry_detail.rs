@@ -23,6 +23,90 @@ pub struct GetEntryDetail<'a> {
     pub notebook_context: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEntryDetailOutput<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    pub notebook_count: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notebooks: std::option::Option<
+        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
+    >,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetEntryDetailError<'a> {
+    #[serde(rename = "EntryNotFound")]
+    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetEntryDetailError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::EntryNotFound(msg) => {
+                write!(f, "EntryNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getEntryDetail
+pub struct GetEntryDetailResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEntryDetailOutput<'de>;
+    type Err<'de> = GetEntryDetailError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEntryDetailResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getEntryDetail
+pub struct GetEntryDetailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEntryDetail<'de>;
+    type Response = GetEntryDetailResponse;
+}
+
 pub mod get_entry_detail_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,88 +217,4 @@ where
             notebook_context: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEntryDetailOutput<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-    pub notebook_count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notebooks: std::option::Option<
-        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-    >,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEntryDetailError<'a> {
-    #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetEntryDetailError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::EntryNotFound(msg) => {
-                write!(f, "EntryNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.getEntryDetail
-pub struct GetEntryDetailResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryDetailOutput<'de>;
-    type Err<'de> = GetEntryDetailError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEntryDetailResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getEntryDetail
-pub struct GetEntryDetailRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryDetail<'de>;
-    type Response = GetEntryDetailResponse;
 }

@@ -20,6 +20,48 @@ pub struct GetLibrary<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLibraryOutput<'a> {
+    #[serde(borrow)]
+    pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
+}
+
+/// Response type for
+///org.passingreads.book.getLibrary
+pub struct GetLibraryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLibraryResponse {
+    const NSID: &'static str = "org.passingreads.book.getLibrary";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLibraryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLibrary<'a> {
+    const NSID: &'static str = "org.passingreads.book.getLibrary";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLibraryResponse;
+}
+
+/// Endpoint type for
+///org.passingreads.book.getLibrary
+pub struct GetLibraryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLibraryRequest {
+    const PATH: &'static str = "/xrpc/org.passingreads.book.getLibrary";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLibrary<'de>;
+    type Response = GetLibraryResponse;
+}
+
 pub mod get_library_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             actor: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLibraryOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
-}
-
-/// Response type for
-///org.passingreads.book.getLibrary
-pub struct GetLibraryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLibraryResponse {
-    const NSID: &'static str = "org.passingreads.book.getLibrary";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLibraryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLibrary<'a> {
-    const NSID: &'static str = "org.passingreads.book.getLibrary";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLibraryResponse;
-}
-
-/// Endpoint type for
-///org.passingreads.book.getLibrary
-pub struct GetLibraryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLibraryRequest {
-    const PATH: &'static str = "/xrpc/org.passingreads.book.getLibrary";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLibrary<'de>;
-    type Response = GetLibraryResponse;
 }

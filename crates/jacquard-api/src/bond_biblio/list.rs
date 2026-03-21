@@ -37,6 +37,146 @@ pub struct List<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: List<'a>,
+}
+
+impl<'a> List<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListRecord;
+impl jacquard_common::xrpc::XrpcResp for ListRecord {
+    const NSID: &'static str = "bond.biblio.list";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ListGetRecordOutput<'_>> for List<'_> {
+    fn from(output: ListGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for List<'_> {
+    const NSID: &'static str = "bond.biblio.list";
+    type Record = ListRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ListRecord {
+    const NSID: &'static str = "bond.biblio.list";
+    type Record = ListRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+    fn nsid() -> &'static str {
+        "bond.biblio.list"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_bond_biblio_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -48,84 +188,84 @@ pub mod list_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Duedate;
-        type Title;
-        type Librarians;
-        type Books;
         type CreatedAt;
+        type Librarians;
+        type Title;
+        type Books;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Duedate = Unset;
-        type Title = Unset;
-        type Librarians = Unset;
-        type Books = Unset;
         type CreatedAt = Unset;
+        type Librarians = Unset;
+        type Title = Unset;
+        type Books = Unset;
     }
     ///State transition - sets the `duedate` field to Set
     pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuedate<S> {}
     impl<S: State> State for SetDuedate<S> {
         type Duedate = Set<members::duedate>;
-        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
         type Librarians = S::Librarians;
-        type Books = S::Books;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Duedate = S::Duedate;
-        type Title = Set<members::title>;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `librarians` field to Set
-    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
-    impl<S: State> State for SetLibrarians<S> {
-        type Duedate = S::Duedate;
         type Title = S::Title;
-        type Librarians = Set<members::librarians>;
         type Books = S::Books;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-        type Librarians = S::Librarians;
-        type Books = Set<members::books>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Duedate = S::Duedate;
-        type Title = S::Title;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
         type CreatedAt = Set<members::created_at>;
+        type Librarians = S::Librarians;
+        type Title = S::Title;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `librarians` field to Set
+    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
+    impl<S: State> State for SetLibrarians<S> {
+        type Duedate = S::Duedate;
+        type CreatedAt = S::CreatedAt;
+        type Librarians = Set<members::librarians>;
+        type Title = S::Title;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Duedate = S::Duedate;
+        type CreatedAt = S::CreatedAt;
+        type Librarians = S::Librarians;
+        type Title = Set<members::title>;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Duedate = S::Duedate;
+        type CreatedAt = S::CreatedAt;
+        type Librarians = S::Librarians;
+        type Title = S::Title;
+        type Books = Set<members::books>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `duedate` field
         pub struct duedate(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `books` field
+        pub struct books(());
     }
 }
 
@@ -279,10 +419,10 @@ impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
     S::Duedate: list_state::IsSet,
-    S::Title: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
-    S::Books: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
+    S::Title: list_state::IsSet,
+    S::Books: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -313,146 +453,6 @@ where
             title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
-}
-
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for List<'_> {
-    const NSID: &'static str = "bond.biblio.list";
-    type Record = ListRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ListRecord;
-impl jacquard_common::xrpc::XrpcResp for ListRecord {
-    const NSID: &'static str = "bond.biblio.list";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ListRecord {
-    const NSID: &'static str = "bond.biblio.list";
-    type Record = ListRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
-    fn nsid() -> &'static str {
-        "bond.biblio.list"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_bond_biblio_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,89 @@ pub struct GetListFeed<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListFeedOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetListFeedError<'a> {
+    #[serde(rename = "UnknownList")]
+    UnknownList(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetListFeedError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::UnknownList(msg) => {
+                write!(f, "UnknownList")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.feed.getListFeed
+pub struct GetListFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
+    const NSID: &'static str = "app.bsky.feed.getListFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetListFeedOutput<'de>;
+    type Err<'de> = GetListFeedError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetListFeed<'a> {
+    const NSID: &'static str = "app.bsky.feed.getListFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListFeedResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.getListFeed
+pub struct GetListFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListFeedRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getListFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListFeed<'de>;
+    type Response = GetListFeedResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_list_feed_state {
@@ -153,83 +232,4 @@ where
             list: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListFeedOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetListFeedError<'a> {
-    #[serde(rename = "UnknownList")]
-    UnknownList(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetListFeedError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::UnknownList(msg) => {
-                write!(f, "UnknownList")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.feed.getListFeed
-pub struct GetListFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
-    const NSID: &'static str = "app.bsky.feed.getListFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListFeedOutput<'de>;
-    type Err<'de> = GetListFeedError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetListFeed<'a> {
-    const NSID: &'static str = "app.bsky.feed.getListFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetListFeedResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.getListFeed
-pub struct GetListFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetListFeedRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.getListFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetListFeed<'de>;
-    type Response = GetListFeedResponse;
 }

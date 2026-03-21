@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -31,6 +27,96 @@ pub struct ListRecords<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub reverse: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListRecordsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub records: Vec<crate::ooo_bsky::authfetch::list_records::Record<'a>>,
+}
+
+/// A record in the hidden repository.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Record<'a> {
+    ///The strategy used to authenticate fetch requests for this record.
+    #[serde(borrow)]
+    pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
+    ///The AT URI of the record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    ///The stored private record value.
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+/// Response type for
+///ooo.bsky.authfetch.listRecords
+pub struct ListRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListRecordsResponse {
+    const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListRecordsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListRecords<'a> {
+    const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListRecordsResponse;
+}
+
+/// Endpoint type for
+///ooo.bsky.authfetch.listRecords
+pub struct ListRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListRecordsRequest {
+    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.listRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListRecords<'de>;
+    type Response = ListRecordsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
+    fn nsid() -> &'static str {
+        "ooo.bsky.authfetch.listRecords"
+    }
+    fn def_name() -> &'static str {
+        "record"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ooo_bsky_authfetch_listRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_records_state {
@@ -172,75 +258,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListRecordsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub records: Vec<crate::ooo_bsky::authfetch::list_records::Record<'a>>,
-}
-
-/// Response type for
-///ooo.bsky.authfetch.listRecords
-pub struct ListRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListRecordsResponse {
-    const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListRecords<'a> {
-    const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListRecordsResponse;
-}
-
-/// Endpoint type for
-///ooo.bsky.authfetch.listRecords
-pub struct ListRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListRecordsRequest {
-    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.listRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListRecords<'de>;
-    type Response = ListRecordsResponse;
-}
-
-/// A record in the hidden repository.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Record<'a> {
-    ///The strategy used to authenticate fetch requests for this record.
-    #[serde(borrow)]
-    pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
-    ///The AT URI of the record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The stored private record value.
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
 pub mod record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -251,51 +268,51 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Uri;
         type Strategy;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Uri = Unset;
         type Strategy = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Uri = S::Uri;
-        type Strategy = S::Strategy;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
         type Uri = Set<members::uri>;
         type Strategy = S::Strategy;
+        type Value = S::Value;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
-        type Value = S::Value;
         type Uri = S::Uri;
         type Strategy = Set<members::strategy>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Strategy = S::Strategy;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -388,9 +405,9 @@ where
 impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
-    S::Value: record_state::IsSet,
     S::Uri: record_state::IsSet,
     S::Strategy: record_state::IsSet,
+    S::Value: record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Record<'a> {
@@ -581,22 +598,5 @@ fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
-    fn nsid() -> &'static str {
-        "ooo.bsky.authfetch.listRecords"
-    }
-    fn def_name() -> &'static str {
-        "record"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ooo_bsky_authfetch_listRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -27,6 +27,59 @@ pub struct FileListView<'a> {
     pub files: std::option::Option<Vec<crate::app_rocksky::googledrive::FileView<'a>>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FileView<'a> {
+    ///The unique identifier of the file.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.googledrive.defs"
+    }
+    fn def_name() -> &'static str {
+        "fileListView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_googledrive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.googledrive.defs"
+    }
+    fn def_name() -> &'static str {
+        "fileView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_googledrive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -100,58 +153,5 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.googledrive.defs"
-    }
-    fn def_name() -> &'static str {
-        "fileListView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_googledrive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FileView<'a> {
-    ///The unique identifier of the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.googledrive.defs"
-    }
-    fn def_name() -> &'static str {
-        "fileView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_googledrive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

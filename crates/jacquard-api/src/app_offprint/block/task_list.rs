@@ -22,6 +22,65 @@ pub struct TaskList<'a> {
     pub children: Vec<crate::app_offprint::block::task_list::TaskItem<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskItem<'a> {
+    ///Whether the task is completed
+    pub checked: bool,
+    ///Nested task items
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub children: std::option::Option<
+        Vec<crate::app_offprint::block::task_list::TaskItem<'a>>,
+    >,
+    ///Text content of the task item
+    #[serde(borrow)]
+    pub content: crate::app_offprint::block::text::Text<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskList<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.taskList"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_taskList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.taskList"
+    }
+    fn def_name() -> &'static str {
+        "taskItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_taskList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod task_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -230,48 +289,6 @@ fn lexicon_doc_app_offprint_block_taskList() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskList<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.taskList"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_taskList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TaskItem<'a> {
-    ///Whether the task is completed
-    pub checked: bool,
-    ///Nested task items
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub children: std::option::Option<
-        Vec<crate::app_offprint::block::task_list::TaskItem<'a>>,
-    >,
-    ///Text content of the task item
-    #[serde(borrow)]
-    pub content: crate::app_offprint::block::text::Text<'a>,
-}
-
 pub mod task_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -433,22 +450,5 @@ where
             content: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.taskList"
-    }
-    fn def_name() -> &'static str {
-        "taskItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_taskList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

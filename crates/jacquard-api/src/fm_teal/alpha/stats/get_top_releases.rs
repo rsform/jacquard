@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_period() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -36,6 +28,60 @@ pub struct GetTopReleases<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub period: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTopReleasesOutput<'a> {
+    ///Next page cursor
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub releases: Vec<crate::fm_teal::alpha::stats::ReleaseView<'a>>,
+}
+
+/// Response type for
+///fm.teal.alpha.stats.getTopReleases
+pub struct GetTopReleasesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTopReleasesResponse {
+    const NSID: &'static str = "fm.teal.alpha.stats.getTopReleases";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTopReleasesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTopReleases<'a> {
+    const NSID: &'static str = "fm.teal.alpha.stats.getTopReleases";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTopReleasesResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.stats.getTopReleases
+pub struct GetTopReleasesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTopReleasesRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getTopReleases";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTopReleases<'de>;
+    type Response = GetTopReleasesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_period() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("all"))
 }
 
 pub mod get_top_releases_state {
@@ -143,50 +189,4 @@ where
             period: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTopReleasesOutput<'a> {
-    ///Next page cursor
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub releases: Vec<crate::fm_teal::alpha::stats::ReleaseView<'a>>,
-}
-
-/// Response type for
-///fm.teal.alpha.stats.getTopReleases
-pub struct GetTopReleasesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTopReleasesResponse {
-    const NSID: &'static str = "fm.teal.alpha.stats.getTopReleases";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTopReleasesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTopReleases<'a> {
-    const NSID: &'static str = "fm.teal.alpha.stats.getTopReleases";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTopReleasesResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.stats.getTopReleases
-pub struct GetTopReleasesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTopReleasesRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getTopReleases";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTopReleases<'de>;
-    type Response = GetTopReleasesResponse;
 }

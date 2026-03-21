@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(500i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -31,6 +27,116 @@ pub struct ListBlobs<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListBlobsOutput<'a> {
+    #[serde(borrow)]
+    pub cids: Vec<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListBlobsError<'a> {
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "RepoTakendown")]
+    RepoTakendown(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "RepoSuspended")]
+    RepoSuspended(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "RepoDeactivated")]
+    RepoDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ListBlobsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoTakendown(msg) => {
+                write!(f, "RepoTakendown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoSuspended(msg) => {
+                write!(f, "RepoSuspended")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoDeactivated(msg) => {
+                write!(f, "RepoDeactivated")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.sync.listBlobs
+pub struct ListBlobsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
+    const NSID: &'static str = "com.atproto.sync.listBlobs";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListBlobsOutput<'de>;
+    type Err<'de> = ListBlobsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
+    const NSID: &'static str = "com.atproto.sync.listBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListBlobsResponse;
+}
+
+/// Endpoint type for
+///com.atproto.sync.listBlobs
+pub struct ListBlobsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListBlobs<'de>;
+    type Response = ListBlobsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(500i64)
 }
 
 pub mod list_blobs_state {
@@ -176,110 +282,4 @@ where
             since: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListBlobsOutput<'a> {
-    #[serde(borrow)]
-    pub cids: Vec<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListBlobsError<'a> {
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "RepoTakendown")]
-    RepoTakendown(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "RepoSuspended")]
-    RepoSuspended(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ListBlobsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RepoTakendown(msg) => {
-                write!(f, "RepoTakendown")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RepoSuspended(msg) => {
-                write!(f, "RepoSuspended")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RepoDeactivated(msg) => {
-                write!(f, "RepoDeactivated")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.sync.listBlobs
-pub struct ListBlobsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
-    const NSID: &'static str = "com.atproto.sync.listBlobs";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListBlobsOutput<'de>;
-    type Err<'de> = ListBlobsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
-    const NSID: &'static str = "com.atproto.sync.listBlobs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListBlobsResponse;
-}
-
-/// Endpoint type for
-///com.atproto.sync.listBlobs
-pub struct ListBlobsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListBlobs<'de>;
-    type Response = ListBlobsResponse;
 }

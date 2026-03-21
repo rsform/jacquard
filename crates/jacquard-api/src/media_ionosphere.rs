@@ -43,6 +43,442 @@ pub struct Broadcast<'a> {
     pub until: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Credit<'a> {
+    #[serde(borrow)]
+    pub entity: crate::media_ionosphere::Entity<'a>,
+    ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
+    #[serde(borrow)]
+    pub role: CreditRole<'a>,
+}
+
+/// Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreditRole<'a> {
+    Creator,
+    Contributor,
+    Guest,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CreditRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Creator => "creator",
+            Self::Contributor => "contributor",
+            Self::Guest => "guest",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CreditRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "creator" => Self::Creator,
+            "contributor" => Self::Contributor,
+            "guest" => Self::Guest,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CreditRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "creator" => Self::Creator,
+            "contributor" => Self::Contributor,
+            "guest" => Self::Guest,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CreditRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CreditRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CreditRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CreditRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CreditRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CreditRole<'_> {
+    type Output = CreditRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreditRole::Creator => CreditRole::Creator,
+            CreditRole::Contributor => CreditRole::Contributor,
+            CreditRole::Guest => CreditRole::Guest,
+            CreditRole::Other(v) => CreditRole::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Entity<'a> {
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+/// TV-Anytime classification scheme URIs permitted by ETSI TS 102 818 section 5.3
+pub type Genre<'a> = jacquard_common::types::string::UriValue<'a>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Geocoordinates<'a> {
+    #[serde(borrow)]
+    pub latitude: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub longitude: jacquard_common::CowStr<'a>,
+}
+
+/// Represents membership to a group, optionally with an index
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Membership<'a> {
+    #[serde(borrow)]
+    pub group: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub index: std::option::Option<i64>,
+}
+
+/// Represents the method of accessing a recording
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Recording<'a> {
+    #[serde(borrow)]
+    pub bearer: crate::media_ionosphere::Bearer<'a>,
+    ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_recording_cost")]
+    pub cost: std::option::Option<i64>,
+    ///The datetime from which this method is available
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub from: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The datetime where this method is no longer available
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub until: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Track<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Artists in order of importance to the track
+    #[serde(borrow)]
+    pub artists: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Broadcast<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "broadcast"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "credit"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.role;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "role",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "entity"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geocoordinates<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "geocoordinates"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.latitude;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "latitude",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.longitude;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longitude",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "membership"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "recording"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Track<'a> {
+    fn nsid() -> &'static str {
+        "media.ionosphere.defs"
+    }
+    fn def_name() -> &'static str {
+        "track"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_media_ionosphere_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.album {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "album",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_broadcast_cost() -> std::option::Option<i64> {
     Some(0i64)
 }
@@ -765,42 +1201,6 @@ fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Broadcast<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "broadcast"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Credit<'a> {
-    #[serde(borrow)]
-    pub entity: crate::media_ionosphere::Entity<'a>,
-    ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
-    #[serde(borrow)]
-    pub role: CreditRole<'a>,
-}
-
 pub mod credit_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -811,37 +1211,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Entity;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Entity = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type Entity = S::Entity;
+        type Role = Unset;
     }
     ///State transition - sets the `entity` field to Set
     pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntity<S> {}
     impl<S: State> State for SetEntity<S> {
-        type Role = S::Role;
         type Entity = Set<members::entity>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Entity = S::Entity;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `entity` field
         pub struct entity(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -914,8 +1314,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Role: credit_state::IsSet,
     S::Entity: credit_state::IsSet,
+    S::Role: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -939,281 +1339,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreditRole<'a> {
-    Creator,
-    Contributor,
-    Guest,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CreditRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Creator => "creator",
-            Self::Contributor => "contributor",
-            Self::Guest => "guest",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CreditRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "creator" => Self::Creator,
-            "contributor" => Self::Contributor,
-            "guest" => Self::Guest,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CreditRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "creator" => Self::Creator,
-            "contributor" => Self::Contributor,
-            "guest" => Self::Guest,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreditRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CreditRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CreditRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CreditRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CreditRole<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CreditRole<'_> {
-    type Output = CreditRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreditRole::Creator => CreditRole::Creator,
-            CreditRole::Contributor => CreditRole::Contributor,
-            CreditRole::Guest => CreditRole::Guest,
-            CreditRole::Other(v) => CreditRole::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "credit"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.role;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Entity<'a> {
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "entity"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// TV-Anytime classification scheme URIs permitted by ETSI TS 102 818 section 5.3
-pub type Genre<'a> = jacquard_common::types::string::UriValue<'a>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Geocoordinates<'a> {
-    #[serde(borrow)]
-    pub latitude: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub longitude: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geocoordinates<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "geocoordinates"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.latitude;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "latitude",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.longitude;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longitude",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Represents membership to a group, optionally with an index
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Membership<'a> {
-    #[serde(borrow)]
-    pub group: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: std::option::Option<i64>,
 }
 
 pub mod membership_state {
@@ -1335,50 +1460,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "membership"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Represents the method of accessing a recording
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Recording<'a> {
-    #[serde(borrow)]
-    pub bearer: crate::media_ionosphere::Bearer<'a>,
-    ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_recording_cost")]
-    pub cost: std::option::Option<i64>,
-    ///The datetime from which this method is available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub from: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The datetime where this method is no longer available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub until: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 fn _default_recording_cost() -> std::option::Option<i64> {
@@ -1550,45 +1631,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "recording"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Track<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Artists in order of importance to the track
-    #[serde(borrow)]
-    pub artists: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-}
-
 pub mod track_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1599,37 +1641,37 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
@@ -1719,8 +1761,8 @@ where
 impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
-    S::Artists: track_state::IsSet,
     S::Title: track_state::IsSet,
+    S::Artists: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {
@@ -1745,47 +1787,5 @@ where
             title: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Track<'a> {
-    fn nsid() -> &'static str {
-        "media.ionosphere.defs"
-    }
-    fn def_name() -> &'static str {
-        "track"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_media_ionosphere_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.album {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "album",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

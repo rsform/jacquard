@@ -24,6 +24,23 @@ pub struct Unknown<'a> {
     pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Unknown<'a> {
+    fn nsid() -> &'static str {
+        "blue.zio.atfile.meta"
+    }
+    fn def_name() -> &'static str {
+        "unknown"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_zio_atfile_meta()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blue_zio_atfile_meta() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -70,22 +87,5 @@ fn lexicon_doc_blue_zio_atfile_meta() -> ::jacquard_lexicon::lexicon::LexiconDoc
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Unknown<'a> {
-    fn nsid() -> &'static str {
-        "blue.zio.atfile.meta"
-    }
-    fn def_name() -> &'static str {
-        "unknown"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_zio_atfile_meta()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

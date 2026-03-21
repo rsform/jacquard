@@ -53,6 +53,182 @@ pub struct Podcast<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PodcastGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Podcast<'a>,
+}
+
+impl<'a> Podcast<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PodcastRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PodcastRecord;
+impl jacquard_common::xrpc::XrpcResp for PodcastRecord {
+    const NSID: &'static str = "org.atpodcasting.podcast";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PodcastGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PodcastGetRecordOutput<'_>> for Podcast<'_> {
+    fn from(output: PodcastGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Podcast<'_> {
+    const NSID: &'static str = "org.atpodcasting.podcast";
+    type Record = PodcastRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PodcastRecord {
+    const NSID: &'static str = "org.atpodcasting.podcast";
+    type Record = PodcastRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.podcast"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_podcast()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.artwork;
+            {
+                let size = value.blob().size;
+                if size > 5000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        max: 5000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.artwork;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "artwork",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.categories;
+            #[allow(unused_comparisons)]
+            if value.len() > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "categories",
+                    ),
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 4000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 4000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.guid;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 36usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "guid",
+                    ),
+                    max: 36usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod podcast_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -64,150 +240,150 @@ pub mod podcast_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type FeedUrl;
-        type Guid;
-        type Title;
-        type Categories;
         type Description;
-        type Language;
         type CreatedAt;
+        type Language;
+        type Title;
         type Artwork;
+        type Guid;
+        type Categories;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type FeedUrl = Unset;
-        type Guid = Unset;
-        type Title = Unset;
-        type Categories = Unset;
         type Description = Unset;
-        type Language = Unset;
         type CreatedAt = Unset;
+        type Language = Unset;
+        type Title = Unset;
         type Artwork = Unset;
+        type Guid = Unset;
+        type Categories = Unset;
     }
     ///State transition - sets the `feed_url` field to Set
     pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
     impl<S: State> State for SetFeedUrl<S> {
         type FeedUrl = Set<members::feed_url>;
-        type Guid = S::Guid;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Language = S::Language;
         type Title = S::Title;
-        type Categories = S::Categories;
-        type Description = S::Description;
-        type Language = S::Language;
-        type CreatedAt = S::CreatedAt;
         type Artwork = S::Artwork;
-    }
-    ///State transition - sets the `guid` field to Set
-    pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGuid<S> {}
-    impl<S: State> State for SetGuid<S> {
-        type FeedUrl = S::FeedUrl;
-        type Guid = Set<members::guid>;
-        type Title = S::Title;
-        type Categories = S::Categories;
-        type Description = S::Description;
-        type Language = S::Language;
-        type CreatedAt = S::CreatedAt;
-        type Artwork = S::Artwork;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type FeedUrl = S::FeedUrl;
         type Guid = S::Guid;
-        type Title = Set<members::title>;
         type Categories = S::Categories;
-        type Description = S::Description;
-        type Language = S::Language;
-        type CreatedAt = S::CreatedAt;
-        type Artwork = S::Artwork;
-    }
-    ///State transition - sets the `categories` field to Set
-    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategories<S> {}
-    impl<S: State> State for SetCategories<S> {
-        type FeedUrl = S::FeedUrl;
-        type Guid = S::Guid;
-        type Title = S::Title;
-        type Categories = Set<members::categories>;
-        type Description = S::Description;
-        type Language = S::Language;
-        type CreatedAt = S::CreatedAt;
-        type Artwork = S::Artwork;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type FeedUrl = S::FeedUrl;
-        type Guid = S::Guid;
-        type Title = S::Title;
-        type Categories = S::Categories;
         type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
         type Language = S::Language;
-        type CreatedAt = S::CreatedAt;
-        type Artwork = S::Artwork;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type FeedUrl = S::FeedUrl;
-        type Guid = S::Guid;
         type Title = S::Title;
-        type Categories = S::Categories;
-        type Description = S::Description;
-        type Language = Set<members::language>;
-        type CreatedAt = S::CreatedAt;
         type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type FeedUrl = S::FeedUrl;
-        type Guid = S::Guid;
-        type Title = S::Title;
-        type Categories = S::Categories;
         type Description = S::Description;
-        type Language = S::Language;
         type CreatedAt = Set<members::created_at>;
+        type Language = S::Language;
+        type Title = S::Title;
         type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type FeedUrl = S::FeedUrl;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Language = Set<members::language>;
+        type Title = S::Title;
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type FeedUrl = S::FeedUrl;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Language = S::Language;
+        type Title = Set<members::title>;
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
     }
     ///State transition - sets the `artwork` field to Set
     pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtwork<S> {}
     impl<S: State> State for SetArtwork<S> {
         type FeedUrl = S::FeedUrl;
-        type Guid = S::Guid;
-        type Title = S::Title;
-        type Categories = S::Categories;
         type Description = S::Description;
-        type Language = S::Language;
         type CreatedAt = S::CreatedAt;
+        type Language = S::Language;
+        type Title = S::Title;
         type Artwork = Set<members::artwork>;
+        type Guid = S::Guid;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `guid` field to Set
+    pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGuid<S> {}
+    impl<S: State> State for SetGuid<S> {
+        type FeedUrl = S::FeedUrl;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Language = S::Language;
+        type Title = S::Title;
+        type Artwork = S::Artwork;
+        type Guid = Set<members::guid>;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `categories` field to Set
+    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategories<S> {}
+    impl<S: State> State for SetCategories<S> {
+        type FeedUrl = S::FeedUrl;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Language = S::Language;
+        type Title = S::Title;
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Categories = Set<members::categories>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `feed_url` field
         pub struct feed_url(());
-        ///Marker type for the `guid` field
-        pub struct guid(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `categories` field
-        pub struct categories(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `language` field
+        pub struct language(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `artwork` field
         pub struct artwork(());
+        ///Marker type for the `guid` field
+        pub struct guid(());
+        ///Marker type for the `categories` field
+        pub struct categories(());
     }
 }
 
@@ -467,13 +643,13 @@ impl<'a, S> PodcastBuilder<'a, S>
 where
     S: podcast_state::State,
     S::FeedUrl: podcast_state::IsSet,
-    S::Guid: podcast_state::IsSet,
-    S::Title: podcast_state::IsSet,
-    S::Categories: podcast_state::IsSet,
     S::Description: podcast_state::IsSet,
-    S::Language: podcast_state::IsSet,
     S::CreatedAt: podcast_state::IsSet,
+    S::Language: podcast_state::IsSet,
+    S::Title: podcast_state::IsSet,
     S::Artwork: podcast_state::IsSet,
+    S::Guid: podcast_state::IsSet,
+    S::Categories: podcast_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podcast<'a> {
@@ -514,182 +690,6 @@ where
             title: self.__unsafe_private_named.10.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Podcast<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PodcastRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PodcastGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Podcast<'a>,
-}
-
-impl From<PodcastGetRecordOutput<'_>> for Podcast<'_> {
-    fn from(output: PodcastGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Podcast<'_> {
-    const NSID: &'static str = "org.atpodcasting.podcast";
-    type Record = PodcastRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PodcastRecord;
-impl jacquard_common::xrpc::XrpcResp for PodcastRecord {
-    const NSID: &'static str = "org.atpodcasting.podcast";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PodcastGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PodcastRecord {
-    const NSID: &'static str = "org.atpodcasting.podcast";
-    type Record = PodcastRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.podcast"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_podcast()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.artwork;
-            {
-                let size = value.blob().size;
-                if size > 5000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
-                        max: 5000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.artwork;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.categories;
-            #[allow(unused_comparisons)]
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "categories",
-                    ),
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 4000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 4000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.guid;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 36usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "guid",
-                    ),
-                    max: 36usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

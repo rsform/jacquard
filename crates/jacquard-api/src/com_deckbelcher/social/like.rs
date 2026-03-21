@@ -23,6 +23,175 @@ pub struct CardSubject<'a> {
     pub r#ref: crate::com_deckbelcher::CardRef<'a>,
 }
 
+/// Record declaring a 'like' of a piece of content (card, deck, reply, etc).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Like<'a> {
+    ///Timestamp when the like was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Reference to the content being liked.
+    #[serde(borrow)]
+    pub subject: LikeSubject<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LikeSubject<'a> {
+    #[serde(rename = "com.deckbelcher.social.like#cardSubject")]
+    CardSubject(Box<crate::com_deckbelcher::social::like::CardSubject<'a>>),
+    #[serde(rename = "com.deckbelcher.social.like#recordSubject")]
+    RecordSubject(Box<crate::com_deckbelcher::social::like::RecordSubject<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LikeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Like<'a>,
+}
+
+/// Subject for liking an ATProto record (deck, reply, etc).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordSubject<'a> {
+    ///Reference to the record.
+    #[serde(borrow)]
+    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+impl<'a> Like<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LikeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardSubject<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.like"
+    }
+    fn def_name() -> &'static str {
+        "cardSubject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_like()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LikeRecord;
+impl jacquard_common::xrpc::XrpcResp for LikeRecord {
+    const NSID: &'static str = "com.deckbelcher.social.like";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LikeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LikeGetRecordOutput<'_>> for Like<'_> {
+    fn from(output: LikeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Like<'_> {
+    const NSID: &'static str = "com.deckbelcher.social.like";
+    type Record = LikeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LikeRecord {
+    const NSID: &'static str = "com.deckbelcher.social.like";
+    type Record = LikeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Like<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.like"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_like()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordSubject<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.like"
+    }
+    fn def_name() -> &'static str {
+        "recordSubject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_like()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod card_subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -273,43 +442,6 @@ fn lexicon_doc_com_deckbelcher_social_like() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardSubject<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.like"
-    }
-    fn def_name() -> &'static str {
-        "cardSubject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_like()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Record declaring a 'like' of a piece of content (card, deck, reply, etc).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Like<'a> {
-    ///Timestamp when the like was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Reference to the content being liked.
-    #[serde(borrow)]
-    pub subject: LikeSubject<'a>,
-}
-
 pub mod like_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -450,121 +582,6 @@ where
     }
 }
 
-impl<'a> Like<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LikeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum LikeSubject<'a> {
-    #[serde(rename = "com.deckbelcher.social.like#cardSubject")]
-    CardSubject(Box<crate::com_deckbelcher::social::like::CardSubject<'a>>),
-    #[serde(rename = "com.deckbelcher.social.like#recordSubject")]
-    RecordSubject(Box<crate::com_deckbelcher::social::like::RecordSubject<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LikeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Like<'a>,
-}
-
-impl From<LikeGetRecordOutput<'_>> for Like<'_> {
-    fn from(output: LikeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Like<'_> {
-    const NSID: &'static str = "com.deckbelcher.social.like";
-    type Record = LikeRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LikeRecord;
-impl jacquard_common::xrpc::XrpcResp for LikeRecord {
-    const NSID: &'static str = "com.deckbelcher.social.like";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LikeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LikeRecord {
-    const NSID: &'static str = "com.deckbelcher.social.like";
-    type Record = LikeRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Like<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.like"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_like()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Subject for liking an ATProto record (deck, reply, etc).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordSubject<'a> {
-    ///Reference to the record.
-    #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod record_subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -667,22 +684,5 @@ where
             r#ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordSubject<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.like"
-    }
-    fn def_name() -> &'static str {
-        "recordSubject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_like()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

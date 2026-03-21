@@ -29,6 +29,115 @@ pub struct BlobEntry<'a> {
     >,
 }
 
+/// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StorageBlobs<'a> {
+    ///Array of blob entries for WebDataset tar files
+    #[serde(borrow)]
+    pub blobs: Vec<crate::science_alt::dataset::storage_blobs::BlobEntry<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobEntry<'a> {
+    fn nsid() -> &'static str {
+        "science.alt.dataset.storageBlobs"
+    }
+    fn def_name() -> &'static str {
+        "blobEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_science_alt_dataset_storageBlobs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blob;
+            {
+                let size = value.blob().size;
+                if size > 52428800usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 52428800usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["application/x-tar"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["application/x-tar".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageBlobs<'a> {
+    fn nsid() -> &'static str {
+        "science.alt.dataset.storageBlobs"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_science_alt_dataset_storageBlobs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blobs;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blobs",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod blob_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -252,85 +361,6 @@ fn lexicon_doc_science_alt_dataset_storageBlobs() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobEntry<'a> {
-    fn nsid() -> &'static str {
-        "science.alt.dataset.storageBlobs"
-    }
-    fn def_name() -> &'static str {
-        "blobEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_science_alt_dataset_storageBlobs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blob;
-            {
-                let size = value.blob().size;
-                if size > 52428800usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 52428800usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["application/x-tar"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["application/x-tar".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StorageBlobs<'a> {
-    ///Array of blob entries for WebDataset tar files
-    #[serde(borrow)]
-    pub blobs: Vec<crate::science_alt::dataset::storage_blobs::BlobEntry<'a>>,
-}
-
 pub mod storage_blobs_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -435,35 +465,5 @@ where
             blobs: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageBlobs<'a> {
-    fn nsid() -> &'static str {
-        "science.alt.dataset.storageBlobs"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_science_alt_dataset_storageBlobs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blobs;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blobs",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

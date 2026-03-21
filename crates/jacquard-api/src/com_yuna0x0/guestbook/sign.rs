@@ -25,6 +25,97 @@ pub struct Sign<'a> {
     pub subject: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SignGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Sign<'a>,
+}
+
+impl<'a> Sign<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SignRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SignRecord;
+impl jacquard_common::xrpc::XrpcResp for SignRecord {
+    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SignGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SignGetRecordOutput<'_>> for Sign<'_> {
+    fn from(output: SignGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Sign<'_> {
+    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
+    type Record = SignRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SignRecord {
+    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
+    type Record = SignRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sign<'a> {
+    fn nsid() -> &'static str {
+        "com.yuna0x0.guestbook.sign"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_yuna0x0_guestbook_sign()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.message;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod sign_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,50 +127,50 @@ pub mod sign_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Subject;
-        type Message;
         type CreatedAt;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Subject = Unset;
-        type Message = Unset;
         type CreatedAt = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
         type Message = S::Message;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Subject = S::Subject;
-        type Message = Set<members::message>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Subject = S::Subject;
-        type Message = S::Message;
         type CreatedAt = Set<members::created_at>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -173,8 +264,8 @@ impl<'a, S> SignBuilder<'a, S>
 where
     S: sign_state::State,
     S::Subject: sign_state::IsSet,
-    S::Message: sign_state::IsSet,
     S::CreatedAt: sign_state::IsSet,
+    S::Message: sign_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sign<'a> {
@@ -199,97 +290,6 @@ where
             subject: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Sign<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SignRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SignGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sign<'a>,
-}
-
-impl From<SignGetRecordOutput<'_>> for Sign<'_> {
-    fn from(output: SignGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Sign<'_> {
-    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
-    type Record = SignRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SignRecord;
-impl jacquard_common::xrpc::XrpcResp for SignRecord {
-    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SignGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SignRecord {
-    const NSID: &'static str = "com.yuna0x0.guestbook.sign";
-    type Record = SignRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sign<'a> {
-    fn nsid() -> &'static str {
-        "com.yuna0x0.guestbook.sign"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_yuna0x0_guestbook_sign()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.message;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

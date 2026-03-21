@@ -25,6 +25,366 @@ pub struct CommitCountBreakdown<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IndividualEmailCommitCount<'a> {
+    pub count: i64,
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IndividualLanguageSize<'a> {
+    #[serde(borrow)]
+    pub lang: jacquard_common::CowStr<'a>,
+    pub size: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LangBreakdown<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub inputs: std::option::Option<
+        Vec<crate::sh_tangled::git::ref_update::IndividualLanguageSize<'a>>,
+    >,
+}
+
+/// An update to a git repository, emitted by knots.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RefUpdate<'a> {
+    ///did of the user that pushed this ref
+    #[serde(borrow)]
+    pub committer_did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub meta: crate::sh_tangled::git::ref_update::Meta<'a>,
+    ///new SHA of this ref
+    #[serde(borrow)]
+    pub new_sha: jacquard_common::CowStr<'a>,
+    ///old SHA of this ref
+    #[serde(borrow)]
+    pub old_sha: jacquard_common::CowStr<'a>,
+    ///Ref being updated
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+    ///did of the owner of the repo
+    #[serde(borrow)]
+    pub repo_did: jacquard_common::types::string::Did<'a>,
+    ///name of the repo
+    #[serde(borrow)]
+    pub repo_name: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RefUpdateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: RefUpdate<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Meta<'a> {
+    #[serde(borrow)]
+    pub commit_count: crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
+    ///Defaults to `false`.
+    #[serde(default = "_default_meta_is_default_ref")]
+    pub is_default_ref: bool,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub lang_breakdown: std::option::Option<
+        crate::sh_tangled::git::ref_update::LangBreakdown<'a>,
+    >,
+}
+
+impl<'a> RefUpdate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RefUpdateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "commitCountBreakdown"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCount<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "individualEmailCommitCount"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "individualLanguageSize"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "langBreakdown"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RefUpdateRecord;
+impl jacquard_common::xrpc::XrpcResp for RefUpdateRecord {
+    const NSID: &'static str = "sh.tangled.git.refUpdate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RefUpdateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
+    fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
+    const NSID: &'static str = "sh.tangled.git.refUpdate";
+    type Record = RefUpdateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RefUpdateRecord {
+    const NSID: &'static str = "sh.tangled.git.refUpdate";
+    type Record = RefUpdateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.new_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.new_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#ref;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ref",
+                    ),
+                    max: 2560usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#ref;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "ref",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "meta"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_git_refUpdate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -412,40 +772,6 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "commitCountBreakdown"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct IndividualEmailCommitCount<'a> {
-    pub count: i64,
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-}
-
 pub mod individual_email_commit_count_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -456,37 +782,37 @@ pub mod individual_email_commit_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Email;
         type Count;
+        type Email;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Email = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Email = Set<members::email>;
-        type Count = S::Count;
+        type Email = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Email = S::Email;
         type Count = Set<members::count>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Count = S::Count;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `email` field
+        pub struct email(());
     }
 }
 
@@ -573,8 +899,8 @@ where
 impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
 where
     S: individual_email_commit_count_state::State,
-    S::Email: individual_email_commit_count_state::IsSet,
     S::Count: individual_email_commit_count_state::IsSet,
+    S::Email: individual_email_commit_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndividualEmailCommitCount<'a> {
@@ -600,40 +926,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCount<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "individualEmailCommitCount"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct IndividualLanguageSize<'a> {
-    #[serde(borrow)]
-    pub lang: jacquard_common::CowStr<'a>,
-    pub size: i64,
-}
-
 pub mod individual_language_size_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -644,37 +936,37 @@ pub mod individual_language_size_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type Lang;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Lang = S::Lang;
+        type Size = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Size = S::Size;
         type Lang = Set<members::lang>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Lang = S::Lang;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -750,8 +1042,8 @@ where
 impl<'a, S> IndividualLanguageSizeBuilder<'a, S>
 where
     S: individual_language_size_state::State,
-    S::Size: individual_language_size_state::IsSet,
     S::Lang: individual_language_size_state::IsSet,
+    S::Size: individual_language_size_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndividualLanguageSize<'a> {
@@ -777,95 +1069,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "individualLanguageSize"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LangBreakdown<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub inputs: std::option::Option<
-        Vec<crate::sh_tangled::git::ref_update::IndividualLanguageSize<'a>>,
-    >,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "langBreakdown"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An update to a git repository, emitted by knots.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RefUpdate<'a> {
-    ///did of the user that pushed this ref
-    #[serde(borrow)]
-    pub committer_did: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub meta: crate::sh_tangled::git::ref_update::Meta<'a>,
-    ///new SHA of this ref
-    #[serde(borrow)]
-    pub new_sha: jacquard_common::CowStr<'a>,
-    ///old SHA of this ref
-    #[serde(borrow)]
-    pub old_sha: jacquard_common::CowStr<'a>,
-    ///Ref being updated
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-    ///did of the owner of the repo
-    #[serde(borrow)]
-    pub repo_did: jacquard_common::types::string::Did<'a>,
-    ///name of the repo
-    #[serde(borrow)]
-    pub repo_name: jacquard_common::CowStr<'a>,
-}
-
 pub mod ref_update_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -876,127 +1079,127 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RepoName;
         type OldSha;
-        type RepoDid;
-        type CommitterDid;
         type NewSha;
         type Ref;
         type Meta;
+        type RepoDid;
+        type RepoName;
+        type CommitterDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RepoName = Unset;
         type OldSha = Unset;
-        type RepoDid = Unset;
-        type CommitterDid = Unset;
         type NewSha = Unset;
         type Ref = Unset;
         type Meta = Unset;
-    }
-    ///State transition - sets the `repo_name` field to Set
-    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoName<S> {}
-    impl<S: State> State for SetRepoName<S> {
-        type RepoName = Set<members::repo_name>;
-        type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type Ref = S::Ref;
-        type Meta = S::Meta;
+        type RepoDid = Unset;
+        type RepoName = Unset;
+        type CommitterDid = Unset;
     }
     ///State transition - sets the `old_sha` field to Set
     pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOldSha<S> {}
     impl<S: State> State for SetOldSha<S> {
-        type RepoName = S::RepoName;
         type OldSha = Set<members::old_sha>;
+        type NewSha = S::NewSha;
+        type Ref = S::Ref;
+        type Meta = S::Meta;
         type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type Ref = S::Ref;
-        type Meta = S::Meta;
-    }
-    ///State transition - sets the `repo_did` field to Set
-    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
-    impl<S: State> State for SetRepoDid<S> {
         type RepoName = S::RepoName;
-        type OldSha = S::OldSha;
-        type RepoDid = Set<members::repo_did>;
         type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type Ref = S::Ref;
-        type Meta = S::Meta;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
-    impl<S: State> State for SetCommitterDid<S> {
-        type RepoName = S::RepoName;
-        type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = Set<members::committer_did>;
-        type NewSha = S::NewSha;
-        type Ref = S::Ref;
-        type Meta = S::Meta;
     }
     ///State transition - sets the `new_sha` field to Set
     pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNewSha<S> {}
     impl<S: State> State for SetNewSha<S> {
-        type RepoName = S::RepoName;
         type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
         type NewSha = Set<members::new_sha>;
         type Ref = S::Ref;
         type Meta = S::Meta;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type RepoName = S::RepoName;
         type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
         type NewSha = S::NewSha;
         type Ref = Set<members::r#ref>;
         type Meta = S::Meta;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
     }
     ///State transition - sets the `meta` field to Set
     pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMeta<S> {}
     impl<S: State> State for SetMeta<S> {
-        type RepoName = S::RepoName;
         type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
         type NewSha = S::NewSha;
         type Ref = S::Ref;
         type Meta = Set<members::meta>;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
+    impl<S: State> State for SetRepoDid<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Ref = S::Ref;
+        type Meta = S::Meta;
+        type RepoDid = Set<members::repo_did>;
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
+    }
+    ///State transition - sets the `repo_name` field to Set
+    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoName<S> {}
+    impl<S: State> State for SetRepoName<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Ref = S::Ref;
+        type Meta = S::Meta;
+        type RepoDid = S::RepoDid;
+        type RepoName = Set<members::repo_name>;
+        type CommitterDid = S::CommitterDid;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Ref = S::Ref;
+        type Meta = S::Meta;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type CommitterDid = Set<members::committer_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo_name` field
-        pub struct repo_name(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
-        ///Marker type for the `repo_did` field
-        pub struct repo_did(());
-        ///Marker type for the `committer_did` field
-        pub struct committer_did(());
         ///Marker type for the `new_sha` field
         pub struct new_sha(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `meta` field
         pub struct meta(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
+        ///Marker type for the `repo_name` field
+        pub struct repo_name(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
     }
 }
 
@@ -1169,13 +1372,13 @@ where
 impl<'a, S> RefUpdateBuilder<'a, S>
 where
     S: ref_update_state::State,
-    S::RepoName: ref_update_state::IsSet,
     S::OldSha: ref_update_state::IsSet,
-    S::RepoDid: ref_update_state::IsSet,
-    S::CommitterDid: ref_update_state::IsSet,
     S::NewSha: ref_update_state::IsSet,
     S::Ref: ref_update_state::IsSet,
     S::Meta: ref_update_state::IsSet,
+    S::RepoDid: ref_update_state::IsSet,
+    S::RepoName: ref_update_state::IsSet,
+    S::CommitterDid: ref_update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RefUpdate<'a> {
@@ -1211,192 +1414,6 @@ where
     }
 }
 
-impl<'a> RefUpdate<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RefUpdateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RefUpdateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: RefUpdate<'a>,
-}
-
-impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
-    fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
-    const NSID: &'static str = "sh.tangled.git.refUpdate";
-    type Record = RefUpdateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RefUpdateRecord;
-impl jacquard_common::xrpc::XrpcResp for RefUpdateRecord {
-    const NSID: &'static str = "sh.tangled.git.refUpdate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RefUpdateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RefUpdateRecord {
-    const NSID: &'static str = "sh.tangled.git.refUpdate";
-    type Record = RefUpdateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.new_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.new_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.old_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.old_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#ref;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ref",
-                    ),
-                    max: 2560usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#ref;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "ref",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Meta<'a> {
-    #[serde(borrow)]
-    pub commit_count: crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
-    ///Defaults to `false`.
-    #[serde(default = "_default_meta_is_default_ref")]
-    pub is_default_ref: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lang_breakdown: std::option::Option<
-        crate::sh_tangled::git::ref_update::LangBreakdown<'a>,
-    >,
-}
-
 fn _default_meta_is_default_ref() -> bool {
     false
 }
@@ -1411,37 +1428,37 @@ pub mod meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsDefaultRef;
         type CommitCount;
+        type IsDefaultRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsDefaultRef = Unset;
         type CommitCount = Unset;
-    }
-    ///State transition - sets the `is_default_ref` field to Set
-    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
-    impl<S: State> State for SetIsDefaultRef<S> {
-        type IsDefaultRef = Set<members::is_default_ref>;
-        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Unset;
     }
     ///State transition - sets the `commit_count` field to Set
     pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitCount<S> {}
     impl<S: State> State for SetCommitCount<S> {
-        type IsDefaultRef = S::IsDefaultRef;
         type CommitCount = Set<members::commit_count>;
+        type IsDefaultRef = S::IsDefaultRef;
+    }
+    ///State transition - sets the `is_default_ref` field to Set
+    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
+    impl<S: State> State for SetIsDefaultRef<S> {
+        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Set<members::is_default_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_default_ref` field
-        pub struct is_default_ref(());
         ///Marker type for the `commit_count` field
         pub struct commit_count(());
+        ///Marker type for the `is_default_ref` field
+        pub struct is_default_ref(());
     }
 }
 
@@ -1536,8 +1553,8 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
 impl<'a, S> MetaBuilder<'a, S>
 where
     S: meta_state::State,
-    S::IsDefaultRef: meta_state::IsSet,
     S::CommitCount: meta_state::IsSet,
+    S::IsDefaultRef: meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Meta<'a> {
@@ -1562,22 +1579,5 @@ where
             lang_breakdown: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.refUpdate"
-    }
-    fn def_name() -> &'static str {
-        "meta"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_refUpdate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

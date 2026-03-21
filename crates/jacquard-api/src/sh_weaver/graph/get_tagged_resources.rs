@@ -5,26 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_include_author_tags() -> std::option::Option<bool> {
-    Some(true)
-}
-
-fn _default_include_community_tags() -> std::option::Option<bool> {
-    Some(true)
-}
-
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_resource_type() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
-}
-
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("recent"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -63,6 +43,93 @@ pub struct GetTaggedResources<'a> {
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTaggedResourcesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub resources: Vec<GetTaggedResourcesOutputResourcesItem<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tag: std::option::Option<crate::sh_weaver::graph::TagView<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetTaggedResourcesOutputResourcesItem<'a> {
+    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
+    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
+    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
+    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
+}
+
+/// Response type for
+///sh.weaver.graph.getTaggedResources
+pub struct GetTaggedResourcesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
+    const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTaggedResourcesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTaggedResourcesResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getTaggedResources
+pub struct GetTaggedResourcesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTaggedResources<'de>;
+    type Response = GetTaggedResourcesResponse;
+}
+
+fn _default_include_author_tags() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_include_community_tags() -> std::option::Option<bool> {
+    Some(true)
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_resource_type() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("all"))
+}
+
+fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("recent"))
 }
 
 pub mod get_tagged_resources_state {
@@ -256,71 +323,4 @@ where
             tag: self.__unsafe_private_named.6.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTaggedResourcesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub resources: Vec<GetTaggedResourcesOutputResourcesItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tag: std::option::Option<crate::sh_weaver::graph::TagView<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetTaggedResourcesOutputResourcesItem<'a> {
-    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
-    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
-    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
-    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
-}
-
-/// Response type for
-///sh.weaver.graph.getTaggedResources
-pub struct GetTaggedResourcesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
-    const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTaggedResourcesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTaggedResourcesResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getTaggedResources
-pub struct GetTaggedResourcesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTaggedResources<'de>;
-    type Response = GetTaggedResourcesResponse;
 }

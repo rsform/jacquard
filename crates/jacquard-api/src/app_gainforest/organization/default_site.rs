@@ -25,6 +25,84 @@ pub struct DefaultSite<'a> {
     pub site: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DefaultSiteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: DefaultSite<'a>,
+}
+
+impl<'a> DefaultSite<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DefaultSiteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultSiteRecord;
+impl jacquard_common::xrpc::XrpcResp for DefaultSiteRecord {
+    const NSID: &'static str = "app.gainforest.organization.defaultSite";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DefaultSiteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DefaultSiteGetRecordOutput<'_>> for DefaultSite<'_> {
+    fn from(output: DefaultSiteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for DefaultSite<'_> {
+    const NSID: &'static str = "app.gainforest.organization.defaultSite";
+    type Record = DefaultSiteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DefaultSiteRecord {
+    const NSID: &'static str = "app.gainforest.organization.defaultSite";
+    type Record = DefaultSiteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefaultSite<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.organization.defaultSite"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_organization_defaultSite()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod default_site_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             site: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> DefaultSite<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DefaultSiteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DefaultSiteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: DefaultSite<'a>,
-}
-
-impl From<DefaultSiteGetRecordOutput<'_>> for DefaultSite<'_> {
-    fn from(output: DefaultSiteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for DefaultSite<'_> {
-    const NSID: &'static str = "app.gainforest.organization.defaultSite";
-    type Record = DefaultSiteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DefaultSiteRecord;
-impl jacquard_common::xrpc::XrpcResp for DefaultSiteRecord {
-    const NSID: &'static str = "app.gainforest.organization.defaultSite";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DefaultSiteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DefaultSiteRecord {
-    const NSID: &'static str = "app.gainforest.organization.defaultSite";
-    type Record = DefaultSiteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefaultSite<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.organization.defaultSite"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_organization_defaultSite()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

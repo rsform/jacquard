@@ -41,6 +41,273 @@ pub struct Settings<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// When viewing others' reviews: show their score or recalculate with your preferences
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SettingsScoreLens<'a> {
+    Theirs,
+    Mine,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SettingsScoreLens<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Theirs => "theirs",
+            Self::Mine => "mine",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SettingsScoreLens<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "theirs" => Self::Theirs,
+            "mine" => Self::Mine,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SettingsScoreLens<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "theirs" => Self::Theirs,
+            "mine" => Self::Mine,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SettingsScoreLens<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SettingsScoreLens<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SettingsScoreLens<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SettingsScoreLens<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SettingsScoreLens<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
+    type Output = SettingsScoreLens<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SettingsScoreLens::Theirs => SettingsScoreLens::Theirs,
+            SettingsScoreLens::Mine => SettingsScoreLens::Mine,
+            SettingsScoreLens::Other(v) => SettingsScoreLens::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SettingsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Settings<'a>,
+}
+
+impl<'a> Settings<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SettingsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SettingsRecord;
+impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
+    const NSID: &'static str = "social.drydown.settings";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SettingsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
+    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Settings<'_> {
+    const NSID: &'static str = "social.drydown.settings";
+    type Record = SettingsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SettingsRecord {
+    const NSID: &'static str = "social.drydown.settings";
+    type Record = SettingsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+    fn nsid() -> &'static str {
+        "social.drydown.settings"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_drydown_settings()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.complexity_preference {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity_preference",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.complexity_preference {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "complexity_preference",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.longevity_priority {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity_priority",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.longevity_priority {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longevity_priority",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.presence_style {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "presence_style",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.presence_style {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "presence_style",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.score_lens {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "score_lens",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.scoring_approach {
+            if *value > 5i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scoring_approach",
+                    ),
+                    max: 5i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.scoring_approach {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scoring_approach",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod settings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -248,273 +515,6 @@ where
             updated_at: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Settings<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SettingsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// When viewing others' reviews: show their score or recalculate with your preferences
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsScoreLens<'a> {
-    Theirs,
-    Mine,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SettingsScoreLens<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Theirs => "theirs",
-            Self::Mine => "mine",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SettingsScoreLens<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "theirs" => Self::Theirs,
-            "mine" => Self::Mine,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SettingsScoreLens<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "theirs" => Self::Theirs,
-            "mine" => Self::Mine,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SettingsScoreLens<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SettingsScoreLens<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SettingsScoreLens<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SettingsScoreLens<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SettingsScoreLens<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
-    type Output = SettingsScoreLens<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SettingsScoreLens::Theirs => SettingsScoreLens::Theirs,
-            SettingsScoreLens::Mine => SettingsScoreLens::Mine,
-            SettingsScoreLens::Other(v) => SettingsScoreLens::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Settings<'a>,
-}
-
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Settings<'_> {
-    const NSID: &'static str = "social.drydown.settings";
-    type Record = SettingsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SettingsRecord;
-impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
-    const NSID: &'static str = "social.drydown.settings";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SettingsRecord {
-    const NSID: &'static str = "social.drydown.settings";
-    type Record = SettingsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
-    fn nsid() -> &'static str {
-        "social.drydown.settings"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_drydown_settings()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.complexity_preference {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity_preference",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.complexity_preference {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity_preference",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.longevity_priority {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity_priority",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.longevity_priority {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity_priority",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.presence_style {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "presence_style",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.presence_style {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "presence_style",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.score_lens {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "score_lens",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.scoring_approach {
-            if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scoring_approach",
-                    ),
-                    max: 5i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.scoring_approach {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scoring_approach",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

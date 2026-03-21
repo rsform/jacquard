@@ -261,6 +261,683 @@ pub struct Geolocation<'a> {
     pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// The nomenclatural code under which the scientific name is constructed.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NomenclaturalCodeEnum<'a> {
+    Iczn,
+    Icn,
+    Icnp,
+    Ictv,
+    BioCode,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> NomenclaturalCodeEnum<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Iczn => "ICZN",
+            Self::Icn => "ICN",
+            Self::Icnp => "ICNP",
+            Self::Ictv => "ICTV",
+            Self::BioCode => "BioCode",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for NomenclaturalCodeEnum<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "ICZN" => Self::Iczn,
+            "ICN" => Self::Icn,
+            "ICNP" => Self::Icnp,
+            "ICTV" => Self::Ictv,
+            "BioCode" => Self::BioCode,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for NomenclaturalCodeEnum<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "ICZN" => Self::Iczn,
+            "ICN" => Self::Icn,
+            "ICNP" => Self::Icnp,
+            "ICTV" => Self::Ictv,
+            "BioCode" => Self::BioCode,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for NomenclaturalCodeEnum<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for NomenclaturalCodeEnum<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for NomenclaturalCodeEnum<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for NomenclaturalCodeEnum<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
+    type Output = NomenclaturalCodeEnum<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            NomenclaturalCodeEnum::Iczn => NomenclaturalCodeEnum::Iczn,
+            NomenclaturalCodeEnum::Icn => NomenclaturalCodeEnum::Icn,
+            NomenclaturalCodeEnum::Icnp => NomenclaturalCodeEnum::Icnp,
+            NomenclaturalCodeEnum::Ictv => NomenclaturalCodeEnum::Ictv,
+            NomenclaturalCodeEnum::BioCode => NomenclaturalCodeEnum::BioCode,
+            NomenclaturalCodeEnum::Other(v) => {
+                NomenclaturalCodeEnum::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Statement about the presence or absence of a taxon at a location.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceStatusEnum<'a> {
+    Present,
+    Absent,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> OccurrenceStatusEnum<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Present => "present",
+            Self::Absent => "absent",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for OccurrenceStatusEnum<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "present" => Self::Present,
+            "absent" => Self::Absent,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for OccurrenceStatusEnum<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "present" => Self::Present,
+            "absent" => Self::Absent,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for OccurrenceStatusEnum<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for OccurrenceStatusEnum<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for OccurrenceStatusEnum<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for OccurrenceStatusEnum<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
+    type Output = OccurrenceStatusEnum<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceStatusEnum::Present => OccurrenceStatusEnum::Present,
+            OccurrenceStatusEnum::Absent => OccurrenceStatusEnum::Absent,
+            OccurrenceStatusEnum::Other(v) => {
+                OccurrenceStatusEnum::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The sex of the biological individual(s) represented in the occurrence.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SexEnum<'a> {
+    Male,
+    Female,
+    Hermaphrodite,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SexEnum<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Male => "male",
+            Self::Female => "female",
+            Self::Hermaphrodite => "hermaphrodite",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SexEnum<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "male" => Self::Male,
+            "female" => Self::Female,
+            "hermaphrodite" => Self::Hermaphrodite,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SexEnum<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "male" => Self::Male,
+            "female" => Self::Female,
+            "hermaphrodite" => Self::Hermaphrodite,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for SexEnum<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for SexEnum<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for SexEnum<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SexEnum<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for SexEnum<'_> {
+    type Output = SexEnum<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SexEnum::Male => SexEnum::Male,
+            SexEnum::Female => SexEnum::Female,
+            SexEnum::Hermaphrodite => SexEnum::Hermaphrodite,
+            SexEnum::Other(v) => SexEnum::Other(v.into_static()),
+        }
+    }
+}
+
+/// A taxonomic identification with provenance metadata
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TaxonIdentification<'a> {
+    ///Date the identification was made (ISO 8601)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub date_identified: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///GBIF backbone taxonomy key for the identified taxon
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identification_qualifier: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Notes or comments about the identification
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identification_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Person(s) who made the identification (pipe-delimited for multiple)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identified_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub identified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The full scientific name including authorship and date
+    #[serde(borrow)]
+    pub scientific_name: jacquard_common::CowStr<'a>,
+}
+
+/// The taxonomic rank of the most specific name in the scientificName.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TaxonRankEnum<'a> {
+    Kingdom,
+    Phylum,
+    Class,
+    Order,
+    Family,
+    Subfamily,
+    Genus,
+    Subgenus,
+    Species,
+    Subspecies,
+    Variety,
+    Form,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TaxonRankEnum<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Kingdom => "kingdom",
+            Self::Phylum => "phylum",
+            Self::Class => "class",
+            Self::Order => "order",
+            Self::Family => "family",
+            Self::Subfamily => "subfamily",
+            Self::Genus => "genus",
+            Self::Subgenus => "subgenus",
+            Self::Species => "species",
+            Self::Subspecies => "subspecies",
+            Self::Variety => "variety",
+            Self::Form => "form",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TaxonRankEnum<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "kingdom" => Self::Kingdom,
+            "phylum" => Self::Phylum,
+            "class" => Self::Class,
+            "order" => Self::Order,
+            "family" => Self::Family,
+            "subfamily" => Self::Subfamily,
+            "genus" => Self::Genus,
+            "subgenus" => Self::Subgenus,
+            "species" => Self::Species,
+            "subspecies" => Self::Subspecies,
+            "variety" => Self::Variety,
+            "form" => Self::Form,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TaxonRankEnum<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "kingdom" => Self::Kingdom,
+            "phylum" => Self::Phylum,
+            "class" => Self::Class,
+            "order" => Self::Order,
+            "family" => Self::Family,
+            "subfamily" => Self::Subfamily,
+            "genus" => Self::Genus,
+            "subgenus" => Self::Subgenus,
+            "species" => Self::Species,
+            "subspecies" => Self::Subspecies,
+            "variety" => Self::Variety,
+            "form" => Self::Form,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for TaxonRankEnum<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for TaxonRankEnum<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for TaxonRankEnum<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TaxonRankEnum<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
+    type Output = TaxonRankEnum<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TaxonRankEnum::Kingdom => TaxonRankEnum::Kingdom,
+            TaxonRankEnum::Phylum => TaxonRankEnum::Phylum,
+            TaxonRankEnum::Class => TaxonRankEnum::Class,
+            TaxonRankEnum::Order => TaxonRankEnum::Order,
+            TaxonRankEnum::Family => TaxonRankEnum::Family,
+            TaxonRankEnum::Subfamily => TaxonRankEnum::Subfamily,
+            TaxonRankEnum::Genus => TaxonRankEnum::Genus,
+            TaxonRankEnum::Subgenus => TaxonRankEnum::Subgenus,
+            TaxonRankEnum::Species => TaxonRankEnum::Species,
+            TaxonRankEnum::Subspecies => TaxonRankEnum::Subspecies,
+            TaxonRankEnum::Variety => TaxonRankEnum::Variety,
+            TaxonRankEnum::Form => TaxonRankEnum::Form,
+            TaxonRankEnum::Other(v) => TaxonRankEnum::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.dwc.defs"
+    }
+    fn def_name() -> &'static str {
+        "geolocation"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_dwc_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.coordinate_uncertainty_in_meters {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "coordinate_uncertainty_in_meters",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.decimal_latitude;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 32usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_latitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.decimal_longitude;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 32usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "decimal_longitude",
+                        ),
+                        max: 32usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.geodetic_datum {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "geodetic_datum",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.dwc.defs"
+    }
+    fn def_name() -> &'static str {
+        "taxonIdentification"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_dwc_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.date_identified {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "date_identified",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.gbif_taxon_key {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "gbif_taxon_key",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.identification_qualifier {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identification_qualifier",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.identification_remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identification_remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.identified_by {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 512usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identified_by",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.identified_by_id {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 512usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identified_by_id",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.scientific_name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 512usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "scientific_name",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -663,682 +1340,5 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.dwc.defs"
-    }
-    fn def_name() -> &'static str {
-        "geolocation"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_dwc_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.coordinate_uncertainty_in_meters {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "coordinate_uncertainty_in_meters",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.decimal_latitude;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_latitude",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.decimal_longitude;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_longitude",
-                        ),
-                        max: 32usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.geodetic_datum {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "geodetic_datum",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// The nomenclatural code under which the scientific name is constructed.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NomenclaturalCodeEnum<'a> {
-    Iczn,
-    Icn,
-    Icnp,
-    Ictv,
-    BioCode,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> NomenclaturalCodeEnum<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Iczn => "ICZN",
-            Self::Icn => "ICN",
-            Self::Icnp => "ICNP",
-            Self::Ictv => "ICTV",
-            Self::BioCode => "BioCode",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for NomenclaturalCodeEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "ICZN" => Self::Iczn,
-            "ICN" => Self::Icn,
-            "ICNP" => Self::Icnp,
-            "ICTV" => Self::Ictv,
-            "BioCode" => Self::BioCode,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for NomenclaturalCodeEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ICZN" => Self::Iczn,
-            "ICN" => Self::Icn,
-            "ICNP" => Self::Icnp,
-            "ICTV" => Self::Ictv,
-            "BioCode" => Self::BioCode,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for NomenclaturalCodeEnum<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for NomenclaturalCodeEnum<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for NomenclaturalCodeEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for NomenclaturalCodeEnum<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
-    type Output = NomenclaturalCodeEnum<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            NomenclaturalCodeEnum::Iczn => NomenclaturalCodeEnum::Iczn,
-            NomenclaturalCodeEnum::Icn => NomenclaturalCodeEnum::Icn,
-            NomenclaturalCodeEnum::Icnp => NomenclaturalCodeEnum::Icnp,
-            NomenclaturalCodeEnum::Ictv => NomenclaturalCodeEnum::Ictv,
-            NomenclaturalCodeEnum::BioCode => NomenclaturalCodeEnum::BioCode,
-            NomenclaturalCodeEnum::Other(v) => {
-                NomenclaturalCodeEnum::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Statement about the presence or absence of a taxon at a location.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OccurrenceStatusEnum<'a> {
-    Present,
-    Absent,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> OccurrenceStatusEnum<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Present => "present",
-            Self::Absent => "absent",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for OccurrenceStatusEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "present" => Self::Present,
-            "absent" => Self::Absent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for OccurrenceStatusEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "present" => Self::Present,
-            "absent" => Self::Absent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for OccurrenceStatusEnum<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for OccurrenceStatusEnum<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for OccurrenceStatusEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for OccurrenceStatusEnum<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
-    type Output = OccurrenceStatusEnum<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            OccurrenceStatusEnum::Present => OccurrenceStatusEnum::Present,
-            OccurrenceStatusEnum::Absent => OccurrenceStatusEnum::Absent,
-            OccurrenceStatusEnum::Other(v) => {
-                OccurrenceStatusEnum::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// The sex of the biological individual(s) represented in the occurrence.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SexEnum<'a> {
-    Male,
-    Female,
-    Hermaphrodite,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SexEnum<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Male => "male",
-            Self::Female => "female",
-            Self::Hermaphrodite => "hermaphrodite",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SexEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "male" => Self::Male,
-            "female" => Self::Female,
-            "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SexEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "male" => Self::Male,
-            "female" => Self::Female,
-            "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for SexEnum<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for SexEnum<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for SexEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SexEnum<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for SexEnum<'_> {
-    type Output = SexEnum<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SexEnum::Male => SexEnum::Male,
-            SexEnum::Female => SexEnum::Female,
-            SexEnum::Hermaphrodite => SexEnum::Hermaphrodite,
-            SexEnum::Other(v) => SexEnum::Other(v.into_static()),
-        }
-    }
-}
-
-/// A taxonomic identification with provenance metadata
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TaxonIdentification<'a> {
-    ///Date the identification was made (ISO 8601)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub date_identified: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///GBIF backbone taxonomy key for the identified taxon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identification_qualifier: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Notes or comments about the identification
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identification_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Person(s) who made the identification (pipe-delimited for multiple)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The full scientific name including authorship and date
-    #[serde(borrow)]
-    pub scientific_name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.dwc.defs"
-    }
-    fn def_name() -> &'static str {
-        "taxonIdentification"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_dwc_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.date_identified {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "date_identified",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.gbif_taxon_key {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "gbif_taxon_key",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.identification_qualifier {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_qualifier",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.identification_remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.identified_by {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.identified_by_id {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by_id",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.scientific_name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// The taxonomic rank of the most specific name in the scientificName.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TaxonRankEnum<'a> {
-    Kingdom,
-    Phylum,
-    Class,
-    Order,
-    Family,
-    Subfamily,
-    Genus,
-    Subgenus,
-    Species,
-    Subspecies,
-    Variety,
-    Form,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TaxonRankEnum<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Kingdom => "kingdom",
-            Self::Phylum => "phylum",
-            Self::Class => "class",
-            Self::Order => "order",
-            Self::Family => "family",
-            Self::Subfamily => "subfamily",
-            Self::Genus => "genus",
-            Self::Subgenus => "subgenus",
-            Self::Species => "species",
-            Self::Subspecies => "subspecies",
-            Self::Variety => "variety",
-            Self::Form => "form",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TaxonRankEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "kingdom" => Self::Kingdom,
-            "phylum" => Self::Phylum,
-            "class" => Self::Class,
-            "order" => Self::Order,
-            "family" => Self::Family,
-            "subfamily" => Self::Subfamily,
-            "genus" => Self::Genus,
-            "subgenus" => Self::Subgenus,
-            "species" => Self::Species,
-            "subspecies" => Self::Subspecies,
-            "variety" => Self::Variety,
-            "form" => Self::Form,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TaxonRankEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "kingdom" => Self::Kingdom,
-            "phylum" => Self::Phylum,
-            "class" => Self::Class,
-            "order" => Self::Order,
-            "family" => Self::Family,
-            "subfamily" => Self::Subfamily,
-            "genus" => Self::Genus,
-            "subgenus" => Self::Subgenus,
-            "species" => Self::Species,
-            "subspecies" => Self::Subspecies,
-            "variety" => Self::Variety,
-            "form" => Self::Form,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for TaxonRankEnum<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for TaxonRankEnum<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for TaxonRankEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TaxonRankEnum<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
-    type Output = TaxonRankEnum<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TaxonRankEnum::Kingdom => TaxonRankEnum::Kingdom,
-            TaxonRankEnum::Phylum => TaxonRankEnum::Phylum,
-            TaxonRankEnum::Class => TaxonRankEnum::Class,
-            TaxonRankEnum::Order => TaxonRankEnum::Order,
-            TaxonRankEnum::Family => TaxonRankEnum::Family,
-            TaxonRankEnum::Subfamily => TaxonRankEnum::Subfamily,
-            TaxonRankEnum::Genus => TaxonRankEnum::Genus,
-            TaxonRankEnum::Subgenus => TaxonRankEnum::Subgenus,
-            TaxonRankEnum::Species => TaxonRankEnum::Species,
-            TaxonRankEnum::Subspecies => TaxonRankEnum::Subspecies,
-            TaxonRankEnum::Variety => TaxonRankEnum::Variety,
-            TaxonRankEnum::Form => TaxonRankEnum::Form,
-            TaxonRankEnum::Other(v) => TaxonRankEnum::Other(v.into_static()),
-        }
     }
 }

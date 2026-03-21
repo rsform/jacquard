@@ -20,6 +20,50 @@ pub struct GetNotebook<'a> {
     pub notebook: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetNotebookOutput<'a> {
+    #[serde(borrow)]
+    pub entries: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getNotebook
+pub struct GetNotebookResponse;
+impl jacquard_common::xrpc::XrpcResp for GetNotebookResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebook";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetNotebookOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebook<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetNotebookResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getNotebook
+pub struct GetNotebookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetNotebook<'de>;
+    type Response = GetNotebookResponse;
+}
+
 pub mod get_notebook_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,48 +153,4 @@ where
             notebook: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetNotebookOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getNotebook
-pub struct GetNotebookResponse;
-impl jacquard_common::xrpc::XrpcResp for GetNotebookResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebook";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebook<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetNotebookResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getNotebook
-pub struct GetNotebookRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebook<'de>;
-    type Response = GetNotebookResponse;
 }

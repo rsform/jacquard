@@ -33,6 +33,139 @@ pub struct CreateReport<'a> {
     pub subject: CreateReportSubject<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateReportSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateReportOutput<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    pub id: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
+    #[serde(borrow)]
+    pub reported_by: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub subject: CreateReportOutputSubject<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateReportOutputSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+}
+
+/// Moderation tool information for tracing the source of the action
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ModTool<'a> {
+    ///Additional arbitrary metadata about the source
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///com.atproto.moderation.createReport
+pub struct CreateReportResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
+    const NSID: &'static str = "com.atproto.moderation.createReport";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateReportOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
+    const NSID: &'static str = "com.atproto.moderation.createReport";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateReportResponse;
+}
+
+/// Endpoint type for
+///com.atproto.moderation.createReport
+pub struct CreateReportRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.moderation.createReport";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateReport<'de>;
+    type Response = CreateReportResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.moderation.createReport"
+    }
+    fn def_name() -> &'static str {
+        "modTool"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_moderation_createReport()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod create_report_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -218,122 +351,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateReportSubject<'a> {
-    #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
-    #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateReportOutput<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    pub id: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
-    #[serde(borrow)]
-    pub reported_by: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub subject: CreateReportOutputSubject<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateReportOutputSubject<'a> {
-    #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
-    #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-}
-
-/// Response type for
-///com.atproto.moderation.createReport
-pub struct CreateReportResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
-    const NSID: &'static str = "com.atproto.moderation.createReport";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateReportOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
-    const NSID: &'static str = "com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateReportResponse;
-}
-
-/// Endpoint type for
-///com.atproto.moderation.createReport
-pub struct CreateReportRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateReport<'de>;
-    type Response = CreateReportResponse;
-}
-
-/// Moderation tool information for tracing the source of the action
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ModTool<'a> {
-    ///Additional arbitrary metadata about the source
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
 fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -482,22 +499,5 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.moderation.createReport"
-    }
-    fn def_name() -> &'static str {
-        "modTool"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_moderation_createReport()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

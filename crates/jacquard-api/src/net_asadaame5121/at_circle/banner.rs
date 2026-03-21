@@ -25,6 +25,128 @@ pub struct Banner<'a> {
     pub ring: crate::net_asadaame5121::at_circle::RingRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BannerGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Banner<'a>,
+}
+
+impl<'a> Banner<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BannerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BannerRecord;
+impl jacquard_common::xrpc::XrpcResp for BannerRecord {
+    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BannerGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BannerGetRecordOutput<'_>> for Banner<'_> {
+    fn from(output: BannerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Banner<'_> {
+    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
+    type Record = BannerRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BannerRecord {
+    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
+    type Record = BannerRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Banner<'a> {
+    fn nsid() -> &'static str {
+        "net.asadaame5121.at-circle.banner"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_asadaame5121_at_circle_banner()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.banner;
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.banner;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "banner",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod banner_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,51 +157,51 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Banner;
-        type CreatedAt;
         type Ring;
+        type CreatedAt;
+        type Banner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Banner = Unset;
-        type CreatedAt = Unset;
         type Ring = Unset;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBanner<S> {}
-    impl<S: State> State for SetBanner<S> {
-        type Banner = Set<members::banner>;
-        type CreatedAt = S::CreatedAt;
-        type Ring = S::Ring;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Banner = S::Banner;
-        type CreatedAt = Set<members::created_at>;
-        type Ring = S::Ring;
+        type CreatedAt = Unset;
+        type Banner = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type Banner = S::Banner;
-        type CreatedAt = S::CreatedAt;
         type Ring = Set<members::ring>;
+        type CreatedAt = S::CreatedAt;
+        type Banner = S::Banner;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
+        type CreatedAt = Set<members::created_at>;
+        type Banner = S::Banner;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBanner<S> {}
+    impl<S: State> State for SetBanner<S> {
+        type Ring = S::Ring;
+        type CreatedAt = S::CreatedAt;
+        type Banner = Set<members::banner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `banner` field
-        pub struct banner(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `banner` field
+        pub struct banner(());
     }
 }
 
@@ -172,9 +294,9 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
-    S::Banner: banner_state::IsSet,
-    S::CreatedAt: banner_state::IsSet,
     S::Ring: banner_state::IsSet,
+    S::CreatedAt: banner_state::IsSet,
+    S::Banner: banner_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Banner<'a> {
@@ -199,128 +321,6 @@ where
             ring: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Banner<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BannerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BannerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Banner<'a>,
-}
-
-impl From<BannerGetRecordOutput<'_>> for Banner<'_> {
-    fn from(output: BannerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Banner<'_> {
-    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
-    type Record = BannerRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BannerRecord;
-impl jacquard_common::xrpc::XrpcResp for BannerRecord {
-    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BannerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BannerRecord {
-    const NSID: &'static str = "net.asadaame5121.at-circle.banner";
-    type Record = BannerRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Banner<'a> {
-    fn nsid() -> &'static str {
-        "net.asadaame5121.at-circle.banner"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_asadaame5121_at_circle_banner()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.banner;
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "banner",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.banner;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "banner",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

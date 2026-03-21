@@ -39,6 +39,406 @@ pub struct Publication<'a> {
     pub theme: std::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublicationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Publication<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Preferences<'a> {
+    ///Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_preferences_show_comments")]
+    pub show_comments: std::option::Option<bool>,
+    ///Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_preferences_show_in_discover")]
+    pub show_in_discover: std::option::Option<bool>,
+    ///Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_preferences_show_mentions")]
+    pub show_mentions: std::option::Option<bool>,
+    ///Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_preferences_show_prev_next")]
+    pub show_prev_next: std::option::Option<bool>,
+    ///Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_preferences_show_recommends")]
+    pub show_recommends: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Theme<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub accent_background: std::option::Option<ThemeAccentBackground<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub accent_text: std::option::Option<ThemeAccentText<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_color: std::option::Option<ThemeBackgroundColor<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_image: std::option::Option<
+        crate::pub_leaflet::theme::background_image::BackgroundImage<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub body_font: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heading_font: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub page_background: std::option::Option<ThemePageBackground<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub page_width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub primary: std::option::Option<ThemePrimary<'a>>,
+    ///Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_theme_show_page_background")]
+    pub show_page_background: std::option::Option<bool>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemeAccentBackground<'a> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemeAccentText<'a> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemeBackgroundColor<'a> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemePageBackground<'a> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemePrimary<'a> {
+    #[serde(rename = "pub.leaflet.theme.color#rgba")]
+    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
+    #[serde(rename = "pub.leaflet.theme.color#rgb")]
+    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
+}
+
+impl<'a> Publication<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PublicationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PublicationRecord;
+impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
+    const NSID: &'static str = "pub.leaflet.publication";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PublicationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
+    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Publication<'_> {
+    const NSID: &'static str = "pub.leaflet.publication";
+    type Record = PublicationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PublicationRecord {
+    const NSID: &'static str = "pub.leaflet.publication";
+    type Record = PublicationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.publication"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_publication()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.publication"
+    }
+    fn def_name() -> &'static str {
+        "preferences"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_publication()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.publication"
+    }
+    fn def_name() -> &'static str {
+        "theme"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_publication()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.body_font {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "body_font",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.heading_font {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "heading_font",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.page_width {
+            if *value > 1600i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "page_width",
+                    ),
+                    max: 1600i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.page_width {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "page_width",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod publication_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -251,151 +651,6 @@ where
             theme: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Publication<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PublicationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Publication<'a>,
-}
-
-impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
-    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Publication<'_> {
-    const NSID: &'static str = "pub.leaflet.publication";
-    type Record = PublicationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PublicationRecord;
-impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
-    const NSID: &'static str = "pub.leaflet.publication";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublicationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PublicationRecord {
-    const NSID: &'static str = "pub.leaflet.publication";
-    type Record = PublicationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.publication"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_publication()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.icon {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.icon {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -727,40 +982,6 @@ fn lexicon_doc_pub_leaflet_publication() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Preferences<'a> {
-    ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_preferences_show_comments")]
-    pub show_comments: std::option::Option<bool>,
-    ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_preferences_show_in_discover")]
-    pub show_in_discover: std::option::Option<bool>,
-    ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_preferences_show_mentions")]
-    pub show_mentions: std::option::Option<bool>,
-    ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_preferences_show_prev_next")]
-    pub show_prev_next: std::option::Option<bool>,
-    ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_preferences_show_recommends")]
-    pub show_recommends: std::option::Option<bool>,
-}
-
 fn _default_preferences_show_comments() -> std::option::Option<bool> {
     Some(true)
 }
@@ -794,69 +1015,6 @@ impl Default for Preferences<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.publication"
-    }
-    fn def_name() -> &'static str {
-        "preferences"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_publication()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Theme<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub accent_background: std::option::Option<ThemeAccentBackground<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub accent_text: std::option::Option<ThemeAccentText<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: std::option::Option<ThemeBackgroundColor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_image: std::option::Option<
-        crate::pub_leaflet::theme::background_image::BackgroundImage<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub body_font: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heading_font: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub page_background: std::option::Option<ThemePageBackground<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub page_width: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub primary: std::option::Option<ThemePrimary<'a>>,
-    ///Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_theme_show_page_background")]
-    pub show_page_background: std::option::Option<bool>,
-}
-
 fn _default_theme_show_page_background() -> std::option::Option<bool> {
     Some(false)
 }
@@ -876,163 +1034,5 @@ impl Default for Theme<'_> {
             show_page_background: Some(false),
             extra_data: Default::default(),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeAccentBackground<'a> {
-    #[serde(rename = "pub.leaflet.theme.color#rgba")]
-    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
-    #[serde(rename = "pub.leaflet.theme.color#rgb")]
-    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeAccentText<'a> {
-    #[serde(rename = "pub.leaflet.theme.color#rgba")]
-    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
-    #[serde(rename = "pub.leaflet.theme.color#rgb")]
-    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeBackgroundColor<'a> {
-    #[serde(rename = "pub.leaflet.theme.color#rgba")]
-    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
-    #[serde(rename = "pub.leaflet.theme.color#rgb")]
-    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemePageBackground<'a> {
-    #[serde(rename = "pub.leaflet.theme.color#rgba")]
-    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
-    #[serde(rename = "pub.leaflet.theme.color#rgb")]
-    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemePrimary<'a> {
-    #[serde(rename = "pub.leaflet.theme.color#rgba")]
-    ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
-    #[serde(rename = "pub.leaflet.theme.color#rgb")]
-    ColorRgb(Box<crate::pub_leaflet::theme::color::Rgb<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.publication"
-    }
-    fn def_name() -> &'static str {
-        "theme"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_publication()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.body_font {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body_font",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.heading_font {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "heading_font",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.page_width {
-            if *value > 1600i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "page_width",
-                    ),
-                    max: 1600i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.page_width {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "page_width",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

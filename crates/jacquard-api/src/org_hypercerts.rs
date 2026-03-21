@@ -30,6 +30,436 @@ pub struct LargeBlob<'a> {
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
 }
 
+/// Object containing a large image
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LargeImage<'a> {
+    ///Image (up to 10MB)
+    #[serde(borrow)]
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// Object containing a blob to external data
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SmallBlob<'a> {
+    ///Blob to external data (up to 10MB)
+    #[serde(borrow)]
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// Object containing a small image
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SmallImage<'a> {
+    ///Image (up to 5MB)
+    #[serde(borrow)]
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// Object containing a small video
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SmallVideo<'a> {
+    ///Video (up to 20MB)
+    #[serde(borrow)]
+    pub video: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// Object containing a URI to external data
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Uri<'a> {
+    ///URI to external data
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::UriValue<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeBlob<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "largeBlob"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blob;
+            {
+                let size = value.blob().size;
+                if size > 104857600usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 104857600usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeImage<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "largeImage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.image;
+            {
+                let size = value.blob().size;
+                if size > 10485760usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 10485760usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.image;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/jpg".to_string(),
+                            "image/png".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallBlob<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "smallBlob"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blob;
+            {
+                let size = value.blob().size;
+                if size > 10485760usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 10485760usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallImage<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "smallImage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.image;
+            {
+                let size = value.blob().size;
+                if size > 5242880usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 5242880usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.image;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/jpg".to_string(),
+                            "image/png".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallVideo<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "smallVideo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.video;
+            {
+                let size = value.blob().size;
+                if size > 20971520usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        max: 20971520usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.video;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["video/mp4", "video/webm"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "video",
+                        ),
+                        accepted: vec![
+                            "video/mp4".to_string(), "video/webm".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.defs"
+    }
+    fn def_name() -> &'static str {
+        "uri"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod large_blob_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -349,85 +779,6 @@ fn lexicon_doc_org_hypercerts_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeBlob<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "largeBlob"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blob;
-            {
-                let size = value.blob().size;
-                if size > 104857600usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 104857600usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Object containing a large image
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LargeImage<'a> {
-    ///Image (up to 10MB)
-    #[serde(borrow)]
-    pub image: jacquard_common::types::blob::BlobRef<'a>,
-}
-
 pub mod large_image_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -531,93 +882,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeImage<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "largeImage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.image;
-            {
-                let size = value.blob().size;
-                if size > 10485760usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        max: 10485760usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.image;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        accepted: vec![
-                            "image/jpeg".to_string(), "image/jpg".to_string(),
-                            "image/png".to_string(), "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Object containing a blob to external data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallBlob<'a> {
-    ///Blob to external data (up to 10MB)
-    #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 pub mod small_blob_state {
@@ -725,85 +989,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallBlob<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "smallBlob"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blob;
-            {
-                let size = value.blob().size;
-                if size > 10485760usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 10485760usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Object containing a small image
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallImage<'a> {
-    ///Image (up to 5MB)
-    #[serde(borrow)]
-    pub image: jacquard_common::types::blob::BlobRef<'a>,
-}
-
 pub mod small_image_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -907,93 +1092,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallImage<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "smallImage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.image;
-            {
-                let size = value.blob().size;
-                if size > 5242880usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        max: 5242880usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.image;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        accepted: vec![
-                            "image/jpeg".to_string(), "image/jpg".to_string(),
-                            "image/png".to_string(), "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Object containing a small video
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallVideo<'a> {
-    ///Video (up to 20MB)
-    #[serde(borrow)]
-    pub video: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 pub mod small_video_state {
@@ -1101,87 +1199,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallVideo<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "smallVideo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.video;
-            {
-                let size = value.blob().size;
-                if size > 20971520usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "video",
-                        ),
-                        max: 20971520usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.video;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["video/mp4", "video/webm"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "video",
-                        ),
-                        accepted: vec![
-                            "video/mp4".to_string(), "video/webm".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Object containing a URI to external data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Uri<'a> {
-    ///URI to external data
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod uri_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1284,22 +1301,5 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.defs"
-    }
-    fn def_name() -> &'static str {
-        "uri"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

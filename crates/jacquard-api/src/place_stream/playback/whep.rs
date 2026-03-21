@@ -22,6 +22,129 @@ pub struct WhepParams<'a> {
     pub streamer: jacquard_common::CowStr<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Whep {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WhepOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum WhepError<'a> {
+    /// This user may not play this stream.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for WhepError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.playback.whep
+pub struct WhepResponse;
+impl jacquard_common::xrpc::XrpcResp for WhepResponse {
+    const NSID: &'static str = "place.stream.playback.whep";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = WhepOutput;
+    type Err<'de> = WhepError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(WhepOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl jacquard_common::xrpc::XrpcRequest for Whep {
+    const NSID: &'static str = "place.stream.playback.whep";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
+    type Response = WhepResponse;
+    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(self.body.to_vec())
+    }
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    where
+        Self: serde::Deserialize<'de>,
+    {
+        Ok(
+            Box::new(Self {
+                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+            }),
+        )
+    }
+}
+
+/// Endpoint type for
+///place.stream.playback.whep
+pub struct WhepRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
+    const PATH: &'static str = "/xrpc/place.stream.playback.whep";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
+    type Request<'de> = Whep;
+    type Response = WhepResponse;
+}
+
 pub mod whep_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,127 +268,4 @@ where
             streamer: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Whep {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WhepOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum WhepError<'a> {
-    /// This user may not play this stream.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for WhepError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.playback.whep
-pub struct WhepResponse;
-impl jacquard_common::xrpc::XrpcResp for WhepResponse {
-    const NSID: &'static str = "place.stream.playback.whep";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = WhepOutput;
-    type Err<'de> = WhepError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(WhepOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl jacquard_common::xrpc::XrpcRequest for Whep {
-    const NSID: &'static str = "place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "*/*",
-    );
-    type Response = WhepResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(self.body.to_vec())
-    }
-    fn decode_body<'de>(
-        body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
-    where
-        Self: serde::Deserialize<'de>,
-    {
-        Ok(
-            Box::new(Self {
-                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-            }),
-        )
-    }
-}
-
-/// Endpoint type for
-///place.stream.playback.whep
-pub struct WhepRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
-    const PATH: &'static str = "/xrpc/place.stream.playback.whep";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "*/*",
-    );
-    type Request<'de> = Whep;
-    type Response = WhepResponse;
 }

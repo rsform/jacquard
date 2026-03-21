@@ -28,6 +28,84 @@ pub struct Syndication<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SyndicationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Syndication<'a>,
+}
+
+impl<'a> Syndication<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SyndicationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SyndicationRecord;
+impl jacquard_common::xrpc::XrpcResp for SyndicationRecord {
+    const NSID: &'static str = "place.stream.broadcast.syndication";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SyndicationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SyndicationGetRecordOutput<'_>> for Syndication<'_> {
+    fn from(output: SyndicationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Syndication<'_> {
+    const NSID: &'static str = "place.stream.broadcast.syndication";
+    type Record = SyndicationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SyndicationRecord {
+    const NSID: &'static str = "place.stream.broadcast.syndication";
+    type Record = SyndicationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Syndication<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.broadcast.syndication"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_broadcast_syndication()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod syndication_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +116,51 @@ pub mod syndication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Streamer;
         type Broadcaster;
         type CreatedAt;
-        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Streamer = Unset;
         type Broadcaster = Unset;
         type CreatedAt = Unset;
-        type Streamer = Unset;
-    }
-    ///State transition - sets the `broadcaster` field to Set
-    pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
-    impl<S: State> State for SetBroadcaster<S> {
-        type Broadcaster = Set<members::broadcaster>;
-        type CreatedAt = S::CreatedAt;
-        type Streamer = S::Streamer;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Broadcaster = S::Broadcaster;
-        type CreatedAt = Set<members::created_at>;
-        type Streamer = S::Streamer;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
+        type Streamer = Set<members::streamer>;
         type Broadcaster = S::Broadcaster;
         type CreatedAt = S::CreatedAt;
-        type Streamer = Set<members::streamer>;
+    }
+    ///State transition - sets the `broadcaster` field to Set
+    pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
+    impl<S: State> State for SetBroadcaster<S> {
+        type Streamer = S::Streamer;
+        type Broadcaster = Set<members::broadcaster>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Streamer = S::Streamer;
+        type Broadcaster = S::Broadcaster;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
         ///Marker type for the `broadcaster` field
         pub struct broadcaster(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
     }
 }
 
@@ -175,9 +253,9 @@ where
 impl<'a, S> SyndicationBuilder<'a, S>
 where
     S: syndication_state::State,
+    S::Streamer: syndication_state::IsSet,
     S::Broadcaster: syndication_state::IsSet,
     S::CreatedAt: syndication_state::IsSet,
-    S::Streamer: syndication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Syndication<'a> {
@@ -202,84 +280,6 @@ where
             streamer: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Syndication<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SyndicationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SyndicationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Syndication<'a>,
-}
-
-impl From<SyndicationGetRecordOutput<'_>> for Syndication<'_> {
-    fn from(output: SyndicationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Syndication<'_> {
-    const NSID: &'static str = "place.stream.broadcast.syndication";
-    type Record = SyndicationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SyndicationRecord;
-impl jacquard_common::xrpc::XrpcResp for SyndicationRecord {
-    const NSID: &'static str = "place.stream.broadcast.syndication";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SyndicationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SyndicationRecord {
-    const NSID: &'static str = "place.stream.broadcast.syndication";
-    type Record = SyndicationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Syndication<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.broadcast.syndication"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_broadcast_syndication()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

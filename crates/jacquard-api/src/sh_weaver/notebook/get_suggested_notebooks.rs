@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -24,6 +20,264 @@ pub struct GetSuggestedNotebooks {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestedNotebooksOutput<'a> {
+    #[serde(borrow)]
+    pub notebooks: Vec<
+        crate::sh_weaver::notebook::get_suggested_notebooks::SuggestedNotebook<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SuggestedNotebook<'a> {
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    #[serde(borrow)]
+    pub reason: crate::sh_weaver::notebook::get_suggested_notebooks::SuggestionReason<
+        'a,
+    >,
+    ///Appview-computed relevance score.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub score: std::option::Option<i64>,
+}
+
+/// Why this notebook was suggested.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SuggestionReason<'a> {
+    ///If followed-author, the author.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub related_author: std::option::Option<
+        crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    >,
+    ///If from-list, the list it's from.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub related_list: std::option::Option<crate::sh_weaver::graph::ListView<'a>>,
+    ///If similar-to-X, the notebook it's similar to.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub related_notebook: std::option::Option<
+        crate::sh_weaver::notebook::NotebookView<'a>,
+    >,
+    ///Tags that matched.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub related_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(borrow)]
+    pub r#type: SuggestionReasonType<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SuggestionReasonType<'a> {
+    SimilarTags,
+    SimilarToLiked,
+    SimilarToRead,
+    FollowedAuthor,
+    PopularInTag,
+    Trending,
+    FromList,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SuggestionReasonType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::SimilarTags => "similar-tags",
+            Self::SimilarToLiked => "similar-to-liked",
+            Self::SimilarToRead => "similar-to-read",
+            Self::FollowedAuthor => "followed-author",
+            Self::PopularInTag => "popular-in-tag",
+            Self::Trending => "trending",
+            Self::FromList => "from-list",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SuggestionReasonType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "similar-tags" => Self::SimilarTags,
+            "similar-to-liked" => Self::SimilarToLiked,
+            "similar-to-read" => Self::SimilarToRead,
+            "followed-author" => Self::FollowedAuthor,
+            "popular-in-tag" => Self::PopularInTag,
+            "trending" => Self::Trending,
+            "from-list" => Self::FromList,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SuggestionReasonType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "similar-tags" => Self::SimilarTags,
+            "similar-to-liked" => Self::SimilarToLiked,
+            "similar-to-read" => Self::SimilarToRead,
+            "followed-author" => Self::FollowedAuthor,
+            "popular-in-tag" => Self::PopularInTag,
+            "trending" => Self::Trending,
+            "from-list" => Self::FromList,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SuggestionReasonType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SuggestionReasonType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SuggestionReasonType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SuggestionReasonType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SuggestionReasonType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SuggestionReasonType<'_> {
+    type Output = SuggestionReasonType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SuggestionReasonType::SimilarTags => SuggestionReasonType::SimilarTags,
+            SuggestionReasonType::SimilarToLiked => SuggestionReasonType::SimilarToLiked,
+            SuggestionReasonType::SimilarToRead => SuggestionReasonType::SimilarToRead,
+            SuggestionReasonType::FollowedAuthor => SuggestionReasonType::FollowedAuthor,
+            SuggestionReasonType::PopularInTag => SuggestionReasonType::PopularInTag,
+            SuggestionReasonType::Trending => SuggestionReasonType::Trending,
+            SuggestionReasonType::FromList => SuggestionReasonType::FromList,
+            SuggestionReasonType::Other(v) => {
+                SuggestionReasonType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getSuggestedNotebooks
+pub struct GetSuggestedNotebooksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestedNotebooksResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestedNotebooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetSuggestedNotebooks {
+    const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestedNotebooksResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getSuggestedNotebooks
+pub struct GetSuggestedNotebooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSuggestedNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedNotebooks;
+    type Response = GetSuggestedNotebooksResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.getSuggestedNotebooks"
+    }
+    fn def_name() -> &'static str {
+        "suggestedNotebook"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.getSuggestedNotebooks"
+    }
+    fn def_name() -> &'static str {
+        "suggestionReason"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
 }
 
 pub mod get_suggested_notebooks_state {
@@ -91,73 +345,6 @@ where
             limit: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestedNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<
-        crate::sh_weaver::notebook::get_suggested_notebooks::SuggestedNotebook<'a>,
-    >,
-}
-
-/// Response type for
-///sh.weaver.notebook.getSuggestedNotebooks
-pub struct GetSuggestedNotebooksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestedNotebooksResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetSuggestedNotebooks {
-    const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestedNotebooksResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getSuggestedNotebooks
-pub struct GetSuggestedNotebooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSuggestedNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedNotebooks;
-    type Response = GetSuggestedNotebooksResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SuggestedNotebook<'a> {
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-    #[serde(borrow)]
-    pub reason: crate::sh_weaver::notebook::get_suggested_notebooks::SuggestionReason<
-        'a,
-    >,
-    ///Appview-computed relevance score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub score: std::option::Option<i64>,
 }
 
 pub mod suggested_notebook_state {
@@ -518,192 +705,5 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon:
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.getSuggestedNotebooks"
-    }
-    fn def_name() -> &'static str {
-        "suggestedNotebook"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Why this notebook was suggested.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SuggestionReason<'a> {
-    ///If followed-author, the author.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub related_author: std::option::Option<
-        crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    >,
-    ///If from-list, the list it's from.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub related_list: std::option::Option<crate::sh_weaver::graph::ListView<'a>>,
-    ///If similar-to-X, the notebook it's similar to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub related_notebook: std::option::Option<
-        crate::sh_weaver::notebook::NotebookView<'a>,
-    >,
-    ///Tags that matched.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub related_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(borrow)]
-    pub r#type: SuggestionReasonType<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestionReasonType<'a> {
-    SimilarTags,
-    SimilarToLiked,
-    SimilarToRead,
-    FollowedAuthor,
-    PopularInTag,
-    Trending,
-    FromList,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SuggestionReasonType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::SimilarTags => "similar-tags",
-            Self::SimilarToLiked => "similar-to-liked",
-            Self::SimilarToRead => "similar-to-read",
-            Self::FollowedAuthor => "followed-author",
-            Self::PopularInTag => "popular-in-tag",
-            Self::Trending => "trending",
-            Self::FromList => "from-list",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SuggestionReasonType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "similar-tags" => Self::SimilarTags,
-            "similar-to-liked" => Self::SimilarToLiked,
-            "similar-to-read" => Self::SimilarToRead,
-            "followed-author" => Self::FollowedAuthor,
-            "popular-in-tag" => Self::PopularInTag,
-            "trending" => Self::Trending,
-            "from-list" => Self::FromList,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SuggestionReasonType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "similar-tags" => Self::SimilarTags,
-            "similar-to-liked" => Self::SimilarToLiked,
-            "similar-to-read" => Self::SimilarToRead,
-            "followed-author" => Self::FollowedAuthor,
-            "popular-in-tag" => Self::PopularInTag,
-            "trending" => Self::Trending,
-            "from-list" => Self::FromList,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SuggestionReasonType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SuggestionReasonType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SuggestionReasonType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SuggestionReasonType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SuggestionReasonType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SuggestionReasonType<'_> {
-    type Output = SuggestionReasonType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SuggestionReasonType::SimilarTags => SuggestionReasonType::SimilarTags,
-            SuggestionReasonType::SimilarToLiked => SuggestionReasonType::SimilarToLiked,
-            SuggestionReasonType::SimilarToRead => SuggestionReasonType::SimilarToRead,
-            SuggestionReasonType::FollowedAuthor => SuggestionReasonType::FollowedAuthor,
-            SuggestionReasonType::PopularInTag => SuggestionReasonType::PopularInTag,
-            SuggestionReasonType::Trending => SuggestionReasonType::Trending,
-            SuggestionReasonType::FromList => SuggestionReasonType::FromList,
-            SuggestionReasonType::Other(v) => {
-                SuggestionReasonType::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.getSuggestedNotebooks"
-    }
-    fn def_name() -> &'static str {
-        "suggestionReason"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

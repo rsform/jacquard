@@ -22,131 +22,6 @@ pub struct Tag<'a> {
     pub tag: jacquard_common::CowStr<'a>,
 }
 
-pub mod tag_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Repo;
-        type Tag;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Repo = Unset;
-        type Tag = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Tag = S::Tag;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Repo = S::Repo;
-        type Tag = Set<members::tag>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `tag` field
-        pub struct tag(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct TagBuilder<'a, S: tag_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Tag<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagBuilder<'a, tag_state::Empty> {
-        TagBuilder::new()
-    }
-}
-
-impl<'a> TagBuilder<'a, tag_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TagBuilder<'a, S>
-where
-    S: tag_state::State,
-    S::Repo: tag_state::IsUnset,
-{
-    /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TagBuilder<'a, S>
-where
-    S: tag_state::State,
-    S::Tag: tag_state::IsUnset,
-{
-    /// Set the `tag` field (required)
-    pub fn tag(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetTag<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TagBuilder<'a, S>
-where
-    S: tag_state::State,
-    S::Repo: tag_state::IsSet,
-    S::Tag: tag_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Tag<'a> {
-        Tag {
-            repo: self.__unsafe_private_named.0.unwrap(),
-            tag: self.__unsafe_private_named.1.unwrap(),
-        }
-    }
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -255,4 +130,129 @@ impl jacquard_common::xrpc::XrpcEndpoint for TagRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Request<'de> = Tag<'de>;
     type Response = TagResponse;
+}
+
+pub mod tag_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Tag;
+        type Repo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Tag = Unset;
+        type Repo = Unset;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Tag = Set<members::tag>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Tag = S::Tag;
+        type Repo = Set<members::repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `tag` field
+        pub struct tag(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TagBuilder<'a, S: tag_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Tag<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TagBuilder<'a, tag_state::Empty> {
+        TagBuilder::new()
+    }
+}
+
+impl<'a> TagBuilder<'a, tag_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Repo: tag_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TagBuilder<'a, tag_state::SetRepo<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Tag: tag_state::IsUnset,
+{
+    /// Set the `tag` field (required)
+    pub fn tag(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TagBuilder<'a, tag_state::SetTag<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Tag: tag_state::IsSet,
+    S::Repo: tag_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Tag<'a> {
+        Tag {
+            repo: self.__unsafe_private_named.0.unwrap(),
+            tag: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }

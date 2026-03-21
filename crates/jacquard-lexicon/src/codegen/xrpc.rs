@@ -9,17 +9,19 @@ use quote::quote;
 
 use super::CodeGenerator;
 use super::utils::make_ident;
+use super::prettify::GeneratedCode;
 
 impl<'c> CodeGenerator<'c> {
-    /// Generate query type
+    /// Generate query type.
     pub(super) fn generate_query(
         &self,
         nsid: &str,
         def_name: &str,
         query: &LexXrpcQuery<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
-        let mut output = Vec::new();
+        let mut type_defs_parts = Vec::new();
+        let mut internals_parts: Vec<TokenStream> = Vec::new();
 
         let params_has_lifetime = query
             .parameters
@@ -35,21 +37,25 @@ impl<'c> CodeGenerator<'c> {
         let has_errors = query.errors.is_some();
 
         if let Some(params) = &query.parameters {
-            let params_struct = self.generate_params_struct(&type_base, nsid, params)?;
-            output.push(params_struct);
+            let sub = self.generate_params_struct(&type_base, nsid, params)?;
+            type_defs_parts.push(sub.type_def);
+            internals_parts.push(sub.default_fns);
+            internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &query.output {
-            let output_struct = self.generate_output_struct(nsid, &type_base, body)?;
-            output.push(output_struct);
+            let sub = self.generate_output_struct(nsid, &type_base, body)?;
+            type_defs_parts.push(sub.type_def);
+            internals_parts.push(sub.default_fns);
+            internals_parts.push(sub.builder);
         }
 
         if let Some(errors) = &query.errors {
             let error_enum = self.generate_error_enum(&type_base, errors)?;
-            output.push(error_enum);
+            type_defs_parts.push(error_enum);
         }
 
-        // Generate XrpcRequest impl
+        // Generate XrpcRequest impl.
         let output_encoding = query
             .output
             .as_ref()
@@ -73,58 +79,72 @@ impl<'c> CodeGenerator<'c> {
             has_errors,
             false, // queries never have binary inputs
         )?;
-        output.push(xrpc_impl);
 
-        Ok(quote! {
-            #(#output)*
+        // Categorize tokens into buckets.
+        let type_defs = quote! { #(#type_defs_parts)* };
+        let internals = quote! { #(#internals_parts)* };
+
+        Ok(GeneratedCode {
+            type_defs,
+            inherent_impls: TokenStream::new(),
+            trait_impls: xrpc_impl,
+            internals,
+            imports: Default::default(),
         })
     }
 
-    /// Generate procedure type
+    /// Generate procedure type.
     pub(super) fn generate_procedure(
         &self,
         nsid: &str,
         def_name: &str,
         proc: &LexXrpcProcedure<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
-        let mut output = Vec::new();
+        let mut type_defs_parts = Vec::new();
+        let mut internals_parts: Vec<TokenStream> = Vec::new();
 
-        // Check if input is a binary body (no schema)
+        // Check if input is a binary body (no schema).
         let is_binary_input = proc
             .input
             .as_ref()
             .map(|i| i.schema.is_none())
             .unwrap_or(false);
 
-        // Input bodies with schemas have lifetimes (they get #[lexicon] attribute)
-        // Binary inputs don't have lifetimes
+        // Input bodies with schemas have lifetimes (they get #[lexicon] attribute).
+        // Binary inputs don't have lifetimes.
         let params_has_lifetime = proc.input.is_some() && !is_binary_input;
         let has_input = proc.input.is_some();
         let has_output = proc.output.is_some();
         let has_errors = proc.errors.is_some();
 
         if let Some(params) = &proc.parameters {
-            let params_struct = self.generate_params_struct_proc(&type_base, nsid, params)?;
-            output.push(params_struct);
+            let sub = self.generate_params_struct_proc(&type_base, nsid, params)?;
+            type_defs_parts.push(sub.type_def);
+            internals_parts.push(sub.default_fns);
+            internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &proc.input {
-            let input_struct = self.generate_input_struct(nsid, &type_base, body)?;
-            output.push(input_struct);
+            let sub = self.generate_input_struct(nsid, &type_base, body)?;
+            type_defs_parts.push(sub.type_def);
+            internals_parts.push(sub.default_fns);
+            internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &proc.output {
-            let output_struct = self.generate_output_struct(nsid, &type_base, body)?;
-            output.push(output_struct);
+            let sub = self.generate_output_struct(nsid, &type_base, body)?;
+            type_defs_parts.push(sub.type_def);
+            internals_parts.push(sub.default_fns);
+            internals_parts.push(sub.builder);
         }
 
         if let Some(errors) = &proc.errors {
             let error_enum = self.generate_error_enum(&type_base, errors)?;
-            output.push(error_enum);
+            type_defs_parts.push(error_enum);
         }
 
-        // Generate XrpcRequest impl
+        // Generate XrpcRequest impl.
         let input_encoding = proc
             .input
             .as_ref()
@@ -152,46 +172,56 @@ impl<'c> CodeGenerator<'c> {
             has_errors,
             is_binary_input,
         )?;
-        output.push(xrpc_impl);
 
-        Ok(quote! {
-            #(#output)*
+        // Categorize tokens into buckets.
+        let type_defs = quote! { #(#type_defs_parts)* };
+        let internals = quote! { #(#internals_parts)* };
+
+        Ok(GeneratedCode {
+            type_defs,
+            inherent_impls: TokenStream::new(),
+            trait_impls: xrpc_impl,
+            internals,
+            imports: Default::default(),
         })
     }
 
+    /// Generate subscription type.
     pub(super) fn generate_subscription(
         &self,
         nsid: &str,
         def_name: &str,
         sub: &LexXrpcSubscription<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
-        let mut output = Vec::new();
+        let mut type_defs_parts = Vec::new();
+        let mut internals_parts: Vec<TokenStream> = Vec::new();
 
         if let Some(params) = &sub.parameters {
-            // Extract LexXrpcParameters from the enum
             match params {
                 crate::lexicon::LexXrpcSubscriptionParameter::Params(params_inner) => {
-                    let params_struct =
+                    let sub_out =
                         self.generate_params_struct_inner(&type_base, nsid, params_inner)?;
-                    output.push(params_struct);
+                    type_defs_parts.push(sub_out.type_def);
+                    internals_parts.push(sub_out.default_fns);
+                    internals_parts.push(sub_out.builder);
                 }
             }
         }
 
         if let Some(message) = &sub.message {
             if let Some(schema) = &message.schema {
-                let message_type = self.generate_subscription_message(nsid, &type_base, schema)?;
-                output.push(message_type);
+                let message_generated = self.generate_subscription_message(nsid, &type_base, schema)?;
+                type_defs_parts.push(message_generated.into_tokens());
             }
         }
 
         if let Some(errors) = &sub.errors {
             let error_enum = self.generate_error_enum(&type_base, errors)?;
-            output.push(error_enum);
+            type_defs_parts.push(error_enum);
         }
 
-        // Generate XrpcSubscription trait impl
+        // Generate XrpcSubscription trait impl.
         let params_has_lifetime = sub
             .parameters
             .as_ref()
@@ -214,10 +244,17 @@ impl<'c> CodeGenerator<'c> {
             has_message,
             has_errors,
         )?;
-        output.push(subscription_impl);
 
-        Ok(quote! {
-            #(#output)*
+        // Categorize tokens into buckets.
+        let type_defs = quote! { #(#type_defs_parts)* };
+        let internals = quote! { #(#internals_parts)* };
+
+        Ok(GeneratedCode {
+            type_defs,
+            inherent_impls: TokenStream::new(),
+            trait_impls: subscription_impl,
+            internals,
+            imports: Default::default(),
         })
     }
 
@@ -226,7 +263,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         type_base: &str,
         schema: &LexXrpcSubscriptionMessageSchema<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         use crate::lexicon::LexXrpcSubscriptionMessageSchema;
 
         match schema {
@@ -281,7 +318,7 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
-                Ok(quote! {
+                let union_def = quote! {
                     #doc
                     #[jacquard_derive::open_union]
                     #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
@@ -292,7 +329,8 @@ impl<'c> CodeGenerator<'c> {
                     }
 
                     #decode_framed_impl
-                })
+                };
+                Ok(GeneratedCode::type_only(union_def))
             }
             LexXrpcSubscriptionMessageSchema::Object(obj) => {
                 // Generate a struct for the message
@@ -316,13 +354,28 @@ impl<'c> CodeGenerator<'c> {
                     #(#default_fns)*
                 };
 
-                // Generate union types for this message
-                let unions =
+                // Generate union types for this message.
+                let nested_items =
                     self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?;
 
-                Ok(quote! {
-                    #struct_def
-                    #(#unions)*
+                let mut nested_type_defs = TokenStream::new();
+                let mut nested_internals = TokenStream::new();
+                for nested in nested_items {
+                    nested_type_defs.extend(nested.type_defs);
+                    nested_internals.extend(nested.inherent_impls);
+                    nested_internals.extend(nested.trait_impls);
+                    nested_internals.extend(nested.internals);
+                }
+
+                Ok(GeneratedCode {
+                    type_defs: quote! {
+                        #struct_def
+                        #nested_type_defs
+                    },
+                    inherent_impls: TokenStream::new(),
+                    trait_impls: TokenStream::new(),
+                    internals: nested_internals,
+                    imports: Default::default(),
                 })
             }
             LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
@@ -333,21 +386,22 @@ impl<'c> CodeGenerator<'c> {
                 let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
                 let doc = self.generate_doc_comment(ref_type.description.as_ref());
 
-                Ok(quote! {
+                let type_alias = quote! {
                     #doc
                     pub type #ident<'a> = #rust_type;
-                })
+                };
+                Ok(GeneratedCode::type_only(type_alias))
             }
         }
     }
 
-    /// Generate params struct from XRPC query parameters
+    /// Generate params struct from XRPC query parameters.
     pub(super) fn generate_params_struct(
         &self,
         type_base: &str,
         nsid: &str,
         params: &crate::lexicon::LexXrpcQueryParameter<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         use crate::lexicon::LexXrpcQueryParameter;
         match params {
             LexXrpcQueryParameter::Params(p) => {
@@ -356,16 +410,16 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Generate params struct from XRPC procedure parameters (query string params)
+    /// Generate params struct from XRPC procedure parameters (query string params).
     pub(super) fn generate_params_struct_proc(
         &self,
         type_base: &str,
         nsid: &str,
         params: &crate::lexicon::LexXrpcProcedureParameter<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         use crate::lexicon::LexXrpcProcedureParameter;
         match params {
-            // For procedures, query string params still get "Params" suffix since the main struct is the input
+            // For procedures, query string params still get "Params" suffix since the main struct is the input.
             LexXrpcProcedureParameter::Params(p) => {
                 let struct_name = format!("{}Params", type_base);
                 let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
@@ -374,24 +428,24 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Generate params struct inner (shared implementation)
+    /// Generate params struct inner (shared implementation).
     pub(super) fn generate_params_struct_inner(
         &self,
         type_base: &str,
         nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
         self.generate_params_struct_inner_with_name(&ident, nsid, p)
     }
 
-    /// Generate params struct with custom name
+    /// Generate params struct with custom name.
     pub(super) fn generate_params_struct_inner_with_name(
         &self,
         ident: &syn::Ident,
         nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let mut fields = Vec::new();
         let mut default_fns = Vec::new();
@@ -457,20 +511,20 @@ impl<'c> CodeGenerator<'c> {
         );
         let builder = ctx.generate();
 
-        Ok(quote! {
-            #(#default_fns)*
-            #struct_def
-            #builder
+        Ok(super::prettify::SubGeneratorOutput {
+            type_def: struct_def,
+            default_fns: quote! { #(#default_fns)* },
+            builder,
         })
     }
 
-    /// Generate input struct from XRPC body
+    /// Generate input struct from XRPC body.
     pub(super) fn generate_input_struct(
         &self,
         nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
         // Check if this is a binary body (no schema, just raw bytes)
@@ -498,7 +552,7 @@ impl<'c> CodeGenerator<'c> {
 
         let doc = self.generate_doc_comment(body.description.as_ref());
 
-        // Binary bodies don't need #[lexicon] attribute or lifetime
+        // Binary bodies don't need #[lexicon] attribute or lifetime.
         let struct_def = if is_binary_body {
             quote! {
                 #doc
@@ -517,7 +571,6 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         } else {
             quote! {
@@ -528,11 +581,10 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         };
 
-        // Generate custom builder if needed (binary bodies skipped - single field)
+        // Generate custom builder if needed (binary bodies skipped — single field).
         let builder = if !is_binary_body && has_builder {
             if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
                 let ctx = super::builder_gen::BuilderGenContext::from_object(
@@ -547,27 +599,42 @@ impl<'c> CodeGenerator<'c> {
             quote! {}
         };
 
-        // Generate union types if schema is an Object
-        let unions = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+        // Generate union types if schema is an Object.
+        let nested_items = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
             self.generate_nested_types(nsid, type_base, &obj.properties, false)?
         } else {
             Vec::new()
         };
 
-        Ok(quote! {
-            #struct_def
-            #builder
-            #(#unions)*
+        let mut nested_type_defs = TokenStream::new();
+        let mut nested_internals = TokenStream::new();
+        for nested in nested_items {
+            nested_type_defs.extend(nested.type_defs);
+            nested_internals.extend(nested.inherent_impls);
+            nested_internals.extend(nested.trait_impls);
+            nested_internals.extend(nested.internals);
+        }
+
+        Ok(super::prettify::SubGeneratorOutput {
+            type_def: quote! {
+                #struct_def
+                #nested_type_defs
+            },
+            default_fns: quote! { #(#default_fns)* },
+            builder: quote! {
+                #nested_internals
+                #builder
+            },
         })
     }
 
-    /// Generate output struct from XRPC body
+    /// Generate output struct from XRPC body.
     pub(super) fn generate_output_struct(
         &self,
         nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<super::prettify::SubGeneratorOutput> {
         let struct_name = format!("{}Output", type_base);
         let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
@@ -591,7 +658,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Output structs always get a lifetime since they have the #[lexicon] attribute
-        // which adds extra_data: BTreeMap<..., Data<'a>>
+        // which adds extra_data: BTreeMap<..., Data<'a>>.
         let struct_def = if has_default {
             quote! {
                 #doc
@@ -601,7 +668,6 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         } else if body.schema.is_none() {
             quote! {
@@ -621,20 +687,33 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         };
 
-        // Generate union types if schema is an Object
-        let unions = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+        // Generate union types if schema is an Object.
+        let nested_items = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
             self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?
         } else {
             Vec::new()
         };
 
-        Ok(quote! {
-            #struct_def
-            #(#unions)*
+        let mut nested_type_defs = TokenStream::new();
+        let mut nested_internals = TokenStream::new();
+        for nested in nested_items {
+            nested_type_defs.extend(nested.type_defs);
+            nested_internals.extend(nested.inherent_impls);
+            nested_internals.extend(nested.trait_impls);
+            nested_internals.extend(nested.internals);
+        }
+
+        // Output structs don't generate builders (they're response types).
+        Ok(super::prettify::SubGeneratorOutput {
+            type_def: quote! {
+                #struct_def
+                #nested_type_defs
+            },
+            default_fns: quote! { #(#default_fns)* },
+            builder: nested_internals,
         })
     }
 

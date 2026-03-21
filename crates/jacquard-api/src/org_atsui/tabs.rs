@@ -22,6 +22,119 @@ pub struct Tabs<'a> {
     pub items: Vec<crate::org_atsui::tabs::Tab<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TabsOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Tab<'a> {
+    ///Element to render as tab content.
+    #[serde(borrow)]
+    pub content: crate::at_inlay::Element<'a>,
+    ///Stable key that identifies the tab among its siblings.
+    #[serde(borrow)]
+    pub key: jacquard_common::CowStr<'a>,
+    ///Display label for the tab.
+    #[serde(borrow)]
+    pub label: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///org.atsui.Tabs
+pub struct TabsResponse;
+impl jacquard_common::xrpc::XrpcResp for TabsResponse {
+    const NSID: &'static str = "org.atsui.Tabs";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TabsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
+    const NSID: &'static str = "org.atsui.Tabs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = TabsResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Tabs
+pub struct TabsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Tabs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Tabs<'de>;
+    type Response = TabsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
+    fn nsid() -> &'static str {
+        "org.atsui.Tabs"
+    }
+    fn def_name() -> &'static str {
+        "tab"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atsui_Tabs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.label;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod tabs_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -127,76 +240,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TabsOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Tabs
-pub struct TabsResponse;
-impl jacquard_common::xrpc::XrpcResp for TabsResponse {
-    const NSID: &'static str = "org.atsui.Tabs";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TabsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
-    const NSID: &'static str = "org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = TabsResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Tabs
-pub struct TabsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Tabs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Tabs<'de>;
-    type Response = TabsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Tab<'a> {
-    ///Element to render as tab content.
-    #[serde(borrow)]
-    pub content: crate::at_inlay::Element<'a>,
-    ///Stable key that identifies the tab among its siblings.
-    #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
-    ///Display label for the tab.
-    #[serde(borrow)]
-    pub label: jacquard_common::CowStr<'a>,
-}
-
 pub mod tab_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -207,49 +250,49 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Content;
+        type Key;
         type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Content = Unset;
+        type Key = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Content = S::Content;
-        type Label = S::Label;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Key = S::Key;
         type Content = Set<members::content>;
+        type Key = S::Key;
+        type Label = S::Label;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Content = S::Content;
+        type Key = Set<members::key>;
         type Label = S::Label;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type Key = S::Key;
         type Content = S::Content;
+        type Key = S::Key;
         type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `label` field
         pub struct label(());
     }
@@ -344,8 +387,8 @@ where
 impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
-    S::Key: tab_state::IsSet,
     S::Content: tab_state::IsSet,
+    S::Key: tab_state::IsSet,
     S::Label: tab_state::IsSet,
 {
     /// Build the final struct
@@ -503,48 +546,5 @@ fn lexicon_doc_org_atsui_Tabs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tab<'a> {
-    fn nsid() -> &'static str {
-        "org.atsui.Tabs"
-    }
-    fn def_name() -> &'static str {
-        "tab"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atsui_Tabs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.label;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

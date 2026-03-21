@@ -36,6 +36,144 @@ pub struct PublishingOwner<'a> {
     pub last_name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublishingOwnerGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: PublishingOwner<'a>,
+}
+
+impl<'a> PublishingOwner<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PublishingOwnerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PublishingOwnerRecord;
+impl jacquard_common::xrpc::XrpcResp for PublishingOwnerRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PublishingOwnerGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PublishingOwnerGetRecordOutput<'_>> for PublishingOwner<'_> {
+    fn from(output: PublishingOwnerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for PublishingOwner<'_> {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
+    type Record = PublishingOwnerRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PublishingOwnerRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
+    type Record = PublishingOwnerRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.actor.publishingOwner"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.collecting_society {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "collecting_society",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.company_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "company_name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.first_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "first_name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.ipi {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 11usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ipi",
+                    ),
+                    max: 11usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.last_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "last_name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod publishing_owner_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -206,144 +344,6 @@ where
             last_name: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> PublishingOwner<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PublishingOwnerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishingOwnerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: PublishingOwner<'a>,
-}
-
-impl From<PublishingOwnerGetRecordOutput<'_>> for PublishingOwner<'_> {
-    fn from(output: PublishingOwnerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for PublishingOwner<'_> {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
-    type Record = PublishingOwnerRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PublishingOwnerRecord;
-impl jacquard_common::xrpc::XrpcResp for PublishingOwnerRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublishingOwnerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PublishingOwnerRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
-    type Record = PublishingOwnerRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.actor.publishingOwner"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.collecting_society {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "collecting_society",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.company_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "company_name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.first_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "first_name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.ipi {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 11usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ipi",
-                    ),
-                    max: 11usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.last_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "last_name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

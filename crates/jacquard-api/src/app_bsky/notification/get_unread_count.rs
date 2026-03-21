@@ -22,6 +22,47 @@ pub struct GetUnreadCount {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUnreadCountOutput<'a> {
+    pub count: i64,
+}
+
+/// Response type for
+///app.bsky.notification.getUnreadCount
+pub struct GetUnreadCountResponse;
+impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
+    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetUnreadCountOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
+    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetUnreadCountResponse;
+}
+
+/// Endpoint type for
+///app.bsky.notification.getUnreadCount
+pub struct GetUnreadCountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.getUnreadCount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetUnreadCount;
+    type Response = GetUnreadCountResponse;
+}
+
 pub mod get_unread_count_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -110,45 +151,4 @@ where
             seen_at: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetUnreadCountOutput<'a> {
-    pub count: i64,
-}
-
-/// Response type for
-///app.bsky.notification.getUnreadCount
-pub struct GetUnreadCountResponse;
-impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
-    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetUnreadCountOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
-    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetUnreadCountResponse;
-}
-
-/// Endpoint type for
-///app.bsky.notification.getUnreadCount
-pub struct GetUnreadCountRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.notification.getUnreadCount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetUnreadCount;
-    type Response = GetUnreadCountResponse;
 }

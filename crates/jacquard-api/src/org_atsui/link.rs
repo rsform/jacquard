@@ -27,6 +27,141 @@ pub struct Link<'a> {
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LinkDecoration<'a> {
+    None,
+    Underline,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> LinkDecoration<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::Underline => "underline",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for LinkDecoration<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "underline" => Self::Underline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for LinkDecoration<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "underline" => Self::Underline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for LinkDecoration<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for LinkDecoration<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for LinkDecoration<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for LinkDecoration<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for LinkDecoration<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for LinkDecoration<'_> {
+    type Output = LinkDecoration<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LinkDecoration::None => LinkDecoration::None,
+            LinkDecoration::Underline => LinkDecoration::Underline,
+            LinkDecoration::Other(v) => LinkDecoration::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///org.atsui.Link
+pub struct LinkResponse;
+impl jacquard_common::xrpc::XrpcResp for LinkResponse {
+    const NSID: &'static str = "org.atsui.Link";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LinkOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Link<'a> {
+    const NSID: &'static str = "org.atsui.Link";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = LinkResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Link
+pub struct LinkRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LinkRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Link";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Link<'de>;
+    type Response = LinkResponse;
+}
+
 pub mod link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -168,139 +303,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LinkDecoration<'a> {
-    None,
-    Underline,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> LinkDecoration<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::Underline => "underline",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for LinkDecoration<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "underline" => Self::Underline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for LinkDecoration<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "underline" => Self::Underline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LinkDecoration<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for LinkDecoration<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for LinkDecoration<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for LinkDecoration<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for LinkDecoration<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for LinkDecoration<'_> {
-    type Output = LinkDecoration<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LinkDecoration::None => LinkDecoration::None,
-            LinkDecoration::Underline => LinkDecoration::Underline,
-            LinkDecoration::Other(v) => LinkDecoration::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Link
-pub struct LinkResponse;
-impl jacquard_common::xrpc::XrpcResp for LinkResponse {
-    const NSID: &'static str = "org.atsui.Link";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Link<'a> {
-    const NSID: &'static str = "org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = LinkResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Link
-pub struct LinkRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for LinkRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Link";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Link<'de>;
-    type Response = LinkResponse;
 }

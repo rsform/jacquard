@@ -20,6 +20,90 @@ pub struct FetchRecords<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchRecordsOutput<'a> {
+    ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
+    #[serde(borrow)]
+    pub results: Vec<crate::ooo_bsky::authfetch::fetch_records::FetchRecordsResult<'a>>,
+}
+
+/// Successful result, with the record value.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchRecordsResult<'a> {
+    ///The stored private record value.
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    ///The strategy used to authenticate fetch requests for this record.
+    #[serde(borrow)]
+    pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
+    ///The AT URI of the record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///ooo.bsky.authfetch.fetchRecords
+pub struct FetchRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for FetchRecordsResponse {
+    const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FetchRecordsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for FetchRecords<'a> {
+    const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = FetchRecordsResponse;
+}
+
+/// Endpoint type for
+///ooo.bsky.authfetch.fetchRecords
+pub struct FetchRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
+    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.fetchRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = FetchRecords<'de>;
+    type Response = FetchRecordsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FetchRecordsResult<'a> {
+    fn nsid() -> &'static str {
+        "ooo.bsky.authfetch.fetchRecords"
+    }
+    fn def_name() -> &'static str {
+        "result"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ooo_bsky_authfetch_fetchRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod fetch_records_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -111,73 +195,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FetchRecordsOutput<'a> {
-    ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
-    #[serde(borrow)]
-    pub results: Vec<crate::ooo_bsky::authfetch::fetch_records::FetchRecordsResult<'a>>,
-}
-
-/// Response type for
-///ooo.bsky.authfetch.fetchRecords
-pub struct FetchRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for FetchRecordsResponse {
-    const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FetchRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for FetchRecords<'a> {
-    const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = FetchRecordsResponse;
-}
-
-/// Endpoint type for
-///ooo.bsky.authfetch.fetchRecords
-pub struct FetchRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
-    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.fetchRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = FetchRecords<'de>;
-    type Response = FetchRecordsResponse;
-}
-
-/// Successful result, with the record value.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FetchRecordsResult<'a> {
-    ///The stored private record value.
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    ///The strategy used to authenticate fetch requests for this record.
-    #[serde(borrow)]
-    pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
-    ///The AT URI of the record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod fetch_records_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -189,50 +206,50 @@ pub mod fetch_records_result_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Strategy;
-        type Record;
         type Uri;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Strategy = Unset;
-        type Record = Unset;
         type Uri = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
         type Strategy = Set<members::strategy>;
+        type Uri = S::Uri;
         type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Strategy = S::Strategy;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Strategy = S::Strategy;
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Strategy = S::Strategy;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `strategy` field
         pub struct strategy(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -326,8 +343,8 @@ impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
     S::Strategy: fetch_records_result_state::IsSet,
-    S::Record: fetch_records_result_state::IsSet,
     S::Uri: fetch_records_result_state::IsSet,
+    S::Record: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FetchRecordsResult<'a> {
@@ -479,22 +496,5 @@ fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon:
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FetchRecordsResult<'a> {
-    fn nsid() -> &'static str {
-        "ooo.bsky.authfetch.fetchRecords"
-    }
-    fn def_name() -> &'static str {
-        "result"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ooo_bsky_authfetch_fetchRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -21,6 +21,49 @@ pub struct GetFeedGenerators {
     pub size: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFeedGeneratorsOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::feed::FeedGeneratorsView<'a>,
+}
+
+/// Response type for
+///app.rocksky.feed.getFeedGenerators
+pub struct GetFeedGeneratorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
+    const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFeedGeneratorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetFeedGenerators {
+    const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFeedGeneratorsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.feed.getFeedGenerators
+pub struct GetFeedGeneratorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFeedGenerators;
+    type Response = GetFeedGeneratorsResponse;
+}
+
 pub mod get_feed_generators_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -86,47 +129,4 @@ where
             size: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFeedGeneratorsOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::feed::FeedGeneratorsView<'a>,
-}
-
-/// Response type for
-///app.rocksky.feed.getFeedGenerators
-pub struct GetFeedGeneratorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
-    const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetFeedGenerators {
-    const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFeedGeneratorsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.feed.getFeedGenerators
-pub struct GetFeedGeneratorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeedGenerators;
-    type Response = GetFeedGeneratorsResponse;
 }

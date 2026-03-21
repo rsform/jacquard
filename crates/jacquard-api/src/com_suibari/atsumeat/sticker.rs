@@ -62,6 +62,427 @@ pub struct Sticker<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// Type of the image source.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StickerImageType<'a> {
+    Avatar,
+    Custom,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StickerImageType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Avatar => "avatar",
+            Self::Custom => "custom",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StickerImageType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "avatar" => Self::Avatar,
+            "custom" => Self::Custom,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StickerImageType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "avatar" => Self::Avatar,
+            "custom" => Self::Custom,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StickerImageType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StickerImageType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StickerImageType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StickerImageType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StickerImageType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StickerImageType<'_> {
+    type Output = StickerImageType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StickerImageType::Avatar => StickerImageType::Avatar,
+            StickerImageType::Custom => StickerImageType::Custom,
+            StickerImageType::Other(v) => StickerImageType::Other(v.into_static()),
+        }
+    }
+}
+
+/// The shape of the sticker canvas.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StickerShape<'a> {
+    Circle,
+    Square,
+    Rectangle,
+    Star,
+    Heart,
+    Diamond,
+    Butterfly,
+    Transparent,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StickerShape<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Circle => "circle",
+            Self::Square => "square",
+            Self::Rectangle => "rectangle",
+            Self::Star => "star",
+            Self::Heart => "heart",
+            Self::Diamond => "diamond",
+            Self::Butterfly => "butterfly",
+            Self::Transparent => "transparent",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StickerShape<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "circle" => Self::Circle,
+            "square" => Self::Square,
+            "rectangle" => Self::Rectangle,
+            "star" => Self::Star,
+            "heart" => Self::Heart,
+            "diamond" => Self::Diamond,
+            "butterfly" => Self::Butterfly,
+            "transparent" => Self::Transparent,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StickerShape<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "circle" => Self::Circle,
+            "square" => Self::Square,
+            "rectangle" => Self::Rectangle,
+            "star" => Self::Star,
+            "heart" => Self::Heart,
+            "diamond" => Self::Diamond,
+            "butterfly" => Self::Butterfly,
+            "transparent" => Self::Transparent,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StickerShape<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StickerShape<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StickerShape<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StickerShape<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StickerShape<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StickerShape<'_> {
+    type Output = StickerShape<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StickerShape::Circle => StickerShape::Circle,
+            StickerShape::Square => StickerShape::Square,
+            StickerShape::Rectangle => StickerShape::Rectangle,
+            StickerShape::Star => StickerShape::Star,
+            StickerShape::Heart => StickerShape::Heart,
+            StickerShape::Diamond => StickerShape::Diamond,
+            StickerShape::Butterfly => StickerShape::Butterfly,
+            StickerShape::Transparent => StickerShape::Transparent,
+            StickerShape::Other(v) => StickerShape::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StickerGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Sticker<'a>,
+}
+
+impl<'a> Sticker<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StickerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StickerRecord;
+impl jacquard_common::xrpc::XrpcResp for StickerRecord {
+    const NSID: &'static str = "com.suibari.atsumeat.sticker";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StickerGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StickerGetRecordOutput<'_>> for Sticker<'_> {
+    fn from(output: StickerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Sticker<'_> {
+    const NSID: &'static str = "com.suibari.atsumeat.sticker";
+    type Record = StickerRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StickerRecord {
+    const NSID: &'static str = "com.suibari.atsumeat.sticker";
+    type Record = StickerRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
+    fn nsid() -> &'static str {
+        "com.suibari.atsumeat.sticker"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_suibari_atsumeat_sticker()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.image_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "image_type",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 6400usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 6400usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.message {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 640usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 640usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.model;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "model",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.shape {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shape",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.signature;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "signature",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.signed_payload;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "signed_payload",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 8usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod sticker_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -72,105 +493,105 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Model;
-        type OriginalOwner;
         type ObtainedAt;
-        type Signature;
         type Image;
+        type Model;
+        type Signature;
         type SignedPayload;
+        type OriginalOwner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Model = Unset;
-        type OriginalOwner = Unset;
         type ObtainedAt = Unset;
-        type Signature = Unset;
         type Image = Unset;
+        type Model = Unset;
+        type Signature = Unset;
         type SignedPayload = Unset;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Model = Set<members::model>;
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
-    }
-    ///State transition - sets the `original_owner` field to Set
-    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
-    impl<S: State> State for SetOriginalOwner<S> {
-        type Model = S::Model;
-        type OriginalOwner = Set<members::original_owner>;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
+        type OriginalOwner = Unset;
     }
     ///State transition - sets the `obtained_at` field to Set
     pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
     impl<S: State> State for SetObtainedAt<S> {
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = Set<members::obtained_at>;
-        type Signature = S::Signature;
         type Image = S::Image;
-        type SignedPayload = S::SignedPayload;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
         type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = Set<members::signature>;
-        type Image = S::Image;
+        type Signature = S::Signature;
         type SignedPayload = S::SignedPayload;
+        type OriginalOwner = S::OriginalOwner;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
         type Image = Set<members::image>;
+        type Model = S::Model;
+        type Signature = S::Signature;
         type SignedPayload = S::SignedPayload;
+        type OriginalOwner = S::OriginalOwner;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Image = S::Image;
+        type Model = Set<members::model>;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+        type OriginalOwner = S::OriginalOwner;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Image = S::Image;
+        type Model = S::Model;
+        type Signature = Set<members::signature>;
+        type SignedPayload = S::SignedPayload;
+        type OriginalOwner = S::OriginalOwner;
     }
     ///State transition - sets the `signed_payload` field to Set
     pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
     impl<S: State> State for SetSignedPayload<S> {
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
         type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
         type Image = S::Image;
+        type Model = S::Model;
+        type Signature = S::Signature;
         type SignedPayload = Set<members::signed_payload>;
+        type OriginalOwner = S::OriginalOwner;
+    }
+    ///State transition - sets the `original_owner` field to Set
+    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
+    impl<S: State> State for SetOriginalOwner<S> {
+        type ObtainedAt = S::ObtainedAt;
+        type Image = S::Image;
+        type Model = S::Model;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+        type OriginalOwner = Set<members::original_owner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `model` field
-        pub struct model(());
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `model` field
+        pub struct model(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
         ///Marker type for the `signed_payload` field
         pub struct signed_payload(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
     }
 }
 
@@ -459,12 +880,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Model: sticker_state::IsSet,
-    S::OriginalOwner: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
-    S::Signature: sticker_state::IsSet,
     S::Image: sticker_state::IsSet,
+    S::Model: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
     S::SignedPayload: sticker_state::IsSet,
+    S::OriginalOwner: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
@@ -509,427 +930,6 @@ where
             tags: self.__unsafe_private_named.12,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Sticker<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StickerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Type of the image source.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StickerImageType<'a> {
-    Avatar,
-    Custom,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> StickerImageType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Avatar => "avatar",
-            Self::Custom => "custom",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for StickerImageType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "avatar" => Self::Avatar,
-            "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for StickerImageType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "avatar" => Self::Avatar,
-            "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StickerImageType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for StickerImageType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for StickerImageType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for StickerImageType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for StickerImageType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for StickerImageType<'_> {
-    type Output = StickerImageType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StickerImageType::Avatar => StickerImageType::Avatar,
-            StickerImageType::Custom => StickerImageType::Custom,
-            StickerImageType::Other(v) => StickerImageType::Other(v.into_static()),
-        }
-    }
-}
-
-/// The shape of the sticker canvas.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StickerShape<'a> {
-    Circle,
-    Square,
-    Rectangle,
-    Star,
-    Heart,
-    Diamond,
-    Butterfly,
-    Transparent,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> StickerShape<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Circle => "circle",
-            Self::Square => "square",
-            Self::Rectangle => "rectangle",
-            Self::Star => "star",
-            Self::Heart => "heart",
-            Self::Diamond => "diamond",
-            Self::Butterfly => "butterfly",
-            Self::Transparent => "transparent",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for StickerShape<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "circle" => Self::Circle,
-            "square" => Self::Square,
-            "rectangle" => Self::Rectangle,
-            "star" => Self::Star,
-            "heart" => Self::Heart,
-            "diamond" => Self::Diamond,
-            "butterfly" => Self::Butterfly,
-            "transparent" => Self::Transparent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for StickerShape<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "circle" => Self::Circle,
-            "square" => Self::Square,
-            "rectangle" => Self::Rectangle,
-            "star" => Self::Star,
-            "heart" => Self::Heart,
-            "diamond" => Self::Diamond,
-            "butterfly" => Self::Butterfly,
-            "transparent" => Self::Transparent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StickerShape<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for StickerShape<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for StickerShape<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for StickerShape<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for StickerShape<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for StickerShape<'_> {
-    type Output = StickerShape<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StickerShape::Circle => StickerShape::Circle,
-            StickerShape::Square => StickerShape::Square,
-            StickerShape::Rectangle => StickerShape::Rectangle,
-            StickerShape::Star => StickerShape::Star,
-            StickerShape::Heart => StickerShape::Heart,
-            StickerShape::Diamond => StickerShape::Diamond,
-            StickerShape::Butterfly => StickerShape::Butterfly,
-            StickerShape::Transparent => StickerShape::Transparent,
-            StickerShape::Other(v) => StickerShape::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StickerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sticker<'a>,
-}
-
-impl From<StickerGetRecordOutput<'_>> for Sticker<'_> {
-    fn from(output: StickerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Sticker<'_> {
-    const NSID: &'static str = "com.suibari.atsumeat.sticker";
-    type Record = StickerRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StickerRecord;
-impl jacquard_common::xrpc::XrpcResp for StickerRecord {
-    const NSID: &'static str = "com.suibari.atsumeat.sticker";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StickerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StickerRecord {
-    const NSID: &'static str = "com.suibari.atsumeat.sticker";
-    type Record = StickerRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
-    fn nsid() -> &'static str {
-        "com.suibari.atsumeat.sticker"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_suibari_atsumeat_sticker()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.image_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "image_type",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 6400usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 6400usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.message {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 640usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 640usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.model;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "model",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.name {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.shape {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shape",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.signature;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.signed_payload;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signed_payload",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

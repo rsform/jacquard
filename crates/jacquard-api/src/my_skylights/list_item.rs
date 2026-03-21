@@ -66,6 +66,156 @@ pub enum BuiltinType<'a> {
     Wishlist(Box<crate::my_skylights::list_item::Wishlist>),
 }
 
+/// User is currently reading/watching/... the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InProgress;
+impl std::fmt::Display for InProgress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "inProgress")
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListItem<'a> {
+    pub added_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub item: std::option::Option<crate::my_skylights::Item<'a>>,
+    #[serde(borrow)]
+    pub list: ListItemList<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub position: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemList<'a> {
+    #[serde(rename = "my.skylights.list")]
+    List(Box<crate::my_skylights::list::List<'a>>),
+    #[serde(rename = "my.skylights.listItem#builtin")]
+    Builtin(Box<crate::my_skylights::list_item::Builtin<'a>>),
+}
+
+/// User owns the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Owned;
+impl std::fmt::Display for Owned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "owned")
+    }
+}
+
+/// User plans to read/watch/... the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Queue;
+impl std::fmt::Display for Queue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "queue")
+    }
+}
+
+/// User wants to own the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Wishlist;
+impl std::fmt::Display for Wishlist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "wishlist")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Builtin<'a> {
+    fn nsid() -> &'static str {
+        "my.skylights.listItem"
+    }
+    fn def_name() -> &'static str {
+        "builtin"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_my_skylights_listItem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+    fn nsid() -> &'static str {
+        "my.skylights.listItem"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_my_skylights_listItem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -236,66 +386,6 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Builtin<'a> {
-    fn nsid() -> &'static str {
-        "my.skylights.listItem"
-    }
-    fn def_name() -> &'static str {
-        "builtin"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_my_skylights_listItem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// User is currently reading/watching/... the item
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct InProgress;
-impl std::fmt::Display for InProgress {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "inProgress")
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListItem<'a> {
-    pub added_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub item: std::option::Option<crate::my_skylights::Item<'a>>,
-    #[serde(borrow)]
-    pub list: ListItemList<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub position: jacquard_common::CowStr<'a>,
-}
-
 pub mod list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -306,51 +396,51 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Position;
-        type AddedAt;
         type List;
+        type AddedAt;
+        type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Position = Unset;
-        type AddedAt = Unset;
         type List = Unset;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Position = Set<members::position>;
-        type AddedAt = S::AddedAt;
-        type List = S::List;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Position = S::Position;
-        type AddedAt = Set<members::added_at>;
-        type List = S::List;
+        type AddedAt = Unset;
+        type Position = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type Position = S::Position;
-        type AddedAt = S::AddedAt;
         type List = Set<members::list>;
+        type AddedAt = S::AddedAt;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type List = S::List;
+        type AddedAt = Set<members::added_at>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type List = S::List;
+        type AddedAt = S::AddedAt;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `position` field
-        pub struct position(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
+        ///Marker type for the `position` field
+        pub struct position(());
     }
 }
 
@@ -477,9 +567,9 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
-    S::Position: list_item_state::IsSet,
-    S::AddedAt: list_item_state::IsSet,
     S::List: list_item_state::IsSet,
+    S::AddedAt: list_item_state::IsSet,
+    S::Position: list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListItem<'a> {
@@ -508,95 +598,5 @@ where
             position: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemList<'a> {
-    #[serde(rename = "my.skylights.list")]
-    List(Box<crate::my_skylights::list::List<'a>>),
-    #[serde(rename = "my.skylights.listItem#builtin")]
-    Builtin(Box<crate::my_skylights::list_item::Builtin<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
-    fn nsid() -> &'static str {
-        "my.skylights.listItem"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_my_skylights_listItem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// User owns the item
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Owned;
-impl std::fmt::Display for Owned {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "owned")
-    }
-}
-
-/// User plans to read/watch/... the item
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Queue;
-impl std::fmt::Display for Queue {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "queue")
-    }
-}
-
-/// User wants to own the item
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Wishlist;
-impl std::fmt::Display for Wishlist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "wishlist")
     }
 }

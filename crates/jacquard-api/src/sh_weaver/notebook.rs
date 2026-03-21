@@ -57,6 +57,1376 @@ pub struct AuthorListView<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookEntryRef<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+}
+
+/// An ordered entry in a Weaver notebook.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookEntryView<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    pub index: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub next: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prev: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+}
+
+/// An entry within a chapter context.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChapterEntryView<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    pub index: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub next: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prev: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+}
+
+/// Hydrated view of a chapter.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChapterView<'a> {
+    #[serde(borrow)]
+    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entry_count: std::option::Option<i64>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// The format of the content. This is used to determine how to render the content.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentFormat<'a> {
+    ///The format of the content. This is used to determine how to render the content. Defaults to `"weaver"`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_content_format_markdown")]
+    #[serde(borrow)]
+    pub markdown: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Author-applied content rating.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentRating<'a> {
+    General,
+    Teen,
+    Mature,
+    Explicit,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ContentRating<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::General => "general",
+            Self::Teen => "teen",
+            Self::Mature => "mature",
+            Self::Explicit => "explicit",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ContentRating<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "general" => Self::General,
+            "teen" => Self::Teen,
+            "mature" => Self::Mature,
+            "explicit" => Self::Explicit,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ContentRating<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "general" => Self::General,
+            "teen" => Self::Teen,
+            "mature" => Self::Mature,
+            "explicit" => Self::Explicit,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for ContentRating<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for ContentRating<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for ContentRating<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ContentRating<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for ContentRating<'_> {
+    type Output = ContentRating<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentRating::General => ContentRating::General,
+            ContentRating::Teen => ContentRating::Teen,
+            ContentRating::Mature => ContentRating::Mature,
+            ContentRating::Explicit => ContentRating::Explicit,
+            ContentRating::Other(v) => ContentRating::Other(v.into_static()),
+        }
+    }
+}
+
+/// Author-applied content warning.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentWarning<'a> {
+    Violence,
+    GraphicViolence,
+    Death,
+    MajorCharacterDeath,
+    SexualContent,
+    ExplicitSexualContent,
+    Language,
+    SubstanceUse,
+    SelfHarm,
+    Abuse,
+    DisturbingImagery,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ContentWarning<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Violence => "violence",
+            Self::GraphicViolence => "graphic-violence",
+            Self::Death => "death",
+            Self::MajorCharacterDeath => "major-character-death",
+            Self::SexualContent => "sexual-content",
+            Self::ExplicitSexualContent => "explicit-sexual-content",
+            Self::Language => "language",
+            Self::SubstanceUse => "substance-use",
+            Self::SelfHarm => "self-harm",
+            Self::Abuse => "abuse",
+            Self::DisturbingImagery => "disturbing-imagery",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ContentWarning<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "violence" => Self::Violence,
+            "graphic-violence" => Self::GraphicViolence,
+            "death" => Self::Death,
+            "major-character-death" => Self::MajorCharacterDeath,
+            "sexual-content" => Self::SexualContent,
+            "explicit-sexual-content" => Self::ExplicitSexualContent,
+            "language" => Self::Language,
+            "substance-use" => Self::SubstanceUse,
+            "self-harm" => Self::SelfHarm,
+            "abuse" => Self::Abuse,
+            "disturbing-imagery" => Self::DisturbingImagery,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ContentWarning<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "violence" => Self::Violence,
+            "graphic-violence" => Self::GraphicViolence,
+            "death" => Self::Death,
+            "major-character-death" => Self::MajorCharacterDeath,
+            "sexual-content" => Self::SexualContent,
+            "explicit-sexual-content" => Self::ExplicitSexualContent,
+            "language" => Self::Language,
+            "substance-use" => Self::SubstanceUse,
+            "self-harm" => Self::SelfHarm,
+            "abuse" => Self::Abuse,
+            "disturbing-imagery" => Self::DisturbingImagery,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for ContentWarning<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for ContentWarning<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for ContentWarning<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ContentWarning<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for ContentWarning<'_> {
+    type Output = ContentWarning<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentWarning::Violence => ContentWarning::Violence,
+            ContentWarning::GraphicViolence => ContentWarning::GraphicViolence,
+            ContentWarning::Death => ContentWarning::Death,
+            ContentWarning::MajorCharacterDeath => ContentWarning::MajorCharacterDeath,
+            ContentWarning::SexualContent => ContentWarning::SexualContent,
+            ContentWarning::ExplicitSexualContent => {
+                ContentWarning::ExplicitSexualContent
+            }
+            ContentWarning::Language => ContentWarning::Language,
+            ContentWarning::SubstanceUse => ContentWarning::SubstanceUse,
+            ContentWarning::SelfHarm => ContentWarning::SelfHarm,
+            ContentWarning::Abuse => ContentWarning::Abuse,
+            ContentWarning::DisturbingImagery => ContentWarning::DisturbingImagery,
+            ContentWarning::Other(v) => ContentWarning::Other(v.into_static()),
+        }
+    }
+}
+
+/// Author-applied content warnings.
+pub type ContentWarnings<'a> = Vec<crate::sh_weaver::notebook::ContentWarning<'a>>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EntryView<'a> {
+    #[serde(borrow)]
+    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub bookmark_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<crate::sh_weaver::notebook::Path<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub permissions: std::option::Option<
+        crate::sh_weaver::notebook::PermissionsState<'a>,
+    >,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rendered_view: std::option::Option<crate::sh_weaver::notebook::RenderedView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_bookmark: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_reading_progress: std::option::Option<
+        crate::sh_weaver::notebook::ReadingProgress<'a>,
+    >,
+}
+
+/// Entry with feed-specific context (discovery reason, notebook context).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FeedEntryView<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notebook_context: std::option::Option<
+        crate::sh_weaver::notebook::FeedNotebookContext<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reason: std::option::Option<crate::sh_weaver::notebook::FeedReason<'a>>,
+}
+
+/// Minimal notebook context for feed display.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FeedNotebookContext<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+///Why this entry appeared in the feed.
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FeedReason<'a> {
+    #[serde(rename = "sh.weaver.notebook.defs#reasonLike")]
+    ReasonLike(Box<crate::sh_weaver::notebook::ReasonLike<'a>>),
+    #[serde(rename = "sh.weaver.notebook.defs#reasonBookmark")]
+    ReasonBookmark(Box<crate::sh_weaver::notebook::ReasonBookmark<'a>>),
+    #[serde(rename = "sh.weaver.notebook.defs#reasonSubscription")]
+    ReasonSubscription(Box<crate::sh_weaver::notebook::ReasonSubscription<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotebookView<'a> {
+    #[serde(borrow)]
+    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub bookmark_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entry_count: std::option::Option<i64>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<crate::sh_weaver::notebook::Path<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub permissions: std::option::Option<
+        crate::sh_weaver::notebook::PermissionsState<'a>,
+    >,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subscriber_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_bookmark: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_reading_progress: std::option::Option<
+        crate::sh_weaver::notebook::ReadingProgress<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_subscription: std::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
+}
+
+/// Hydrated view of a page (entries displayed together).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PageView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entry_count: std::option::Option<i64>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// The path of the notebook.
+pub type Path<'a> = jacquard_common::CowStr<'a>;
+/// A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionGrant<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///For authority: record createdAt. For invitees: accept createdAt
+    pub granted_at: jacquard_common::types::string::Datetime,
+    ///direct = this resource (includes authority), inherited = via notebook invite
+    #[serde(borrow)]
+    pub scope: PermissionGrantScope<'a>,
+    ///For authority: resource URI. For invitees: invite URI
+    #[serde(borrow)]
+    pub source: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// direct = this resource (includes authority), inherited = via notebook invite
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PermissionGrantScope<'a> {
+    Direct,
+    Inherited,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PermissionGrantScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Direct => "direct",
+            Self::Inherited => "inherited",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PermissionGrantScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "direct" => Self::Direct,
+            "inherited" => Self::Inherited,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PermissionGrantScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "direct" => Self::Direct,
+            "inherited" => Self::Inherited,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for PermissionGrantScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for PermissionGrantScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for PermissionGrantScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PermissionGrantScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for PermissionGrantScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for PermissionGrantScope<'_> {
+    type Output = PermissionGrantScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PermissionGrantScope::Direct => PermissionGrantScope::Direct,
+            PermissionGrantScope::Inherited => PermissionGrantScope::Inherited,
+            PermissionGrantScope::Other(v) => {
+                PermissionGrantScope::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// ACL-style permissions for a resource. Separate from authors (who contributed).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionsState<'a> {
+    ///DIDs that can edit this resource
+    #[serde(borrow)]
+    pub editors: Vec<crate::sh_weaver::notebook::PermissionGrant<'a>>,
+    ///DIDs that can view (future use)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewers: std::option::Option<
+        Vec<crate::sh_weaver::notebook::PermissionGrant<'a>>,
+    >,
+}
+
+/// A published version of an entry in a collaborator's repo.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublishedVersionView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///If content differs, the version it diverged from
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub diverged_from: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///True if this is the 'primary' version (owner's repo)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_canonical: std::option::Option<bool>,
+    pub published_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub publisher: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Viewer's reading progress (appview-side state, not a record).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReadingProgress<'a> {
+    ///Last entry the viewer was reading.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub current_entry: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_read_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub percent_complete: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<ReadingProgressStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReadingProgressStatus<'a> {
+    Reading,
+    Finished,
+    Abandoned,
+    WantToRead,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReadingProgressStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Reading => "reading",
+            Self::Finished => "finished",
+            Self::Abandoned => "abandoned",
+            Self::WantToRead => "want-to-read",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReadingProgressStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReadingProgressStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ReadingProgressStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ReadingProgressStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ReadingProgressStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReadingProgressStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ReadingProgressStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ReadingProgressStatus<'_> {
+    type Output = ReadingProgressStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReadingProgressStatus::Reading => ReadingProgressStatus::Reading,
+            ReadingProgressStatus::Finished => ReadingProgressStatus::Finished,
+            ReadingProgressStatus::Abandoned => ReadingProgressStatus::Abandoned,
+            ReadingProgressStatus::WantToRead => ReadingProgressStatus::WantToRead,
+            ReadingProgressStatus::Other(v) => {
+                ReadingProgressStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReasonBookmark<'a> {
+    #[serde(borrow)]
+    pub by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReasonLike<'a> {
+    #[serde(borrow)]
+    pub by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReasonSubscription<'a> {
+    pub indexed_at: jacquard_common::types::string::Datetime,
+}
+
+/// View of a rendered and cached notebook entry
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RenderedView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub css: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub html: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// An array of tags associated with the notebook entry. Tags can help categorize and organize entries.
+pub type Tags<'a> = Vec<jacquard_common::CowStr<'a>>;
+/// The title of the notebook entry.
+pub type Title<'a> = jacquard_common::CowStr<'a>;
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "authorListView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookEntryRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookEntryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChapterEntryView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "chapterEntryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChapterView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "chapterView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentFormat<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "contentFormat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "entryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedEntryView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "feedEntryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedNotebookContext<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "feedNotebookContext"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "notebookView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PageView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "pageView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PermissionGrant<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "permissionGrant"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PermissionsState<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "permissionsState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishedVersionView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "publishedVersionView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReadingProgress<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "readingProgress"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.percent_complete {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percent_complete",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.percent_complete {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percent_complete",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonBookmark<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "reasonBookmark"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonLike<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "reasonLike"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonSubscription<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "reasonSubscription"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RenderedView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "renderedView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.css {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "css",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.css {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["text/css"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "css",
+                        ),
+                        accepted: vec!["text/css".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.html;
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "html",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.html;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["text/html"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "html",
+                        ),
+                        accepted: vec!["text/html".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod author_list_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -67,37 +1437,37 @@ pub mod author_list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Record;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Record = S::Record;
+        type Index = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Index = S::Index;
         type Record = Set<members::record>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Record = S::Record;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
@@ -190,8 +1560,8 @@ impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
 impl<'a, S> AuthorListViewBuilder<'a, S>
 where
     S: author_list_view_state::State,
-    S::Index: author_list_view_state::IsSet,
     S::Record: author_list_view_state::IsSet,
+    S::Index: author_list_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthorListView<'a> {
@@ -2118,39 +3488,6 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "authorListView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BookEntryRef<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-}
-
 pub mod book_entry_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2256,47 +3593,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "bookEntryRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An ordered entry in a Weaver notebook.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BookEntryView<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-    pub index: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub next: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub prev: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
-}
-
 pub mod book_entry_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2307,37 +3603,37 @@ pub mod book_entry_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entry;
         type Index;
+        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entry = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
-        type Entry = Set<members::entry>;
-        type Index = S::Index;
+        type Entry = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Entry = S::Entry;
         type Index = Set<members::index>;
+        type Entry = S::Entry;
+    }
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntry<S> {}
+    impl<S: State> State for SetEntry<S> {
+        type Index = S::Index;
+        type Entry = Set<members::entry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry` field
-        pub struct entry(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `entry` field
+        pub struct entry(());
     }
 }
 
@@ -2450,8 +3746,8 @@ impl<'a, S: book_entry_view_state::State> BookEntryViewBuilder<'a, S> {
 impl<'a, S> BookEntryViewBuilder<'a, S>
 where
     S: book_entry_view_state::State,
-    S::Entry: book_entry_view_state::IsSet,
     S::Index: book_entry_view_state::IsSet,
+    S::Entry: book_entry_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BookEntryView<'a> {
@@ -2479,47 +3775,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "bookEntryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An entry within a chapter context.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChapterEntryView<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-    pub index: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub next: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub prev: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
 }
 
 pub mod chapter_entry_view_state {
@@ -2706,57 +3961,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChapterEntryView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "chapterEntryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Hydrated view of a chapter.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChapterView<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_count: std::option::Option<i64>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod chapter_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2767,105 +3971,105 @@ pub mod chapter_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Authors;
-        type Cid;
+        type Record;
         type Uri;
         type Notebook;
-        type Record;
+        type IndexedAt;
+        type Cid;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Authors = Unset;
-        type Cid = Unset;
+        type Record = Unset;
         type Uri = Unset;
         type Notebook = Unset;
-        type Record = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Authors = S::Authors;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Notebook = S::Notebook;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type IndexedAt = S::IndexedAt;
-        type Authors = Set<members::authors>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Notebook = S::Notebook;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Authors = S::Authors;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Notebook = S::Notebook;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Authors = S::Authors;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Notebook = S::Notebook;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type IndexedAt = S::IndexedAt;
-        type Authors = S::Authors;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Notebook = Set<members::notebook>;
-        type Record = S::Record;
+        type IndexedAt = Unset;
+        type Cid = Unset;
+        type Authors = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
-        type Authors = S::Authors;
-        type Cid = S::Cid;
+        type Record = Set<members::record>;
         type Uri = S::Uri;
         type Notebook = S::Notebook;
-        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Record = S::Record;
+        type Uri = Set<members::uri>;
+        type Notebook = S::Notebook;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Notebook = Set<members::notebook>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Notebook = S::Notebook;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Notebook = S::Notebook;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Notebook = S::Notebook;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
-        ///Marker type for the `record` field
-        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -3082,12 +4286,12 @@ where
 impl<'a, S> ChapterViewBuilder<'a, S>
 where
     S: chapter_view_state::State,
-    S::IndexedAt: chapter_view_state::IsSet,
-    S::Authors: chapter_view_state::IsSet,
-    S::Cid: chapter_view_state::IsSet,
+    S::Record: chapter_view_state::IsSet,
     S::Uri: chapter_view_state::IsSet,
     S::Notebook: chapter_view_state::IsSet,
-    S::Record: chapter_view_state::IsSet,
+    S::IndexedAt: chapter_view_state::IsSet,
+    S::Cid: chapter_view_state::IsSet,
+    S::Authors: chapter_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ChapterView<'a> {
@@ -3127,43 +4331,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChapterView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "chapterView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The format of the content. This is used to determine how to render the content.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ContentFormat<'a> {
-    ///The format of the content. This is used to determine how to render the content. Defaults to `"weaver"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_content_format_markdown")]
-    #[serde(borrow)]
-    pub markdown: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 fn _default_content_format_markdown() -> std::option::Option<
     jacquard_common::CowStr<'static>,
 > {
@@ -3179,303 +4346,6 @@ impl Default for ContentFormat<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentFormat<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "contentFormat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Author-applied content rating.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ContentRating<'a> {
-    General,
-    Teen,
-    Mature,
-    Explicit,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ContentRating<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::General => "general",
-            Self::Teen => "teen",
-            Self::Mature => "mature",
-            Self::Explicit => "explicit",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ContentRating<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "general" => Self::General,
-            "teen" => Self::Teen,
-            "mature" => Self::Mature,
-            "explicit" => Self::Explicit,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ContentRating<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "general" => Self::General,
-            "teen" => Self::Teen,
-            "mature" => Self::Mature,
-            "explicit" => Self::Explicit,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ContentRating<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for ContentRating<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for ContentRating<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ContentRating<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for ContentRating<'_> {
-    type Output = ContentRating<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ContentRating::General => ContentRating::General,
-            ContentRating::Teen => ContentRating::Teen,
-            ContentRating::Mature => ContentRating::Mature,
-            ContentRating::Explicit => ContentRating::Explicit,
-            ContentRating::Other(v) => ContentRating::Other(v.into_static()),
-        }
-    }
-}
-
-/// Author-applied content warning.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ContentWarning<'a> {
-    Violence,
-    GraphicViolence,
-    Death,
-    MajorCharacterDeath,
-    SexualContent,
-    ExplicitSexualContent,
-    Language,
-    SubstanceUse,
-    SelfHarm,
-    Abuse,
-    DisturbingImagery,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ContentWarning<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Violence => "violence",
-            Self::GraphicViolence => "graphic-violence",
-            Self::Death => "death",
-            Self::MajorCharacterDeath => "major-character-death",
-            Self::SexualContent => "sexual-content",
-            Self::ExplicitSexualContent => "explicit-sexual-content",
-            Self::Language => "language",
-            Self::SubstanceUse => "substance-use",
-            Self::SelfHarm => "self-harm",
-            Self::Abuse => "abuse",
-            Self::DisturbingImagery => "disturbing-imagery",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ContentWarning<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "violence" => Self::Violence,
-            "graphic-violence" => Self::GraphicViolence,
-            "death" => Self::Death,
-            "major-character-death" => Self::MajorCharacterDeath,
-            "sexual-content" => Self::SexualContent,
-            "explicit-sexual-content" => Self::ExplicitSexualContent,
-            "language" => Self::Language,
-            "substance-use" => Self::SubstanceUse,
-            "self-harm" => Self::SelfHarm,
-            "abuse" => Self::Abuse,
-            "disturbing-imagery" => Self::DisturbingImagery,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ContentWarning<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "violence" => Self::Violence,
-            "graphic-violence" => Self::GraphicViolence,
-            "death" => Self::Death,
-            "major-character-death" => Self::MajorCharacterDeath,
-            "sexual-content" => Self::SexualContent,
-            "explicit-sexual-content" => Self::ExplicitSexualContent,
-            "language" => Self::Language,
-            "substance-use" => Self::SubstanceUse,
-            "self-harm" => Self::SelfHarm,
-            "abuse" => Self::Abuse,
-            "disturbing-imagery" => Self::DisturbingImagery,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ContentWarning<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for ContentWarning<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for ContentWarning<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ContentWarning<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for ContentWarning<'_> {
-    type Output = ContentWarning<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ContentWarning::Violence => ContentWarning::Violence,
-            ContentWarning::GraphicViolence => ContentWarning::GraphicViolence,
-            ContentWarning::Death => ContentWarning::Death,
-            ContentWarning::MajorCharacterDeath => ContentWarning::MajorCharacterDeath,
-            ContentWarning::SexualContent => ContentWarning::SexualContent,
-            ContentWarning::ExplicitSexualContent => {
-                ContentWarning::ExplicitSexualContent
-            }
-            ContentWarning::Language => ContentWarning::Language,
-            ContentWarning::SubstanceUse => ContentWarning::SubstanceUse,
-            ContentWarning::SelfHarm => ContentWarning::SelfHarm,
-            ContentWarning::Abuse => ContentWarning::Abuse,
-            ContentWarning::DisturbingImagery => ContentWarning::DisturbingImagery,
-            ContentWarning::Other(v) => ContentWarning::Other(v.into_static()),
-        }
-    }
-}
-
-/// Author-applied content warnings.
-pub type ContentWarnings<'a> = Vec<crate::sh_weaver::notebook::ContentWarning<'a>>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryView<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bookmark_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub path: std::option::Option<crate::sh_weaver::notebook::Path<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub permissions: std::option::Option<
-        crate::sh_weaver::notebook::PermissionsState<'a>,
-    >,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rendered_view: std::option::Option<crate::sh_weaver::notebook::RenderedView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_bookmark: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_reading_progress: std::option::Option<
-        crate::sh_weaver::notebook::ReadingProgress<'a>,
-    >,
-}
-
 pub mod entry_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3488,8 +4358,8 @@ pub mod entry_view_state {
     pub trait State: sealed::Sealed {
         type IndexedAt;
         type Uri;
-        type Cid;
         type Record;
+        type Cid;
         type Authors;
     }
     /// Empty state - all required fields are unset
@@ -3498,8 +4368,8 @@ pub mod entry_view_state {
     impl State for Empty {
         type IndexedAt = Unset;
         type Uri = Unset;
-        type Cid = Unset;
         type Record = Unset;
+        type Cid = Unset;
         type Authors = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
@@ -3508,8 +4378,8 @@ pub mod entry_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type IndexedAt = Set<members::indexed_at>;
         type Uri = S::Uri;
-        type Cid = S::Cid;
         type Record = S::Record;
+        type Cid = S::Cid;
         type Authors = S::Authors;
     }
     ///State transition - sets the `uri` field to Set
@@ -3518,18 +4388,8 @@ pub mod entry_view_state {
     impl<S: State> State for SetUri<S> {
         type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
         type Cid = S::Cid;
-        type Record = S::Record;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
         type Authors = S::Authors;
     }
     ///State transition - sets the `record` field to Set
@@ -3538,8 +4398,18 @@ pub mod entry_view_state {
     impl<S: State> State for SetRecord<S> {
         type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Cid = S::Cid;
         type Record = Set<members::record>;
+        type Cid = S::Cid;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
         type Authors = S::Authors;
     }
     ///State transition - sets the `authors` field to Set
@@ -3548,8 +4418,8 @@ pub mod entry_view_state {
     impl<S: State> State for SetAuthors<S> {
         type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Cid = S::Cid;
         type Record = S::Record;
+        type Cid = S::Cid;
         type Authors = Set<members::authors>;
     }
     /// Marker types for field names
@@ -3559,10 +4429,10 @@ pub mod entry_view_state {
         pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `authors` field
         pub struct authors(());
     }
@@ -3903,8 +4773,8 @@ where
     S: entry_view_state::State,
     S::IndexedAt: entry_view_state::IsSet,
     S::Uri: entry_view_state::IsSet,
-    S::Cid: entry_view_state::IsSet,
     S::Record: entry_view_state::IsSet,
+    S::Cid: entry_view_state::IsSet,
     S::Authors: entry_view_state::IsSet,
 {
     /// Build the final struct
@@ -3955,48 +4825,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "entryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Entry with feed-specific context (discovery reason, notebook context).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedEntryView<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notebook_context: std::option::Option<
-        crate::sh_weaver::notebook::FeedNotebookContext<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reason: std::option::Option<crate::sh_weaver::notebook::FeedReason<'a>>,
 }
 
 pub mod feed_entry_view_state {
@@ -4146,45 +4974,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedEntryView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "feedEntryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Minimal notebook context for feed display.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedNotebookContext<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod feed_notebook_context_state {
@@ -4346,106 +5135,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedNotebookContext<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "feedNotebookContext"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-///Why this entry appeared in the feed.
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum FeedReason<'a> {
-    #[serde(rename = "sh.weaver.notebook.defs#reasonLike")]
-    ReasonLike(Box<crate::sh_weaver::notebook::ReasonLike<'a>>),
-    #[serde(rename = "sh.weaver.notebook.defs#reasonBookmark")]
-    ReasonBookmark(Box<crate::sh_weaver::notebook::ReasonBookmark<'a>>),
-    #[serde(rename = "sh.weaver.notebook.defs#reasonSubscription")]
-    ReasonSubscription(Box<crate::sh_weaver::notebook::ReasonSubscription<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotebookView<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bookmark_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_count: std::option::Option<i64>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub path: std::option::Option<crate::sh_weaver::notebook::Path<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub permissions: std::option::Option<
-        crate::sh_weaver::notebook::PermissionsState<'a>,
-    >,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub subscriber_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_bookmark: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_reading_progress: std::option::Option<
-        crate::sh_weaver::notebook::ReadingProgress<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_subscription: std::option::Option<
-        jacquard_common::types::string::AtUri<'a>,
-    >,
-}
-
 pub mod notebook_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4456,85 +5145,85 @@ pub mod notebook_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type IndexedAt;
-        type Uri;
-        type Authors;
         type Record;
+        type Authors;
+        type Uri;
+        type IndexedAt;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type IndexedAt = Unset;
-        type Uri = Unset;
-        type Authors = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Authors = S::Authors;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Authors = S::Authors;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Authors = S::Authors;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Authors = Set<members::authors>;
-        type Record = S::Record;
+        type Authors = Unset;
+        type Uri = Unset;
+        type IndexedAt = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Authors = S::Authors;
         type Record = Set<members::record>;
+        type Authors = S::Authors;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Record = S::Record;
+        type Authors = Set<members::authors>;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Record = S::Record;
+        type Authors = S::Authors;
+        type Uri = Set<members::uri>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Record = S::Record;
+        type Authors = S::Authors;
+        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
+        type Authors = S::Authors;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -4901,11 +5590,11 @@ impl<'a, S: notebook_view_state::State> NotebookViewBuilder<'a, S> {
 impl<'a, S> NotebookViewBuilder<'a, S>
 where
     S: notebook_view_state::State,
-    S::Cid: notebook_view_state::IsSet,
-    S::IndexedAt: notebook_view_state::IsSet,
-    S::Uri: notebook_view_state::IsSet,
-    S::Authors: notebook_view_state::IsSet,
     S::Record: notebook_view_state::IsSet,
+    S::Authors: notebook_view_state::IsSet,
+    S::Uri: notebook_view_state::IsSet,
+    S::IndexedAt: notebook_view_state::IsSet,
+    S::Cid: notebook_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotebookView<'a> {
@@ -4961,55 +5650,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "notebookView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Hydrated view of a page (entries displayed together).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PageView<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_count: std::option::Option<i64>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod page_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5020,85 +5660,85 @@ pub mod page_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
-        type Cid;
-        type Uri;
-        type Record;
         type IndexedAt;
+        type Uri;
+        type Cid;
+        type Notebook;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
-        type Record = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Notebook = S::Notebook;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Notebook = S::Notebook;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Notebook = S::Notebook;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Record = Set<members::record>;
-        type IndexedAt = S::IndexedAt;
+        type Uri = Unset;
+        type Cid = Unset;
+        type Notebook = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Notebook = S::Notebook;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Record = S::Record;
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Notebook = S::Notebook;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Notebook = S::Notebook;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Notebook = S::Notebook;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Notebook = Set<members::notebook>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Notebook = S::Notebook;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -5285,11 +5925,11 @@ where
 impl<'a, S> PageViewBuilder<'a, S>
 where
     S: page_view_state::State,
-    S::Notebook: page_view_state::IsSet,
-    S::Cid: page_view_state::IsSet,
-    S::Uri: page_view_state::IsSet,
-    S::Record: page_view_state::IsSet,
     S::IndexedAt: page_view_state::IsSet,
+    S::Uri: page_view_state::IsSet,
+    S::Cid: page_view_state::IsSet,
+    S::Notebook: page_view_state::IsSet,
+    S::Record: page_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PageView<'a> {
@@ -5327,50 +5967,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PageView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "pageView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The path of the notebook.
-pub type Path<'a> = jacquard_common::CowStr<'a>;
-/// A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionGrant<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///For authority: record createdAt. For invitees: accept createdAt
-    pub granted_at: jacquard_common::types::string::Datetime,
-    ///direct = this resource (includes authority), inherited = via notebook invite
-    #[serde(borrow)]
-    pub scope: PermissionGrantScope<'a>,
-    ///For authority: resource URI. For invitees: invite URI
-    #[serde(borrow)]
-    pub source: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod permission_grant_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5382,66 +5978,66 @@ pub mod permission_grant_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Source;
-        type Scope;
         type Did;
         type GrantedAt;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Source = Unset;
-        type Scope = Unset;
         type Did = Unset;
         type GrantedAt = Unset;
+        type Scope = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
         type Source = Set<members::source>;
+        type Did = S::Did;
+        type GrantedAt = S::GrantedAt;
         type Scope = S::Scope;
-        type Did = S::Did;
-        type GrantedAt = S::GrantedAt;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Source = S::Source;
-        type Scope = Set<members::scope>;
-        type Did = S::Did;
-        type GrantedAt = S::GrantedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Source = S::Source;
-        type Scope = S::Scope;
         type Did = Set<members::did>;
         type GrantedAt = S::GrantedAt;
+        type Scope = S::Scope;
     }
     ///State transition - sets the `granted_at` field to Set
     pub struct SetGrantedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGrantedAt<S> {}
     impl<S: State> State for SetGrantedAt<S> {
         type Source = S::Source;
-        type Scope = S::Scope;
         type Did = S::Did;
         type GrantedAt = Set<members::granted_at>;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Source = S::Source;
+        type Did = S::Did;
+        type GrantedAt = S::GrantedAt;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `granted_at` field
         pub struct granted_at(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
@@ -5555,9 +6151,9 @@ impl<'a, S> PermissionGrantBuilder<'a, S>
 where
     S: permission_grant_state::State,
     S::Source: permission_grant_state::IsSet,
-    S::Scope: permission_grant_state::IsSet,
     S::Did: permission_grant_state::IsSet,
     S::GrantedAt: permission_grant_state::IsSet,
+    S::Scope: permission_grant_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PermissionGrant<'a> {
@@ -5585,138 +6181,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// direct = this resource (includes authority), inherited = via notebook invite
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PermissionGrantScope<'a> {
-    Direct,
-    Inherited,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> PermissionGrantScope<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Direct => "direct",
-            Self::Inherited => "inherited",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for PermissionGrantScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "direct" => Self::Direct,
-            "inherited" => Self::Inherited,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for PermissionGrantScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "direct" => Self::Direct,
-            "inherited" => Self::Inherited,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PermissionGrantScope<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for PermissionGrantScope<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for PermissionGrantScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for PermissionGrantScope<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for PermissionGrantScope<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for PermissionGrantScope<'_> {
-    type Output = PermissionGrantScope<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PermissionGrantScope::Direct => PermissionGrantScope::Direct,
-            PermissionGrantScope::Inherited => PermissionGrantScope::Inherited,
-            PermissionGrantScope::Other(v) => {
-                PermissionGrantScope::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PermissionGrant<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "permissionGrant"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// ACL-style permissions for a resource. Separate from authors (who contributed).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionsState<'a> {
-    ///DIDs that can edit this resource
-    #[serde(borrow)]
-    pub editors: Vec<crate::sh_weaver::notebook::PermissionGrant<'a>>,
-    ///DIDs that can view (future use)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewers: std::option::Option<
-        Vec<crate::sh_weaver::notebook::PermissionGrant<'a>>,
-    >,
 }
 
 pub mod permissions_state_state {
@@ -5846,56 +6310,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PermissionsState<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "permissionsState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A published version of an entry in a collaborator's repo.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishedVersionView<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///If content differs, the version it diverged from
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub diverged_from: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///True if this is the 'primary' version (owner's repo)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_canonical: std::option::Option<bool>,
-    pub published_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub publisher: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod published_version_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5906,67 +6320,67 @@ pub mod published_version_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Publisher;
-        type Cid;
-        type PublishedAt;
         type Uri;
+        type Publisher;
+        type PublishedAt;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Publisher = Unset;
-        type Cid = Unset;
-        type PublishedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `publisher` field to Set
-    pub struct SetPublisher<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublisher<S> {}
-    impl<S: State> State for SetPublisher<S> {
-        type Publisher = Set<members::publisher>;
-        type Cid = S::Cid;
-        type PublishedAt = S::PublishedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Publisher = S::Publisher;
-        type Cid = Set<members::cid>;
-        type PublishedAt = S::PublishedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type Publisher = S::Publisher;
-        type Cid = S::Cid;
-        type PublishedAt = Set<members::published_at>;
-        type Uri = S::Uri;
+        type Publisher = Unset;
+        type PublishedAt = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Publisher = S::Publisher;
-        type Cid = S::Cid;
-        type PublishedAt = S::PublishedAt;
         type Uri = Set<members::uri>;
+        type Publisher = S::Publisher;
+        type PublishedAt = S::PublishedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `publisher` field to Set
+    pub struct SetPublisher<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublisher<S> {}
+    impl<S: State> State for SetPublisher<S> {
+        type Uri = S::Uri;
+        type Publisher = Set<members::publisher>;
+        type PublishedAt = S::PublishedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Uri = S::Uri;
+        type Publisher = S::Publisher;
+        type PublishedAt = Set<members::published_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Publisher = S::Publisher;
+        type PublishedAt = S::PublishedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `publisher` field
-        pub struct publisher(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `publisher` field
+        pub struct publisher(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -6139,10 +6553,10 @@ where
 impl<'a, S> PublishedVersionViewBuilder<'a, S>
 where
     S: published_version_view_state::State,
-    S::Publisher: published_version_view_state::IsSet,
-    S::Cid: published_version_view_state::IsSet,
-    S::PublishedAt: published_version_view_state::IsSet,
     S::Uri: published_version_view_state::IsSet,
+    S::Publisher: published_version_view_state::IsSet,
+    S::PublishedAt: published_version_view_state::IsSet,
+    S::Cid: published_version_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PublishedVersionView<'a> {
@@ -6176,210 +6590,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishedVersionView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "publishedVersionView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Viewer's reading progress (appview-side state, not a record).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReadingProgress<'a> {
-    ///Last entry the viewer was reading.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub current_entry: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_read_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub percent_complete: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<ReadingProgressStatus<'a>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReadingProgressStatus<'a> {
-    Reading,
-    Finished,
-    Abandoned,
-    WantToRead,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ReadingProgressStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Reading => "reading",
-            Self::Finished => "finished",
-            Self::Abandoned => "abandoned",
-            Self::WantToRead => "want-to-read",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ReadingProgressStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "reading" => Self::Reading,
-            "finished" => Self::Finished,
-            "abandoned" => Self::Abandoned,
-            "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ReadingProgressStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "reading" => Self::Reading,
-            "finished" => Self::Finished,
-            "abandoned" => Self::Abandoned,
-            "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReadingProgressStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ReadingProgressStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ReadingProgressStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ReadingProgressStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ReadingProgressStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ReadingProgressStatus<'_> {
-    type Output = ReadingProgressStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReadingProgressStatus::Reading => ReadingProgressStatus::Reading,
-            ReadingProgressStatus::Finished => ReadingProgressStatus::Finished,
-            ReadingProgressStatus::Abandoned => ReadingProgressStatus::Abandoned,
-            ReadingProgressStatus::WantToRead => ReadingProgressStatus::WantToRead,
-            ReadingProgressStatus::Other(v) => {
-                ReadingProgressStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReadingProgress<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "readingProgress"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.percent_complete {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percent_complete",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.percent_complete {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percent_complete",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReasonBookmark<'a> {
-    #[serde(borrow)]
-    pub by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
 }
 
 pub mod reason_bookmark_state {
@@ -6522,40 +6732,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonBookmark<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "reasonBookmark"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReasonLike<'a> {
-    #[serde(borrow)]
-    pub by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-}
-
 pub mod reason_like_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -6696,38 +6872,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonLike<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "reasonLike"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReasonSubscription<'a> {
-    pub indexed_at: jacquard_common::types::string::Datetime,
-}
-
 pub mod reason_subscription_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -6831,43 +6975,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonSubscription<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "reasonSubscription"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// View of a rendered and cached notebook entry
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RenderedView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub css: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub html: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 pub mod rendered_view_state {
@@ -6996,111 +7103,3 @@ where
         }
     }
 }
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RenderedView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.defs"
-    }
-    fn def_name() -> &'static str {
-        "renderedView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.css {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "css",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.css {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["text/css"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "css",
-                        ),
-                        accepted: vec!["text/css".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.html;
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "html",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.html;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["text/html"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "html",
-                        ),
-                        accepted: vec!["text/html".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An array of tags associated with the notebook entry. Tags can help categorize and organize entries.
-pub type Tags<'a> = Vec<jacquard_common::CowStr<'a>>;
-/// The title of the notebook entry.
-pub type Title<'a> = jacquard_common::CowStr<'a>;

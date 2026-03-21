@@ -20,6 +20,49 @@ pub struct GetMetadata<'a> {
     pub path: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetMetadataOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::dropbox::FileView<'a>,
+}
+
+/// Response type for
+///app.rocksky.dropbox.getMetadata
+pub struct GetMetadataResponse;
+impl jacquard_common::xrpc::XrpcResp for GetMetadataResponse {
+    const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetMetadataOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMetadata<'a> {
+    const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetMetadataResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.dropbox.getMetadata
+pub struct GetMetadataRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getMetadata";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetMetadata<'de>;
+    type Response = GetMetadataResponse;
+}
+
 pub mod get_metadata_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,47 +150,4 @@ where
             path: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetMetadataOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::dropbox::FileView<'a>,
-}
-
-/// Response type for
-///app.rocksky.dropbox.getMetadata
-pub struct GetMetadataResponse;
-impl jacquard_common::xrpc::XrpcResp for GetMetadataResponse {
-    const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetMetadataOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetMetadata<'a> {
-    const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetMetadataResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.dropbox.getMetadata
-pub struct GetMetadataRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getMetadata";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetMetadata<'de>;
-    type Response = GetMetadataResponse;
 }

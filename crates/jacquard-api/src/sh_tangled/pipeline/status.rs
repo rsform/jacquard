@@ -37,6 +37,84 @@ pub struct Status<'a> {
     pub workflow: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Status<'a>,
+}
+
+impl<'a> Status<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StatusRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StatusRecord;
+impl jacquard_common::xrpc::XrpcResp for StatusRecord {
+    const NSID: &'static str = "sh.tangled.pipeline.status";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatusGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StatusGetRecordOutput<'_>> for Status<'_> {
+    fn from(output: StatusGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Status<'_> {
+    const NSID: &'static str = "sh.tangled.pipeline.status";
+    type Record = StatusRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StatusRecord {
+    const NSID: &'static str = "sh.tangled.pipeline.status";
+    type Record = StatusRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline.status"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline_status()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -47,67 +125,67 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Status;
+        type Pipeline;
         type CreatedAt;
         type Workflow;
-        type Pipeline;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Status = Unset;
+        type Pipeline = Unset;
         type CreatedAt = Unset;
         type Workflow = Unset;
-        type Pipeline = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Workflow = S::Workflow;
-        type Pipeline = S::Pipeline;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type CreatedAt = S::CreatedAt;
-        type Workflow = Set<members::workflow>;
-        type Pipeline = S::Pipeline;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPipeline<S> {}
-    impl<S: State> State for SetPipeline<S> {
-        type CreatedAt = S::CreatedAt;
-        type Workflow = S::Workflow;
-        type Pipeline = Set<members::pipeline>;
-        type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
+        type Pipeline = S::Pipeline;
         type CreatedAt = S::CreatedAt;
         type Workflow = S::Workflow;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPipeline<S> {}
+    impl<S: State> State for SetPipeline<S> {
+        type Status = S::Status;
+        type Pipeline = Set<members::pipeline>;
+        type CreatedAt = S::CreatedAt;
+        type Workflow = S::Workflow;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
         type Pipeline = S::Pipeline;
-        type Status = Set<members::status>;
+        type CreatedAt = Set<members::created_at>;
+        type Workflow = S::Workflow;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type Status = S::Status;
+        type Pipeline = S::Pipeline;
+        type CreatedAt = S::CreatedAt;
+        type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
@@ -251,10 +329,10 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
+    S::Status: status_state::IsSet,
+    S::Pipeline: status_state::IsSet,
     S::CreatedAt: status_state::IsSet,
     S::Workflow: status_state::IsSet,
-    S::Pipeline: status_state::IsSet,
-    S::Status: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -285,84 +363,6 @@ where
             workflow: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Status<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatusRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Status<'a>,
-}
-
-impl From<StatusGetRecordOutput<'_>> for Status<'_> {
-    fn from(output: StatusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Status<'_> {
-    const NSID: &'static str = "sh.tangled.pipeline.status";
-    type Record = StatusRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StatusRecord;
-impl jacquard_common::xrpc::XrpcResp for StatusRecord {
-    const NSID: &'static str = "sh.tangled.pipeline.status";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StatusRecord {
-    const NSID: &'static str = "sh.tangled.pipeline.status";
-    type Record = StatusRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline.status"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline_status()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

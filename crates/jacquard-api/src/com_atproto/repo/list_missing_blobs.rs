@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(500i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,90 @@ pub struct ListMissingBlobs<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListMissingBlobsOutput<'a> {
+    #[serde(borrow)]
+    pub blobs: Vec<crate::com_atproto::repo::list_missing_blobs::RecordBlob<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordBlob<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub record_uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///com.atproto.repo.listMissingBlobs
+pub struct ListMissingBlobsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListMissingBlobsResponse {
+    const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListMissingBlobsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListMissingBlobs<'a> {
+    const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListMissingBlobsResponse;
+}
+
+/// Endpoint type for
+///com.atproto.repo.listMissingBlobs
+pub struct ListMissingBlobsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.listMissingBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListMissingBlobs<'de>;
+    type Response = ListMissingBlobsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordBlob<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.listMissingBlobs"
+    }
+    fn def_name() -> &'static str {
+        "recordBlob"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_listMissingBlobs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(500i64)
 }
 
 pub mod list_missing_blobs_state {
@@ -118,69 +198,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListMissingBlobsOutput<'a> {
-    #[serde(borrow)]
-    pub blobs: Vec<crate::com_atproto::repo::list_missing_blobs::RecordBlob<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///com.atproto.repo.listMissingBlobs
-pub struct ListMissingBlobsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListMissingBlobsResponse {
-    const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListMissingBlobsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListMissingBlobs<'a> {
-    const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListMissingBlobsResponse;
-}
-
-/// Endpoint type for
-///com.atproto.repo.listMissingBlobs
-pub struct ListMissingBlobsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.repo.listMissingBlobs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListMissingBlobs<'de>;
-    type Response = ListMissingBlobsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordBlob<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub record_uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod record_blob_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -191,37 +208,37 @@ pub mod record_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RecordUri;
         type Cid;
+        type RecordUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RecordUri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record_uri` field to Set
-    pub struct SetRecordUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordUri<S> {}
-    impl<S: State> State for SetRecordUri<S> {
-        type RecordUri = Set<members::record_uri>;
-        type Cid = S::Cid;
+        type RecordUri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type RecordUri = S::RecordUri;
         type Cid = Set<members::cid>;
+        type RecordUri = S::RecordUri;
+    }
+    ///State transition - sets the `record_uri` field to Set
+    pub struct SetRecordUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordUri<S> {}
+    impl<S: State> State for SetRecordUri<S> {
+        type Cid = S::Cid;
+        type RecordUri = Set<members::record_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record_uri` field
-        pub struct record_uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `record_uri` field
+        pub struct record_uri(());
     }
 }
 
@@ -294,8 +311,8 @@ where
 impl<'a, S> RecordBlobBuilder<'a, S>
 where
     S: record_blob_state::State,
-    S::RecordUri: record_blob_state::IsSet,
     S::Cid: record_blob_state::IsSet,
+    S::RecordUri: record_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordBlob<'a> {
@@ -438,22 +455,5 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordBlob<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.listMissingBlobs"
-    }
-    fn def_name() -> &'static str {
-        "recordBlob"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_listMissingBlobs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

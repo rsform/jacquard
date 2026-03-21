@@ -21,6 +21,48 @@ pub struct PauseParams<'a> {
     pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct Pause;
+/// Response type for
+///app.rocksky.player.pause
+pub struct PauseResponse;
+impl jacquard_common::xrpc::XrpcResp for PauseResponse {
+    const NSID: &'static str = "app.rocksky.player.pause";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for Pause {
+    const NSID: &'static str = "app.rocksky.player.pause";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PauseResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.player.pause
+pub struct PauseRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.player.pause";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Pause;
+    type Response = PauseResponse;
+}
+
 pub mod pause_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -94,46 +136,4 @@ where
             player_id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct Pause;
-/// Response type for
-///app.rocksky.player.pause
-pub struct PauseResponse;
-impl jacquard_common::xrpc::XrpcResp for PauseResponse {
-    const NSID: &'static str = "app.rocksky.player.pause";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for Pause {
-    const NSID: &'static str = "app.rocksky.player.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PauseResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.player.pause
-pub struct PauseRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.player.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Pause;
-    type Response = PauseResponse;
 }

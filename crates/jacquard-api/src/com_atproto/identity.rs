@@ -37,6 +37,23 @@ pub struct IdentityInfo<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IdentityInfo<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.identity.defs"
+    }
+    fn def_name() -> &'static str {
+        "identityInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_identity_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod identity_info_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -295,22 +312,5 @@ fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IdentityInfo<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.identity.defs"
-    }
-    fn def_name() -> &'static str {
-        "identityInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_identity_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

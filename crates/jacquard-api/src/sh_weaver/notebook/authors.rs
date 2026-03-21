@@ -25,6 +25,139 @@ pub struct AuthorListItem<'a> {
     pub profile: std::option::Option<AuthorListItemProfile<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum AuthorListItemProfile<'a> {
+    #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
+    ProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<'a>>),
+    #[serde(rename = "sh.weaver.actor.defs#profileView")]
+    ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
+}
+
+/// Authors of a Weaver notebook.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Authors<'a> {
+    #[serde(borrow)]
+    pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Authors<'a>,
+}
+
+impl<'a> Authors<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AuthorsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.authors"
+    }
+    fn def_name() -> &'static str {
+        "authorListItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_authors()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AuthorsRecord;
+impl jacquard_common::xrpc::XrpcResp for AuthorsRecord {
+    const NSID: &'static str = "sh.weaver.notebook.authors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AuthorsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
+    fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Authors<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.authors";
+    type Record = AuthorsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AuthorsRecord {
+    const NSID: &'static str = "sh.weaver.notebook.authors";
+    type Record = AuthorsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Authors<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.authors"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_authors()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod author_list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -141,25 +274,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum AuthorListItemProfile<'a> {
-    #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
-    ProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<'a>>),
-    #[serde(rename = "sh.weaver.actor.defs#profileView")]
-    ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
 }
 
 fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -282,42 +396,6 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.authors"
-    }
-    fn def_name() -> &'static str {
-        "authorListItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_authors()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Authors of a Weaver notebook.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Authors<'a> {
-    #[serde(borrow)]
-    pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod authors_state {
@@ -446,83 +524,5 @@ where
             created_at: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Authors<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AuthorsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthorsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Authors<'a>,
-}
-
-impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
-    fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Authors<'_> {
-    const NSID: &'static str = "sh.weaver.notebook.authors";
-    type Record = AuthorsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AuthorsRecord;
-impl jacquard_common::xrpc::XrpcResp for AuthorsRecord {
-    const NSID: &'static str = "sh.weaver.notebook.authors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AuthorsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AuthorsRecord {
-    const NSID: &'static str = "sh.weaver.notebook.authors";
-    type Record = AuthorsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Authors<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.authors"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_authors()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

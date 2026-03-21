@@ -30,6 +30,23 @@ pub struct Text<'a> {
     pub text_size: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.text"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_text()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_fyi_questionable_richtext_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -109,22 +126,5 @@ fn lexicon_doc_fyi_questionable_richtext_text() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.text"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_text()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

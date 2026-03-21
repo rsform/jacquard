@@ -28,6 +28,97 @@ pub struct Mood<'a> {
     pub when: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MoodGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Mood<'a>,
+}
+
+impl<'a> Mood<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MoodRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MoodRecord;
+impl jacquard_common::xrpc::XrpcResp for MoodRecord {
+    const NSID: &'static str = "computer.aesthetic.mood";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MoodGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MoodGetRecordOutput<'_>> for Mood<'_> {
+    fn from(output: MoodGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Mood<'_> {
+    const NSID: &'static str = "computer.aesthetic.mood";
+    type Record = MoodRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MoodRecord {
+    const NSID: &'static str = "computer.aesthetic.mood";
+    type Record = MoodRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
+    fn nsid() -> &'static str {
+        "computer.aesthetic.mood"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_computer_aesthetic_mood()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.mood;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mood",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod mood_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +129,51 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mood;
-        type Ref;
         type When;
+        type Ref;
+        type Mood;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mood = Unset;
-        type Ref = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `mood` field to Set
-    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMood<S> {}
-    impl<S: State> State for SetMood<S> {
-        type Mood = Set<members::mood>;
-        type Ref = S::Ref;
-        type When = S::When;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Mood = S::Mood;
-        type Ref = Set<members::r#ref>;
-        type When = S::When;
+        type Ref = Unset;
+        type Mood = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Mood = S::Mood;
-        type Ref = S::Ref;
         type When = Set<members::when>;
+        type Ref = S::Ref;
+        type Mood = S::Mood;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type When = S::When;
+        type Ref = Set<members::r#ref>;
+        type Mood = S::Mood;
+    }
+    ///State transition - sets the `mood` field to Set
+    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMood<S> {}
+    impl<S: State> State for SetMood<S> {
+        type When = S::When;
+        type Ref = S::Ref;
+        type Mood = Set<members::mood>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mood` field
-        pub struct mood(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `mood` field
+        pub struct mood(());
     }
 }
 
@@ -175,9 +266,9 @@ where
 impl<'a, S> MoodBuilder<'a, S>
 where
     S: mood_state::State,
-    S::Mood: mood_state::IsSet,
-    S::Ref: mood_state::IsSet,
     S::When: mood_state::IsSet,
+    S::Ref: mood_state::IsSet,
+    S::Mood: mood_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Mood<'a> {
@@ -202,97 +293,6 @@ where
             when: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Mood<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MoodRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MoodGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Mood<'a>,
-}
-
-impl From<MoodGetRecordOutput<'_>> for Mood<'_> {
-    fn from(output: MoodGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Mood<'_> {
-    const NSID: &'static str = "computer.aesthetic.mood";
-    type Record = MoodRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MoodRecord;
-impl jacquard_common::xrpc::XrpcResp for MoodRecord {
-    const NSID: &'static str = "computer.aesthetic.mood";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MoodGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MoodRecord {
-    const NSID: &'static str = "computer.aesthetic.mood";
-    type Record = MoodRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
-    fn nsid() -> &'static str {
-        "computer.aesthetic.mood"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_computer_aesthetic_mood()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.mood;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mood",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

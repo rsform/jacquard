@@ -47,6 +47,1215 @@ pub struct CandidateTaxon<'a> {
     pub scientific_name: jacquard_common::CowStr<'a>,
 }
 
+/// Generic categorical classification result (e.g., conservation priority, habitat type).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ClassificationResult<'a> {
+    ///The classification category (e.g., 'conservation-priority', 'habitat-type').
+    #[serde(borrow)]
+    pub category: jacquard_common::CowStr<'a>,
+    ///Additional notes about the classification.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The assigned classification value (e.g., 'critical', 'tropical-rainforest').
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+/// Data quality assessment result with per-field quality flags.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DataQualityResult<'a> {
+    ///Overall completeness score (0-1000, where 1000 = 100.0%).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub completeness_score: std::option::Option<i64>,
+    ///List of quality issues found in the record.
+    #[serde(borrow)]
+    pub flags: Vec<crate::app_gainforest::evaluator::QualityFlag<'a>>,
+    ///Additional notes about the quality assessment.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// A single measurement derived by an evaluator from source data.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DerivedMeasurement<'a> {
+    ///Description of the method used to obtain the measurement.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub measurement_method: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The nature of the measurement (e.g., 'canopy cover', 'NDVI', 'tree height').
+    #[serde(borrow)]
+    pub measurement_type: jacquard_common::CowStr<'a>,
+    ///The units for the measurement value (e.g., '%', 'm', 'kg').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub measurement_unit: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The value of the measurement.
+    #[serde(borrow)]
+    pub measurement_value: jacquard_common::CowStr<'a>,
+}
+
+/// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MeasurementResult<'a> {
+    ///List of derived measurements.
+    #[serde(borrow)]
+    pub measurements: Vec<crate::app_gainforest::evaluator::DerivedMeasurement<'a>>,
+    ///Additional notes about the measurements.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Provenance metadata describing the method used to produce an evaluation.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MethodInfo<'a> {
+    ///Identifier for the specific model checkpoint used (e.g., date or hash).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub model_checkpoint: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Human-readable name of the method or model (e.g., 'GainForest BioClassifier').
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///URIs to papers, documentation, or repositories describing this method.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<
+        Vec<jacquard_common::types::string::UriValue<'a>>,
+    >,
+    ///Version string of the method or model (e.g., '2.1.0').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// A single data quality flag indicating an issue with a specific field.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QualityFlag<'a> {
+    ///The field name that has the quality issue.
+    #[serde(borrow)]
+    pub field: jacquard_common::CowStr<'a>,
+    ///Description of the quality issue.
+    #[serde(borrow)]
+    pub issue: jacquard_common::CowStr<'a>,
+    ///Severity level of the quality issue.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub severity: std::option::Option<QualityFlagSeverity<'a>>,
+}
+
+/// Severity level of the quality issue.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QualityFlagSeverity<'a> {
+    Error,
+    Warning,
+    Info,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> QualityFlagSeverity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Error => "error",
+            Self::Warning => "warning",
+            Self::Info => "info",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for QualityFlagSeverity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "error" => Self::Error,
+            "warning" => Self::Warning,
+            "info" => Self::Info,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for QualityFlagSeverity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "error" => Self::Error,
+            "warning" => Self::Warning,
+            "info" => Self::Info,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for QualityFlagSeverity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for QualityFlagSeverity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for QualityFlagSeverity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for QualityFlagSeverity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for QualityFlagSeverity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for QualityFlagSeverity<'_> {
+    type Output = QualityFlagSeverity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QualityFlagSeverity::Error => QualityFlagSeverity::Error,
+            QualityFlagSeverity::Warning => QualityFlagSeverity::Warning,
+            QualityFlagSeverity::Info => QualityFlagSeverity::Info,
+            QualityFlagSeverity::Other(v) => QualityFlagSeverity::Other(v.into_static()),
+        }
+    }
+}
+
+/// AI or human species recognition result with ranked candidate identifications.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SpeciesIdResult<'a> {
+    ///Ranked list of candidate species identifications.
+    #[serde(borrow)]
+    pub candidates: Vec<crate::app_gainforest::evaluator::CandidateTaxon<'a>>,
+    ///Which feature of the subject record was used as input (e.g., 'mediaEvidence').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub input_feature: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Additional notes about the species identification.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Reference to a target record that is being evaluated.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectRef<'a> {
+    ///CID pinning the exact version of the target record.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ///AT-URI of the target record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Expert verification result for a previous identification or evaluation.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationResult<'a> {
+    ///Notes about the verification decision.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Verification status: confirmed, rejected, or uncertain.
+    #[serde(borrow)]
+    pub status: VerificationResultStatus<'a>,
+    ///Suggested corrections if the original identification was rejected or uncertain.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub suggested_corrections: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Name of the person who performed the verification.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verified_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Persistent identifier (e.g., ORCID) of the verifier.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Verification status: confirmed, rejected, or uncertain.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VerificationResultStatus<'a> {
+    Confirmed,
+    Rejected,
+    Uncertain,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VerificationResultStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Confirmed => "confirmed",
+            Self::Rejected => "rejected",
+            Self::Uncertain => "uncertain",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VerificationResultStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "confirmed" => Self::Confirmed,
+            "rejected" => Self::Rejected,
+            "uncertain" => Self::Uncertain,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VerificationResultStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "confirmed" => Self::Confirmed,
+            "rejected" => Self::Rejected,
+            "uncertain" => Self::Uncertain,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VerificationResultStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VerificationResultStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VerificationResultStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VerificationResultStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VerificationResultStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationResultStatus<'_> {
+    type Output = VerificationResultStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationResultStatus::Confirmed => VerificationResultStatus::Confirmed,
+            VerificationResultStatus::Rejected => VerificationResultStatus::Rejected,
+            VerificationResultStatus::Uncertain => VerificationResultStatus::Uncertain,
+            VerificationResultStatus::Other(v) => {
+                VerificationResultStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CandidateTaxon<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "candidateTaxon"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.confidence;
+            if *value > 1000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "confidence",
+                    ),
+                    max: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.confidence;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "confidence",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.family {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "family",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.gbif_taxon_key {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "gbif_taxon_key",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.genus {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "genus",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.kingdom {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "kingdom",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.rank;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rank",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.scientific_name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 512usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "scientific_name",
+                        ),
+                        max: 512usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ClassificationResult<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "classificationResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.category;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "category",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.value;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "value",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataQualityResult<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "dataQualityResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.completeness_score {
+            if *value > 1000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "completeness_score",
+                    ),
+                    max: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.completeness_score {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "completeness_score",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.flags;
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "flags",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DerivedMeasurement<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "derivedMeasurement"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.measurement_method {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1024usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_method",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.measurement_type;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_type",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.measurement_unit {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_unit",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.measurement_value;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1024usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "measurement_value",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasurementResult<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "measurementResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.measurements;
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "measurements",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MethodInfo<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "methodInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.model_checkpoint {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 128usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "model_checkpoint",
+                        ),
+                        max: 128usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.references {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "references",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.version {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "version",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QualityFlag<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "qualityFlag"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.field;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "field",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.issue;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "issue",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.severity {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "severity",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpeciesIdResult<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "speciesIdResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.candidates;
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "candidates",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.input_feature {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "input_feature",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "subjectRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationResult<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.evaluator.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_evaluator_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.remarks {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2048usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "remarks",
+                        ),
+                        max: 2048usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.status;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "status",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.suggested_corrections {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 5000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "suggested_corrections",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.verified_by {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "verified_by",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.verified_by_id {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "verified_by_id",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod candidate_taxon_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -57,51 +1266,51 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Confidence;
         type Rank;
         type ScientificName;
-        type Confidence;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Confidence = Unset;
         type Rank = Unset;
         type ScientificName = Unset;
-        type Confidence = Unset;
-    }
-    ///State transition - sets the `rank` field to Set
-    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRank<S> {}
-    impl<S: State> State for SetRank<S> {
-        type Rank = Set<members::rank>;
-        type ScientificName = S::ScientificName;
-        type Confidence = S::Confidence;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type Rank = S::Rank;
-        type ScientificName = Set<members::scientific_name>;
-        type Confidence = S::Confidence;
     }
     ///State transition - sets the `confidence` field to Set
     pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConfidence<S> {}
     impl<S: State> State for SetConfidence<S> {
+        type Confidence = Set<members::confidence>;
         type Rank = S::Rank;
         type ScientificName = S::ScientificName;
-        type Confidence = Set<members::confidence>;
+    }
+    ///State transition - sets the `rank` field to Set
+    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRank<S> {}
+    impl<S: State> State for SetRank<S> {
+        type Confidence = S::Confidence;
+        type Rank = Set<members::rank>;
+        type ScientificName = S::ScientificName;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type Confidence = S::Confidence;
+        type Rank = S::Rank;
+        type ScientificName = Set<members::scientific_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `confidence` field
+        pub struct confidence(());
         ///Marker type for the `rank` field
         pub struct rank(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
-        ///Marker type for the `confidence` field
-        pub struct confidence(());
     }
 }
 
@@ -265,9 +1474,9 @@ where
 impl<'a, S> CandidateTaxonBuilder<'a, S>
 where
     S: candidate_taxon_state::State,
+    S::Confidence: candidate_taxon_state::IsSet,
     S::Rank: candidate_taxon_state::IsSet,
     S::ScientificName: candidate_taxon_state::IsSet,
-    S::Confidence: candidate_taxon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CandidateTaxon<'a> {
@@ -1283,274 +2492,6 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> ::jacquard_lexicon::lexicon::L
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CandidateTaxon<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "candidateTaxon"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.confidence;
-            if *value > 1000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "confidence",
-                    ),
-                    max: 1000i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.confidence;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "confidence",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.family {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "family",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.gbif_taxon_key {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "gbif_taxon_key",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.genus {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "genus",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.kingdom {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "kingdom",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.rank;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rank",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.scientific_name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name",
-                        ),
-                        max: 512usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Generic categorical classification result (e.g., conservation priority, habitat type).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ClassificationResult<'a> {
-    ///The classification category (e.g., 'conservation-priority', 'habitat-type').
-    #[serde(borrow)]
-    pub category: jacquard_common::CowStr<'a>,
-    ///Additional notes about the classification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The assigned classification value (e.g., 'critical', 'tropical-rainforest').
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ClassificationResult<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "classificationResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.category;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "category",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.value;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "value",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Data quality assessment result with per-field quality flags.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DataQualityResult<'a> {
-    ///Overall completeness score (0-1000, where 1000 = 100.0%).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completeness_score: std::option::Option<i64>,
-    ///List of quality issues found in the record.
-    #[serde(borrow)]
-    pub flags: Vec<crate::app_gainforest::evaluator::QualityFlag<'a>>,
-    ///Additional notes about the quality assessment.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod data_quality_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1691,219 +2632,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataQualityResult<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "dataQualityResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.completeness_score {
-            if *value > 1000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "completeness_score",
-                    ),
-                    max: 1000i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.completeness_score {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "completeness_score",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.flags;
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "flags",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A single measurement derived by an evaluator from source data.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DerivedMeasurement<'a> {
-    ///Description of the method used to obtain the measurement.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub measurement_method: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The nature of the measurement (e.g., 'canopy cover', 'NDVI', 'tree height').
-    #[serde(borrow)]
-    pub measurement_type: jacquard_common::CowStr<'a>,
-    ///The units for the measurement value (e.g., '%', 'm', 'kg').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub measurement_unit: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The value of the measurement.
-    #[serde(borrow)]
-    pub measurement_value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DerivedMeasurement<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "derivedMeasurement"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.measurement_method {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "measurement_method",
-                        ),
-                        max: 1024usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.measurement_type;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "measurement_type",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.measurement_unit {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "measurement_unit",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.measurement_value;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "measurement_value",
-                        ),
-                        max: 1024usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MeasurementResult<'a> {
-    ///List of derived measurements.
-    #[serde(borrow)]
-    pub measurements: Vec<crate::app_gainforest::evaluator::DerivedMeasurement<'a>>,
-    ///Additional notes about the measurements.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod measurement_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2028,390 +2756,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasurementResult<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "measurementResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.measurements;
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "measurements",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Provenance metadata describing the method used to produce an evaluation.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MethodInfo<'a> {
-    ///Identifier for the specific model checkpoint used (e.g., date or hash).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub model_checkpoint: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Human-readable name of the method or model (e.g., 'GainForest BioClassifier').
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///URIs to papers, documentation, or repositories describing this method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub references: std::option::Option<
-        Vec<jacquard_common::types::string::UriValue<'a>>,
-    >,
-    ///Version string of the method or model (e.g., '2.1.0').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MethodInfo<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "methodInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.model_checkpoint {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "model_checkpoint",
-                        ),
-                        max: 128usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.references {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "references",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.version {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "version",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A single data quality flag indicating an issue with a specific field.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QualityFlag<'a> {
-    ///The field name that has the quality issue.
-    #[serde(borrow)]
-    pub field: jacquard_common::CowStr<'a>,
-    ///Description of the quality issue.
-    #[serde(borrow)]
-    pub issue: jacquard_common::CowStr<'a>,
-    ///Severity level of the quality issue.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub severity: std::option::Option<QualityFlagSeverity<'a>>,
-}
-
-/// Severity level of the quality issue.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum QualityFlagSeverity<'a> {
-    Error,
-    Warning,
-    Info,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> QualityFlagSeverity<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Error => "error",
-            Self::Warning => "warning",
-            Self::Info => "info",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for QualityFlagSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "error" => Self::Error,
-            "warning" => Self::Warning,
-            "info" => Self::Info,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for QualityFlagSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "error" => Self::Error,
-            "warning" => Self::Warning,
-            "info" => Self::Info,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for QualityFlagSeverity<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for QualityFlagSeverity<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for QualityFlagSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for QualityFlagSeverity<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for QualityFlagSeverity<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for QualityFlagSeverity<'_> {
-    type Output = QualityFlagSeverity<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            QualityFlagSeverity::Error => QualityFlagSeverity::Error,
-            QualityFlagSeverity::Warning => QualityFlagSeverity::Warning,
-            QualityFlagSeverity::Info => QualityFlagSeverity::Info,
-            QualityFlagSeverity::Other(v) => QualityFlagSeverity::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QualityFlag<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "qualityFlag"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.field;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "field",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.issue;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "issue",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.severity {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "severity",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// AI or human species recognition result with ranked candidate identifications.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SpeciesIdResult<'a> {
-    ///Ranked list of candidate species identifications.
-    #[serde(borrow)]
-    pub candidates: Vec<crate::app_gainforest::evaluator::CandidateTaxon<'a>>,
-    ///Which feature of the subject record was used as input (e.g., 'mediaEvidence').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub input_feature: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Additional notes about the species identification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod species_id_result_state {
@@ -2562,94 +2906,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpeciesIdResult<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "speciesIdResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.candidates;
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "candidates",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.input_feature {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "input_feature",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Reference to a target record that is being evaluated.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectRef<'a> {
-    ///CID pinning the exact version of the target record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///AT-URI of the target record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod subject_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2774,261 +3030,5 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "subjectRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Expert verification result for a previous identification or evaluation.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationResult<'a> {
-    ///Notes about the verification decision.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Verification status: confirmed, rejected, or uncertain.
-    #[serde(borrow)]
-    pub status: VerificationResultStatus<'a>,
-    ///Suggested corrections if the original identification was rejected or uncertain.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub suggested_corrections: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Name of the person who performed the verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub verified_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Persistent identifier (e.g., ORCID) of the verifier.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub verified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Verification status: confirmed, rejected, or uncertain.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationResultStatus<'a> {
-    Confirmed,
-    Rejected,
-    Uncertain,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VerificationResultStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Confirmed => "confirmed",
-            Self::Rejected => "rejected",
-            Self::Uncertain => "uncertain",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VerificationResultStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "confirmed" => Self::Confirmed,
-            "rejected" => Self::Rejected,
-            "uncertain" => Self::Uncertain,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VerificationResultStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "confirmed" => Self::Confirmed,
-            "rejected" => Self::Rejected,
-            "uncertain" => Self::Uncertain,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VerificationResultStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VerificationResultStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VerificationResultStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VerificationResultStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VerificationResultStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VerificationResultStatus<'_> {
-    type Output = VerificationResultStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VerificationResultStatus::Confirmed => VerificationResultStatus::Confirmed,
-            VerificationResultStatus::Rejected => VerificationResultStatus::Rejected,
-            VerificationResultStatus::Uncertain => VerificationResultStatus::Uncertain,
-            VerificationResultStatus::Other(v) => {
-                VerificationResultStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationResult<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.evaluator.defs"
-    }
-    fn def_name() -> &'static str {
-        "verificationResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_evaluator_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.remarks {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "remarks",
-                        ),
-                        max: 2048usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.status;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "status",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.suggested_corrections {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "suggested_corrections",
-                        ),
-                        max: 5000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.verified_by {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "verified_by",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.verified_by_id {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "verified_by_id",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

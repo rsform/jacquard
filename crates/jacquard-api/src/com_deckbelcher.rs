@@ -33,6 +33,23 @@ Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub scryfall_uri: jacquard_common::types::string::UriValue<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardRef<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.defs"
+    }
+    fn def_name() -> &'static str {
+        "cardRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod card_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -253,22 +270,5 @@ fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardRef<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.defs"
-    }
-    fn def_name() -> &'static str {
-        "cardRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

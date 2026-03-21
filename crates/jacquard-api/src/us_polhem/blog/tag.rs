@@ -27,6 +27,123 @@ pub struct Tag<'a> {
     pub slug: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Tag<'a>,
+}
+
+impl<'a> Tag<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TagRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TagRecord;
+impl jacquard_common::xrpc::XrpcResp for TagRecord {
+    const NSID: &'static str = "us.polhem.blog.tag";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TagGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TagGetRecordOutput<'_>> for Tag<'_> {
+    fn from(output: TagGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Tag<'_> {
+    const NSID: &'static str = "us.polhem.blog.tag";
+    type Record = TagRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TagRecord {
+    const NSID: &'static str = "us.polhem.blog.tag";
+    type Record = TagRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+    fn nsid() -> &'static str {
+        "us.polhem.blog.tag"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_us_polhem_blog_tag()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.slug;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slug",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod tag_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,8 +156,8 @@ pub mod tag_state {
     pub trait State: sealed::Sealed {
         type Description;
         type CreatedAt;
-        type Name;
         type Slug;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -48,8 +165,8 @@ pub mod tag_state {
     impl State for Empty {
         type Description = Unset;
         type CreatedAt = Unset;
-        type Name = Unset;
         type Slug = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
@@ -57,8 +174,8 @@ pub mod tag_state {
     impl<S: State> State for SetDescription<S> {
         type Description = Set<members::description>;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Slug = S::Slug;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -66,17 +183,8 @@ pub mod tag_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
+        type Slug = S::Slug;
         type Name = S::Name;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
@@ -84,8 +192,17 @@ pub mod tag_state {
     impl<S: State> State for SetSlug<S> {
         type Description = S::Description;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Slug = Set<members::slug>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -94,10 +211,10 @@ pub mod tag_state {
         pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -212,8 +329,8 @@ where
     S: tag_state::State,
     S::Description: tag_state::IsSet,
     S::CreatedAt: tag_state::IsSet,
-    S::Name: tag_state::IsSet,
     S::Slug: tag_state::IsSet,
+    S::Name: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
@@ -240,123 +357,6 @@ where
             slug: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Tag<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TagRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tag<'a>,
-}
-
-impl From<TagGetRecordOutput<'_>> for Tag<'_> {
-    fn from(output: TagGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Tag<'_> {
-    const NSID: &'static str = "us.polhem.blog.tag";
-    type Record = TagRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TagRecord;
-impl jacquard_common::xrpc::XrpcResp for TagRecord {
-    const NSID: &'static str = "us.polhem.blog.tag";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TagGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TagRecord {
-    const NSID: &'static str = "us.polhem.blog.tag";
-    type Record = TagRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
-    fn nsid() -> &'static str {
-        "us.polhem.blog.tag"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_us_polhem_blog_tag()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.slug;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

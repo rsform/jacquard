@@ -22,6 +22,42 @@ pub struct TableRow<'a> {
     pub content: Vec<TableRowContentItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum TableRowContentItem<'a> {
+    #[serde(rename = "blog.pckt.block.tableCell")]
+    TableCell(Box<crate::blog_pckt::block::table_cell::TableCell<'a>>),
+    #[serde(rename = "blog.pckt.block.tableHeader")]
+    TableHeader(Box<crate::blog_pckt::block::table_header::TableHeader<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TableRow<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.tableRow"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_tableRow()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod table_row_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,25 +161,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TableRowContentItem<'a> {
-    #[serde(rename = "blog.pckt.block.tableCell")]
-    TableCell(Box<crate::blog_pckt::block::table_cell::TableCell<'a>>),
-    #[serde(rename = "blog.pckt.block.tableHeader")]
-    TableHeader(Box<crate::blog_pckt::block::table_header::TableHeader<'a>>),
-}
-
 fn lexicon_doc_blog_pckt_block_tableRow() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -195,22 +212,5 @@ fn lexicon_doc_blog_pckt_block_tableRow() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TableRow<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.tableRow"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_tableRow()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

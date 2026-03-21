@@ -26,6 +26,84 @@ pub struct Issue<'a> {
     pub issue: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IssueGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Issue<'a>,
+}
+
+impl<'a> Issue<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, IssueRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct IssueRecord;
+impl jacquard_common::xrpc::XrpcResp for IssueRecord {
+    const NSID: &'static str = "network.slices.tools.bug.issue";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = IssueGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<IssueGetRecordOutput<'_>> for Issue<'_> {
+    fn from(output: IssueGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Issue<'_> {
+    const NSID: &'static str = "network.slices.tools.bug.issue";
+    type Record = IssueRecord;
+}
+
+impl jacquard_common::types::collection::Collection for IssueRecord {
+    const NSID: &'static str = "network.slices.tools.bug.issue";
+    type Record = IssueRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Issue<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.bug.issue"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_bug_issue()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod issue_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,51 +114,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Bug;
         type Issue;
         type CreatedAt;
-        type Bug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Bug = Unset;
         type Issue = Unset;
         type CreatedAt = Unset;
-        type Bug = Unset;
-    }
-    ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssue<S> {}
-    impl<S: State> State for SetIssue<S> {
-        type Issue = Set<members::issue>;
-        type CreatedAt = S::CreatedAt;
-        type Bug = S::Bug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Issue = S::Issue;
-        type CreatedAt = Set<members::created_at>;
-        type Bug = S::Bug;
     }
     ///State transition - sets the `bug` field to Set
     pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBug<S> {}
     impl<S: State> State for SetBug<S> {
+        type Bug = Set<members::bug>;
         type Issue = S::Issue;
         type CreatedAt = S::CreatedAt;
-        type Bug = Set<members::bug>;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssue<S> {}
+    impl<S: State> State for SetIssue<S> {
+        type Bug = S::Bug;
+        type Issue = Set<members::issue>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Bug = S::Bug;
+        type Issue = S::Issue;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `bug` field
+        pub struct bug(());
         ///Marker type for the `issue` field
         pub struct issue(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `bug` field
-        pub struct bug(());
     }
 }
 
@@ -173,9 +251,9 @@ where
 impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
+    S::Bug: issue_state::IsSet,
     S::Issue: issue_state::IsSet,
     S::CreatedAt: issue_state::IsSet,
-    S::Bug: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {
@@ -200,84 +278,6 @@ where
             issue: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Issue<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, IssueRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct IssueGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Issue<'a>,
-}
-
-impl From<IssueGetRecordOutput<'_>> for Issue<'_> {
-    fn from(output: IssueGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Issue<'_> {
-    const NSID: &'static str = "network.slices.tools.bug.issue";
-    type Record = IssueRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct IssueRecord;
-impl jacquard_common::xrpc::XrpcResp for IssueRecord {
-    const NSID: &'static str = "network.slices.tools.bug.issue";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = IssueGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for IssueRecord {
-    const NSID: &'static str = "network.slices.tools.bug.issue";
-    type Record = IssueRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Issue<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.bug.issue"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_bug_issue()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

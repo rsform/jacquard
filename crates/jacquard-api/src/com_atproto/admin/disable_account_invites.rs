@@ -25,6 +25,36 @@ pub struct DisableAccountInvites<'a> {
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Response type for
+///com.atproto.admin.disableAccountInvites
+pub struct DisableAccountInvitesResponse;
+impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
+    const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
+    const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DisableAccountInvitesResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.disableAccountInvites
+pub struct DisableAccountInvitesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.disableAccountInvites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DisableAccountInvites<'de>;
+    type Response = DisableAccountInvitesResponse;
+}
+
 pub mod disable_account_invites_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -150,34 +180,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.admin.disableAccountInvites
-pub struct DisableAccountInvitesResponse;
-impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
-    const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
-    const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DisableAccountInvitesResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.disableAccountInvites
-pub struct DisableAccountInvitesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.disableAccountInvites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DisableAccountInvites<'de>;
-    type Response = DisableAccountInvitesResponse;
 }

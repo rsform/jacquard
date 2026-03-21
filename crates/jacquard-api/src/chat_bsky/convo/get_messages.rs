@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,74 @@ pub struct GetMessages<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetMessagesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub messages: Vec<GetMessagesOutputMessagesItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetMessagesOutputMessagesItem<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
+/// Response type for
+///chat.bsky.convo.getMessages
+pub struct GetMessagesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
+    const NSID: &'static str = "chat.bsky.convo.getMessages";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetMessagesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
+    const NSID: &'static str = "chat.bsky.convo.getMessages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetMessagesResponse;
+}
+
+/// Endpoint type for
+///chat.bsky.convo.getMessages
+pub struct GetMessagesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.getMessages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetMessages<'de>;
+    type Response = GetMessagesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_messages_state {
@@ -153,68 +217,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetMessagesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub messages: Vec<GetMessagesOutputMessagesItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetMessagesOutputMessagesItem<'a> {
-    #[serde(rename = "chat.bsky.convo.defs#messageView")]
-    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
-    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
-    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
-}
-
-/// Response type for
-///chat.bsky.convo.getMessages
-pub struct GetMessagesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
-    const NSID: &'static str = "chat.bsky.convo.getMessages";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetMessagesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
-    const NSID: &'static str = "chat.bsky.convo.getMessages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetMessagesResponse;
-}
-
-/// Endpoint type for
-///chat.bsky.convo.getMessages
-pub struct GetMessagesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {
-    const PATH: &'static str = "/xrpc/chat.bsky.convo.getMessages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetMessages<'de>;
-    type Response = GetMessagesResponse;
 }

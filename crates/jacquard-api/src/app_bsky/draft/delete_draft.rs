@@ -20,6 +20,36 @@ pub struct DeleteDraft<'a> {
     pub id: jacquard_common::types::string::Tid,
 }
 
+/// Response type for
+///app.bsky.draft.deleteDraft
+pub struct DeleteDraftResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
+    const NSID: &'static str = "app.bsky.draft.deleteDraft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
+    const NSID: &'static str = "app.bsky.draft.deleteDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteDraftResponse;
+}
+
+/// Endpoint type for
+///app.bsky.draft.deleteDraft
+pub struct DeleteDraftRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.draft.deleteDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteDraft<'de>;
+    type Response = DeleteDraftResponse;
+}
+
 pub mod delete_draft_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -123,34 +153,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.draft.deleteDraft
-pub struct DeleteDraftResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
-    const NSID: &'static str = "app.bsky.draft.deleteDraft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
-    const NSID: &'static str = "app.bsky.draft.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteDraftResponse;
-}
-
-/// Endpoint type for
-///app.bsky.draft.deleteDraft
-pub struct DeleteDraftRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.draft.deleteDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteDraft<'de>;
-    type Response = DeleteDraftResponse;
 }

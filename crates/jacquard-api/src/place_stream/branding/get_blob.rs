@@ -23,6 +23,97 @@ pub struct GetBlob<'a> {
     pub key: jacquard_common::CowStr<'a>,
 }
 
+/// Raw blob data with appropriate content-type
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBlobOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetBlobError<'a> {
+    /// The requested branding asset does not exist
+    #[serde(rename = "BrandingNotFound")]
+    BrandingNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetBlobError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BrandingNotFound(msg) => {
+                write!(f, "BrandingNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.branding.getBlob
+pub struct GetBlobResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
+    const NSID: &'static str = "place.stream.branding.getBlob";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = GetBlobOutput;
+    type Err<'de> = GetBlobError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetBlobOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
+    const NSID: &'static str = "place.stream.branding.getBlob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBlobResponse;
+}
+
+/// Endpoint type for
+///place.stream.branding.getBlob
+pub struct GetBlobRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
+    const PATH: &'static str = "/xrpc/place.stream.branding.getBlob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBlob<'de>;
+    type Response = GetBlobResponse;
+}
+
 pub mod get_blob_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,95 +224,4 @@ where
             key: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-/// Raw blob data with appropriate content-type
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBlobOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBlobError<'a> {
-    /// The requested branding asset does not exist
-    #[serde(rename = "BrandingNotFound")]
-    BrandingNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetBlobError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BrandingNotFound(msg) => {
-                write!(f, "BrandingNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.branding.getBlob
-pub struct GetBlobResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
-    const NSID: &'static str = "place.stream.branding.getBlob";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetBlobOutput;
-    type Err<'de> = GetBlobError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(GetBlobOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
-    const NSID: &'static str = "place.stream.branding.getBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBlobResponse;
-}
-
-/// Endpoint type for
-///place.stream.branding.getBlob
-pub struct GetBlobRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
-    const PATH: &'static str = "/xrpc/place.stream.branding.getBlob";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBlob<'de>;
-    type Response = GetBlobResponse;
 }

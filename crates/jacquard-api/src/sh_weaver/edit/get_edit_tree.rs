@@ -20,6 +20,49 @@ pub struct GetEditTree<'a> {
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEditTreeOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::sh_weaver::edit::EditTreeView<'a>,
+}
+
+/// Response type for
+///sh.weaver.edit.getEditTree
+pub struct GetEditTreeResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEditTreeResponse {
+    const NSID: &'static str = "sh.weaver.edit.getEditTree";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEditTreeOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditTree<'a> {
+    const NSID: &'static str = "sh.weaver.edit.getEditTree";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEditTreeResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.edit.getEditTree
+pub struct GetEditTreeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditTree";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEditTree<'de>;
+    type Response = GetEditTreeResponse;
+}
+
 pub mod get_edit_tree_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             resource: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEditTreeOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::sh_weaver::edit::EditTreeView<'a>,
-}
-
-/// Response type for
-///sh.weaver.edit.getEditTree
-pub struct GetEditTreeResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEditTreeResponse {
-    const NSID: &'static str = "sh.weaver.edit.getEditTree";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEditTreeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditTree<'a> {
-    const NSID: &'static str = "sh.weaver.edit.getEditTree";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEditTreeResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.edit.getEditTree
-pub struct GetEditTreeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditTree";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEditTree<'de>;
-    type Response = GetEditTreeResponse;
 }

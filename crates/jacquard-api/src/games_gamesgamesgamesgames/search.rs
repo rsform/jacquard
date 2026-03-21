@@ -5,18 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_include_cancelled() -> std::option::Option<bool> {
-    Some(false)
-}
-
-fn _default_include_unrated() -> std::option::Option<bool> {
-    Some(false)
-}
-
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -69,6 +57,93 @@ pub struct Search<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub results: Vec<SearchOutputResultsItem<'a>>,
+    ///Total number of results matching the query above the relevance threshold.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_results: std::option::Option<i64>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchOutputResultsItem<'a> {
+    #[serde(rename = "games.gamesgamesgamesgames.defs#gameSummaryView")]
+    GameSummaryView(Box<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>),
+    #[serde(rename = "games.gamesgamesgamesgames.defs#profileSummaryView")]
+    ProfileSummaryView(Box<crate::games_gamesgamesgamesgames::ProfileSummaryView<'a>>),
+    #[serde(rename = "games.gamesgamesgamesgames.defs#platformSummaryView")]
+    PlatformSummaryView(Box<crate::games_gamesgamesgamesgames::PlatformSummaryView<'a>>),
+    #[serde(rename = "games.gamesgamesgamesgames.defs#collectionSummaryView")]
+    CollectionSummaryView(
+        Box<crate::games_gamesgamesgamesgames::CollectionSummaryView<'a>>,
+    ),
+    #[serde(rename = "games.gamesgamesgamesgames.defs#engineSummaryView")]
+    EngineSummaryView(Box<crate::games_gamesgamesgamesgames::EngineSummaryView<'a>>),
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.search
+pub struct SearchResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.search";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Search<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.search";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.search
+pub struct SearchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.search";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Search<'de>;
+    type Response = SearchResponse;
+}
+
+fn _default_include_cancelled() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_include_unrated() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
 }
 
 pub mod search_state {
@@ -402,79 +477,4 @@ where
             types: self.__unsafe_private_named.12,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub results: Vec<SearchOutputResultsItem<'a>>,
-    ///Total number of results matching the query above the relevance threshold.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_results: std::option::Option<i64>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchOutputResultsItem<'a> {
-    #[serde(rename = "games.gamesgamesgamesgames.defs#gameSummaryView")]
-    GameSummaryView(Box<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>),
-    #[serde(rename = "games.gamesgamesgamesgames.defs#profileSummaryView")]
-    ProfileSummaryView(Box<crate::games_gamesgamesgamesgames::ProfileSummaryView<'a>>),
-    #[serde(rename = "games.gamesgamesgamesgames.defs#platformSummaryView")]
-    PlatformSummaryView(Box<crate::games_gamesgamesgamesgames::PlatformSummaryView<'a>>),
-    #[serde(rename = "games.gamesgamesgamesgames.defs#collectionSummaryView")]
-    CollectionSummaryView(
-        Box<crate::games_gamesgamesgamesgames::CollectionSummaryView<'a>>,
-    ),
-    #[serde(rename = "games.gamesgamesgamesgames.defs#engineSummaryView")]
-    EngineSummaryView(Box<crate::games_gamesgamesgamesgames::EngineSummaryView<'a>>),
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.search
-pub struct SearchResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.search";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Search<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.search";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.search
-pub struct SearchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.search";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Search<'de>;
-    type Response = SearchResponse;
 }

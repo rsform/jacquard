@@ -22,6 +22,697 @@ pub struct DataPoint<'a> {
     pub value: i64,
 }
 
+/// A shared fitness trend or dashboard snapshot
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Trend<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub chart_style: std::option::Option<TrendChartStyle<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub data_points: std::option::Option<Vec<crate::app_fitsky::trend::DataPoint<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub metric: TrendMetric<'a>,
+    #[serde(borrow)]
+    pub period: TrendPeriod<'a>,
+    #[serde(borrow)]
+    pub summary: crate::app_fitsky::trend::TrendSummary<'a>,
+    #[serde(borrow)]
+    pub widget_type: TrendWidgetType<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendChartStyle<'a> {
+    Line,
+    Bar,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendChartStyle<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Line => "line",
+            Self::Bar => "bar",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendChartStyle<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "line" => Self::Line,
+            "bar" => Self::Bar,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendChartStyle<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "line" => Self::Line,
+            "bar" => Self::Bar,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendChartStyle<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendChartStyle<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendChartStyle<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendChartStyle<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendChartStyle<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendChartStyle<'_> {
+    type Output = TrendChartStyle<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendChartStyle::Line => TrendChartStyle::Line,
+            TrendChartStyle::Bar => TrendChartStyle::Bar,
+            TrendChartStyle::Other(v) => TrendChartStyle::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendMetric<'a> {
+    Distance,
+    Duration,
+    Pace,
+    Steps,
+    Calories,
+    HeartRate,
+    WorkoutCount,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendMetric<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Distance => "distance",
+            Self::Duration => "duration",
+            Self::Pace => "pace",
+            Self::Steps => "steps",
+            Self::Calories => "calories",
+            Self::HeartRate => "heartRate",
+            Self::WorkoutCount => "workoutCount",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendMetric<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "distance" => Self::Distance,
+            "duration" => Self::Duration,
+            "pace" => Self::Pace,
+            "steps" => Self::Steps,
+            "calories" => Self::Calories,
+            "heartRate" => Self::HeartRate,
+            "workoutCount" => Self::WorkoutCount,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendMetric<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "distance" => Self::Distance,
+            "duration" => Self::Duration,
+            "pace" => Self::Pace,
+            "steps" => Self::Steps,
+            "calories" => Self::Calories,
+            "heartRate" => Self::HeartRate,
+            "workoutCount" => Self::WorkoutCount,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendMetric<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendMetric<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendMetric<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendMetric<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendMetric<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendMetric<'_> {
+    type Output = TrendMetric<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendMetric::Distance => TrendMetric::Distance,
+            TrendMetric::Duration => TrendMetric::Duration,
+            TrendMetric::Pace => TrendMetric::Pace,
+            TrendMetric::Steps => TrendMetric::Steps,
+            TrendMetric::Calories => TrendMetric::Calories,
+            TrendMetric::HeartRate => TrendMetric::HeartRate,
+            TrendMetric::WorkoutCount => TrendMetric::WorkoutCount,
+            TrendMetric::Other(v) => TrendMetric::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendPeriod<'a> {
+    _1d,
+    _7d,
+    _30d,
+    _90d,
+    _1y,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendPeriod<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1d => "1d",
+            Self::_7d => "7d",
+            Self::_30d => "30d",
+            Self::_90d => "90d",
+            Self::_1y => "1y",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendPeriod<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "1d" => Self::_1d,
+            "7d" => Self::_7d,
+            "30d" => Self::_30d,
+            "90d" => Self::_90d,
+            "1y" => Self::_1y,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendPeriod<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "1d" => Self::_1d,
+            "7d" => Self::_7d,
+            "30d" => Self::_30d,
+            "90d" => Self::_90d,
+            "1y" => Self::_1y,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendPeriod<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendPeriod<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendPeriod<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendPeriod<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendPeriod<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendPeriod<'_> {
+    type Output = TrendPeriod<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendPeriod::_1d => TrendPeriod::_1d,
+            TrendPeriod::_7d => TrendPeriod::_7d,
+            TrendPeriod::_30d => TrendPeriod::_30d,
+            TrendPeriod::_90d => TrendPeriod::_90d,
+            TrendPeriod::_1y => TrendPeriod::_1y,
+            TrendPeriod::Other(v) => TrendPeriod::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendWidgetType<'a> {
+    TodaySummary,
+    WeeklyProgress,
+    GoalProgress,
+    RecentWorkouts,
+    CustomTrend,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendWidgetType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::TodaySummary => "today-summary",
+            Self::WeeklyProgress => "weekly-progress",
+            Self::GoalProgress => "goal-progress",
+            Self::RecentWorkouts => "recent-workouts",
+            Self::CustomTrend => "custom-trend",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendWidgetType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "today-summary" => Self::TodaySummary,
+            "weekly-progress" => Self::WeeklyProgress,
+            "goal-progress" => Self::GoalProgress,
+            "recent-workouts" => Self::RecentWorkouts,
+            "custom-trend" => Self::CustomTrend,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendWidgetType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "today-summary" => Self::TodaySummary,
+            "weekly-progress" => Self::WeeklyProgress,
+            "goal-progress" => Self::GoalProgress,
+            "recent-workouts" => Self::RecentWorkouts,
+            "custom-trend" => Self::CustomTrend,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendWidgetType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendWidgetType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendWidgetType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendWidgetType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendWidgetType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
+    type Output = TrendWidgetType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendWidgetType::TodaySummary => TrendWidgetType::TodaySummary,
+            TrendWidgetType::WeeklyProgress => TrendWidgetType::WeeklyProgress,
+            TrendWidgetType::GoalProgress => TrendWidgetType::GoalProgress,
+            TrendWidgetType::RecentWorkouts => TrendWidgetType::RecentWorkouts,
+            TrendWidgetType::CustomTrend => TrendWidgetType::CustomTrend,
+            TrendWidgetType::Other(v) => TrendWidgetType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Trend<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendSummary<'a> {
+    ///Average value in base units
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub average: std::option::Option<i64>,
+    ///Best value in base units
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub best: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub count: std::option::Option<i64>,
+    ///Total value in base units
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total: std::option::Option<i64>,
+    ///Worst value in base units
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub worst: std::option::Option<i64>,
+}
+
+impl<'a> Trend<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TrendRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataPoint<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.trend"
+    }
+    fn def_name() -> &'static str {
+        "dataPoint"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_trend()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TrendRecord;
+impl jacquard_common::xrpc::XrpcResp for TrendRecord {
+    const NSID: &'static str = "app.fitsky.trend";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TrendGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TrendGetRecordOutput<'_>> for Trend<'_> {
+    fn from(output: TrendGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Trend<'_> {
+    const NSID: &'static str = "app.fitsky.trend";
+    type Record = TrendRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TrendRecord {
+    const NSID: &'static str = "app.fitsky.trend";
+    type Record = TrendRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.trend"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_trend()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.caption {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "caption",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.chart_style {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "chart_style",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.metric;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "metric",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.period;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "period",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.widget_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "widget_type",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendSummary<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.trend"
+    }
+    fn def_name() -> &'static str {
+        "trendSummary"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_trend()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod data_point_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -471,59 +1162,6 @@ fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataPoint<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.trend"
-    }
-    fn def_name() -> &'static str {
-        "dataPoint"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_trend()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A shared fitness trend or dashboard snapshot
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Trend<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub chart_style: std::option::Option<TrendChartStyle<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub data_points: std::option::Option<Vec<crate::app_fitsky::trend::DataPoint<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub metric: TrendMetric<'a>,
-    #[serde(borrow)]
-    pub period: TrendPeriod<'a>,
-    #[serde(borrow)]
-    pub summary: crate::app_fitsky::trend::TrendSummary<'a>,
-    #[serde(borrow)]
-    pub widget_type: TrendWidgetType<'a>,
-}
-
 pub mod trend_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -535,9 +1173,9 @@ pub mod trend_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type WidgetType;
+        type CreatedAt;
         type Period;
         type Summary;
-        type CreatedAt;
         type Metric;
     }
     /// Empty state - all required fields are unset
@@ -545,9 +1183,9 @@ pub mod trend_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type WidgetType = Unset;
+        type CreatedAt = Unset;
         type Period = Unset;
         type Summary = Unset;
-        type CreatedAt = Unset;
         type Metric = Unset;
     }
     ///State transition - sets the `widget_type` field to Set
@@ -555,29 +1193,9 @@ pub mod trend_state {
     impl<S: State> sealed::Sealed for SetWidgetType<S> {}
     impl<S: State> State for SetWidgetType<S> {
         type WidgetType = Set<members::widget_type>;
+        type CreatedAt = S::CreatedAt;
         type Period = S::Period;
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
-        type WidgetType = S::WidgetType;
-        type Period = Set<members::period>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type WidgetType = S::WidgetType;
-        type Period = S::Period;
-        type Summary = Set<members::summary>;
-        type CreatedAt = S::CreatedAt;
         type Metric = S::Metric;
     }
     ///State transition - sets the `created_at` field to Set
@@ -585,9 +1203,29 @@ pub mod trend_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type WidgetType = S::WidgetType;
+        type CreatedAt = Set<members::created_at>;
         type Period = S::Period;
         type Summary = S::Summary;
-        type CreatedAt = Set<members::created_at>;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeriod<S> {}
+    impl<S: State> State for SetPeriod<S> {
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Period = Set<members::period>;
+        type Summary = S::Summary;
+        type Metric = S::Metric;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Period = S::Period;
+        type Summary = Set<members::summary>;
         type Metric = S::Metric;
     }
     ///State transition - sets the `metric` field to Set
@@ -595,9 +1233,9 @@ pub mod trend_state {
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
         type Period = S::Period;
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
         type Metric = Set<members::metric>;
     }
     /// Marker types for field names
@@ -605,12 +1243,12 @@ pub mod trend_state {
     pub mod members {
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `period` field
         pub struct period(());
         ///Marker type for the `summary` field
         pub struct summary(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `metric` field
         pub struct metric(());
     }
@@ -827,9 +1465,9 @@ impl<'a, S> TrendBuilder<'a, S>
 where
     S: trend_state::State,
     S::WidgetType: trend_state::IsSet,
+    S::CreatedAt: trend_state::IsSet,
     S::Period: trend_state::IsSet,
     S::Summary: trend_state::IsSet,
-    S::CreatedAt: trend_state::IsSet,
     S::Metric: trend_state::IsSet,
 {
     /// Build the final struct
@@ -867,643 +1505,5 @@ where
             widget_type: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Trend<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TrendRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendChartStyle<'a> {
-    Line,
-    Bar,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TrendChartStyle<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Line => "line",
-            Self::Bar => "bar",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TrendChartStyle<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "line" => Self::Line,
-            "bar" => Self::Bar,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TrendChartStyle<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "line" => Self::Line,
-            "bar" => Self::Bar,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendChartStyle<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TrendChartStyle<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TrendChartStyle<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TrendChartStyle<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TrendChartStyle<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TrendChartStyle<'_> {
-    type Output = TrendChartStyle<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TrendChartStyle::Line => TrendChartStyle::Line,
-            TrendChartStyle::Bar => TrendChartStyle::Bar,
-            TrendChartStyle::Other(v) => TrendChartStyle::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendMetric<'a> {
-    Distance,
-    Duration,
-    Pace,
-    Steps,
-    Calories,
-    HeartRate,
-    WorkoutCount,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TrendMetric<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Distance => "distance",
-            Self::Duration => "duration",
-            Self::Pace => "pace",
-            Self::Steps => "steps",
-            Self::Calories => "calories",
-            Self::HeartRate => "heartRate",
-            Self::WorkoutCount => "workoutCount",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TrendMetric<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "distance" => Self::Distance,
-            "duration" => Self::Duration,
-            "pace" => Self::Pace,
-            "steps" => Self::Steps,
-            "calories" => Self::Calories,
-            "heartRate" => Self::HeartRate,
-            "workoutCount" => Self::WorkoutCount,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TrendMetric<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "distance" => Self::Distance,
-            "duration" => Self::Duration,
-            "pace" => Self::Pace,
-            "steps" => Self::Steps,
-            "calories" => Self::Calories,
-            "heartRate" => Self::HeartRate,
-            "workoutCount" => Self::WorkoutCount,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendMetric<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TrendMetric<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TrendMetric<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TrendMetric<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TrendMetric<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TrendMetric<'_> {
-    type Output = TrendMetric<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TrendMetric::Distance => TrendMetric::Distance,
-            TrendMetric::Duration => TrendMetric::Duration,
-            TrendMetric::Pace => TrendMetric::Pace,
-            TrendMetric::Steps => TrendMetric::Steps,
-            TrendMetric::Calories => TrendMetric::Calories,
-            TrendMetric::HeartRate => TrendMetric::HeartRate,
-            TrendMetric::WorkoutCount => TrendMetric::WorkoutCount,
-            TrendMetric::Other(v) => TrendMetric::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendPeriod<'a> {
-    _1d,
-    _7d,
-    _30d,
-    _90d,
-    _1y,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TrendPeriod<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_1d => "1d",
-            Self::_7d => "7d",
-            Self::_30d => "30d",
-            Self::_90d => "90d",
-            Self::_1y => "1y",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TrendPeriod<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "1d" => Self::_1d,
-            "7d" => Self::_7d,
-            "30d" => Self::_30d,
-            "90d" => Self::_90d,
-            "1y" => Self::_1y,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TrendPeriod<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1d" => Self::_1d,
-            "7d" => Self::_7d,
-            "30d" => Self::_30d,
-            "90d" => Self::_90d,
-            "1y" => Self::_1y,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendPeriod<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TrendPeriod<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TrendPeriod<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TrendPeriod<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TrendPeriod<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TrendPeriod<'_> {
-    type Output = TrendPeriod<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TrendPeriod::_1d => TrendPeriod::_1d,
-            TrendPeriod::_7d => TrendPeriod::_7d,
-            TrendPeriod::_30d => TrendPeriod::_30d,
-            TrendPeriod::_90d => TrendPeriod::_90d,
-            TrendPeriod::_1y => TrendPeriod::_1y,
-            TrendPeriod::Other(v) => TrendPeriod::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendWidgetType<'a> {
-    TodaySummary,
-    WeeklyProgress,
-    GoalProgress,
-    RecentWorkouts,
-    CustomTrend,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TrendWidgetType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::TodaySummary => "today-summary",
-            Self::WeeklyProgress => "weekly-progress",
-            Self::GoalProgress => "goal-progress",
-            Self::RecentWorkouts => "recent-workouts",
-            Self::CustomTrend => "custom-trend",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TrendWidgetType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "today-summary" => Self::TodaySummary,
-            "weekly-progress" => Self::WeeklyProgress,
-            "goal-progress" => Self::GoalProgress,
-            "recent-workouts" => Self::RecentWorkouts,
-            "custom-trend" => Self::CustomTrend,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TrendWidgetType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "today-summary" => Self::TodaySummary,
-            "weekly-progress" => Self::WeeklyProgress,
-            "goal-progress" => Self::GoalProgress,
-            "recent-workouts" => Self::RecentWorkouts,
-            "custom-trend" => Self::CustomTrend,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendWidgetType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TrendWidgetType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TrendWidgetType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TrendWidgetType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TrendWidgetType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
-    type Output = TrendWidgetType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TrendWidgetType::TodaySummary => TrendWidgetType::TodaySummary,
-            TrendWidgetType::WeeklyProgress => TrendWidgetType::WeeklyProgress,
-            TrendWidgetType::GoalProgress => TrendWidgetType::GoalProgress,
-            TrendWidgetType::RecentWorkouts => TrendWidgetType::RecentWorkouts,
-            TrendWidgetType::CustomTrend => TrendWidgetType::CustomTrend,
-            TrendWidgetType::Other(v) => TrendWidgetType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Trend<'a>,
-}
-
-impl From<TrendGetRecordOutput<'_>> for Trend<'_> {
-    fn from(output: TrendGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Trend<'_> {
-    const NSID: &'static str = "app.fitsky.trend";
-    type Record = TrendRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TrendRecord;
-impl jacquard_common::xrpc::XrpcResp for TrendRecord {
-    const NSID: &'static str = "app.fitsky.trend";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TrendGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TrendRecord {
-    const NSID: &'static str = "app.fitsky.trend";
-    type Record = TrendRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.trend"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_trend()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.caption {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "caption",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.chart_style {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "chart_style",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.image {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.image {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.metric;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "metric",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.period;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "period",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.widget_type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "widget_type",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendSummary<'a> {
-    ///Average value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub average: std::option::Option<i64>,
-    ///Best value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub best: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub count: std::option::Option<i64>,
-    ///Total value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total: std::option::Option<i64>,
-    ///Worst value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub worst: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendSummary<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.trend"
-    }
-    fn def_name() -> &'static str {
-        "trendSummary"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_trend()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

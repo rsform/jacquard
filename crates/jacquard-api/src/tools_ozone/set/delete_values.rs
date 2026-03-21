@@ -25,6 +25,71 @@ pub struct DeleteValues<'a> {
     pub values: Vec<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteValuesError<'a> {
+    /// set with the given name does not exist
+    #[serde(rename = "SetNotFound")]
+    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteValuesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SetNotFound(msg) => {
+                write!(f, "SetNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.set.deleteValues
+pub struct DeleteValuesResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteValuesResponse {
+    const NSID: &'static str = "tools.ozone.set.deleteValues";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = DeleteValuesError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteValues<'a> {
+    const NSID: &'static str = "tools.ozone.set.deleteValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteValuesResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.set.deleteValues
+pub struct DeleteValuesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteValuesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.deleteValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteValues<'de>;
+    type Response = DeleteValuesResponse;
+}
+
 pub mod delete_values_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -163,69 +228,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteValuesError<'a> {
-    /// set with the given name does not exist
-    #[serde(rename = "SetNotFound")]
-    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteValuesError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::SetNotFound(msg) => {
-                write!(f, "SetNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.set.deleteValues
-pub struct DeleteValuesResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteValuesResponse {
-    const NSID: &'static str = "tools.ozone.set.deleteValues";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteValuesError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteValues<'a> {
-    const NSID: &'static str = "tools.ozone.set.deleteValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteValuesResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.set.deleteValues
-pub struct DeleteValuesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteValuesRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.set.deleteValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteValues<'de>;
-    type Response = DeleteValuesResponse;
 }

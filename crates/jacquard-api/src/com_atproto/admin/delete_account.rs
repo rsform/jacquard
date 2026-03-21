@@ -21,6 +21,36 @@ pub struct DeleteAccount<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+/// Response type for
+///com.atproto.admin.deleteAccount
+pub struct DeleteAccountResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
+    const NSID: &'static str = "com.atproto.admin.deleteAccount";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
+    const NSID: &'static str = "com.atproto.admin.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteAccountResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.deleteAccount
+pub struct DeleteAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteAccount<'de>;
+    type Response = DeleteAccountResponse;
+}
+
 pub mod delete_account_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.admin.deleteAccount
-pub struct DeleteAccountResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
-    const NSID: &'static str = "com.atproto.admin.deleteAccount";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
-    const NSID: &'static str = "com.atproto.admin.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteAccountResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.deleteAccount
-pub struct DeleteAccountRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteAccount<'de>;
-    type Response = DeleteAccountResponse;
 }

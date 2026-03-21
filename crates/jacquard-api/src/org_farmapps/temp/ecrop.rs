@@ -27,6 +27,23 @@ pub struct CodeType<'a> {
     pub list_id: jacquard_common::types::string::Nsid<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeType<'a> {
+    fn nsid() -> &'static str {
+        "org.farmapps.temp.ecrop.defs"
+    }
+    fn def_name() -> &'static str {
+        "codeType"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_farmapps_temp_ecrop_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod code_type_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -251,22 +268,5 @@ fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeType<'a> {
-    fn nsid() -> &'static str {
-        "org.farmapps.temp.ecrop.defs"
-    }
-    fn def_name() -> &'static str {
-        "codeType"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_farmapps_temp_ecrop_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

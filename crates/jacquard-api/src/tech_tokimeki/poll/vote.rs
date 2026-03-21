@@ -26,6 +26,108 @@ pub struct Vote<'a> {
     pub poll: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VoteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Vote<'a>,
+}
+
+impl<'a> Vote<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct VoteRecord;
+impl jacquard_common::xrpc::XrpcResp for VoteRecord {
+    const NSID: &'static str = "tech.tokimeki.poll.vote";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = VoteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
+    fn from(output: VoteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Vote<'_> {
+    const NSID: &'static str = "tech.tokimeki.poll.vote";
+    type Record = VoteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for VoteRecord {
+    const NSID: &'static str = "tech.tokimeki.poll.vote";
+    type Record = VoteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.poll.vote"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_poll_vote()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.option_index;
+            if *value > 3i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "option_index",
+                    ),
+                    max: 3i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.option_index;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "option_index",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod vote_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,51 +138,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Poll;
         type OptionIndex;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Poll = Unset;
         type OptionIndex = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Poll = S::Poll;
-        type OptionIndex = S::OptionIndex;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
         type Poll = Set<members::poll>;
         type OptionIndex = S::OptionIndex;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `option_index` field to Set
     pub struct SetOptionIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptionIndex<S> {}
     impl<S: State> State for SetOptionIndex<S> {
-        type CreatedAt = S::CreatedAt;
         type Poll = S::Poll;
         type OptionIndex = Set<members::option_index>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Poll = S::Poll;
+        type OptionIndex = S::OptionIndex;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
         ///Marker type for the `option_index` field
         pub struct option_index(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -173,9 +275,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::CreatedAt: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
     S::OptionIndex: vote_state::IsSet,
+    S::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -200,108 +302,6 @@ where
             poll: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
-}
-
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Vote<'_> {
-    const NSID: &'static str = "tech.tokimeki.poll.vote";
-    type Record = VoteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct VoteRecord;
-impl jacquard_common::xrpc::XrpcResp for VoteRecord {
-    const NSID: &'static str = "tech.tokimeki.poll.vote";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for VoteRecord {
-    const NSID: &'static str = "tech.tokimeki.poll.vote";
-    type Record = VoteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.poll.vote"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_poll_vote()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.option_index;
-            if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "option_index",
-                    ),
-                    max: 3i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.option_index;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "option_index",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

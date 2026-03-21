@@ -27,6 +27,23 @@ pub struct Blockquote<'a> {
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.blockquote"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_blockquote()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_fyi_questionable_richtext_blockquote() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -91,22 +108,5 @@ fn lexicon_doc_fyi_questionable_richtext_blockquote() -> ::jacquard_lexicon::lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.blockquote"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_blockquote()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

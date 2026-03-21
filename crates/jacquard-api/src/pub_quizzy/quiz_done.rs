@@ -25,6 +25,84 @@ pub struct QuizDone<'a> {
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuizDoneGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: QuizDone<'a>,
+}
+
+impl<'a> QuizDone<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, QuizDoneRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct QuizDoneRecord;
+impl jacquard_common::xrpc::XrpcResp for QuizDoneRecord {
+    const NSID: &'static str = "pub.quizzy.quizDone";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QuizDoneGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<QuizDoneGetRecordOutput<'_>> for QuizDone<'_> {
+    fn from(output: QuizDoneGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for QuizDone<'_> {
+    const NSID: &'static str = "pub.quizzy.quizDone";
+    type Record = QuizDoneRecord;
+}
+
+impl jacquard_common::types::collection::Collection for QuizDoneRecord {
+    const NSID: &'static str = "pub.quizzy.quizDone";
+    type Record = QuizDoneRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizDone<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quizDone"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quizDone()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod quiz_done_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             timestamp: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> QuizDone<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, QuizDoneRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizDoneGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: QuizDone<'a>,
-}
-
-impl From<QuizDoneGetRecordOutput<'_>> for QuizDone<'_> {
-    fn from(output: QuizDoneGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for QuizDone<'_> {
-    const NSID: &'static str = "pub.quizzy.quizDone";
-    type Record = QuizDoneRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct QuizDoneRecord;
-impl jacquard_common::xrpc::XrpcResp for QuizDoneRecord {
-    const NSID: &'static str = "pub.quizzy.quizDone";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizDoneGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for QuizDoneRecord {
-    const NSID: &'static str = "pub.quizzy.quizDone";
-    type Record = QuizDoneRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizDone<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quizDone"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quizDone()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

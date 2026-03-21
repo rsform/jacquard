@@ -48,6 +48,211 @@ pub struct InterestedParty<'a> {
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// A song or musical work: the melody, lyrics, and arrangement created by composers and authors
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Song<'a> {
+    ///List of interested parties (authors, composers, publishers) associated with this song
+    #[serde(borrow)]
+    pub interested_parties: Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
+    ///ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub iswc: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SongGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Song<'a>,
+}
+
+impl<'a> Song<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SongRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.song"
+    }
+    fn def_name() -> &'static str {
+        "interestedParty"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_song()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.collecting_society {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "collecting_society",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.ipi {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 11usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ipi",
+                    ),
+                    max: 11usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.role {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "role",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SongRecord;
+impl jacquard_common::xrpc::XrpcResp for SongRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.song";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SongGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SongGetRecordOutput<'_>> for Song<'_> {
+    fn from(output: SongGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Song<'_> {
+    const NSID: &'static str = "ch.indiemusi.alpha.song";
+    type Record = SongRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SongRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.song";
+    type Record = SongRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.song"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_song()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.interested_parties;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "interested_parties",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.iswc {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 13usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "iswc",
+                    ),
+                    max: 13usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -294,95 +499,6 @@ fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.song"
-    }
-    fn def_name() -> &'static str {
-        "interestedParty"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_song()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.collecting_society {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "collecting_society",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.ipi {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 11usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ipi",
-                    ),
-                    max: 11usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.role {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A song or musical work: the melody, lyrics, and arrangement created by composers and authors
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Song<'a> {
-    ///List of interested parties (authors, composers, publishers) associated with this song
-    #[serde(borrow)]
-    pub interested_parties: Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
-    ///ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub iswc: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-}
-
 pub mod song_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -393,37 +509,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type InterestedParties;
         type Title;
+        type InterestedParties;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type InterestedParties = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `interested_parties` field to Set
-    pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
-    impl<S: State> State for SetInterestedParties<S> {
-        type InterestedParties = Set<members::interested_parties>;
-        type Title = S::Title;
+        type InterestedParties = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type InterestedParties = S::InterestedParties;
         type Title = Set<members::title>;
+        type InterestedParties = S::InterestedParties;
+    }
+    ///State transition - sets the `interested_parties` field to Set
+    pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
+    impl<S: State> State for SetInterestedParties<S> {
+        type Title = S::Title;
+        type InterestedParties = Set<members::interested_parties>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interested_parties` field
-        pub struct interested_parties(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `interested_parties` field
+        pub struct interested_parties(());
     }
 }
 
@@ -515,8 +631,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::InterestedParties: song_state::IsSet,
     S::Title: song_state::IsSet,
+    S::InterestedParties: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -541,121 +657,5 @@ where
             title: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Song<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SongRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SongGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Song<'a>,
-}
-
-impl From<SongGetRecordOutput<'_>> for Song<'_> {
-    fn from(output: SongGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Song<'_> {
-    const NSID: &'static str = "ch.indiemusi.alpha.song";
-    type Record = SongRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SongRecord;
-impl jacquard_common::xrpc::XrpcResp for SongRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.song";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SongGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SongRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.song";
-    type Record = SongRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.song"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_song()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.interested_parties;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "interested_parties",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.iswc {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 13usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "iswc",
-                    ),
-                    max: 13usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

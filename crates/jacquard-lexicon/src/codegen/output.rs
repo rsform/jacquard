@@ -1,19 +1,19 @@
 use crate::error::{CodegenError, Result};
-use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use super::CodeGenerator;
 use super::nsid_utils::NsidPath;
 use super::utils::{make_ident, sanitize_name};
+use super::prettify::FileOutput;
 
 impl<'c> CodeGenerator<'c> {
     /// Generate all code for the corpus, organized by file
-    /// Returns a map of file paths to (tokens, optional NSID)
+    /// Returns a map of file paths to FileOutput with reordered tokens
     pub fn generate_all(
         &self,
-    ) -> Result<BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>> {
-        let mut file_contents: BTreeMap<std::path::PathBuf, Vec<TokenStream>> = BTreeMap::new();
+    ) -> Result<BTreeMap<std::path::PathBuf, FileOutput>> {
+        let mut file_contents: BTreeMap<std::path::PathBuf, Vec<super::prettify::GeneratedCode>> = BTreeMap::new();
         let mut file_nsids: BTreeMap<std::path::PathBuf, String> = BTreeMap::new();
 
         // Generate code for all lexicons
@@ -24,19 +24,20 @@ impl<'c> CodeGenerator<'c> {
             file_nsids.insert(file_path.clone(), nsid.to_string());
 
             for (def_name, def) in &doc.defs {
-                let tokens = self.generate_def(nsid.as_ref(), def_name.as_ref(), def)?;
+                let generated = self.generate_def(nsid.as_ref(), def_name.as_ref(), def)?;
                 file_contents
                     .entry(file_path.clone())
                     .or_default()
-                    .push(tokens);
+                    .push(generated);
             }
         }
 
-        // Combine all tokens for each file
+        // Combine all tokens for each file using FileOutput::combine for reordering
         let mut result = BTreeMap::new();
-        for (path, tokens_vec) in file_contents {
+        for (path, generated_vec) in file_contents {
             let nsid = file_nsids.get(&path).cloned();
-            result.insert(path, (quote! { #(#tokens_vec)* }, nsid));
+            let file_output = FileOutput::combine(generated_vec, nsid);
+            result.insert(path, file_output);
         }
 
         Ok(result)
@@ -45,10 +46,10 @@ impl<'c> CodeGenerator<'c> {
     /// Generate parent module files with pub mod declarations
     pub fn generate_module_tree(
         &self,
-        file_map: &BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
-        defs_only: &BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
+        file_map: &BTreeMap<std::path::PathBuf, FileOutput>,
+        defs_only: &BTreeMap<std::path::PathBuf, FileOutput>,
         subscription_files: &HashSet<std::path::PathBuf>,
-    ) -> BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)> {
+    ) -> BTreeMap<std::path::PathBuf, FileOutput> {
         // Track what modules each directory needs to declare
         // Key: directory path, Value: set of module names (file stems)
         let mut dir_modules: BTreeMap<std::path::PathBuf, BTreeSet<String>> = BTreeMap::new();
@@ -133,14 +134,27 @@ impl<'c> CodeGenerator<'c> {
             } else {
                 quote! { #(#mods)* }
             };
-            if let Some((existing_tokens, nsid)) = defs_only.get(&mod_file_path) {
+            if let Some(existing_output) = defs_only.get(&mod_file_path) {
                 // Put module declarations FIRST, then existing defs content
+                let existing_tokens = &existing_output.tokens;
+                let merged_tokens = quote! { #module_tokens #existing_tokens };
                 result.insert(
                     mod_file_path,
-                    (quote! { #module_tokens #existing_tokens }, nsid.clone()),
+                    FileOutput {
+                        tokens: merged_tokens,
+                        imports: existing_output.imports.clone(),
+                        nsid: existing_output.nsid.clone(),
+                    },
                 );
             } else {
-                result.insert(mod_file_path, (module_tokens, None));
+                result.insert(
+                    mod_file_path,
+                    FileOutput {
+                        tokens: module_tokens,
+                        imports: Default::default(),
+                        nsid: None,
+                    },
+                );
             }
         }
 
@@ -156,7 +170,14 @@ impl<'c> CodeGenerator<'c> {
         // Generate common builder types (Set, Unset, IsSet, IsUnset)
         let common_types_path = std::path::PathBuf::from("builder_types.rs");
         let common_types_tokens = super::builder_gen::common::generate_common_types();
-        all_files.insert(common_types_path, (common_types_tokens, None));
+        all_files.insert(
+            common_types_path,
+            FileOutput {
+                tokens: common_types_tokens,
+                imports: Default::default(),
+                nsid: None,
+            },
+        );
 
         // Get subscription files for feature gating
         let subscription_files = self.subscription_files.borrow();
@@ -168,8 +189,8 @@ impl<'c> CodeGenerator<'c> {
             let old_count = all_files.len();
 
             // Merge new module files
-            for (path, tokens) in module_map {
-                all_files.insert(path, tokens);
+            for (path, file_output) in module_map {
+                all_files.insert(path, file_output);
             }
 
             if all_files.len() == old_count {
@@ -179,7 +200,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Write to disk
-        for (path, (tokens, nsid)) in all_files {
+        for (path, file_output) in all_files {
             let full_path = output_dir.join(&path);
 
             // Create parent directories
@@ -189,10 +210,10 @@ impl<'c> CodeGenerator<'c> {
 
             // Format code
             let file: syn::File =
-                syn::parse2(tokens.clone()).map_err(|e| CodegenError::TokenParseError {
+                syn::parse2(file_output.tokens.clone()).map_err(|e| CodegenError::TokenParseError {
                     path: path.clone(),
                     source: e,
-                    tokens: tokens.to_string(),
+                    tokens: file_output.tokens.to_string(),
                 })?;
             let mut formatted = prettyplease::unparse(&file);
 
@@ -220,7 +241,7 @@ impl<'c> CodeGenerator<'c> {
             formatted = result_lines.join("\n");
 
             // Add header comment
-            let header = if let Some(nsid) = nsid {
+            let header = if let Some(nsid) = &file_output.nsid {
                 format!(
                     "// @generated by jacquard-lexicon. DO NOT EDIT.\n//\n// Lexicon: {}\n//\n// This file was automatically generated from Lexicon schemas.\n// Any manual changes will be overwritten on the next regeneration.\n\n",
                     nsid

@@ -49,6 +49,23 @@ pub enum ParagraphContentItem<'a> {
     Mention(Box<crate::blog_pckt::block::mention::Mention<'a>>),
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.paragraph"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_paragraph()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -117,22 +134,5 @@ fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.paragraph"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_paragraph()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

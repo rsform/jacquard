@@ -29,6 +29,84 @@ pub struct FollowGate<'a> {
     pub require_approval: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FollowGateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: FollowGate<'a>,
+}
+
+impl<'a> FollowGate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FollowGateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FollowGateRecord;
+impl jacquard_common::xrpc::XrpcResp for FollowGateRecord {
+    const NSID: &'static str = "sh.weaver.graph.followGate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FollowGateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FollowGateGetRecordOutput<'_>> for FollowGate<'_> {
+    fn from(output: FollowGateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for FollowGate<'_> {
+    const NSID: &'static str = "sh.weaver.graph.followGate";
+    type Record = FollowGateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FollowGateRecord {
+    const NSID: &'static str = "sh.weaver.graph.followGate";
+    type Record = FollowGateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowGate<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.followGate"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_followGate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_follow_gate_invalidate_prior() -> std::option::Option<bool> {
     Some(false)
 }
@@ -171,84 +249,6 @@ where
             require_approval: self.__unsafe_private_named.2.or_else(|| Some(false)),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> FollowGate<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FollowGateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowGateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FollowGate<'a>,
-}
-
-impl From<FollowGateGetRecordOutput<'_>> for FollowGate<'_> {
-    fn from(output: FollowGateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for FollowGate<'_> {
-    const NSID: &'static str = "sh.weaver.graph.followGate";
-    type Record = FollowGateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FollowGateRecord;
-impl jacquard_common::xrpc::XrpcResp for FollowGateRecord {
-    const NSID: &'static str = "sh.weaver.graph.followGate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FollowGateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FollowGateRecord {
-    const NSID: &'static str = "sh.weaver.graph.followGate";
-    type Record = FollowGateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowGate<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.followGate"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_followGate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

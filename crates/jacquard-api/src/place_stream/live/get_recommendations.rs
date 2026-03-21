@@ -25,6 +25,87 @@ pub struct LivestreamRecommendation<'a> {
     pub source: jacquard_common::CowStr<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecommendations<'a> {
+    #[serde(borrow)]
+    pub user_did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecommendationsOutput<'a> {
+    ///Ordered list of recommendations
+    #[serde(borrow)]
+    pub recommendations: Vec<
+        crate::place_stream::live::get_recommendations::LivestreamRecommendation<'a>,
+    >,
+    ///The user DID this recommendation is for
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamRecommendation<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.live.getRecommendations"
+    }
+    fn def_name() -> &'static str {
+        "livestreamRecommendation"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_live_getRecommendations()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///place.stream.live.getRecommendations
+pub struct GetRecommendationsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRecommendationsResponse {
+    const NSID: &'static str = "place.stream.live.getRecommendations";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRecommendationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecommendations<'a> {
+    const NSID: &'static str = "place.stream.live.getRecommendations";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecommendationsResponse;
+}
+
+/// Endpoint type for
+///place.stream.live.getRecommendations
+pub struct GetRecommendationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendationsRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.getRecommendations";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecommendations<'de>;
+    type Response = GetRecommendationsResponse;
+}
+
 pub mod livestream_recommendation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,37 +116,37 @@ pub mod livestream_recommendation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
         type Did;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type Did = S::Did;
+        type Source = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Source = S::Source;
         type Did = Set<members::did>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Did = S::Did;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -150,8 +231,8 @@ where
 impl<'a, S> LivestreamRecommendationBuilder<'a, S>
 where
     S: livestream_recommendation_state::State,
-    S::Source: livestream_recommendation_state::IsSet,
     S::Did: livestream_recommendation_state::IsSet,
+    S::Source: livestream_recommendation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamRecommendation<'a> {
@@ -304,38 +385,6 @@ fn lexicon_doc_place_stream_live_getRecommendations() -> ::jacquard_lexicon::lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamRecommendation<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.live.getRecommendations"
-    }
-    fn def_name() -> &'static str {
-        "livestreamRecommendation"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_live_getRecommendations()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecommendations<'a> {
-    #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod get_recommendations_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -425,53 +474,4 @@ where
             user_did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecommendationsOutput<'a> {
-    ///Ordered list of recommendations
-    #[serde(borrow)]
-    pub recommendations: Vec<
-        crate::place_stream::live::get_recommendations::LivestreamRecommendation<'a>,
-    >,
-    ///The user DID this recommendation is for
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-}
-
-/// Response type for
-///place.stream.live.getRecommendations
-pub struct GetRecommendationsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRecommendationsResponse {
-    const NSID: &'static str = "place.stream.live.getRecommendations";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecommendationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecommendations<'a> {
-    const NSID: &'static str = "place.stream.live.getRecommendations";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRecommendationsResponse;
-}
-
-/// Endpoint type for
-///place.stream.live.getRecommendations
-pub struct GetRecommendationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendationsRequest {
-    const PATH: &'static str = "/xrpc/place.stream.live.getRecommendations";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecommendations<'de>;
-    type Response = GetRecommendationsResponse;
 }

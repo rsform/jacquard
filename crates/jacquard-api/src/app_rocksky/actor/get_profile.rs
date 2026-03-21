@@ -21,6 +21,49 @@ pub struct GetProfile<'a> {
     pub did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetProfileOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::actor::ProfileViewDetailed<'a>,
+}
+
+/// Response type for
+///app.rocksky.actor.getProfile
+pub struct GetProfileResponse;
+impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
+    const NSID: &'static str = "app.rocksky.actor.getProfile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetProfileOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
+    const NSID: &'static str = "app.rocksky.actor.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetProfileResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.actor.getProfile
+pub struct GetProfileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.actor.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetProfile<'de>;
+    type Response = GetProfileResponse;
+}
+
 pub mod get_profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -96,47 +139,4 @@ where
             did: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetProfileOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::actor::ProfileViewDetailed<'a>,
-}
-
-/// Response type for
-///app.rocksky.actor.getProfile
-pub struct GetProfileResponse;
-impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
-    const NSID: &'static str = "app.rocksky.actor.getProfile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
-    const NSID: &'static str = "app.rocksky.actor.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetProfileResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.actor.getProfile
-pub struct GetProfileRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.actor.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfile<'de>;
-    type Response = GetProfileResponse;
 }

@@ -53,6 +53,290 @@ pub struct Bug<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BugSeverity<'a> {
+    Cosmetic,
+    Annoying,
+    Broken,
+    Unusable,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> BugSeverity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Cosmetic => "cosmetic",
+            Self::Annoying => "annoying",
+            Self::Broken => "broken",
+            Self::Unusable => "unusable",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for BugSeverity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "cosmetic" => Self::Cosmetic,
+            "annoying" => Self::Annoying,
+            "broken" => Self::Broken,
+            "unusable" => Self::Unusable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for BugSeverity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "cosmetic" => Self::Cosmetic,
+            "annoying" => Self::Annoying,
+            "broken" => Self::Broken,
+            "unusable" => Self::Unusable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for BugSeverity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for BugSeverity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for BugSeverity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for BugSeverity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for BugSeverity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for BugSeverity<'_> {
+    type Output = BugSeverity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BugSeverity::Cosmetic => BugSeverity::Cosmetic,
+            BugSeverity::Annoying => BugSeverity::Annoying,
+            BugSeverity::Broken => BugSeverity::Broken,
+            BugSeverity::Unusable => BugSeverity::Unusable,
+            BugSeverity::Other(v) => BugSeverity::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BugGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Bug<'a>,
+}
+
+impl<'a> Bug<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BugRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BugRecord;
+impl jacquard_common::xrpc::XrpcResp for BugRecord {
+    const NSID: &'static str = "network.slices.tools.bug";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BugGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BugGetRecordOutput<'_>> for Bug<'_> {
+    fn from(output: BugGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Bug<'_> {
+    const NSID: &'static str = "network.slices.tools.bug";
+    type Record = BugRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BugRecord {
+    const NSID: &'static str = "network.slices.tools.bug";
+    type Record = BugRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.tools.bug"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_tools_bug()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.app_used {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "app_used",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 3000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.steps_to_reproduce;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "steps_to_reproduce",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.steps_to_reproduce;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "steps_to_reproduce",
+                        ),
+                        max: 1500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod bug_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -63,105 +347,105 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Severity;
-        type Description;
-        type Namespace;
-        type StepsToReproduce;
         type CreatedAt;
+        type Severity;
+        type StepsToReproduce;
+        type Title;
+        type Namespace;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Severity = Unset;
-        type Description = Unset;
-        type Namespace = Unset;
-        type StepsToReproduce = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Severity = S::Severity;
-        type Description = S::Description;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = S::StepsToReproduce;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Title = S::Title;
-        type Severity = Set<members::severity>;
-        type Description = S::Description;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = S::StepsToReproduce;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Severity = S::Severity;
-        type Description = Set<members::description>;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = S::StepsToReproduce;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
-        type Title = S::Title;
-        type Severity = S::Severity;
-        type Description = S::Description;
-        type Namespace = Set<members::namespace>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `steps_to_reproduce` field to Set
-    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
-    impl<S: State> State for SetStepsToReproduce<S> {
-        type Title = S::Title;
-        type Severity = S::Severity;
-        type Description = S::Description;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = Set<members::steps_to_reproduce>;
-        type CreatedAt = S::CreatedAt;
+        type Severity = Unset;
+        type StepsToReproduce = Unset;
+        type Title = Unset;
+        type Namespace = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Severity = S::Severity;
-        type Description = S::Description;
-        type Namespace = S::Namespace;
-        type StepsToReproduce = S::StepsToReproduce;
         type CreatedAt = Set<members::created_at>;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Title = S::Title;
+        type Namespace = S::Namespace;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type CreatedAt = S::CreatedAt;
+        type Severity = Set<members::severity>;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Title = S::Title;
+        type Namespace = S::Namespace;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `steps_to_reproduce` field to Set
+    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
+    impl<S: State> State for SetStepsToReproduce<S> {
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type Title = S::Title;
+        type Namespace = S::Namespace;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Title = Set<members::title>;
+        type Namespace = S::Namespace;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNamespace<S> {}
+    impl<S: State> State for SetNamespace<S> {
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Title = S::Title;
+        type Namespace = Set<members::namespace>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Title = S::Title;
+        type Namespace = S::Namespace;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `severity` field
-        pub struct severity(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `namespace` field
-        pub struct namespace(());
-        ///Marker type for the `steps_to_reproduce` field
-        pub struct steps_to_reproduce(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
+        ///Marker type for the `steps_to_reproduce` field
+        pub struct steps_to_reproduce(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `namespace` field
+        pub struct namespace(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -410,12 +694,12 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::Title: bug_state::IsSet,
-    S::Severity: bug_state::IsSet,
-    S::Description: bug_state::IsSet,
-    S::Namespace: bug_state::IsSet,
-    S::StepsToReproduce: bug_state::IsSet,
     S::CreatedAt: bug_state::IsSet,
+    S::Severity: bug_state::IsSet,
+    S::StepsToReproduce: bug_state::IsSet,
+    S::Title: bug_state::IsSet,
+    S::Namespace: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {
@@ -454,290 +738,6 @@ where
             title: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Bug<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BugRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BugSeverity<'a> {
-    Cosmetic,
-    Annoying,
-    Broken,
-    Unusable,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> BugSeverity<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Cosmetic => "cosmetic",
-            Self::Annoying => "annoying",
-            Self::Broken => "broken",
-            Self::Unusable => "unusable",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for BugSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "cosmetic" => Self::Cosmetic,
-            "annoying" => Self::Annoying,
-            "broken" => Self::Broken,
-            "unusable" => Self::Unusable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for BugSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "cosmetic" => Self::Cosmetic,
-            "annoying" => Self::Annoying,
-            "broken" => Self::Broken,
-            "unusable" => Self::Unusable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BugSeverity<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for BugSeverity<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for BugSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for BugSeverity<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for BugSeverity<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for BugSeverity<'_> {
-    type Output = BugSeverity<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BugSeverity::Cosmetic => BugSeverity::Cosmetic,
-            BugSeverity::Annoying => BugSeverity::Annoying,
-            BugSeverity::Broken => BugSeverity::Broken,
-            BugSeverity::Unusable => BugSeverity::Unusable,
-            BugSeverity::Other(v) => BugSeverity::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BugGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Bug<'a>,
-}
-
-impl From<BugGetRecordOutput<'_>> for Bug<'_> {
-    fn from(output: BugGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Bug<'_> {
-    const NSID: &'static str = "network.slices.tools.bug";
-    type Record = BugRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BugRecord;
-impl jacquard_common::xrpc::XrpcResp for BugRecord {
-    const NSID: &'static str = "network.slices.tools.bug";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BugGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BugRecord {
-    const NSID: &'static str = "network.slices.tools.bug";
-    type Record = BugRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bug<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.tools.bug"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_tools_bug()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.app_used {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "app_used",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.description;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.steps_to_reproduce;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "steps_to_reproduce",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.steps_to_reproduce;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "steps_to_reproduce",
-                        ),
-                        max: 1500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

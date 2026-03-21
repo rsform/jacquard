@@ -25,6 +25,97 @@ pub struct Favorites<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FavoritesGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Favorites<'a>,
+}
+
+impl<'a> Favorites<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FavoritesRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FavoritesRecord;
+impl jacquard_common::xrpc::XrpcResp for FavoritesRecord {
+    const NSID: &'static str = "app.beaconbits.favorites";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FavoritesGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FavoritesGetRecordOutput<'_>> for Favorites<'_> {
+    fn from(output: FavoritesGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Favorites<'_> {
+    const NSID: &'static str = "app.beaconbits.favorites";
+    type Record = FavoritesRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FavoritesRecord {
+    const NSID: &'static str = "app.beaconbits.favorites";
+    type Record = FavoritesRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
+    fn nsid() -> &'static str {
+        "app.beaconbits.favorites"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_beaconbits_favorites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.dids;
+            #[allow(unused_comparisons)]
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "dids",
+                    ),
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod favorites_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,37 +126,37 @@ pub mod favorites_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Dids;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Dids = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Dids = S::Dids;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDids<S> {}
     impl<S: State> State for SetDids<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Dids = Set<members::dids>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Dids = S::Dids;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `dids` field
         pub struct dids(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -138,8 +229,8 @@ where
 impl<'a, S> FavoritesBuilder<'a, S>
 where
     S: favorites_state::State,
-    S::UpdatedAt: favorites_state::IsSet,
     S::Dids: favorites_state::IsSet,
+    S::UpdatedAt: favorites_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorites<'a> {
@@ -162,97 +253,6 @@ where
             updated_at: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Favorites<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FavoritesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FavoritesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Favorites<'a>,
-}
-
-impl From<FavoritesGetRecordOutput<'_>> for Favorites<'_> {
-    fn from(output: FavoritesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Favorites<'_> {
-    const NSID: &'static str = "app.beaconbits.favorites";
-    type Record = FavoritesRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FavoritesRecord;
-impl jacquard_common::xrpc::XrpcResp for FavoritesRecord {
-    const NSID: &'static str = "app.beaconbits.favorites";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FavoritesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FavoritesRecord {
-    const NSID: &'static str = "app.beaconbits.favorites";
-    type Record = FavoritesRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
-    fn nsid() -> &'static str {
-        "app.beaconbits.favorites"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_beaconbits_favorites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.dids;
-            #[allow(unused_comparisons)]
-            if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dids",
-                    ),
-                    max: 500usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

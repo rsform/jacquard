@@ -33,6 +33,428 @@ pub struct ActivitySubscription<'a> {
     pub reply: bool,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatPreference<'a> {
+    #[serde(borrow)]
+    pub include: ChatPreferenceInclude<'a>,
+    pub push: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ChatPreferenceInclude<'a> {
+    All,
+    Accepted,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ChatPreferenceInclude<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::Accepted => "accepted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ChatPreferenceInclude<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "accepted" => Self::Accepted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ChatPreferenceInclude<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "accepted" => Self::Accepted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ChatPreferenceInclude<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ChatPreferenceInclude<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ChatPreferenceInclude<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ChatPreferenceInclude<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ChatPreferenceInclude<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ChatPreferenceInclude<'_> {
+    type Output = ChatPreferenceInclude<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ChatPreferenceInclude::All => ChatPreferenceInclude::All,
+            ChatPreferenceInclude::Accepted => ChatPreferenceInclude::Accepted,
+            ChatPreferenceInclude::Other(v) => {
+                ChatPreferenceInclude::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FilterablePreference<'a> {
+    #[serde(borrow)]
+    pub include: FilterablePreferenceInclude<'a>,
+    pub list: bool,
+    pub push: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FilterablePreferenceInclude<'a> {
+    All,
+    Follows,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> FilterablePreferenceInclude<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::Follows => "follows",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for FilterablePreferenceInclude<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "follows" => Self::Follows,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for FilterablePreferenceInclude<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "follows" => Self::Follows,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for FilterablePreferenceInclude<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for FilterablePreferenceInclude<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for FilterablePreferenceInclude<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for FilterablePreferenceInclude<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for FilterablePreferenceInclude<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for FilterablePreferenceInclude<'_> {
+    type Output = FilterablePreferenceInclude<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            FilterablePreferenceInclude::All => FilterablePreferenceInclude::All,
+            FilterablePreferenceInclude::Follows => FilterablePreferenceInclude::Follows,
+            FilterablePreferenceInclude::Other(v) => {
+                FilterablePreferenceInclude::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Preference<'a> {
+    pub list: bool,
+    pub push: bool,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Preferences<'a> {
+    #[serde(borrow)]
+    pub chat: crate::app_bsky::notification::ChatPreference<'a>,
+    #[serde(borrow)]
+    pub follow: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub like: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub like_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub mention: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub quote: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub reply: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub repost_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    #[serde(borrow)]
+    pub starterpack_joined: crate::app_bsky::notification::Preference<'a>,
+    #[serde(borrow)]
+    pub subscribed_post: crate::app_bsky::notification::Preference<'a>,
+    #[serde(borrow)]
+    pub unverified: crate::app_bsky::notification::Preference<'a>,
+    #[serde(borrow)]
+    pub verified: crate::app_bsky::notification::Preference<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordDeleted<'a> {}
+/// Object used to store activity subscription data in stash.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectActivitySubscription<'a> {
+    #[serde(borrow)]
+    pub activity_subscription: crate::app_bsky::notification::ActivitySubscription<'a>,
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySubscription<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "activitySubscription"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "chatPreference"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "filterablePreference"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "preference"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "preferences"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordDeleted<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "recordDeleted"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectActivitySubscription<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.defs"
+    }
+    fn def_name() -> &'static str {
+        "subjectActivitySubscription"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod activity_subscription_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -597,40 +1019,6 @@ fn lexicon_doc_app_bsky_notification_defs() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySubscription<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "activitySubscription"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChatPreference<'a> {
-    #[serde(borrow)]
-    pub include: ChatPreferenceInclude<'a>,
-    pub push: bool,
-}
-
 pub mod chat_preference_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -771,131 +1159,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChatPreferenceInclude<'a> {
-    All,
-    Accepted,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ChatPreferenceInclude<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::All => "all",
-            Self::Accepted => "accepted",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ChatPreferenceInclude<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "all" => Self::All,
-            "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ChatPreferenceInclude<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ChatPreferenceInclude<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ChatPreferenceInclude<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ChatPreferenceInclude<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ChatPreferenceInclude<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ChatPreferenceInclude<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ChatPreferenceInclude<'_> {
-    type Output = ChatPreferenceInclude<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ChatPreferenceInclude::All => ChatPreferenceInclude::All,
-            ChatPreferenceInclude::Accepted => ChatPreferenceInclude::Accepted,
-            ChatPreferenceInclude::Other(v) => {
-                ChatPreferenceInclude::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "chatPreference"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FilterablePreference<'a> {
-    #[serde(borrow)]
-    pub include: FilterablePreferenceInclude<'a>,
-    pub list: bool,
-    pub push: bool,
-}
-
 pub mod filterable_preference_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -906,51 +1169,51 @@ pub mod filterable_preference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Push;
         type Include;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Push = Unset;
         type Include = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Push = S::Push;
-        type Include = S::Include;
+        type List = Unset;
     }
     ///State transition - sets the `push` field to Set
     pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPush<S> {}
     impl<S: State> State for SetPush<S> {
-        type List = S::List;
         type Push = Set<members::push>;
         type Include = S::Include;
+        type List = S::List;
     }
     ///State transition - sets the `include` field to Set
     pub struct SetInclude<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInclude<S> {}
     impl<S: State> State for SetInclude<S> {
-        type List = S::List;
         type Push = S::Push;
         type Include = Set<members::include>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Push = S::Push;
+        type Include = S::Include;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `push` field
         pub struct push(());
         ///Marker type for the `include` field
         pub struct include(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
@@ -1043,9 +1306,9 @@ where
 impl<'a, S> FilterablePreferenceBuilder<'a, S>
 where
     S: filterable_preference_state::State,
-    S::List: filterable_preference_state::IsSet,
     S::Push: filterable_preference_state::IsSet,
     S::Include: filterable_preference_state::IsSet,
+    S::List: filterable_preference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FilterablePreference<'a> {
@@ -1073,129 +1336,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FilterablePreferenceInclude<'a> {
-    All,
-    Follows,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> FilterablePreferenceInclude<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::All => "all",
-            Self::Follows => "follows",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for FilterablePreferenceInclude<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "all" => Self::All,
-            "follows" => Self::Follows,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for FilterablePreferenceInclude<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "follows" => Self::Follows,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for FilterablePreferenceInclude<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for FilterablePreferenceInclude<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for FilterablePreferenceInclude<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for FilterablePreferenceInclude<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for FilterablePreferenceInclude<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for FilterablePreferenceInclude<'_> {
-    type Output = FilterablePreferenceInclude<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            FilterablePreferenceInclude::All => FilterablePreferenceInclude::All,
-            FilterablePreferenceInclude::Follows => FilterablePreferenceInclude::Follows,
-            FilterablePreferenceInclude::Other(v) => {
-                FilterablePreferenceInclude::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "filterablePreference"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Preference<'a> {
-    pub list: bool,
-    pub push: bool,
-}
-
 pub mod preference_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1206,37 +1346,37 @@ pub mod preference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Push;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Push = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Push = S::Push;
+        type List = Unset;
     }
     ///State transition - sets the `push` field to Set
     pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPush<S> {}
     impl<S: State> State for SetPush<S> {
-        type List = S::List;
         type Push = Set<members::push>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Push = S::Push;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `push` field
         pub struct push(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
@@ -1306,8 +1446,8 @@ where
 impl<'a, S> PreferenceBuilder<'a, S>
 where
     S: preference_state::State,
-    S::List: preference_state::IsSet,
     S::Push: preference_state::IsSet,
+    S::List: preference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preference<'a> {
@@ -1333,63 +1473,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "preference"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Preferences<'a> {
-    #[serde(borrow)]
-    pub chat: crate::app_bsky::notification::ChatPreference<'a>,
-    #[serde(borrow)]
-    pub follow: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub like: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub like_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub mention: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub quote: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub reply: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub repost: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub repost_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
-    #[serde(borrow)]
-    pub starterpack_joined: crate::app_bsky::notification::Preference<'a>,
-    #[serde(borrow)]
-    pub subscribed_post: crate::app_bsky::notification::Preference<'a>,
-    #[serde(borrow)]
-    pub unverified: crate::app_bsky::notification::Preference<'a>,
-    #[serde(borrow)]
-    pub verified: crate::app_bsky::notification::Preference<'a>,
-}
-
 pub mod preferences_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1400,299 +1483,299 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RepostViaRepost;
-        type Unverified;
-        type Repost;
-        type Reply;
-        type Chat;
-        type Like;
         type LikeViaRepost;
-        type Follow;
-        type Mention;
-        type Quote;
-        type SubscribedPost;
         type Verified;
+        type SubscribedPost;
+        type Like;
+        type Reply;
+        type Repost;
+        type Mention;
+        type Unverified;
+        type Follow;
+        type Chat;
+        type Quote;
+        type RepostViaRepost;
         type StarterpackJoined;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RepostViaRepost = Unset;
-        type Unverified = Unset;
-        type Repost = Unset;
-        type Reply = Unset;
-        type Chat = Unset;
-        type Like = Unset;
         type LikeViaRepost = Unset;
-        type Follow = Unset;
-        type Mention = Unset;
-        type Quote = Unset;
-        type SubscribedPost = Unset;
         type Verified = Unset;
+        type SubscribedPost = Unset;
+        type Like = Unset;
+        type Reply = Unset;
+        type Repost = Unset;
+        type Mention = Unset;
+        type Unverified = Unset;
+        type Follow = Unset;
+        type Chat = Unset;
+        type Quote = Unset;
+        type RepostViaRepost = Unset;
         type StarterpackJoined = Unset;
-    }
-    ///State transition - sets the `repost_via_repost` field to Set
-    pub struct SetRepostViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepostViaRepost<S> {}
-    impl<S: State> State for SetRepostViaRepost<S> {
-        type RepostViaRepost = Set<members::repost_via_repost>;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `unverified` field to Set
-    pub struct SetUnverified<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnverified<S> {}
-    impl<S: State> State for SetUnverified<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = Set<members::unverified>;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `repost` field to Set
-    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepost<S> {}
-    impl<S: State> State for SetRepost<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = Set<members::repost>;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `reply` field to Set
-    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReply<S> {}
-    impl<S: State> State for SetReply<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = Set<members::reply>;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `chat` field to Set
-    pub struct SetChat<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChat<S> {}
-    impl<S: State> State for SetChat<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = Set<members::chat>;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `like` field to Set
-    pub struct SetLike<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLike<S> {}
-    impl<S: State> State for SetLike<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = Set<members::like>;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
     }
     ///State transition - sets the `like_via_repost` field to Set
     pub struct SetLikeViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLikeViaRepost<S> {}
     impl<S: State> State for SetLikeViaRepost<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
         type LikeViaRepost = Set<members::like_via_repost>;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
+        type Verified = S::Verified;
         type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `follow` field to Set
-    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollow<S> {}
-    impl<S: State> State for SetFollow<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
         type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = Set<members::follow>;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
         type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `mention` field to Set
-    pub struct SetMention<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMention<S> {}
-    impl<S: State> State for SetMention<S> {
-        type RepostViaRepost = S::RepostViaRepost;
         type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
         type Follow = S::Follow;
-        type Mention = Set<members::mention>;
+        type Chat = S::Chat;
         type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `quote` field to Set
-    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuote<S> {}
-    impl<S: State> State for SetQuote<S> {
         type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = Set<members::quote>;
-        type SubscribedPost = S::SubscribedPost;
-        type Verified = S::Verified;
-        type StarterpackJoined = S::StarterpackJoined;
-    }
-    ///State transition - sets the `subscribed_post` field to Set
-    pub struct SetSubscribedPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubscribedPost<S> {}
-    impl<S: State> State for SetSubscribedPost<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
-        type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = Set<members::subscribed_post>;
-        type Verified = S::Verified;
         type StarterpackJoined = S::StarterpackJoined;
     }
     ///State transition - sets the `verified` field to Set
     pub struct SetVerified<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerified<S> {}
     impl<S: State> State for SetVerified<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
         type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
         type Verified = Set<members::verified>;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `subscribed_post` field to Set
+    pub struct SetSubscribedPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubscribedPost<S> {}
+    impl<S: State> State for SetSubscribedPost<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = Set<members::subscribed_post>;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `like` field to Set
+    pub struct SetLike<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLike<S> {}
+    impl<S: State> State for SetLike<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = Set<members::like>;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `reply` field to Set
+    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReply<S> {}
+    impl<S: State> State for SetReply<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = Set<members::reply>;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `repost` field to Set
+    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepost<S> {}
+    impl<S: State> State for SetRepost<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = Set<members::repost>;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `mention` field to Set
+    pub struct SetMention<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMention<S> {}
+    impl<S: State> State for SetMention<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = Set<members::mention>;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `unverified` field to Set
+    pub struct SetUnverified<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnverified<S> {}
+    impl<S: State> State for SetUnverified<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = Set<members::unverified>;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `follow` field to Set
+    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFollow<S> {}
+    impl<S: State> State for SetFollow<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = Set<members::follow>;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `chat` field to Set
+    pub struct SetChat<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChat<S> {}
+    impl<S: State> State for SetChat<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = Set<members::chat>;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `quote` field to Set
+    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuote<S> {}
+    impl<S: State> State for SetQuote<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = Set<members::quote>;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `repost_via_repost` field to Set
+    pub struct SetRepostViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepostViaRepost<S> {}
+    impl<S: State> State for SetRepostViaRepost<S> {
+        type LikeViaRepost = S::LikeViaRepost;
+        type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = Set<members::repost_via_repost>;
         type StarterpackJoined = S::StarterpackJoined;
     }
     ///State transition - sets the `starterpack_joined` field to Set
     pub struct SetStarterpackJoined<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStarterpackJoined<S> {}
     impl<S: State> State for SetStarterpackJoined<S> {
-        type RepostViaRepost = S::RepostViaRepost;
-        type Unverified = S::Unverified;
-        type Repost = S::Repost;
-        type Reply = S::Reply;
-        type Chat = S::Chat;
-        type Like = S::Like;
         type LikeViaRepost = S::LikeViaRepost;
-        type Follow = S::Follow;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type SubscribedPost = S::SubscribedPost;
         type Verified = S::Verified;
+        type SubscribedPost = S::SubscribedPost;
+        type Like = S::Like;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type Mention = S::Mention;
+        type Unverified = S::Unverified;
+        type Follow = S::Follow;
+        type Chat = S::Chat;
+        type Quote = S::Quote;
+        type RepostViaRepost = S::RepostViaRepost;
         type StarterpackJoined = Set<members::starterpack_joined>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repost_via_repost` field
-        pub struct repost_via_repost(());
-        ///Marker type for the `unverified` field
-        pub struct unverified(());
-        ///Marker type for the `repost` field
-        pub struct repost(());
-        ///Marker type for the `reply` field
-        pub struct reply(());
-        ///Marker type for the `chat` field
-        pub struct chat(());
-        ///Marker type for the `like` field
-        pub struct like(());
         ///Marker type for the `like_via_repost` field
         pub struct like_via_repost(());
-        ///Marker type for the `follow` field
-        pub struct follow(());
-        ///Marker type for the `mention` field
-        pub struct mention(());
-        ///Marker type for the `quote` field
-        pub struct quote(());
-        ///Marker type for the `subscribed_post` field
-        pub struct subscribed_post(());
         ///Marker type for the `verified` field
         pub struct verified(());
+        ///Marker type for the `subscribed_post` field
+        pub struct subscribed_post(());
+        ///Marker type for the `like` field
+        pub struct like(());
+        ///Marker type for the `reply` field
+        pub struct reply(());
+        ///Marker type for the `repost` field
+        pub struct repost(());
+        ///Marker type for the `mention` field
+        pub struct mention(());
+        ///Marker type for the `unverified` field
+        pub struct unverified(());
+        ///Marker type for the `follow` field
+        pub struct follow(());
+        ///Marker type for the `chat` field
+        pub struct chat(());
+        ///Marker type for the `quote` field
+        pub struct quote(());
+        ///Marker type for the `repost_via_repost` field
+        pub struct repost_via_repost(());
         ///Marker type for the `starterpack_joined` field
         pub struct starterpack_joined(());
     }
@@ -2001,18 +2084,18 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
-    S::RepostViaRepost: preferences_state::IsSet,
-    S::Unverified: preferences_state::IsSet,
-    S::Repost: preferences_state::IsSet,
-    S::Reply: preferences_state::IsSet,
-    S::Chat: preferences_state::IsSet,
-    S::Like: preferences_state::IsSet,
     S::LikeViaRepost: preferences_state::IsSet,
-    S::Follow: preferences_state::IsSet,
-    S::Mention: preferences_state::IsSet,
-    S::Quote: preferences_state::IsSet,
-    S::SubscribedPost: preferences_state::IsSet,
     S::Verified: preferences_state::IsSet,
+    S::SubscribedPost: preferences_state::IsSet,
+    S::Like: preferences_state::IsSet,
+    S::Reply: preferences_state::IsSet,
+    S::Repost: preferences_state::IsSet,
+    S::Mention: preferences_state::IsSet,
+    S::Unverified: preferences_state::IsSet,
+    S::Follow: preferences_state::IsSet,
+    S::Chat: preferences_state::IsSet,
+    S::Quote: preferences_state::IsSet,
+    S::RepostViaRepost: preferences_state::IsSet,
     S::StarterpackJoined: preferences_state::IsSet,
 {
     /// Build the final struct
@@ -2059,72 +2142,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "preferences"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordDeleted<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordDeleted<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "recordDeleted"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Object used to store activity subscription data in stash.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectActivitySubscription<'a> {
-    #[serde(borrow)]
-    pub activity_subscription: crate::app_bsky::notification::ActivitySubscription<'a>,
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
 }
 
 pub mod subject_activity_subscription_state {
@@ -2278,22 +2295,5 @@ where
             subject: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectActivitySubscription<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.defs"
-    }
-    fn def_name() -> &'static str {
-        "subjectActivitySubscription"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -26,6 +26,75 @@ pub struct GetPost<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub encrypt_cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Description of the error code.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///uk.skyblur.post.getPost
+pub struct GetPostResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
+    const NSID: &'static str = "uk.skyblur.post.getPost";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPostOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
+    const NSID: &'static str = "uk.skyblur.post.getPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GetPostResponse;
+}
+
+/// Endpoint type for
+///uk.skyblur.post.getPost
+pub struct GetPostRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
+    const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetPost<'de>;
+    type Response = GetPostResponse;
+}
+
 pub mod get_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -148,73 +217,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPostOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub encrypt_cid: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Description of the error code.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub error_description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///uk.skyblur.post.getPost
-pub struct GetPostResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
-    const NSID: &'static str = "uk.skyblur.post.getPost";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
-    const NSID: &'static str = "uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = GetPostResponse;
-}
-
-/// Endpoint type for
-///uk.skyblur.post.getPost
-pub struct GetPostRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
-    const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = GetPost<'de>;
-    type Response = GetPostResponse;
 }

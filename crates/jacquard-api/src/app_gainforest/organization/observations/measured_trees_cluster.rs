@@ -25,6 +25,84 @@ pub struct MeasuredTreesCluster<'a> {
     pub shapefile: jacquard_common::types::value::Data<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MeasuredTreesClusterGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: MeasuredTreesCluster<'a>,
+}
+
+impl<'a> MeasuredTreesCluster<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MeasuredTreesClusterRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MeasuredTreesClusterRecord;
+impl jacquard_common::xrpc::XrpcResp for MeasuredTreesClusterRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MeasuredTreesClusterGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MeasuredTreesClusterGetRecordOutput<'_>> for MeasuredTreesCluster<'_> {
+    fn from(output: MeasuredTreesClusterGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for MeasuredTreesCluster<'_> {
+    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
+    type Record = MeasuredTreesClusterRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MeasuredTreesClusterRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
+    type Record = MeasuredTreesClusterRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasuredTreesCluster<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.organization.observations.measuredTreesCluster"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod measured_trees_cluster_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -165,84 +243,6 @@ where
             shapefile: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> MeasuredTreesCluster<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MeasuredTreesClusterRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MeasuredTreesClusterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: MeasuredTreesCluster<'a>,
-}
-
-impl From<MeasuredTreesClusterGetRecordOutput<'_>> for MeasuredTreesCluster<'_> {
-    fn from(output: MeasuredTreesClusterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for MeasuredTreesCluster<'_> {
-    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
-    type Record = MeasuredTreesClusterRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MeasuredTreesClusterRecord;
-impl jacquard_common::xrpc::XrpcResp for MeasuredTreesClusterRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MeasuredTreesClusterGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MeasuredTreesClusterRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
-    type Record = MeasuredTreesClusterRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasuredTreesCluster<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.organization.observations.measuredTreesCluster"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -24,127 +24,6 @@ pub struct Block<'a> {
     pub block: BlockBlock<'a>,
 }
 
-pub mod block_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Block;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Block = Unset;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type Block = Set<members::block>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `block` field
-        pub struct block(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct BlockBuilder<'a, S: block_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<BlockAlignment<'a>>,
-        ::core::option::Option<BlockBlock<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Block<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlockBuilder<'a, block_state::Empty> {
-        BlockBuilder::new()
-    }
-}
-
-impl<'a> BlockBuilder<'a, block_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: block_state::State> BlockBuilder<'a, S> {
-    /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<BlockAlignment<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<BlockAlignment<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> BlockBuilder<'a, S>
-where
-    S: block_state::State,
-    S::Block: block_state::IsUnset,
-{
-    /// Set the `block` field (required)
-    pub fn block(
-        mut self,
-        value: impl Into<BlockBlock<'a>>,
-    ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> BlockBuilder<'a, S>
-where
-    S: block_state::State,
-    S::Block: block_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Block<'a> {
-        Block {
-            alignment: self.__unsafe_private_named.0,
-            block: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Block<'a> {
-        Block {
-            alignment: self.__unsafe_private_named.0,
-            block: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BlockAlignment<'a> {
     TextAlignLeft,
@@ -286,6 +165,316 @@ pub enum BlockBlock<'a> {
     Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
     Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinearDocument<'a> {
+    #[serde(borrow)]
+    pub blocks: Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Position<'a> {
+    pub block: Vec<i64>,
+    pub offset: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Quote<'a> {
+    #[serde(borrow)]
+    pub end: crate::pub_leaflet::pages::linear_document::Position<'a>,
+    #[serde(borrow)]
+    pub start: crate::pub_leaflet::pages::linear_document::Position<'a>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignCenter;
+impl std::fmt::Display for TextAlignCenter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignCenter")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignJustify;
+impl std::fmt::Display for TextAlignJustify {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignJustify")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignLeft;
+impl std::fmt::Display for TextAlignLeft {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignLeft")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignRight;
+impl std::fmt::Display for TextAlignRight {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignRight")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.linearDocument"
+    }
+    fn def_name() -> &'static str {
+        "block"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_linearDocument()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocument<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.linearDocument"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_linearDocument()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.linearDocument"
+    }
+    fn def_name() -> &'static str {
+        "position"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_linearDocument()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.linearDocument"
+    }
+    fn def_name() -> &'static str {
+        "quote"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_linearDocument()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+pub mod block_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Block;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Block = Unset;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Block = Set<members::block>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `block` field
+        pub struct block(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockBuilder<'a, S: block_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<BlockAlignment<'a>>,
+        ::core::option::Option<BlockBlock<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Block<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockBuilder<'a, block_state::Empty> {
+        BlockBuilder::new()
+    }
+}
+
+impl<'a> BlockBuilder<'a, block_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: block_state::State> BlockBuilder<'a, S> {
+    /// Set the `alignment` field (optional)
+    pub fn alignment(mut self, value: impl Into<Option<BlockAlignment<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alignment` field to an Option value (optional)
+    pub fn maybe_alignment(mut self, value: Option<BlockAlignment<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Block: block_state::IsUnset,
+{
+    /// Set the `block` field (required)
+    pub fn block(
+        mut self,
+        value: impl Into<BlockBlock<'a>>,
+    ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Block: block_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Block<'a> {
+        Block {
+            alignment: self.__unsafe_private_named.0,
+            block: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Block<'a> {
+        Block {
+            alignment: self.__unsafe_private_named.0,
+            block: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_pub_leaflet_pages_linearDocument() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -522,42 +711,6 @@ fn lexicon_doc_pub_leaflet_pages_linearDocument() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.linearDocument"
-    }
-    fn def_name() -> &'static str {
-        "block"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_linearDocument()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinearDocument<'a> {
-    #[serde(borrow)]
-    pub blocks: Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod linear_document_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -681,39 +834,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocument<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.linearDocument"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_linearDocument()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Position<'a> {
-    pub block: Vec<i64>,
-    pub offset: i64,
-}
-
 pub mod position_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -724,37 +844,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Offset;
         type Block;
+        type Offset;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Offset = Unset;
         type Block = Unset;
-    }
-    ///State transition - sets the `offset` field to Set
-    pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOffset<S> {}
-    impl<S: State> State for SetOffset<S> {
-        type Offset = Set<members::offset>;
-        type Block = S::Block;
+        type Offset = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
-        type Offset = S::Offset;
         type Block = Set<members::block>;
+        type Offset = S::Offset;
+    }
+    ///State transition - sets the `offset` field to Set
+    pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOffset<S> {}
+    impl<S: State> State for SetOffset<S> {
+        type Block = S::Block;
+        type Offset = Set<members::offset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `offset` field
-        pub struct offset(());
         ///Marker type for the `block` field
         pub struct block(());
+        ///Marker type for the `offset` field
+        pub struct offset(());
     }
 }
 
@@ -827,8 +947,8 @@ where
 impl<'a, S> PositionBuilder<'a, S>
 where
     S: position_state::State,
-    S::Offset: position_state::IsSet,
     S::Block: position_state::IsSet,
+    S::Offset: position_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Position<'a> {
@@ -852,41 +972,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.linearDocument"
-    }
-    fn def_name() -> &'static str {
-        "position"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_linearDocument()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
-    #[serde(borrow)]
-    pub end: crate::pub_leaflet::pages::linear_document::Position<'a>,
-    #[serde(borrow)]
-    pub start: crate::pub_leaflet::pages::linear_document::Position<'a>,
 }
 
 pub mod quote_state {
@@ -1026,90 +1111,5 @@ where
             start: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.linearDocument"
-    }
-    fn def_name() -> &'static str {
-        "quote"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_linearDocument()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignCenter;
-impl std::fmt::Display for TextAlignCenter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignCenter")
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignJustify;
-impl std::fmt::Display for TextAlignJustify {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignJustify")
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignLeft;
-impl std::fmt::Display for TextAlignLeft {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignLeft")
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignRight;
-impl std::fmt::Display for TextAlignRight {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignRight")
     }
 }

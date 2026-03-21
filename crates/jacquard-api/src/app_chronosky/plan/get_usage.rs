@@ -37,6 +37,230 @@ pub struct CurrentPlan<'a> {
     pub valid_until: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUsageOutput<'a> {
+    #[serde(borrow)]
+    pub current_plan: crate::app_chronosky::plan::get_usage::CurrentPlan<'a>,
+    #[serde(borrow)]
+    pub limits: crate::app_chronosky::plan::get_usage::PlanLimits<'a>,
+    #[serde(borrow)]
+    pub usage: crate::app_chronosky::plan::get_usage::UsageStats<'a>,
+}
+
+/// Plan limits.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlanLimits<'a> {
+    ///Whether markdown formatting is supported
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub markdown_support: std::option::Option<bool>,
+    ///Maximum image size (MB)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_image_size_mb: std::option::Option<i64>,
+    ///Maximum images per post
+    pub max_images_per_post: i64,
+    ///Maximum days in advance to schedule
+    pub max_schedule_days: i64,
+    ///Maximum video size (MB)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_video_size_mb: std::option::Option<i64>,
+    ///Maximum posts per month
+    pub monthly_posts_limit: i64,
+    ///Maximum concurrent pending posts
+    pub pending_posts_limit: i64,
+    ///Minimum interval between scheduled posts (minutes)
+    pub schedule_interval_minutes: i64,
+    ///Whether thread posts are enabled
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub thread_posts: std::option::Option<bool>,
+    ///Maximum posts per thread
+    pub thread_posts_limit: i64,
+    ///Monthly video processing minutes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub video_processing_minutes_monthly: std::option::Option<i64>,
+    ///Whether video uploads are enabled
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub video_upload: std::option::Option<bool>,
+}
+
+/// Usage statistics.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UsageStats<'a> {
+    ///API requests in current hour
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub api_requests_this_hour: std::option::Option<i64>,
+    ///Last time usage was updated (ISO 8601)
+    pub last_updated: jacquard_common::types::string::Datetime,
+    ///End of current monthly period (ISO 8601)
+    pub monthly_period_end: jacquard_common::types::string::Datetime,
+    ///Start of current monthly period (ISO 8601)
+    pub monthly_period_start: jacquard_common::types::string::Datetime,
+    ///Number of posts this month
+    pub monthly_posts_count: i64,
+    ///Current number of pending posts
+    pub pending_posts_count: i64,
+    ///Storage used (MB)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub storage_used_mb: std::option::Option<i64>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.plan.getUsage"
+    }
+    fn def_name() -> &'static str {
+        "currentPlan"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_plan_getUsage()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tier;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tier",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct GetUsage;
+/// Response type for
+///app.chronosky.plan.getUsage
+pub struct GetUsageResponse;
+impl jacquard_common::xrpc::XrpcResp for GetUsageResponse {
+    const NSID: &'static str = "app.chronosky.plan.getUsage";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetUsageOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetUsage {
+    const NSID: &'static str = "app.chronosky.plan.getUsage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetUsageResponse;
+}
+
+/// Endpoint type for
+///app.chronosky.plan.getUsage
+pub struct GetUsageRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetUsageRequest {
+    const PATH: &'static str = "/xrpc/app.chronosky.plan.getUsage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetUsage;
+    type Response = GetUsageResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanLimits<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.plan.getUsage"
+    }
+    fn def_name() -> &'static str {
+        "planLimits"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_plan_getUsage()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UsageStats<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.plan.getUsage"
+    }
+    fn def_name() -> &'static str {
+        "usageStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_plan_getUsage()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod current_plan_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -47,85 +271,85 @@ pub mod current_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Tier;
-        type IsActive;
         type Name;
+        type Tier;
         type DisplayName;
+        type IsActive;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Tier = Unset;
-        type IsActive = Unset;
         type Name = Unset;
+        type Tier = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Tier = S::Tier;
-        type IsActive = S::IsActive;
-        type Name = S::Name;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `tier` field to Set
-    pub struct SetTier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTier<S> {}
-    impl<S: State> State for SetTier<S> {
-        type Id = S::Id;
-        type Tier = Set<members::tier>;
-        type IsActive = S::IsActive;
-        type Name = S::Name;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `is_active` field to Set
-    pub struct SetIsActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsActive<S> {}
-    impl<S: State> State for SetIsActive<S> {
-        type Id = S::Id;
-        type Tier = S::Tier;
-        type IsActive = Set<members::is_active>;
-        type Name = S::Name;
-        type DisplayName = S::DisplayName;
+        type IsActive = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Tier = S::Tier;
-        type IsActive = S::IsActive;
         type Name = Set<members::name>;
+        type Tier = S::Tier;
         type DisplayName = S::DisplayName;
+        type IsActive = S::IsActive;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `tier` field to Set
+    pub struct SetTier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTier<S> {}
+    impl<S: State> State for SetTier<S> {
+        type Name = S::Name;
+        type Tier = Set<members::tier>;
+        type DisplayName = S::DisplayName;
+        type IsActive = S::IsActive;
+        type Id = S::Id;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Id = S::Id;
-        type Tier = S::Tier;
-        type IsActive = S::IsActive;
         type Name = S::Name;
+        type Tier = S::Tier;
         type DisplayName = Set<members::display_name>;
+        type IsActive = S::IsActive;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `is_active` field to Set
+    pub struct SetIsActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsActive<S> {}
+    impl<S: State> State for SetIsActive<S> {
+        type Name = S::Name;
+        type Tier = S::Tier;
+        type DisplayName = S::DisplayName;
+        type IsActive = Set<members::is_active>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Tier = S::Tier;
+        type DisplayName = S::DisplayName;
+        type IsActive = S::IsActive;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `tier` field
-        pub struct tier(());
-        ///Marker type for the `is_active` field
-        pub struct is_active(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `tier` field
+        pub struct tier(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `is_active` field
+        pub struct is_active(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -278,11 +502,11 @@ impl<'a, S: current_plan_state::State> CurrentPlanBuilder<'a, S> {
 impl<'a, S> CurrentPlanBuilder<'a, S>
 where
     S: current_plan_state::State,
-    S::Id: current_plan_state::IsSet,
-    S::Tier: current_plan_state::IsSet,
-    S::IsActive: current_plan_state::IsSet,
     S::Name: current_plan_state::IsSet,
+    S::Tier: current_plan_state::IsSet,
     S::DisplayName: current_plan_state::IsSet,
+    S::IsActive: current_plan_state::IsSet,
+    S::Id: current_plan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CurrentPlan<'a> {
@@ -778,165 +1002,6 @@ fn lexicon_doc_app_chronosky_plan_getUsage() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.plan.getUsage"
-    }
-    fn def_name() -> &'static str {
-        "currentPlan"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_plan_getUsage()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.tier;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tier",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetUsageOutput<'a> {
-    #[serde(borrow)]
-    pub current_plan: crate::app_chronosky::plan::get_usage::CurrentPlan<'a>,
-    #[serde(borrow)]
-    pub limits: crate::app_chronosky::plan::get_usage::PlanLimits<'a>,
-    #[serde(borrow)]
-    pub usage: crate::app_chronosky::plan::get_usage::UsageStats<'a>,
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct GetUsage;
-/// Response type for
-///app.chronosky.plan.getUsage
-pub struct GetUsageResponse;
-impl jacquard_common::xrpc::XrpcResp for GetUsageResponse {
-    const NSID: &'static str = "app.chronosky.plan.getUsage";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetUsageOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetUsage {
-    const NSID: &'static str = "app.chronosky.plan.getUsage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetUsageResponse;
-}
-
-/// Endpoint type for
-///app.chronosky.plan.getUsage
-pub struct GetUsageRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetUsageRequest {
-    const PATH: &'static str = "/xrpc/app.chronosky.plan.getUsage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetUsage;
-    type Response = GetUsageResponse;
-}
-
-/// Plan limits.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlanLimits<'a> {
-    ///Whether markdown formatting is supported
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub markdown_support: std::option::Option<bool>,
-    ///Maximum image size (MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_image_size_mb: std::option::Option<i64>,
-    ///Maximum images per post
-    pub max_images_per_post: i64,
-    ///Maximum days in advance to schedule
-    pub max_schedule_days: i64,
-    ///Maximum video size (MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_video_size_mb: std::option::Option<i64>,
-    ///Maximum posts per month
-    pub monthly_posts_limit: i64,
-    ///Maximum concurrent pending posts
-    pub pending_posts_limit: i64,
-    ///Minimum interval between scheduled posts (minutes)
-    pub schedule_interval_minutes: i64,
-    ///Whether thread posts are enabled
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub thread_posts: std::option::Option<bool>,
-    ///Maximum posts per thread
-    pub thread_posts_limit: i64,
-    ///Monthly video processing minutes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub video_processing_minutes_monthly: std::option::Option<i64>,
-    ///Whether video uploads are enabled
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub video_upload: std::option::Option<bool>,
-}
-
 pub mod plan_limits_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -947,105 +1012,105 @@ pub mod plan_limits_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScheduleIntervalMinutes;
-        type MaxImagesPerPost;
-        type MaxScheduleDays;
-        type ThreadPostsLimit;
-        type PendingPostsLimit;
         type MonthlyPostsLimit;
+        type MaxScheduleDays;
+        type ScheduleIntervalMinutes;
+        type ThreadPostsLimit;
+        type MaxImagesPerPost;
+        type PendingPostsLimit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScheduleIntervalMinutes = Unset;
-        type MaxImagesPerPost = Unset;
-        type MaxScheduleDays = Unset;
-        type ThreadPostsLimit = Unset;
-        type PendingPostsLimit = Unset;
         type MonthlyPostsLimit = Unset;
-    }
-    ///State transition - sets the `schedule_interval_minutes` field to Set
-    pub struct SetScheduleIntervalMinutes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduleIntervalMinutes<S> {}
-    impl<S: State> State for SetScheduleIntervalMinutes<S> {
-        type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `max_images_per_post` field to Set
-    pub struct SetMaxImagesPerPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaxImagesPerPost<S> {}
-    impl<S: State> State for SetMaxImagesPerPost<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxImagesPerPost = Set<members::max_images_per_post>;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `max_schedule_days` field to Set
-    pub struct SetMaxScheduleDays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaxScheduleDays<S> {}
-    impl<S: State> State for SetMaxScheduleDays<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = Set<members::max_schedule_days>;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `thread_posts_limit` field to Set
-    pub struct SetThreadPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThreadPostsLimit<S> {}
-    impl<S: State> State for SetThreadPostsLimit<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = Set<members::thread_posts_limit>;
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `pending_posts_limit` field to Set
-    pub struct SetPendingPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPendingPostsLimit<S> {}
-    impl<S: State> State for SetPendingPostsLimit<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type PendingPostsLimit = Set<members::pending_posts_limit>;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = Unset;
+        type ScheduleIntervalMinutes = Unset;
+        type ThreadPostsLimit = Unset;
+        type MaxImagesPerPost = Unset;
+        type PendingPostsLimit = Unset;
     }
     ///State transition - sets the `monthly_posts_limit` field to Set
     pub struct SetMonthlyPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPostsLimit<S> {}
     impl<S: State> State for SetMonthlyPostsLimit<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type PendingPostsLimit = S::PendingPostsLimit;
         type MonthlyPostsLimit = Set<members::monthly_posts_limit>;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type PendingPostsLimit = S::PendingPostsLimit;
+    }
+    ///State transition - sets the `max_schedule_days` field to Set
+    pub struct SetMaxScheduleDays<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMaxScheduleDays<S> {}
+    impl<S: State> State for SetMaxScheduleDays<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = Set<members::max_schedule_days>;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type PendingPostsLimit = S::PendingPostsLimit;
+    }
+    ///State transition - sets the `schedule_interval_minutes` field to Set
+    pub struct SetScheduleIntervalMinutes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduleIntervalMinutes<S> {}
+    impl<S: State> State for SetScheduleIntervalMinutes<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type PendingPostsLimit = S::PendingPostsLimit;
+    }
+    ///State transition - sets the `thread_posts_limit` field to Set
+    pub struct SetThreadPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThreadPostsLimit<S> {}
+    impl<S: State> State for SetThreadPostsLimit<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = Set<members::thread_posts_limit>;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type PendingPostsLimit = S::PendingPostsLimit;
+    }
+    ///State transition - sets the `max_images_per_post` field to Set
+    pub struct SetMaxImagesPerPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMaxImagesPerPost<S> {}
+    impl<S: State> State for SetMaxImagesPerPost<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+        type MaxImagesPerPost = Set<members::max_images_per_post>;
+        type PendingPostsLimit = S::PendingPostsLimit;
+    }
+    ///State transition - sets the `pending_posts_limit` field to Set
+    pub struct SetPendingPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPendingPostsLimit<S> {}
+    impl<S: State> State for SetPendingPostsLimit<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type PendingPostsLimit = Set<members::pending_posts_limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schedule_interval_minutes` field
-        pub struct schedule_interval_minutes(());
-        ///Marker type for the `max_images_per_post` field
-        pub struct max_images_per_post(());
-        ///Marker type for the `max_schedule_days` field
-        pub struct max_schedule_days(());
-        ///Marker type for the `thread_posts_limit` field
-        pub struct thread_posts_limit(());
-        ///Marker type for the `pending_posts_limit` field
-        pub struct pending_posts_limit(());
         ///Marker type for the `monthly_posts_limit` field
         pub struct monthly_posts_limit(());
+        ///Marker type for the `max_schedule_days` field
+        pub struct max_schedule_days(());
+        ///Marker type for the `schedule_interval_minutes` field
+        pub struct schedule_interval_minutes(());
+        ///Marker type for the `thread_posts_limit` field
+        pub struct thread_posts_limit(());
+        ///Marker type for the `max_images_per_post` field
+        pub struct max_images_per_post(());
+        ///Marker type for the `pending_posts_limit` field
+        pub struct pending_posts_limit(());
     }
 }
 
@@ -1298,12 +1363,12 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
 impl<'a, S> PlanLimitsBuilder<'a, S>
 where
     S: plan_limits_state::State,
-    S::ScheduleIntervalMinutes: plan_limits_state::IsSet,
-    S::MaxImagesPerPost: plan_limits_state::IsSet,
-    S::MaxScheduleDays: plan_limits_state::IsSet,
-    S::ThreadPostsLimit: plan_limits_state::IsSet,
-    S::PendingPostsLimit: plan_limits_state::IsSet,
     S::MonthlyPostsLimit: plan_limits_state::IsSet,
+    S::MaxScheduleDays: plan_limits_state::IsSet,
+    S::ScheduleIntervalMinutes: plan_limits_state::IsSet,
+    S::ThreadPostsLimit: plan_limits_state::IsSet,
+    S::MaxImagesPerPost: plan_limits_state::IsSet,
+    S::PendingPostsLimit: plan_limits_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanLimits<'a> {
@@ -1349,54 +1414,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanLimits<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.plan.getUsage"
-    }
-    fn def_name() -> &'static str {
-        "planLimits"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_plan_getUsage()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Usage statistics.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UsageStats<'a> {
-    ///API requests in current hour
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub api_requests_this_hour: std::option::Option<i64>,
-    ///Last time usage was updated (ISO 8601)
-    pub last_updated: jacquard_common::types::string::Datetime,
-    ///End of current monthly period (ISO 8601)
-    pub monthly_period_end: jacquard_common::types::string::Datetime,
-    ///Start of current monthly period (ISO 8601)
-    pub monthly_period_start: jacquard_common::types::string::Datetime,
-    ///Number of posts this month
-    pub monthly_posts_count: i64,
-    ///Current number of pending posts
-    pub pending_posts_count: i64,
-    ///Storage used (MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub storage_used_mb: std::option::Option<i64>,
-}
-
 pub mod usage_stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1407,85 +1424,85 @@ pub mod usage_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PendingPostsCount;
-        type MonthlyPostsCount;
         type MonthlyPeriodEnd;
         type LastUpdated;
+        type MonthlyPostsCount;
         type MonthlyPeriodStart;
+        type PendingPostsCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PendingPostsCount = Unset;
-        type MonthlyPostsCount = Unset;
         type MonthlyPeriodEnd = Unset;
         type LastUpdated = Unset;
+        type MonthlyPostsCount = Unset;
         type MonthlyPeriodStart = Unset;
-    }
-    ///State transition - sets the `pending_posts_count` field to Set
-    pub struct SetPendingPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPendingPostsCount<S> {}
-    impl<S: State> State for SetPendingPostsCount<S> {
-        type PendingPostsCount = Set<members::pending_posts_count>;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = S::LastUpdated;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
-    }
-    ///State transition - sets the `monthly_posts_count` field to Set
-    pub struct SetMonthlyPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPostsCount<S> {}
-    impl<S: State> State for SetMonthlyPostsCount<S> {
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = Set<members::monthly_posts_count>;
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = S::LastUpdated;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = Unset;
     }
     ///State transition - sets the `monthly_period_end` field to Set
     pub struct SetMonthlyPeriodEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPeriodEnd<S> {}
     impl<S: State> State for SetMonthlyPeriodEnd<S> {
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodEnd = Set<members::monthly_period_end>;
         type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = S::PendingPostsCount;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
         type LastUpdated = Set<members::last_updated>;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = S::PendingPostsCount;
+    }
+    ///State transition - sets the `monthly_posts_count` field to Set
+    pub struct SetMonthlyPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonthlyPostsCount<S> {}
+    impl<S: State> State for SetMonthlyPostsCount<S> {
+        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
+        type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = Set<members::monthly_posts_count>;
+        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = S::PendingPostsCount;
     }
     ///State transition - sets the `monthly_period_start` field to Set
     pub struct SetMonthlyPeriodStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPeriodStart<S> {}
     impl<S: State> State for SetMonthlyPeriodStart<S> {
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
         type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodStart = Set<members::monthly_period_start>;
+        type PendingPostsCount = S::PendingPostsCount;
+    }
+    ///State transition - sets the `pending_posts_count` field to Set
+    pub struct SetPendingPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPendingPostsCount<S> {}
+    impl<S: State> State for SetPendingPostsCount<S> {
+        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
+        type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
+        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = Set<members::pending_posts_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pending_posts_count` field
-        pub struct pending_posts_count(());
-        ///Marker type for the `monthly_posts_count` field
-        pub struct monthly_posts_count(());
         ///Marker type for the `monthly_period_end` field
         pub struct monthly_period_end(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `monthly_posts_count` field
+        pub struct monthly_posts_count(());
         ///Marker type for the `monthly_period_start` field
         pub struct monthly_period_start(());
+        ///Marker type for the `pending_posts_count` field
+        pub struct pending_posts_count(());
     }
 }
 
@@ -1646,11 +1663,11 @@ impl<'a, S: usage_stats_state::State> UsageStatsBuilder<'a, S> {
 impl<'a, S> UsageStatsBuilder<'a, S>
 where
     S: usage_stats_state::State,
-    S::PendingPostsCount: usage_stats_state::IsSet,
-    S::MonthlyPostsCount: usage_stats_state::IsSet,
     S::MonthlyPeriodEnd: usage_stats_state::IsSet,
     S::LastUpdated: usage_stats_state::IsSet,
+    S::MonthlyPostsCount: usage_stats_state::IsSet,
     S::MonthlyPeriodStart: usage_stats_state::IsSet,
+    S::PendingPostsCount: usage_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UsageStats<'a> {
@@ -1683,22 +1700,5 @@ where
             storage_used_mb: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UsageStats<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.plan.getUsage"
-    }
-    fn def_name() -> &'static str {
-        "usageStats"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_plan_getUsage()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

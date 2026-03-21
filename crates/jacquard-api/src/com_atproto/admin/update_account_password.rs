@@ -23,6 +23,36 @@ pub struct UpdateAccountPassword<'a> {
     pub password: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///com.atproto.admin.updateAccountPassword
+pub struct UpdateAccountPasswordResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
+    const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
+    const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateAccountPasswordResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.updateAccountPassword
+pub struct UpdateAccountPasswordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateAccountPassword<'de>;
+    type Response = UpdateAccountPasswordResponse;
+}
+
 pub mod update_account_password_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,37 +63,37 @@ pub mod update_account_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Password;
         type Did;
+        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Password = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Password = Set<members::password>;
-        type Did = S::Did;
+        type Password = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Password = S::Password;
         type Did = Set<members::did>;
+        type Password = S::Password;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Did = S::Did;
+        type Password = Set<members::password>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `password` field
-        pub struct password(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `password` field
+        pub struct password(());
     }
 }
 
@@ -142,8 +172,8 @@ where
 impl<'a, S> UpdateAccountPasswordBuilder<'a, S>
 where
     S: update_account_password_state::State,
-    S::Password: update_account_password_state::IsSet,
     S::Did: update_account_password_state::IsSet,
+    S::Password: update_account_password_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateAccountPassword<'a> {
@@ -167,34 +197,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.admin.updateAccountPassword
-pub struct UpdateAccountPasswordResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
-    const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
-    const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateAccountPasswordResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.updateAccountPassword
-pub struct UpdateAccountPasswordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateAccountPassword<'de>;
-    type Response = UpdateAccountPasswordResponse;
 }

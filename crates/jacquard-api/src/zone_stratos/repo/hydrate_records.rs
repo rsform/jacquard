@@ -22,6 +22,96 @@ pub struct HydrateRecords<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HydrateRecordsOutput<'a> {
+    ///URIs blocked due to boundary restrictions
+    #[serde(borrow)]
+    pub blocked: Vec<jacquard_common::types::string::AtUri<'a>>,
+    ///URIs that were not found
+    #[serde(borrow)]
+    pub not_found: Vec<jacquard_common::types::string::AtUri<'a>>,
+    ///Successfully hydrated records
+    #[serde(borrow)]
+    pub records: Vec<crate::zone_stratos::repo::hydrate_records::RecordView<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+/// Response type for
+///zone.stratos.repo.hydrateRecords
+pub struct HydrateRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for HydrateRecordsResponse {
+    const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = HydrateRecordsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for HydrateRecords<'a> {
+    const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = HydrateRecordsResponse;
+}
+
+/// Endpoint type for
+///zone.stratos.repo.hydrateRecords
+pub struct HydrateRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordsRequest {
+    const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = HydrateRecords<'de>;
+    type Response = HydrateRecordsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordView<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.repo.hydrateRecords"
+    }
+    fn def_name() -> &'static str {
+        "recordView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_repo_hydrateRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod hydrate_records_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -127,79 +217,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HydrateRecordsOutput<'a> {
-    ///URIs blocked due to boundary restrictions
-    #[serde(borrow)]
-    pub blocked: Vec<jacquard_common::types::string::AtUri<'a>>,
-    ///URIs that were not found
-    #[serde(borrow)]
-    pub not_found: Vec<jacquard_common::types::string::AtUri<'a>>,
-    ///Successfully hydrated records
-    #[serde(borrow)]
-    pub records: Vec<crate::zone_stratos::repo::hydrate_records::RecordView<'a>>,
-}
-
-/// Response type for
-///zone.stratos.repo.hydrateRecords
-pub struct HydrateRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for HydrateRecordsResponse {
-    const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = HydrateRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for HydrateRecords<'a> {
-    const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = HydrateRecordsResponse;
-}
-
-/// Endpoint type for
-///zone.stratos.repo.hydrateRecords
-pub struct HydrateRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordsRequest {
-    const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = HydrateRecords<'de>;
-    type Response = HydrateRecordsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordView<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
 pub mod record_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -210,51 +227,51 @@ pub mod record_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
         type Value;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Value = S::Value;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
         type Value = S::Value;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Cid = S::Cid;
         type Uri = S::Uri;
         type Value = Set<members::value>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Value = S::Value;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -347,9 +364,9 @@ where
 impl<'a, S> RecordViewBuilder<'a, S>
 where
     S: record_view_state::State,
-    S::Cid: record_view_state::IsSet,
     S::Uri: record_view_state::IsSet,
     S::Value: record_view_state::IsSet,
+    S::Cid: record_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordView<'a> {
@@ -513,22 +530,5 @@ fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> ::jacquard_lexicon::lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordView<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.repo.hydrateRecords"
-    }
-    fn def_name() -> &'static str {
-        "recordView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_repo_hydrateRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

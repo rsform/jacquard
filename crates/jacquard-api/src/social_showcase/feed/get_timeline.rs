@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -28,6 +24,55 @@ pub struct GetTimeline<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTimelineOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feed: Vec<crate::social_showcase::ItemView<'a>>,
+}
+
+/// Response type for
+///social.showcase.feed.getTimeline
+pub struct GetTimelineResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTimelineResponse {
+    const NSID: &'static str = "social.showcase.feed.getTimeline";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTimelineOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTimeline<'a> {
+    const NSID: &'static str = "social.showcase.feed.getTimeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTimelineResponse;
+}
+
+/// Endpoint type for
+///social.showcase.feed.getTimeline
+pub struct GetTimelineRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTimelineRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.feed.getTimeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTimeline<'de>;
+    type Response = GetTimelineResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_timeline_state {
@@ -117,49 +162,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTimelineOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<crate::social_showcase::ItemView<'a>>,
-}
-
-/// Response type for
-///social.showcase.feed.getTimeline
-pub struct GetTimelineResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTimelineResponse {
-    const NSID: &'static str = "social.showcase.feed.getTimeline";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTimelineOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTimeline<'a> {
-    const NSID: &'static str = "social.showcase.feed.getTimeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTimelineResponse;
-}
-
-/// Endpoint type for
-///social.showcase.feed.getTimeline
-pub struct GetTimelineRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTimelineRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.feed.getTimeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTimeline<'de>;
-    type Response = GetTimelineResponse;
 }

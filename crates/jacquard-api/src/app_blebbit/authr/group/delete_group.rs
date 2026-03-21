@@ -21,6 +21,48 @@ pub struct DeleteGroupParams<'a> {
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct DeleteGroup;
+/// Response type for
+///app.blebbit.authr.group.deleteGroup
+pub struct DeleteGroupResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
+    const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
+    const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteGroupResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.group.deleteGroup
+pub struct DeleteGroupRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroup";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteGroup;
+    type Response = DeleteGroupResponse;
+}
+
 pub mod delete_group_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -88,46 +130,4 @@ where
             id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct DeleteGroup;
-/// Response type for
-///app.blebbit.authr.group.deleteGroup
-pub struct DeleteGroupResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
-    const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
-    const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteGroupResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.group.deleteGroup
-pub struct DeleteGroupRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteGroup;
-    type Response = DeleteGroupResponse;
 }

@@ -34,6 +34,165 @@ pub struct BadgeView<'a> {
     pub signature: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BadgeViewBadgeType<'a> {
+    Mod,
+    Streamer,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> BadgeViewBadgeType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Mod => "place.stream.badge.defs#mod",
+            Self::Streamer => "place.stream.badge.defs#streamer",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for BadgeViewBadgeType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "place.stream.badge.defs#mod" => Self::Mod,
+            "place.stream.badge.defs#streamer" => Self::Streamer,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for BadgeViewBadgeType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "place.stream.badge.defs#mod" => Self::Mod,
+            "place.stream.badge.defs#streamer" => Self::Streamer,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for BadgeViewBadgeType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for BadgeViewBadgeType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for BadgeViewBadgeType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for BadgeViewBadgeType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for BadgeViewBadgeType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for BadgeViewBadgeType<'_> {
+    type Output = BadgeViewBadgeType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BadgeViewBadgeType::Mod => BadgeViewBadgeType::Mod,
+            BadgeViewBadgeType::Streamer => BadgeViewBadgeType::Streamer,
+            BadgeViewBadgeType::Other(v) => BadgeViewBadgeType::Other(v.into_static()),
+        }
+    }
+}
+
+/// This user is a moderator. Displayed with a sword icon.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Mod;
+impl std::fmt::Display for Mod {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "mod")
+    }
+}
+
+/// This user is the streamer. Displayed with a star icon.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Streamer;
+impl std::fmt::Display for Streamer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "streamer")
+    }
+}
+
+/// This user is a very important person.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Vip;
+impl std::fmt::Display for Vip {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "vip")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.badge.defs"
+    }
+    fn def_name() -> &'static str {
+        "badgeView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_badge_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod badge_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -44,51 +203,51 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BadgeType;
         type Issuer;
         type Recipient;
+        type BadgeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BadgeType = Unset;
         type Issuer = Unset;
         type Recipient = Unset;
-    }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type BadgeType = Set<members::badge_type>;
-        type Issuer = S::Issuer;
-        type Recipient = S::Recipient;
+        type BadgeType = Unset;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssuer<S> {}
     impl<S: State> State for SetIssuer<S> {
-        type BadgeType = S::BadgeType;
         type Issuer = Set<members::issuer>;
         type Recipient = S::Recipient;
+        type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `recipient` field to Set
     pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecipient<S> {}
     impl<S: State> State for SetRecipient<S> {
-        type BadgeType = S::BadgeType;
         type Issuer = S::Issuer;
         type Recipient = Set<members::recipient>;
+        type BadgeType = S::BadgeType;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type Issuer = S::Issuer;
+        type Recipient = S::Recipient;
+        type BadgeType = Set<members::badge_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
         ///Marker type for the `recipient` field
         pub struct recipient(());
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
     }
 }
 
@@ -201,9 +360,9 @@ impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
 impl<'a, S> BadgeViewBuilder<'a, S>
 where
     S: badge_view_state::State,
-    S::BadgeType: badge_view_state::IsSet,
     S::Issuer: badge_view_state::IsSet,
     S::Recipient: badge_view_state::IsSet,
+    S::BadgeType: badge_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BadgeView<'a> {
@@ -229,94 +388,6 @@ where
             recipient: self.__unsafe_private_named.2.unwrap(),
             signature: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BadgeViewBadgeType<'a> {
-    Mod,
-    Streamer,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> BadgeViewBadgeType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Mod => "place.stream.badge.defs#mod",
-            Self::Streamer => "place.stream.badge.defs#streamer",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for BadgeViewBadgeType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "place.stream.badge.defs#mod" => Self::Mod,
-            "place.stream.badge.defs#streamer" => Self::Streamer,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for BadgeViewBadgeType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "place.stream.badge.defs#mod" => Self::Mod,
-            "place.stream.badge.defs#streamer" => Self::Streamer,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BadgeViewBadgeType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for BadgeViewBadgeType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for BadgeViewBadgeType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for BadgeViewBadgeType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for BadgeViewBadgeType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for BadgeViewBadgeType<'_> {
-    type Output = BadgeViewBadgeType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BadgeViewBadgeType::Mod => BadgeViewBadgeType::Mod,
-            BadgeViewBadgeType::Streamer => BadgeViewBadgeType::Streamer,
-            BadgeViewBadgeType::Other(v) => BadgeViewBadgeType::Other(v.into_static()),
         }
     }
 }
@@ -458,76 +529,5 @@ fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.badge.defs"
-    }
-    fn def_name() -> &'static str {
-        "badgeView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_badge_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// This user is a moderator. Displayed with a sword icon.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Mod;
-impl std::fmt::Display for Mod {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "mod")
-    }
-}
-
-/// This user is the streamer. Displayed with a star icon.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Streamer;
-impl std::fmt::Display for Streamer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "streamer")
-    }
-}
-
-/// This user is a very important person.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Vip;
-impl std::fmt::Display for Vip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "vip")
     }
 }

@@ -32,6 +32,84 @@ pub struct Reply<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReplyGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Reply<'a>,
+}
+
+impl<'a> Reply<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReplyRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ReplyRecord;
+impl jacquard_common::xrpc::XrpcResp for ReplyRecord {
+    const NSID: &'static str = "com.deckbelcher.social.reply";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ReplyGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReplyGetRecordOutput<'_>> for Reply<'_> {
+    fn from(output: ReplyGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Reply<'_> {
+    const NSID: &'static str = "com.deckbelcher.social.reply";
+    type Record = ReplyRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ReplyRecord {
+    const NSID: &'static str = "com.deckbelcher.social.reply";
+    type Record = ReplyRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reply<'a> {
+    fn nsid() -> &'static str {
+        "com.deckbelcher.social.reply"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_deckbelcher_social_reply()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod reply_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,8 +120,8 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
         type Root;
         type Parent;
     }
@@ -51,26 +129,26 @@ pub mod reply_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
         type Root = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Root = S::Root;
-        type Parent = S::Parent;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Root = S::Root;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
         type Root = S::Root;
         type Parent = S::Parent;
     }
@@ -78,8 +156,8 @@ pub mod reply_state {
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
         type Parent = S::Parent;
     }
@@ -87,18 +165,18 @@ pub mod reply_state {
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
         type Root = S::Root;
         type Parent = Set<members::parent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `parent` field
@@ -235,8 +313,8 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::CreatedAt: reply_state::IsSet,
     S::Content: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
     S::Root: reply_state::IsSet,
     S::Parent: reply_state::IsSet,
 {
@@ -267,84 +345,6 @@ where
             updated_at: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Reply<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReplyRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reply<'a>,
-}
-
-impl From<ReplyGetRecordOutput<'_>> for Reply<'_> {
-    fn from(output: ReplyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Reply<'_> {
-    const NSID: &'static str = "com.deckbelcher.social.reply";
-    type Record = ReplyRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ReplyRecord;
-impl jacquard_common::xrpc::XrpcResp for ReplyRecord {
-    const NSID: &'static str = "com.deckbelcher.social.reply";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReplyGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ReplyRecord {
-    const NSID: &'static str = "com.deckbelcher.social.reply";
-    type Record = ReplyRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reply<'a> {
-    fn nsid() -> &'static str {
-        "com.deckbelcher.social.reply"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_deckbelcher_social_reply()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

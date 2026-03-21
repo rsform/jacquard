@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -30,6 +26,55 @@ pub struct GetFollowers<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFollowersOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub followers: Vec<crate::social_showcase::ProfileView<'a>>,
+}
+
+/// Response type for
+///social.showcase.graph.getFollowers
+pub struct GetFollowersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFollowersResponse {
+    const NSID: &'static str = "social.showcase.graph.getFollowers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFollowersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowers<'a> {
+    const NSID: &'static str = "social.showcase.graph.getFollowers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFollowersResponse;
+}
+
+/// Endpoint type for
+///social.showcase.graph.getFollowers
+pub struct GetFollowersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFollowersRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.graph.getFollowers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFollowers<'de>;
+    type Response = GetFollowersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_followers_state {
@@ -154,49 +199,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFollowersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub followers: Vec<crate::social_showcase::ProfileView<'a>>,
-}
-
-/// Response type for
-///social.showcase.graph.getFollowers
-pub struct GetFollowersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFollowersResponse {
-    const NSID: &'static str = "social.showcase.graph.getFollowers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFollowersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowers<'a> {
-    const NSID: &'static str = "social.showcase.graph.getFollowers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFollowersResponse;
-}
-
-/// Endpoint type for
-///social.showcase.graph.getFollowers
-pub struct GetFollowersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFollowersRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.graph.getFollowers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFollowers<'de>;
-    type Response = GetFollowersResponse;
 }

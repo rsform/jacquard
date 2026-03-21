@@ -24,6 +24,58 @@ pub struct GetProfile<'a> {
     pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetProfileOutput<'a> {
+    ///The user's activity
+    #[serde(borrow)]
+    pub activity: Vec<crate::buzz_bookhive::Activity<'a>>,
+    ///All books in the user's library
+    #[serde(borrow)]
+    pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
+    ///The user's friend activity
+    #[serde(borrow)]
+    pub friend_activity: Vec<crate::buzz_bookhive::UserBook<'a>>,
+    ///The user's profile
+    #[serde(borrow)]
+    pub profile: crate::buzz_bookhive::Profile<'a>,
+}
+
+/// Response type for
+///buzz.bookhive.getProfile
+pub struct GetProfileResponse;
+impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
+    const NSID: &'static str = "buzz.bookhive.getProfile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetProfileOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
+    const NSID: &'static str = "buzz.bookhive.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetProfileResponse;
+}
+
+/// Endpoint type for
+///buzz.bookhive.getProfile
+pub struct GetProfileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
+    const PATH: &'static str = "/xrpc/buzz.bookhive.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetProfile<'de>;
+    type Response = GetProfileResponse;
+}
+
 pub mod get_profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -111,56 +163,4 @@ where
             handle: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetProfileOutput<'a> {
-    ///The user's activity
-    #[serde(borrow)]
-    pub activity: Vec<crate::buzz_bookhive::Activity<'a>>,
-    ///All books in the user's library
-    #[serde(borrow)]
-    pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
-    ///The user's friend activity
-    #[serde(borrow)]
-    pub friend_activity: Vec<crate::buzz_bookhive::UserBook<'a>>,
-    ///The user's profile
-    #[serde(borrow)]
-    pub profile: crate::buzz_bookhive::Profile<'a>,
-}
-
-/// Response type for
-///buzz.bookhive.getProfile
-pub struct GetProfileResponse;
-impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
-    const NSID: &'static str = "buzz.bookhive.getProfile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
-    const NSID: &'static str = "buzz.bookhive.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetProfileResponse;
-}
-
-/// Endpoint type for
-///buzz.bookhive.getProfile
-pub struct GetProfileRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
-    const PATH: &'static str = "/xrpc/buzz.bookhive.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfile<'de>;
-    type Response = GetProfileResponse;
 }

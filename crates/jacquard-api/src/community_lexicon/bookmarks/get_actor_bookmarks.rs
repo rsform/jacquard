@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -30,6 +26,55 @@ pub struct GetActorBookmarks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorBookmarksOutput<'a> {
+    #[serde(borrow)]
+    pub bookmarks: Vec<crate::community_lexicon::bookmarks::bookmark::Bookmark<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///community.lexicon.bookmarks.getActorBookmarks
+pub struct GetActorBookmarksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorBookmarksResponse {
+    const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorBookmarksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorBookmarks<'a> {
+    const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorBookmarksResponse;
+}
+
+/// Endpoint type for
+///community.lexicon.bookmarks.getActorBookmarks
+pub struct GetActorBookmarksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorBookmarksRequest {
+    const PATH: &'static str = "/xrpc/community.lexicon.bookmarks.getActorBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorBookmarks<'de>;
+    type Response = GetActorBookmarksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_actor_bookmarks_state {
@@ -140,49 +185,4 @@ where
             tags: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorBookmarksOutput<'a> {
-    #[serde(borrow)]
-    pub bookmarks: Vec<crate::community_lexicon::bookmarks::bookmark::Bookmark<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///community.lexicon.bookmarks.getActorBookmarks
-pub struct GetActorBookmarksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorBookmarksResponse {
-    const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorBookmarksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorBookmarks<'a> {
-    const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorBookmarksResponse;
-}
-
-/// Endpoint type for
-///community.lexicon.bookmarks.getActorBookmarks
-pub struct GetActorBookmarksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorBookmarksRequest {
-    const PATH: &'static str = "/xrpc/community.lexicon.bookmarks.getActorBookmarks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorBookmarks<'de>;
-    type Response = GetActorBookmarksResponse;
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,57 @@ pub struct ListNotifications<'a> {
     pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListNotificationsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notifications: Vec<crate::sh_weaver::notification::Notification<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Response type for
+///sh.weaver.notification.listNotifications
+pub struct ListNotificationsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
+    const NSID: &'static str = "sh.weaver.notification.listNotifications";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListNotificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
+    const NSID: &'static str = "sh.weaver.notification.listNotifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListNotificationsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notification.listNotifications
+pub struct ListNotificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notification.listNotifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListNotifications<'de>;
+    type Response = ListNotificationsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_notifications_state {
@@ -163,51 +210,4 @@ where
             seen_at: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListNotificationsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notifications: Vec<crate::sh_weaver::notification::Notification<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-/// Response type for
-///sh.weaver.notification.listNotifications
-pub struct ListNotificationsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
-    const NSID: &'static str = "sh.weaver.notification.listNotifications";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
-    const NSID: &'static str = "sh.weaver.notification.listNotifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListNotificationsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notification.listNotifications
-pub struct ListNotificationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notification.listNotifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListNotifications<'de>;
-    type Response = ListNotificationsResponse;
 }

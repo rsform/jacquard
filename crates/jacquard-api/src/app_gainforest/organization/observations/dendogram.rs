@@ -25,6 +25,84 @@ pub struct Dendogram<'a> {
     pub dendogram: jacquard_common::types::value::Data<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DendogramGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Dendogram<'a>,
+}
+
+impl<'a> Dendogram<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DendogramRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DendogramRecord;
+impl jacquard_common::xrpc::XrpcResp for DendogramRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DendogramGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DendogramGetRecordOutput<'_>> for Dendogram<'_> {
+    fn from(output: DendogramGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Dendogram<'_> {
+    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
+    type Record = DendogramRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DendogramRecord {
+    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
+    type Record = DendogramRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Dendogram<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.organization.observations.dendogram"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_organization_observations_dendogram()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod dendogram_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,84 +240,6 @@ where
             dendogram: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Dendogram<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DendogramRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DendogramGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Dendogram<'a>,
-}
-
-impl From<DendogramGetRecordOutput<'_>> for Dendogram<'_> {
-    fn from(output: DendogramGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Dendogram<'_> {
-    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
-    type Record = DendogramRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DendogramRecord;
-impl jacquard_common::xrpc::XrpcResp for DendogramRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DendogramGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DendogramRecord {
-    const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
-    type Record = DendogramRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Dendogram<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.organization.observations.dendogram"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_organization_observations_dendogram()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

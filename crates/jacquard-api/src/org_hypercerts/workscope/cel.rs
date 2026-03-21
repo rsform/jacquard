@@ -31,6 +31,165 @@ pub struct Cel<'a> {
     pub version: CelVersion<'a>,
 }
 
+/// CEL context schema version.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CelVersion<'a> {
+    V1,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CelVersion<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::V1 => "v1",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CelVersion<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "v1" => Self::V1,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CelVersion<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "v1" => Self::V1,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CelVersion<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CelVersion<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CelVersion<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CelVersion<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CelVersion<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CelVersion<'_> {
+    type Output = CelVersion<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CelVersion::V1 => CelVersion::V1,
+            CelVersion::Other(v) => CelVersion::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.workscope.cel"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_workscope_cel()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.expression;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "expression",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.expression;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 5000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "expression",
+                        ),
+                        max: 5000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.used_tags;
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "used_tags",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.version;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 16usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
+                    max: 16usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod cel_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -41,67 +200,67 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Expression;
         type Version;
         type UsedTags;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Expression = Unset;
         type Version = Unset;
         type UsedTags = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Expression = S::Expression;
-        type Version = S::Version;
-        type UsedTags = S::UsedTags;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `expression` field to Set
     pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpression<S> {}
     impl<S: State> State for SetExpression<S> {
-        type CreatedAt = S::CreatedAt;
         type Expression = Set<members::expression>;
         type Version = S::Version;
         type UsedTags = S::UsedTags;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type CreatedAt = S::CreatedAt;
         type Expression = S::Expression;
         type Version = Set<members::version>;
         type UsedTags = S::UsedTags;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `used_tags` field to Set
     pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUsedTags<S> {}
     impl<S: State> State for SetUsedTags<S> {
-        type CreatedAt = S::CreatedAt;
         type Expression = S::Expression;
         type Version = S::Version;
         type UsedTags = Set<members::used_tags>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Expression = S::Expression;
+        type Version = S::Version;
+        type UsedTags = S::UsedTags;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `expression` field
         pub struct expression(());
         ///Marker type for the `version` field
         pub struct version(());
         ///Marker type for the `used_tags` field
         pub struct used_tags(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -214,10 +373,10 @@ where
 impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
-    S::CreatedAt: cel_state::IsSet,
     S::Expression: cel_state::IsSet,
     S::Version: cel_state::IsSet,
     S::UsedTags: cel_state::IsSet,
+    S::CreatedAt: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {
@@ -243,90 +402,6 @@ where
             used_tags: self.__unsafe_private_named.2.unwrap(),
             version: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// CEL context schema version.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CelVersion<'a> {
-    V1,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CelVersion<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::V1 => "v1",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CelVersion<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "v1" => Self::V1,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CelVersion<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "v1" => Self::V1,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CelVersion<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CelVersion<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CelVersion<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CelVersion<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CelVersion<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CelVersion<'_> {
-    type Output = CelVersion<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CelVersion::V1 => CelVersion::V1,
-            CelVersion::Other(v) => CelVersion::Other(v.into_static()),
         }
     }
 }
@@ -452,80 +527,5 @@ fn lexicon_doc_org_hypercerts_workscope_cel() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.workscope.cel"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_workscope_cel()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.expression;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "expression",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.expression;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "expression",
-                        ),
-                        max: 5000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.used_tags;
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "used_tags",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.version;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
-                    max: 16usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

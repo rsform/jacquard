@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct FetchLabels {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FetchLabelsOutput<'a> {
+    #[serde(borrow)]
+    pub labels: Vec<crate::com_atproto::label::Label<'a>>,
+}
+
+/// Response type for
+///com.atproto.temp.fetchLabels
+pub struct FetchLabelsResponse;
+impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
+    const NSID: &'static str = "com.atproto.temp.fetchLabels";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FetchLabelsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for FetchLabels {
+    const NSID: &'static str = "com.atproto.temp.fetchLabels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = FetchLabelsResponse;
+}
+
+/// Endpoint type for
+///com.atproto.temp.fetchLabels
+pub struct FetchLabelsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.fetchLabels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = FetchLabels;
+    type Response = FetchLabelsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod fetch_labels_state {
@@ -107,46 +149,4 @@ where
             since: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FetchLabelsOutput<'a> {
-    #[serde(borrow)]
-    pub labels: Vec<crate::com_atproto::label::Label<'a>>,
-}
-
-/// Response type for
-///com.atproto.temp.fetchLabels
-pub struct FetchLabelsResponse;
-impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
-    const NSID: &'static str = "com.atproto.temp.fetchLabels";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FetchLabelsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for FetchLabels {
-    const NSID: &'static str = "com.atproto.temp.fetchLabels";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = FetchLabelsResponse;
-}
-
-/// Endpoint type for
-///com.atproto.temp.fetchLabels
-pub struct FetchLabelsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.temp.fetchLabels";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = FetchLabels;
-    type Response = FetchLabelsResponse;
 }

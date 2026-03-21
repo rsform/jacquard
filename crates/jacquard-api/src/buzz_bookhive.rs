@@ -61,6 +61,861 @@ pub struct Activity<'a> {
     pub user_handle: jacquard_common::CowStr<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ActivityType<'a> {
+    Review,
+    Rated,
+    Started,
+    Finished,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ActivityType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Review => "review",
+            Self::Rated => "rated",
+            Self::Started => "started",
+            Self::Finished => "finished",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ActivityType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "review" => Self::Review,
+            "rated" => Self::Rated,
+            "started" => Self::Started,
+            "finished" => Self::Finished,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ActivityType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "review" => Self::Review,
+            "rated" => Self::Rated,
+            "started" => Self::Started,
+            "finished" => Self::Finished,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ActivityType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ActivityType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ActivityType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ActivityType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ActivityType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ActivityType<'_> {
+    type Output = ActivityType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ActivityType::Review => ActivityType::Review,
+            ActivityType::Rated => ActivityType::Rated,
+            ActivityType::Started => ActivityType::Started,
+            ActivityType::Finished => ActivityType::Finished,
+            ActivityType::Other(v) => ActivityType::Other(v.into_static()),
+        }
+    }
+}
+
+/// External identifiers for a book
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookIdentifiers<'a> {
+    ///Goodreads book ID
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub goodreads_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///BookHive's internal ID
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hive_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///10-digit ISBN
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isbn10: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///13-digit ISBN
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Reading progress tracking data
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookProgress<'a> {
+    ///Current chapter the user is on
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub current_chapter: std::option::Option<i64>,
+    ///Current page the user is on
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub current_page: std::option::Option<i64>,
+    ///How far through the book the reader is (0-100)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub percent: std::option::Option<i64>,
+    ///Total number of chapters in the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_chapters: std::option::Option<i64>,
+    ///Total number of pages in the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_pages: std::option::Option<i64>,
+    ///When the progress was last updated
+    pub updated_at: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Comment<'a> {
+    #[serde(borrow)]
+    pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///The content of the comment.
+    #[serde(borrow)]
+    pub comment: jacquard_common::CowStr<'a>,
+    ///Client-declared timestamp when this comment was originally created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///The DID of the user who made the comment
+    #[serde(borrow)]
+    pub did: jacquard_common::CowStr<'a>,
+    ///The handle of the user who made the comment
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+/// User has finished reading the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Finished;
+impl std::fmt::Display for Finished {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "finished")
+    }
+}
+
+/// User owns the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Owned;
+impl std::fmt::Display for Owned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "owned")
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Profile<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub books_read: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    ///Whether the authed user is following this profile
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_following: std::option::Option<bool>,
+    pub reviews: i64,
+}
+
+/// User is currently reading the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Reading;
+impl std::fmt::Display for Reading {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reading")
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Review<'a> {
+    ///The date the review was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///The DID of the user who made the review
+    #[serde(borrow)]
+    pub did: jacquard_common::CowStr<'a>,
+    ///The handle of the user who made the review
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    ///The review content
+    #[serde(borrow)]
+    pub review: jacquard_common::CowStr<'a>,
+    ///The number of stars given to the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub stars: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UserBook<'a> {
+    ///The authors of the book (tab separated)
+    #[serde(borrow)]
+    pub authors: jacquard_common::CowStr<'a>,
+    ///Progress tracking information for the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub book_progress: std::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
+    ///Cover image of the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Book description/summary
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The date the user finished reading the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The book's hive id, used to correlate user's books with the hive
+    #[serde(borrow)]
+    pub hive_id: jacquard_common::CowStr<'a>,
+    ///Average rating (0-1000)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rating: std::option::Option<i64>,
+    ///The book's review
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub review: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub stars: std::option::Option<i64>,
+    ///The date the user started reading the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<UserBookStatus<'a>>,
+    ///Cover image of the book
+    #[serde(borrow)]
+    pub thumbnail: jacquard_common::CowStr<'a>,
+    ///The title of the book
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    ///The DID of the user who added the book
+    #[serde(borrow)]
+    pub user_did: jacquard_common::CowStr<'a>,
+    ///The handle of the user who added the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UserBookStatus<'a> {
+    Finished,
+    Reading,
+    WantToRead,
+    Abandoned,
+    Owned,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UserBookStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Finished => "buzz.bookhive.defs#finished",
+            Self::Reading => "buzz.bookhive.defs#reading",
+            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
+            Self::Abandoned => "buzz.bookhive.defs#abandoned",
+            Self::Owned => "buzz.bookhive.defs#owned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UserBookStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UserBookStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UserBookStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UserBookStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UserBookStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UserBookStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UserBookStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UserBookStatus<'_> {
+    type Output = UserBookStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UserBookStatus::Finished => UserBookStatus::Finished,
+            UserBookStatus::Reading => UserBookStatus::Reading,
+            UserBookStatus::WantToRead => UserBookStatus::WantToRead,
+            UserBookStatus::Abandoned => UserBookStatus::Abandoned,
+            UserBookStatus::Owned => UserBookStatus::Owned,
+            UserBookStatus::Other(v) => UserBookStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// User wants to read the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct WantToRead;
+impl std::fmt::Display for WantToRead {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "wantToRead")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "activity"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookIdentifiers<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookIdentifiers"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookProgress<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookProgress"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.current_chapter {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "current_chapter",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.current_page {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "current_page",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.percent {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percent",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.percent {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "percent",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_chapters {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_chapters",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_pages {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_pages",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "comment"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.comment;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.comment;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "comment",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "profile"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.books_read;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "books_read",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.reviews;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reviews",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "review"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.defs"
+    }
+    fn def_name() -> &'static str {
+        "userBook"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.authors;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.authors;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.rating {
+            if *value > 1000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
+                    max: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.rating {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.review {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 15000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "review",
+                        ),
+                        max: 15000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value > 10i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod activity_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -71,105 +926,105 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Type;
-        type UserDid;
         type CreatedAt;
-        type HiveId;
+        type Title;
         type UserHandle;
+        type UserDid;
+        type Type;
+        type HiveId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Type = Unset;
-        type UserDid = Unset;
         type CreatedAt = Unset;
-        type HiveId = Unset;
+        type Title = Unset;
         type UserHandle = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Type = S::Type;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type UserHandle = S::UserHandle;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Title = S::Title;
-        type Type = Set<members::r#type>;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type UserHandle = S::UserHandle;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Title = S::Title;
-        type Type = S::Type;
-        type UserDid = Set<members::user_did>;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type UserHandle = S::UserHandle;
+        type UserDid = Unset;
+        type Type = Unset;
+        type HiveId = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Type = S::Type;
-        type UserDid = S::UserDid;
         type CreatedAt = Set<members::created_at>;
-        type HiveId = S::HiveId;
-        type UserHandle = S::UserHandle;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiveId<S> {}
-    impl<S: State> State for SetHiveId<S> {
         type Title = S::Title;
-        type Type = S::Type;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = Set<members::hive_id>;
         type UserHandle = S::UserHandle;
+        type UserDid = S::UserDid;
+        type Type = S::Type;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type UserHandle = S::UserHandle;
+        type UserDid = S::UserDid;
+        type Type = S::Type;
+        type HiveId = S::HiveId;
     }
     ///State transition - sets the `user_handle` field to Set
     pub struct SetUserHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserHandle<S> {}
     impl<S: State> State for SetUserHandle<S> {
-        type Title = S::Title;
-        type Type = S::Type;
-        type UserDid = S::UserDid;
         type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
+        type Title = S::Title;
         type UserHandle = Set<members::user_handle>;
+        type UserDid = S::UserDid;
+        type Type = S::Type;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type UserHandle = S::UserHandle;
+        type UserDid = Set<members::user_did>;
+        type Type = S::Type;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type UserHandle = S::UserHandle;
+        type UserDid = S::UserDid;
+        type Type = Set<members::r#type>;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type UserHandle = S::UserHandle;
+        type UserDid = S::UserDid;
+        type Type = S::Type;
+        type HiveId = Set<members::hive_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `user_handle` field
         pub struct user_handle(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
     }
 }
 
@@ -322,12 +1177,12 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::Title: activity_state::IsSet,
-    S::Type: activity_state::IsSet,
-    S::UserDid: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
-    S::HiveId: activity_state::IsSet,
+    S::Title: activity_state::IsSet,
     S::UserHandle: activity_state::IsSet,
+    S::UserDid: activity_state::IsSet,
+    S::Type: activity_state::IsSet,
+    S::HiveId: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -357,104 +1212,6 @@ where
             user_did: self.__unsafe_private_named.4.unwrap(),
             user_handle: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityType<'a> {
-    Review,
-    Rated,
-    Started,
-    Finished,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ActivityType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Review => "review",
-            Self::Rated => "rated",
-            Self::Started => "started",
-            Self::Finished => "finished",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ActivityType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "review" => Self::Review,
-            "rated" => Self::Rated,
-            "started" => Self::Started,
-            "finished" => Self::Finished,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ActivityType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "review" => Self::Review,
-            "rated" => Self::Rated,
-            "started" => Self::Started,
-            "finished" => Self::Finished,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ActivityType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ActivityType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ActivityType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ActivityType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ActivityType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ActivityType<'_> {
-    type Output = ActivityType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ActivityType::Review => ActivityType::Review,
-            ActivityType::Rated => ActivityType::Rated,
-            ActivityType::Started => ActivityType::Started,
-            ActivityType::Finished => ActivityType::Finished,
-            ActivityType::Other(v) => ActivityType::Other(v.into_static()),
         }
     }
 }
@@ -1549,104 +2306,6 @@ fn lexicon_doc_buzz_bookhive_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "activity"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// External identifiers for a book
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BookIdentifiers<'a> {
-    ///Goodreads book ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub goodreads_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///BookHive's internal ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hive_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///10-digit ISBN
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub isbn10: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///13-digit ISBN
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookIdentifiers<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "bookIdentifiers"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Reading progress tracking data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BookProgress<'a> {
-    ///Current chapter the user is on
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current_chapter: std::option::Option<i64>,
-    ///Current page the user is on
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current_page: std::option::Option<i64>,
-    ///How far through the book the reader is (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub percent: std::option::Option<i64>,
-    ///Total number of chapters in the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_chapters: std::option::Option<i64>,
-    ///Total number of pages in the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_pages: std::option::Option<i64>,
-    ///When the progress was last updated
-    pub updated_at: jacquard_common::types::string::Datetime,
-}
-
 pub mod book_progress_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1832,118 +2491,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookProgress<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "bookProgress"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.current_chapter {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current_chapter",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.current_page {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current_page",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.percent {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percent",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.percent {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percent",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.total_chapters {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_chapters",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.total_pages {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_pages",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Comment<'a> {
-    #[serde(borrow)]
-    pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///The content of the comment.
-    #[serde(borrow)]
-    pub comment: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this comment was originally created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID of the user who made the comment
-    #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
-    ///The handle of the user who made the comment
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod comment_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1954,105 +2501,105 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
-        type CreatedAt;
-        type Handle;
-        type Comment;
-        type Parent;
         type Did;
+        type Book;
+        type Handle;
+        type Parent;
+        type Comment;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
-        type CreatedAt = Unset;
-        type Handle = Unset;
-        type Comment = Unset;
-        type Parent = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type CreatedAt = S::CreatedAt;
-        type Handle = S::Handle;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
-        type CreatedAt = Set<members::created_at>;
-        type Handle = S::Handle;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-        type Handle = Set<members::handle>;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-        type Handle = S::Handle;
-        type Comment = Set<members::comment>;
-        type Parent = S::Parent;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-        type Handle = S::Handle;
-        type Comment = S::Comment;
-        type Parent = Set<members::parent>;
-        type Did = S::Did;
+        type Book = Unset;
+        type Handle = Unset;
+        type Parent = Unset;
+        type Comment = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-        type Handle = S::Handle;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
         type Did = Set<members::did>;
+        type Book = S::Book;
+        type Handle = S::Handle;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Did = S::Did;
+        type Book = Set<members::book>;
+        type Handle = S::Handle;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Book = S::Book;
+        type Handle = Set<members::handle>;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Did = S::Did;
+        type Book = S::Book;
+        type Handle = S::Handle;
+        type Parent = Set<members::parent>;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Did = S::Did;
+        type Book = S::Book;
+        type Handle = S::Handle;
+        type Parent = S::Parent;
+        type Comment = Set<members::comment>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type Book = S::Book;
+        type Handle = S::Handle;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `comment` field
-        pub struct comment(());
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `book` field
+        pub struct book(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
+        ///Marker type for the `comment` field
+        pub struct comment(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -2205,12 +2752,12 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Book: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
-    S::Handle: comment_state::IsSet,
-    S::Comment: comment_state::IsSet,
-    S::Parent: comment_state::IsSet,
     S::Did: comment_state::IsSet,
+    S::Book: comment_state::IsSet,
+    S::Handle: comment_state::IsSet,
+    S::Parent: comment_state::IsSet,
+    S::Comment: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -2244,120 +2791,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "comment"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.comment;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "comment",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.comment;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "comment",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// User has finished reading the book
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Finished;
-impl std::fmt::Display for Finished {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "finished")
-    }
-}
-
-/// User owns the book
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Owned;
-impl std::fmt::Display for Owned {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "owned")
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Profile<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub books_read: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    ///Whether the authed user is following this profile
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_following: std::option::Option<bool>,
-    pub reviews: i64,
-}
-
 pub mod profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2368,65 +2801,65 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
-        type Reviews;
         type Handle;
+        type Reviews;
+        type DisplayName;
         type BooksRead;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
-        type Reviews = Unset;
         type Handle = Unset;
+        type Reviews = Unset;
+        type DisplayName = Unset;
         type BooksRead = Unset;
     }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
         type Reviews = S::Reviews;
-        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
         type BooksRead = S::BooksRead;
     }
     ///State transition - sets the `reviews` field to Set
     pub struct SetReviews<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReviews<S> {}
     impl<S: State> State for SetReviews<S> {
-        type DisplayName = S::DisplayName;
-        type Reviews = Set<members::reviews>;
         type Handle = S::Handle;
+        type Reviews = Set<members::reviews>;
+        type DisplayName = S::DisplayName;
         type BooksRead = S::BooksRead;
     }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type DisplayName = S::DisplayName;
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Handle = S::Handle;
         type Reviews = S::Reviews;
-        type Handle = Set<members::handle>;
+        type DisplayName = Set<members::display_name>;
         type BooksRead = S::BooksRead;
     }
     ///State transition - sets the `books_read` field to Set
     pub struct SetBooksRead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBooksRead<S> {}
     impl<S: State> State for SetBooksRead<S> {
-        type DisplayName = S::DisplayName;
-        type Reviews = S::Reviews;
         type Handle = S::Handle;
+        type Reviews = S::Reviews;
+        type DisplayName = S::DisplayName;
         type BooksRead = Set<members::books_read>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `reviews` field
-        pub struct reviews(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `reviews` field
+        pub struct reviews(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `books_read` field
         pub struct books_read(());
     }
@@ -2592,9 +3025,9 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::DisplayName: profile_state::IsSet,
-    S::Reviews: profile_state::IsSet,
     S::Handle: profile_state::IsSet,
+    S::Reviews: profile_state::IsSet,
+    S::DisplayName: profile_state::IsSet,
     S::BooksRead: profile_state::IsSet,
 {
     /// Build the final struct
@@ -2631,93 +3064,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "profile"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.books_read;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "books_read",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.reviews;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reviews",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// User is currently reading the book
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Reading;
-impl std::fmt::Display for Reading {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "reading")
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Review<'a> {
-    ///The date the review was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID of the user who made the review
-    #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
-    ///The handle of the user who made the review
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    ///The review content
-    #[serde(borrow)]
-    pub review: jacquard_common::CowStr<'a>,
-    ///The number of stars given to the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
-}
-
 pub mod review_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2729,66 +3075,66 @@ pub mod review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type CreatedAt;
-        type Did;
         type Review;
+        type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type CreatedAt = Unset;
-        type Did = Unset;
         type Review = Unset;
+        type Did = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
-        type CreatedAt = S::CreatedAt;
+        type Review = S::Review;
         type Did = S::Did;
-        type Review = S::Review;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Handle = S::Handle;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
-        type Review = S::Review;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type CreatedAt = S::CreatedAt;
-        type Did = Set<members::did>;
-        type Review = S::Review;
     }
     ///State transition - sets the `review` field to Set
     pub struct SetReview<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReview<S> {}
     impl<S: State> State for SetReview<S> {
         type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
         type Review = Set<members::review>;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Review = S::Review;
+        type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Handle = S::Handle;
+        type Review = S::Review;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `review` field
         pub struct review(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -2916,9 +3262,9 @@ impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
     S::Handle: review_state::IsSet,
-    S::CreatedAt: review_state::IsSet,
-    S::Did: review_state::IsSet,
     S::Review: review_state::IsSet,
+    S::Did: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -2950,88 +3296,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "review"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UserBook<'a> {
-    ///The authors of the book (tab separated)
-    #[serde(borrow)]
-    pub authors: jacquard_common::CowStr<'a>,
-    ///Progress tracking information for the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub book_progress: std::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
-    ///Cover image of the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Book description/summary
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date the user finished reading the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The book's hive id, used to correlate user's books with the hive
-    #[serde(borrow)]
-    pub hive_id: jacquard_common::CowStr<'a>,
-    ///Average rating (0-1000)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
-    ///The book's review
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub review: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
-    ///The date the user started reading the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<UserBookStatus<'a>>,
-    ///Cover image of the book
-    #[serde(borrow)]
-    pub thumbnail: jacquard_common::CowStr<'a>,
-    ///The title of the book
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    ///The DID of the user who added the book
-    #[serde(borrow)]
-    pub user_did: jacquard_common::CowStr<'a>,
-    ///The handle of the user who added the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user_handle: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod user_book_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3042,105 +3306,105 @@ pub mod user_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type UserDid;
-        type Thumbnail;
+        type Title;
         type Authors;
-        type HiveId;
+        type Thumbnail;
         type CreatedAt;
+        type HiveId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type UserDid = Unset;
-        type Thumbnail = Unset;
+        type Title = Unset;
         type Authors = Unset;
-        type HiveId = Unset;
+        type Thumbnail = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type UserDid = S::UserDid;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-        type HiveId = S::HiveId;
-        type CreatedAt = S::CreatedAt;
+        type HiveId = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
-        type Title = S::Title;
         type UserDid = Set<members::user_did>;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-        type HiveId = S::HiveId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `thumbnail` field to Set
-    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
-    impl<S: State> State for SetThumbnail<S> {
         type Title = S::Title;
-        type UserDid = S::UserDid;
-        type Thumbnail = Set<members::thumbnail>;
         type Authors = S::Authors;
-        type HiveId = S::HiveId;
+        type Thumbnail = S::Thumbnail;
         type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type UserDid = S::UserDid;
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
         type UserDid = S::UserDid;
-        type Thumbnail = S::Thumbnail;
+        type Title = S::Title;
         type Authors = Set<members::authors>;
-        type HiveId = S::HiveId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiveId<S> {}
-    impl<S: State> State for SetHiveId<S> {
-        type Title = S::Title;
-        type UserDid = S::UserDid;
         type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-        type HiveId = Set<members::hive_id>;
         type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `thumbnail` field to Set
+    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
+    impl<S: State> State for SetThumbnail<S> {
+        type UserDid = S::UserDid;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type Thumbnail = Set<members::thumbnail>;
+        type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type UserDid = S::UserDid;
-        type Thumbnail = S::Thumbnail;
+        type Title = S::Title;
         type Authors = S::Authors;
-        type HiveId = S::HiveId;
+        type Thumbnail = S::Thumbnail;
         type CreatedAt = Set<members::created_at>;
+        type HiveId = S::HiveId;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type UserDid = S::UserDid;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type Thumbnail = S::Thumbnail;
+        type CreatedAt = S::CreatedAt;
+        type HiveId = Set<members::hive_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `thumbnail` field
-        pub struct thumbnail(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `authors` field
         pub struct authors(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
+        ///Marker type for the `thumbnail` field
+        pub struct thumbnail(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
     }
 }
 
@@ -3486,12 +3750,12 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
 impl<'a, S> UserBookBuilder<'a, S>
 where
     S: user_book_state::State,
-    S::Title: user_book_state::IsSet,
     S::UserDid: user_book_state::IsSet,
-    S::Thumbnail: user_book_state::IsSet,
+    S::Title: user_book_state::IsSet,
     S::Authors: user_book_state::IsSet,
-    S::HiveId: user_book_state::IsSet,
+    S::Thumbnail: user_book_state::IsSet,
     S::CreatedAt: user_book_state::IsSet,
+    S::HiveId: user_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UserBook<'a> {
@@ -3542,269 +3806,5 @@ where
             user_handle: self.__unsafe_private_named.15,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UserBookStatus<'a> {
-    Finished,
-    Reading,
-    WantToRead,
-    Abandoned,
-    Owned,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> UserBookStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Finished => "buzz.bookhive.defs#finished",
-            Self::Reading => "buzz.bookhive.defs#reading",
-            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
-            Self::Abandoned => "buzz.bookhive.defs#abandoned",
-            Self::Owned => "buzz.bookhive.defs#owned",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for UserBookStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "buzz.bookhive.defs#finished" => Self::Finished,
-            "buzz.bookhive.defs#reading" => Self::Reading,
-            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
-            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
-            "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for UserBookStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "buzz.bookhive.defs#finished" => Self::Finished,
-            "buzz.bookhive.defs#reading" => Self::Reading,
-            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
-            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
-            "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UserBookStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for UserBookStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for UserBookStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for UserBookStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for UserBookStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for UserBookStatus<'_> {
-    type Output = UserBookStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UserBookStatus::Finished => UserBookStatus::Finished,
-            UserBookStatus::Reading => UserBookStatus::Reading,
-            UserBookStatus::WantToRead => UserBookStatus::WantToRead,
-            UserBookStatus::Abandoned => UserBookStatus::Abandoned,
-            UserBookStatus::Owned => UserBookStatus::Owned,
-            UserBookStatus::Other(v) => UserBookStatus::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.defs"
-    }
-    fn def_name() -> &'static str {
-        "userBook"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.authors;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.authors;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.rating {
-            if *value > 1000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
-                    max: 1000i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.rating {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rating",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.review {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 15000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "review",
-                        ),
-                        max: 15000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.stars {
-            if *value > 10i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
-                    max: 10i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.stars {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// User wants to read the book
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct WantToRead;
-impl std::fmt::Display for WantToRead {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "wantToRead")
     }
 }

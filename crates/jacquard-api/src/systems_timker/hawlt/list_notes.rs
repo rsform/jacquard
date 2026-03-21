@@ -27,6 +27,90 @@ pub struct ListNotes<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListNotesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notes: Vec<crate::systems_timker::hawlt::list_notes::NoteView<'a>>,
+}
+
+/// A note record with its AT URI, CID, and server-side index timestamp.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NoteView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: crate::systems_timker::hawlt::note::Note<'a>,
+}
+
+/// Response type for
+///systems.timker.hawlt.listNotes
+pub struct ListNotesResponse;
+impl jacquard_common::xrpc::XrpcResp for ListNotesResponse {
+    const NSID: &'static str = "systems.timker.hawlt.listNotes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListNotesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotes<'a> {
+    const NSID: &'static str = "systems.timker.hawlt.listNotes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListNotesResponse;
+}
+
+/// Endpoint type for
+///systems.timker.hawlt.listNotes
+pub struct ListNotesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListNotesRequest {
+    const PATH: &'static str = "/xrpc/systems.timker.hawlt.listNotes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListNotes<'de>;
+    type Response = ListNotesResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteView<'a> {
+    fn nsid() -> &'static str {
+        "systems.timker.hawlt.listNotes"
+    }
+    fn def_name() -> &'static str {
+        "noteView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_systems_timker_hawlt_listNotes()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod list_notes_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -151,73 +235,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListNotesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notes: Vec<crate::systems_timker::hawlt::list_notes::NoteView<'a>>,
-}
-
-/// Response type for
-///systems.timker.hawlt.listNotes
-pub struct ListNotesResponse;
-impl jacquard_common::xrpc::XrpcResp for ListNotesResponse {
-    const NSID: &'static str = "systems.timker.hawlt.listNotes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotes<'a> {
-    const NSID: &'static str = "systems.timker.hawlt.listNotes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListNotesResponse;
-}
-
-/// Endpoint type for
-///systems.timker.hawlt.listNotes
-pub struct ListNotesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListNotesRequest {
-    const PATH: &'static str = "/xrpc/systems.timker.hawlt.listNotes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListNotes<'de>;
-    type Response = ListNotesResponse;
-}
-
-/// A note record with its AT URI, CID, and server-side index timestamp.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NoteView<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: crate::systems_timker::hawlt::note::Note<'a>,
-}
-
 pub mod note_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -228,67 +245,67 @@ pub mod note_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Cid;
         type Uri;
+        type Cid;
         type Value;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Uri = Unset;
+        type Cid = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Value = S::Value;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
         type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
+        type Cid = S::Cid;
         type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -401,10 +418,10 @@ where
 impl<'a, S> NoteViewBuilder<'a, S>
 where
     S: note_view_state::State,
-    S::IndexedAt: note_view_state::IsSet,
-    S::Cid: note_view_state::IsSet,
     S::Uri: note_view_state::IsSet,
+    S::Cid: note_view_state::IsSet,
     S::Value: note_view_state::IsSet,
+    S::IndexedAt: note_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NoteView<'a> {
@@ -610,22 +627,5 @@ fn lexicon_doc_systems_timker_hawlt_listNotes() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteView<'a> {
-    fn nsid() -> &'static str {
-        "systems.timker.hawlt.listNotes"
-    }
-    fn def_name() -> &'static str {
-        "noteView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_systems_timker_hawlt_listNotes()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

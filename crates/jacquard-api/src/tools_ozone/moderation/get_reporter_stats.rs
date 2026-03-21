@@ -20,6 +20,48 @@ pub struct GetReporterStats<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetReporterStatsOutput<'a> {
+    #[serde(borrow)]
+    pub stats: Vec<crate::tools_ozone::moderation::ReporterStats<'a>>,
+}
+
+/// Response type for
+///tools.ozone.moderation.getReporterStats
+pub struct GetReporterStatsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetReporterStatsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetReporterStatsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetReporterStats<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetReporterStatsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.getReporterStats
+pub struct GetReporterStatsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetReporterStatsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getReporterStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetReporterStats<'de>;
+    type Response = GetReporterStatsResponse;
+}
+
 pub mod get_reporter_stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             dids: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetReporterStatsOutput<'a> {
-    #[serde(borrow)]
-    pub stats: Vec<crate::tools_ozone::moderation::ReporterStats<'a>>,
-}
-
-/// Response type for
-///tools.ozone.moderation.getReporterStats
-pub struct GetReporterStatsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetReporterStatsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetReporterStatsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetReporterStats<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetReporterStatsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.getReporterStats
-pub struct GetReporterStatsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetReporterStatsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getReporterStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetReporterStats<'de>;
-    type Response = GetReporterStatsResponse;
 }

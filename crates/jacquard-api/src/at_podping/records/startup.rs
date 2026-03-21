@@ -59,6 +59,84 @@ pub struct Startup<'a> {
     pub v: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StartupGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Startup<'a>,
+}
+
+impl<'a> Startup<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StartupRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StartupRecord;
+impl jacquard_common::xrpc::XrpcResp for StartupRecord {
+    const NSID: &'static str = "at.podping.records.startup";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StartupGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StartupGetRecordOutput<'_>> for Startup<'_> {
+    fn from(output: StartupGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Startup<'_> {
+    const NSID: &'static str = "at.podping.records.startup";
+    type Record = StartupRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StartupRecord {
+    const NSID: &'static str = "at.podping.records.startup";
+    type Record = StartupRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Startup<'a> {
+    fn nsid() -> &'static str {
+        "at.podping.records.startup"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_podping_records_startup()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod startup_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -70,50 +148,50 @@ pub mod startup_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Message;
-        type ServerAccount;
         type Timestamp;
+        type ServerAccount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Message = Unset;
-        type ServerAccount = Unset;
         type Timestamp = Unset;
+        type ServerAccount = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
         type Message = Set<members::message>;
+        type Timestamp = S::Timestamp;
         type ServerAccount = S::ServerAccount;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `server_account` field to Set
-    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
-    impl<S: State> State for SetServerAccount<S> {
-        type Message = S::Message;
-        type ServerAccount = Set<members::server_account>;
-        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
         type Message = S::Message;
-        type ServerAccount = S::ServerAccount;
         type Timestamp = Set<members::timestamp>;
+        type ServerAccount = S::ServerAccount;
+    }
+    ///State transition - sets the `server_account` field to Set
+    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
+    impl<S: State> State for SetServerAccount<S> {
+        type Message = S::Message;
+        type Timestamp = S::Timestamp;
+        type ServerAccount = Set<members::server_account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `server_account` field
-        pub struct server_account(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `server_account` field
+        pub struct server_account(());
     }
 }
 
@@ -358,8 +436,8 @@ impl<'a, S> StartupBuilder<'a, S>
 where
     S: startup_state::State,
     S::Message: startup_state::IsSet,
-    S::ServerAccount: startup_state::IsSet,
     S::Timestamp: startup_state::IsSet,
+    S::ServerAccount: startup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Startup<'a> {
@@ -400,84 +478,6 @@ where
             v: self.__unsafe_private_named.10,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Startup<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StartupRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StartupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Startup<'a>,
-}
-
-impl From<StartupGetRecordOutput<'_>> for Startup<'_> {
-    fn from(output: StartupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Startup<'_> {
-    const NSID: &'static str = "at.podping.records.startup";
-    type Record = StartupRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StartupRecord;
-impl jacquard_common::xrpc::XrpcResp for StartupRecord {
-    const NSID: &'static str = "at.podping.records.startup";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StartupGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StartupRecord {
-    const NSID: &'static str = "at.podping.records.startup";
-    type Record = StartupRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Startup<'a> {
-    fn nsid() -> &'static str {
-        "at.podping.records.startup"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_podping_records_startup()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -35,6 +35,161 @@ pub struct Rights<'a> {
     pub rights_type: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RightsAttachment<'a> {
+    #[serde(rename = "org.hypercerts.defs#uri")]
+    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    #[serde(rename = "org.hypercerts.defs#smallBlob")]
+    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RightsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Rights<'a>,
+}
+
+impl<'a> Rights<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RightsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RightsRecord;
+impl jacquard_common::xrpc::XrpcResp for RightsRecord {
+    const NSID: &'static str = "org.hypercerts.claim.rights";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RightsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RightsGetRecordOutput<'_>> for Rights<'_> {
+    fn from(output: RightsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Rights<'_> {
+    const NSID: &'static str = "org.hypercerts.claim.rights";
+    type Record = RightsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RightsRecord {
+    const NSID: &'static str = "org.hypercerts.claim.rights";
+    type Record = RightsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
+    fn nsid() -> &'static str {
+        "org.hypercerts.claim.rights"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_hypercerts_claim_rights()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.rights_description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rights_description",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.rights_description;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "rights_description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.rights_name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rights_name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.rights_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rights_type",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod rights_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -45,67 +200,67 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RightsName;
+        type RightsDescription;
         type RightsType;
         type CreatedAt;
-        type RightsDescription;
+        type RightsName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RightsName = Unset;
+        type RightsDescription = Unset;
         type RightsType = Unset;
         type CreatedAt = Unset;
-        type RightsDescription = Unset;
-    }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsName<S> {}
-    impl<S: State> State for SetRightsName<S> {
-        type RightsName = Set<members::rights_name>;
-        type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
-        type RightsDescription = S::RightsDescription;
-    }
-    ///State transition - sets the `rights_type` field to Set
-    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsType<S> {}
-    impl<S: State> State for SetRightsType<S> {
-        type RightsName = S::RightsName;
-        type RightsType = Set<members::rights_type>;
-        type CreatedAt = S::CreatedAt;
-        type RightsDescription = S::RightsDescription;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type RightsName = S::RightsName;
-        type RightsType = S::RightsType;
-        type CreatedAt = Set<members::created_at>;
-        type RightsDescription = S::RightsDescription;
+        type RightsName = Unset;
     }
     ///State transition - sets the `rights_description` field to Set
     pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
     impl<S: State> State for SetRightsDescription<S> {
-        type RightsName = S::RightsName;
+        type RightsDescription = Set<members::rights_description>;
         type RightsType = S::RightsType;
         type CreatedAt = S::CreatedAt;
-        type RightsDescription = Set<members::rights_description>;
+        type RightsName = S::RightsName;
+    }
+    ///State transition - sets the `rights_type` field to Set
+    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsType<S> {}
+    impl<S: State> State for SetRightsType<S> {
+        type RightsDescription = S::RightsDescription;
+        type RightsType = Set<members::rights_type>;
+        type CreatedAt = S::CreatedAt;
+        type RightsName = S::RightsName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type RightsDescription = S::RightsDescription;
+        type RightsType = S::RightsType;
+        type CreatedAt = Set<members::created_at>;
+        type RightsName = S::RightsName;
+    }
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsName<S> {}
+    impl<S: State> State for SetRightsName<S> {
+        type RightsDescription = S::RightsDescription;
+        type RightsType = S::RightsType;
+        type CreatedAt = S::CreatedAt;
+        type RightsName = Set<members::rights_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rights_name` field
-        pub struct rights_name(());
+        ///Marker type for the `rights_description` field
+        pub struct rights_description(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `rights_description` field
-        pub struct rights_description(());
+        ///Marker type for the `rights_name` field
+        pub struct rights_name(());
     }
 }
 
@@ -232,10 +387,10 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
-    S::RightsName: rights_state::IsSet,
+    S::RightsDescription: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
     S::CreatedAt: rights_state::IsSet,
-    S::RightsDescription: rights_state::IsSet,
+    S::RightsName: rights_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rights<'a> {
@@ -264,161 +419,6 @@ where
             rights_type: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Rights<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RightsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RightsAttachment<'a> {
-    #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
-    #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RightsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Rights<'a>,
-}
-
-impl From<RightsGetRecordOutput<'_>> for Rights<'_> {
-    fn from(output: RightsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Rights<'_> {
-    const NSID: &'static str = "org.hypercerts.claim.rights";
-    type Record = RightsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RightsRecord;
-impl jacquard_common::xrpc::XrpcResp for RightsRecord {
-    const NSID: &'static str = "org.hypercerts.claim.rights";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RightsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RightsRecord {
-    const NSID: &'static str = "org.hypercerts.claim.rights";
-    type Record = RightsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
-    fn nsid() -> &'static str {
-        "org.hypercerts.claim.rights"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_hypercerts_claim_rights()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.rights_description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_description",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.rights_description;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "rights_description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.rights_name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.rights_type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_type",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

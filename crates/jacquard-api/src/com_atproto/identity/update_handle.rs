@@ -22,6 +22,36 @@ pub struct UpdateHandle<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+/// Response type for
+///com.atproto.identity.updateHandle
+pub struct UpdateHandleResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
+    const NSID: &'static str = "com.atproto.identity.updateHandle";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
+    const NSID: &'static str = "com.atproto.identity.updateHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateHandleResponse;
+}
+
+/// Endpoint type for
+///com.atproto.identity.updateHandle
+pub struct UpdateHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.updateHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateHandle<'de>;
+    type Response = UpdateHandleResponse;
+}
+
 pub mod update_handle_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,34 +155,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.identity.updateHandle
-pub struct UpdateHandleResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
-    const NSID: &'static str = "com.atproto.identity.updateHandle";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
-    const NSID: &'static str = "com.atproto.identity.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateHandleResponse;
-}
-
-/// Endpoint type for
-///com.atproto.identity.updateHandle
-pub struct UpdateHandleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.identity.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateHandle<'de>;
-    type Response = UpdateHandleResponse;
 }

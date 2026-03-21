@@ -24,6 +24,32 @@ pub struct AtProtoCallback<'a> {
     pub state: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///app.ocho.auth.atProtoCallback
+pub struct AtProtoCallbackResponse;
+impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
+    const NSID: &'static str = "app.ocho.auth.atProtoCallback";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<'a> {
+    const NSID: &'static str = "app.ocho.auth.atProtoCallback";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = AtProtoCallbackResponse;
+}
+
+/// Endpoint type for
+///app.ocho.auth.atProtoCallback
+pub struct AtProtoCallbackRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.auth.atProtoCallback";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = AtProtoCallback<'de>;
+    type Response = AtProtoCallbackResponse;
+}
+
 pub mod at_proto_callback_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,50 +61,50 @@ pub mod at_proto_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type State;
-        type Code;
         type Iss;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type State = Unset;
-        type Code = Unset;
         type Iss = Unset;
+        type Code = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
         type State = Set<members::state>;
+        type Iss = S::Iss;
         type Code = S::Code;
-        type Iss = S::Iss;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type State = S::State;
-        type Code = Set<members::code>;
-        type Iss = S::Iss;
     }
     ///State transition - sets the `iss` field to Set
     pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIss<S> {}
     impl<S: State> State for SetIss<S> {
         type State = S::State;
-        type Code = S::Code;
         type Iss = Set<members::iss>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type State = S::State;
+        type Iss = S::Iss;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `state` field
         pub struct state(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `iss` field
         pub struct iss(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
@@ -172,8 +198,8 @@ impl<'a, S> AtProtoCallbackBuilder<'a, S>
 where
     S: at_proto_callback_state::State,
     S::State: at_proto_callback_state::IsSet,
-    S::Code: at_proto_callback_state::IsSet,
     S::Iss: at_proto_callback_state::IsSet,
+    S::Code: at_proto_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AtProtoCallback<'a> {
@@ -183,30 +209,4 @@ where
             state: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-/// Response type for
-///app.ocho.auth.atProtoCallback
-pub struct AtProtoCallbackResponse;
-impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
-    const NSID: &'static str = "app.ocho.auth.atProtoCallback";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<'a> {
-    const NSID: &'static str = "app.ocho.auth.atProtoCallback";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = AtProtoCallbackResponse;
-}
-
-/// Endpoint type for
-///app.ocho.auth.atProtoCallback
-pub struct AtProtoCallbackRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.auth.atProtoCallback";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = AtProtoCallback<'de>;
-    type Response = AtProtoCallbackResponse;
 }

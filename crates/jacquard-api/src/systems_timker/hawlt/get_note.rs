@@ -24,6 +24,52 @@ pub struct GetNote<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetNoteOutput<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: crate::systems_timker::hawlt::note::Note<'a>,
+}
+
+/// Response type for
+///systems.timker.hawlt.getNote
+pub struct GetNoteResponse;
+impl jacquard_common::xrpc::XrpcResp for GetNoteResponse {
+    const NSID: &'static str = "systems.timker.hawlt.getNote";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetNoteOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetNote<'a> {
+    const NSID: &'static str = "systems.timker.hawlt.getNote";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetNoteResponse;
+}
+
+/// Endpoint type for
+///systems.timker.hawlt.getNote
+pub struct GetNoteRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
+    const PATH: &'static str = "/xrpc/systems.timker.hawlt.getNote";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetNote<'de>;
+    type Response = GetNoteResponse;
+}
+
 pub mod get_note_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,37 +80,37 @@ pub mod get_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Repo;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Repo = S::Repo;
+        type Rkey = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Rkey = S::Rkey;
         type Repo = Set<members::repo>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Repo = S::Repo;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -145,8 +191,8 @@ where
 impl<'a, S> GetNoteBuilder<'a, S>
 where
     S: get_note_state::State,
-    S::Rkey: get_note_state::IsSet,
     S::Repo: get_note_state::IsSet,
+    S::Rkey: get_note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetNote<'a> {
@@ -155,50 +201,4 @@ where
             rkey: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetNoteOutput<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: crate::systems_timker::hawlt::note::Note<'a>,
-}
-
-/// Response type for
-///systems.timker.hawlt.getNote
-pub struct GetNoteResponse;
-impl jacquard_common::xrpc::XrpcResp for GetNoteResponse {
-    const NSID: &'static str = "systems.timker.hawlt.getNote";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNoteOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNote<'a> {
-    const NSID: &'static str = "systems.timker.hawlt.getNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetNoteResponse;
-}
-
-/// Endpoint type for
-///systems.timker.hawlt.getNote
-pub struct GetNoteRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
-    const PATH: &'static str = "/xrpc/systems.timker.hawlt.getNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNote<'de>;
-    type Response = GetNoteResponse;
 }

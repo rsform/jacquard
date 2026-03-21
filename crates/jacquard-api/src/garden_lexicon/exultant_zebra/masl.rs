@@ -27,6 +27,65 @@ pub struct Masl<'a> {
     pub resources: Vec<crate::garden_lexicon::exultant_zebra::masl::Resource<'a>>,
 }
 
+/// A single resource identified by a CID.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Resource<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Optional path for this resource (e.g. '/index.html').
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The content identifier for this resource.
+    #[serde(borrow)]
+    pub src: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Masl<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.masl"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_masl()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resource<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.masl"
+    }
+    fn def_name() -> &'static str {
+        "resource"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_masl()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod masl_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -297,48 +356,6 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_masl() -> ::jacquard_lexicon::lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Masl<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.masl"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_masl()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A single resource identified by a CID.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Resource<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optional path for this resource (e.g. '/index.html').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The content identifier for this resource.
-    #[serde(borrow)]
-    pub src: jacquard_common::types::blob::BlobRef<'a>,
-}
-
 pub mod resource_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -482,22 +499,5 @@ where
             src: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Resource<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.masl"
-    }
-    fn def_name() -> &'static str {
-        "resource"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_masl()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

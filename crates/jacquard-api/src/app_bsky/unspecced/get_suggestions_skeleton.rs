@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -33,6 +29,66 @@ pub struct GetSuggestionsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestionsSkeletonOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::unspecced::SkeletonSearchActor<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///DEPRECATED: use recIdStr instead.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rec_id: std::option::Option<i64>,
+    ///Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getSuggestionsSkeleton
+pub struct GetSuggestionsSkeletonResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestionsSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestionsSkeletonOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestionsSkeleton<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestionsSkeletonResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getSuggestionsSkeleton
+pub struct GetSuggestionsSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestionsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestionsSkeleton<'de>;
+    type Response = GetSuggestionsSkeletonResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_suggestions_skeleton_state {
@@ -167,60 +223,4 @@ where
             viewer: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestionsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::unspecced::SkeletonSearchActor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rec_id: std::option::Option<i64>,
-    ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getSuggestionsSkeleton
-pub struct GetSuggestionsSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestionsSkeletonResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestionsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestionsSkeleton<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestionsSkeletonResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getSuggestionsSkeleton
-pub struct GetSuggestionsSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsSkeletonRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestionsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestionsSkeleton<'de>;
-    type Response = GetSuggestionsSkeletonResponse;
 }

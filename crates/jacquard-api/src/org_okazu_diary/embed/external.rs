@@ -30,6 +30,58 @@ pub struct External<'a> {
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Thumb<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::UriValue<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
+    fn nsid() -> &'static str {
+        "org.okazu-diary.embed.external"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_okazu_diary_embed_external()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thumb<'a> {
+    fn nsid() -> &'static str {
+        "org.okazu-diary.embed.external"
+    }
+    fn def_name() -> &'static str {
+        "thumb"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_okazu_diary_embed_external()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod external_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -348,41 +400,6 @@ fn lexicon_doc_org_okazu_diary_embed_external() -> ::jacquard_lexicon::lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
-    fn nsid() -> &'static str {
-        "org.okazu-diary.embed.external"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_okazu_diary_embed_external()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumb<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod thumb_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -520,22 +537,5 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thumb<'a> {
-    fn nsid() -> &'static str {
-        "org.okazu-diary.embed.external"
-    }
-    fn def_name() -> &'static str {
-        "thumb"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_okazu_diary_embed_external()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

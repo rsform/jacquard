@@ -27,6 +27,157 @@ pub struct Log<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LogGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Log<'a>,
+}
+
+/// Reference to a visible spark with timing information
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SparkRef<'a> {
+    ///Milliseconds since the spark appeared on screen (0-10000)
+    pub elapsed: i64,
+    ///Strong reference to the spark record
+    #[serde(borrow)]
+    pub spark: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+impl<'a> Log<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LogRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LogRecord;
+impl jacquard_common::xrpc::XrpcResp for LogRecord {
+    const NSID: &'static str = "tech.tokimeki.takibi.log";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LogGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LogGetRecordOutput<'_>> for Log<'_> {
+    fn from(output: LogGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Log<'_> {
+    const NSID: &'static str = "tech.tokimeki.takibi.log";
+    type Record = LogRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LogRecord {
+    const NSID: &'static str = "tech.tokimeki.takibi.log";
+    type Record = LogRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.takibi.log"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_takibi_log()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.visible_sparks {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "visible_sparks",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.takibi.log"
+    }
+    fn def_name() -> &'static str {
+        "sparkRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_takibi_log()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.elapsed;
+            if *value > 10000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "elapsed",
+                    ),
+                    max: 10000i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.elapsed;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "elapsed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod log_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -154,96 +305,6 @@ where
     }
 }
 
-impl<'a> Log<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LogRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Log<'a>,
-}
-
-impl From<LogGetRecordOutput<'_>> for Log<'_> {
-    fn from(output: LogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Log<'_> {
-    const NSID: &'static str = "tech.tokimeki.takibi.log";
-    type Record = LogRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LogRecord;
-impl jacquard_common::xrpc::XrpcResp for LogRecord {
-    const NSID: &'static str = "tech.tokimeki.takibi.log";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LogGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LogRecord {
-    const NSID: &'static str = "tech.tokimeki.takibi.log";
-    type Record = LogRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.takibi.log"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_takibi_log()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.visible_sparks {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "visible_sparks",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -367,26 +428,6 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-/// Reference to a visible spark with timing information
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SparkRef<'a> {
-    ///Milliseconds since the spark appeared on screen (0-10000)
-    pub elapsed: i64,
-    ///Strong reference to the spark record
-    #[serde(borrow)]
-    pub spark: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod spark_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -397,37 +438,37 @@ pub mod spark_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Spark;
         type Elapsed;
+        type Spark;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Spark = Unset;
         type Elapsed = Unset;
-    }
-    ///State transition - sets the `spark` field to Set
-    pub struct SetSpark<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpark<S> {}
-    impl<S: State> State for SetSpark<S> {
-        type Spark = Set<members::spark>;
-        type Elapsed = S::Elapsed;
+        type Spark = Unset;
     }
     ///State transition - sets the `elapsed` field to Set
     pub struct SetElapsed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetElapsed<S> {}
     impl<S: State> State for SetElapsed<S> {
-        type Spark = S::Spark;
         type Elapsed = Set<members::elapsed>;
+        type Spark = S::Spark;
+    }
+    ///State transition - sets the `spark` field to Set
+    pub struct SetSpark<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpark<S> {}
+    impl<S: State> State for SetSpark<S> {
+        type Elapsed = S::Elapsed;
+        type Spark = Set<members::spark>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `spark` field
-        pub struct spark(());
         ///Marker type for the `elapsed` field
         pub struct elapsed(());
+        ///Marker type for the `spark` field
+        pub struct spark(());
     }
 }
 
@@ -500,8 +541,8 @@ where
 impl<'a, S> SparkRefBuilder<'a, S>
 where
     S: spark_ref_state::State,
-    S::Spark: spark_ref_state::IsSet,
     S::Elapsed: spark_ref_state::IsSet,
+    S::Spark: spark_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparkRef<'a> {
@@ -524,46 +565,5 @@ where
             spark: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.takibi.log"
-    }
-    fn def_name() -> &'static str {
-        "sparkRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_takibi_log()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.elapsed;
-            if *value > 10000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "elapsed",
-                    ),
-                    max: 10000i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.elapsed;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "elapsed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

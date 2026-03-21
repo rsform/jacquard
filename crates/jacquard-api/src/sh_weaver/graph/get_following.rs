@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,57 @@ pub struct GetFollowing<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFollowingOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub following: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    #[serde(borrow)]
+    pub subject: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+}
+
+/// Response type for
+///sh.weaver.graph.getFollowing
+pub struct GetFollowingResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFollowingResponse {
+    const NSID: &'static str = "sh.weaver.graph.getFollowing";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFollowingOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowing<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getFollowing";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFollowingResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getFollowing
+pub struct GetFollowingRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getFollowing";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFollowing<'de>;
+    type Response = GetFollowingResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_following_state {
@@ -153,51 +200,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFollowingOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub following: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(borrow)]
-    pub subject: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-}
-
-/// Response type for
-///sh.weaver.graph.getFollowing
-pub struct GetFollowingResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFollowingResponse {
-    const NSID: &'static str = "sh.weaver.graph.getFollowing";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFollowingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowing<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getFollowing";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFollowingResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getFollowing
-pub struct GetFollowingRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getFollowing";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFollowing<'de>;
-    type Response = GetFollowingResponse;
 }

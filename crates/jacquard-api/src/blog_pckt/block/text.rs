@@ -27,6 +27,23 @@ pub struct Text<'a> {
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.text"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_text()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -97,22 +114,5 @@ fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.text"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_text()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

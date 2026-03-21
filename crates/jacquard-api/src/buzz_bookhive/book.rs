@@ -54,6 +54,323 @@ pub struct Book<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BookStatus<'a> {
+    Finished,
+    Reading,
+    WantToRead,
+    Abandoned,
+    Owned,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> BookStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Finished => "buzz.bookhive.defs#finished",
+            Self::Reading => "buzz.bookhive.defs#reading",
+            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
+            Self::Abandoned => "buzz.bookhive.defs#abandoned",
+            Self::Owned => "buzz.bookhive.defs#owned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for BookStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for BookStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for BookStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for BookStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for BookStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for BookStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for BookStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for BookStatus<'_> {
+    type Output = BookStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BookStatus::Finished => BookStatus::Finished,
+            BookStatus::Reading => BookStatus::Reading,
+            BookStatus::WantToRead => BookStatus::WantToRead,
+            BookStatus::Abandoned => BookStatus::Abandoned,
+            BookStatus::Owned => BookStatus::Owned,
+            BookStatus::Other(v) => BookStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Book<'a>,
+}
+
+impl<'a> Book<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BookRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BookRecord;
+impl jacquard_common::xrpc::XrpcResp for BookRecord {
+    const NSID: &'static str = "buzz.bookhive.book";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BookGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BookGetRecordOutput<'_>> for Book<'_> {
+    fn from(output: BookGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Book<'_> {
+    const NSID: &'static str = "buzz.bookhive.book";
+    type Record = BookRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BookRecord {
+    const NSID: &'static str = "buzz.bookhive.book";
+    type Record = BookRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.book"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_book()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.authors;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.authors;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.cover {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.cover {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.review {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 15000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "review",
+                        ),
+                        max: 15000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value > 10i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod book_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -64,65 +381,65 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Authors;
         type CreatedAt;
-        type Title;
         type HiveId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Authors = Unset;
         type CreatedAt = Unset;
-        type Title = Unset;
         type HiveId = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type HiveId = S::HiveId;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
+        type Title = S::Title;
         type Authors = Set<members::authors>;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type HiveId = S::HiveId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
         type Authors = S::Authors;
         type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type HiveId = S::HiveId;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
         type HiveId = S::HiveId;
     }
     ///State transition - sets the `hive_id` field to Set
     pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHiveId<S> {}
     impl<S: State> State for SetHiveId<S> {
+        type Title = S::Title;
         type Authors = S::Authors;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type HiveId = Set<members::hive_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `hive_id` field
         pub struct hive_id(());
     }
@@ -374,9 +691,9 @@ where
 impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
+    S::Title: book_state::IsSet,
     S::Authors: book_state::IsSet,
     S::CreatedAt: book_state::IsSet,
-    S::Title: book_state::IsSet,
     S::HiveId: book_state::IsSet,
 {
     /// Build the final struct
@@ -418,323 +735,6 @@ where
             title: self.__unsafe_private_named.10.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Book<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BookRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BookStatus<'a> {
-    Finished,
-    Reading,
-    WantToRead,
-    Abandoned,
-    Owned,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> BookStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Finished => "buzz.bookhive.defs#finished",
-            Self::Reading => "buzz.bookhive.defs#reading",
-            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
-            Self::Abandoned => "buzz.bookhive.defs#abandoned",
-            Self::Owned => "buzz.bookhive.defs#owned",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for BookStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "buzz.bookhive.defs#finished" => Self::Finished,
-            "buzz.bookhive.defs#reading" => Self::Reading,
-            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
-            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
-            "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for BookStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "buzz.bookhive.defs#finished" => Self::Finished,
-            "buzz.bookhive.defs#reading" => Self::Reading,
-            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
-            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
-            "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BookStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for BookStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for BookStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for BookStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for BookStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for BookStatus<'_> {
-    type Output = BookStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BookStatus::Finished => BookStatus::Finished,
-            BookStatus::Reading => BookStatus::Reading,
-            BookStatus::WantToRead => BookStatus::WantToRead,
-            BookStatus::Abandoned => BookStatus::Abandoned,
-            BookStatus::Owned => BookStatus::Owned,
-            BookStatus::Other(v) => BookStatus::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BookGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Book<'a>,
-}
-
-impl From<BookGetRecordOutput<'_>> for Book<'_> {
-    fn from(output: BookGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Book<'_> {
-    const NSID: &'static str = "buzz.bookhive.book";
-    type Record = BookRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BookRecord;
-impl jacquard_common::xrpc::XrpcResp for BookRecord {
-    const NSID: &'static str = "buzz.bookhive.book";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BookGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BookRecord {
-    const NSID: &'static str = "buzz.bookhive.book";
-    type Record = BookRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.book"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_book()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.authors;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.authors;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.cover {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.cover {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.review {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 15000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "review",
-                        ),
-                        max: 15000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.stars {
-            if *value > 10i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
-                    max: 10i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.stars {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

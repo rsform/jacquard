@@ -20,6 +20,49 @@ pub struct GetClips<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetClipsOutput<'a> {
+    ///An array of hydrated clip views
+    #[serde(borrow)]
+    pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
+}
+
+/// Response type for
+///social.clippr.feed.getClips
+pub struct GetClipsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetClipsResponse {
+    const NSID: &'static str = "social.clippr.feed.getClips";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetClipsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetClips<'a> {
+    const NSID: &'static str = "social.clippr.feed.getClips";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetClipsResponse;
+}
+
+/// Endpoint type for
+///social.clippr.feed.getClips
+pub struct GetClipsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
+    const PATH: &'static str = "/xrpc/social.clippr.feed.getClips";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetClips<'de>;
+    type Response = GetClipsResponse;
+}
+
 pub mod get_clips_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetClipsOutput<'a> {
-    ///An array of hydrated clip views
-    #[serde(borrow)]
-    pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
-}
-
-/// Response type for
-///social.clippr.feed.getClips
-pub struct GetClipsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetClipsResponse {
-    const NSID: &'static str = "social.clippr.feed.getClips";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetClipsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetClips<'a> {
-    const NSID: &'static str = "social.clippr.feed.getClips";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetClipsResponse;
-}
-
-/// Endpoint type for
-///social.clippr.feed.getClips
-pub struct GetClipsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
-    const PATH: &'static str = "/xrpc/social.clippr.feed.getClips";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetClips<'de>;
-    type Response = GetClipsResponse;
 }

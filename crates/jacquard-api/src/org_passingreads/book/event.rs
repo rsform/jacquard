@@ -41,6 +41,247 @@ pub struct Event<'a> {
     pub occurred_at: jacquard_common::types::string::Datetime,
 }
 
+/// What event has occurred
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EventEvent<'a> {
+    OrgPassingreadsBookCheckin,
+    OrgPassingreadsBookDrop,
+    OrgPassingreadsBookFind,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EventEvent<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::OrgPassingreadsBookCheckin => "org.passingreads.book.checkin",
+            Self::OrgPassingreadsBookDrop => "org.passingreads.book.drop",
+            Self::OrgPassingreadsBookFind => "org.passingreads.book.find",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EventEvent<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
+            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
+            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EventEvent<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
+            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
+            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EventEvent<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EventEvent<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EventEvent<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EventEvent<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EventEvent<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EventEvent<'_> {
+    type Output = EventEvent<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EventEvent::OrgPassingreadsBookCheckin => {
+                EventEvent::OrgPassingreadsBookCheckin
+            }
+            EventEvent::OrgPassingreadsBookDrop => EventEvent::OrgPassingreadsBookDrop,
+            EventEvent::OrgPassingreadsBookFind => EventEvent::OrgPassingreadsBookFind,
+            EventEvent::Other(v) => EventEvent::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EventLocation<'a> {
+    #[serde(rename = "com.atproto.repo.strongRef#main")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "community.lexicon.location.hthree#main")]
+    Hthree(Box<crate::community_lexicon::location::hthree::Hthree<'a>>),
+    #[serde(rename = "org.passingreads.book.event#osmLocation")]
+    OsmLocation(Box<crate::org_passingreads::book::event::OsmLocation<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Event<'a>,
+}
+
+/// A physical location from OpenStreetMap.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OsmLocation<'a> {
+    ///The type of place (e.g., cafe, library, park).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The name of the place from OpenStreetMap.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///The OpenStreetMap element ID in interoperable format: N (node), W (way), or R (relation) prefix followed by numeric ID. Example: N123456789
+    #[serde(borrow)]
+    pub osm_id: jacquard_common::CowStr<'a>,
+    ///The H3 cell index for proximity queries.
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Event<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EventRecord;
+impl jacquard_common::xrpc::XrpcResp for EventRecord {
+    const NSID: &'static str = "org.passingreads.book.event";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EventGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EventGetRecordOutput<'_>> for Event<'_> {
+    fn from(output: EventGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Event<'_> {
+    const NSID: &'static str = "org.passingreads.book.event";
+    type Record = EventRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EventRecord {
+    const NSID: &'static str = "org.passingreads.book.event";
+    type Record = EventRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "org.passingreads.book.event"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_passingreads_book_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OsmLocation<'a> {
+    fn nsid() -> &'static str {
+        "org.passingreads.book.event"
+    }
+    fn def_name() -> &'static str {
+        "osmLocation"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_passingreads_book_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -51,105 +292,105 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
+        type OccurredAt;
+        type BookPub;
         type BookSig;
+        type Book;
         type Did;
         type Location;
-        type BookPub;
-        type OccurredAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
+        type OccurredAt = Unset;
+        type BookPub = Unset;
         type BookSig = Unset;
+        type Book = Unset;
         type Did = Unset;
         type Location = Unset;
-        type BookPub = Unset;
-        type OccurredAt = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type BookSig = S::BookSig;
-        type Did = S::Did;
-        type Location = S::Location;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `book_sig` field to Set
-    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookSig<S> {}
-    impl<S: State> State for SetBookSig<S> {
-        type Book = S::Book;
-        type BookSig = Set<members::book_sig>;
-        type Did = S::Did;
-        type Location = S::Location;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Book = S::Book;
-        type BookSig = S::BookSig;
-        type Did = Set<members::did>;
-        type Location = S::Location;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type Book = S::Book;
-        type BookSig = S::BookSig;
-        type Did = S::Did;
-        type Location = Set<members::location>;
-        type BookPub = S::BookPub;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `book_pub` field to Set
-    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookPub<S> {}
-    impl<S: State> State for SetBookPub<S> {
-        type Book = S::Book;
-        type BookSig = S::BookSig;
-        type Did = S::Did;
-        type Location = S::Location;
-        type BookPub = Set<members::book_pub>;
-        type OccurredAt = S::OccurredAt;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
     impl<S: State> State for SetOccurredAt<S> {
-        type Book = S::Book;
+        type OccurredAt = Set<members::occurred_at>;
+        type BookPub = S::BookPub;
         type BookSig = S::BookSig;
+        type Book = S::Book;
         type Did = S::Did;
         type Location = S::Location;
+    }
+    ///State transition - sets the `book_pub` field to Set
+    pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookPub<S> {}
+    impl<S: State> State for SetBookPub<S> {
+        type OccurredAt = S::OccurredAt;
+        type BookPub = Set<members::book_pub>;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+        type Did = S::Did;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `book_sig` field to Set
+    pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookSig<S> {}
+    impl<S: State> State for SetBookSig<S> {
+        type OccurredAt = S::OccurredAt;
         type BookPub = S::BookPub;
-        type OccurredAt = Set<members::occurred_at>;
+        type BookSig = Set<members::book_sig>;
+        type Book = S::Book;
+        type Did = S::Did;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+        type BookSig = S::BookSig;
+        type Book = Set<members::book>;
+        type Did = S::Did;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+        type Did = Set<members::did>;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type OccurredAt = S::OccurredAt;
+        type BookPub = S::BookPub;
+        type BookSig = S::BookSig;
+        type Book = S::Book;
+        type Did = S::Did;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
+        ///Marker type for the `occurred_at` field
+        pub struct occurred_at(());
+        ///Marker type for the `book_pub` field
+        pub struct book_pub(());
         ///Marker type for the `book_sig` field
         pub struct book_sig(());
+        ///Marker type for the `book` field
+        pub struct book(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `location` field
         pub struct location(());
-        ///Marker type for the `book_pub` field
-        pub struct book_pub(());
-        ///Marker type for the `occurred_at` field
-        pub struct occurred_at(());
     }
 }
 
@@ -316,12 +557,12 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Book: event_state::IsSet,
+    S::OccurredAt: event_state::IsSet,
+    S::BookPub: event_state::IsSet,
     S::BookSig: event_state::IsSet,
+    S::Book: event_state::IsSet,
     S::Did: event_state::IsSet,
     S::Location: event_state::IsSet,
-    S::BookPub: event_state::IsSet,
-    S::OccurredAt: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -354,201 +595,6 @@ where
             occurred_at: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// What event has occurred
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventEvent<'a> {
-    OrgPassingreadsBookCheckin,
-    OrgPassingreadsBookDrop,
-    OrgPassingreadsBookFind,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> EventEvent<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::OrgPassingreadsBookCheckin => "org.passingreads.book.checkin",
-            Self::OrgPassingreadsBookDrop => "org.passingreads.book.drop",
-            Self::OrgPassingreadsBookFind => "org.passingreads.book.find",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for EventEvent<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
-            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
-            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for EventEvent<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
-            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
-            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EventEvent<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for EventEvent<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for EventEvent<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for EventEvent<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for EventEvent<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for EventEvent<'_> {
-    type Output = EventEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EventEvent::OrgPassingreadsBookCheckin => {
-                EventEvent::OrgPassingreadsBookCheckin
-            }
-            EventEvent::OrgPassingreadsBookDrop => EventEvent::OrgPassingreadsBookDrop,
-            EventEvent::OrgPassingreadsBookFind => EventEvent::OrgPassingreadsBookFind,
-            EventEvent::Other(v) => EventEvent::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum EventLocation<'a> {
-    #[serde(rename = "com.atproto.repo.strongRef#main")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-    #[serde(rename = "community.lexicon.location.hthree#main")]
-    Hthree(Box<crate::community_lexicon::location::hthree::Hthree<'a>>),
-    #[serde(rename = "org.passingreads.book.event#osmLocation")]
-    OsmLocation(Box<crate::org_passingreads::book::event::OsmLocation<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
-}
-
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Event<'_> {
-    const NSID: &'static str = "org.passingreads.book.event";
-    type Record = EventRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EventRecord;
-impl jacquard_common::xrpc::XrpcResp for EventRecord {
-    const NSID: &'static str = "org.passingreads.book.event";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EventRecord {
-    const NSID: &'static str = "org.passingreads.book.event";
-    type Record = EventRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
-    fn nsid() -> &'static str {
-        "org.passingreads.book.event"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_passingreads_book_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -817,51 +863,5 @@ fn lexicon_doc_org_passingreads_book_event() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-/// A physical location from OpenStreetMap.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OsmLocation<'a> {
-    ///The type of place (e.g., cafe, library, park).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The name of the place from OpenStreetMap.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///The OpenStreetMap element ID in interoperable format: N (node), W (way), or R (relation) prefix followed by numeric ID. Example: N123456789
-    #[serde(borrow)]
-    pub osm_id: jacquard_common::CowStr<'a>,
-    ///The H3 cell index for proximity queries.
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OsmLocation<'a> {
-    fn nsid() -> &'static str {
-        "org.passingreads.book.event"
-    }
-    fn def_name() -> &'static str {
-        "osmLocation"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_passingreads_book_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

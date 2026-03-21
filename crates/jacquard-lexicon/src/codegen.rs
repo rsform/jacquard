@@ -10,6 +10,7 @@ pub(crate) mod lifetime;
 pub(crate) mod names;
 pub(crate) mod nsid_utils;
 pub(crate) mod output;
+pub(crate) mod prettify;
 pub(crate) mod schema_impl;
 pub(crate) mod structs;
 pub(crate) mod types;
@@ -17,10 +18,14 @@ pub(crate) mod union_codegen;
 pub(crate) mod utils;
 pub(crate) mod xrpc;
 
+// Re-export types that external consumers need (binaries, test crates).
+pub use prettify::{CodegenMode, GeneratedCode, FileOutput};
+
 /// Code generator for lexicon types
 pub struct CodeGenerator<'c> {
     corpus: &'c LexiconCorpus,
     root_module: String,
+    mode: prettify::CodegenMode,
     /// Track namespace dependencies (namespace -> set of namespaces it depends on)
     namespace_deps:
         std::cell::RefCell<std::collections::HashMap<String, std::collections::HashSet<String>>>,
@@ -36,6 +41,23 @@ impl<'c> CodeGenerator<'c> {
         Self {
             corpus,
             root_module: root_module.into(),
+            mode: prettify::CodegenMode::Macro,
+            namespace_deps: std::cell::RefCell::new(std::collections::HashMap::new()),
+            subscription_files: std::cell::RefCell::new(std::collections::HashSet::new()),
+            generated_shared_docs: std::cell::RefCell::new(std::collections::HashSet::new()),
+        }
+    }
+
+    /// Create a new code generator with a specific codegen mode
+    pub fn with_mode(
+        corpus: &'c LexiconCorpus,
+        root_module: impl Into<String>,
+        mode: prettify::CodegenMode,
+    ) -> Self {
+        Self {
+            corpus,
+            root_module: root_module.into(),
+            mode,
             namespace_deps: std::cell::RefCell::new(std::collections::HashMap::new()),
             subscription_files: std::cell::RefCell::new(std::collections::HashSet::new()),
             generated_shared_docs: std::cell::RefCell::new(std::collections::HashSet::new()),
@@ -143,7 +165,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         def: &LexUserType<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         match def {
             LexUserType::Record(record) => self.generate_record(nsid, def_name, record),
             LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj),
@@ -158,7 +180,7 @@ impl<'c> CodeGenerator<'c> {
                 // Token name for Display impl (just the def name, not the full ref)
                 let token_name = def_name;
 
-                Ok(quote! {
+                let tokens = quote! {
                     #doc
                     #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Hash, jacquard_derive::IntoStatic)]
                     pub struct #ident;
@@ -168,7 +190,8 @@ impl<'c> CodeGenerator<'c> {
                             write!(f, #token_name)
                         }
                     }
-                })
+                };
+                Ok(GeneratedCode::type_only(tokens))
             }
             LexUserType::String(s) if s.known_values.is_some() => {
                 self.generate_known_values_enum(nsid, def_name, s)
@@ -179,10 +202,11 @@ impl<'c> CodeGenerator<'c> {
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
                 let rust_type = self.string_to_rust_type(s);
                 let doc = self.generate_doc_comment(s.description.as_ref());
-                Ok(quote! {
+                let tokens = quote! {
                     #doc
                     pub type #ident<'a> = #rust_type;
-                })
+                };
+                Ok(GeneratedCode::type_only(tokens))
             }
             LexUserType::Integer(i) if i.r#enum.is_some() => {
                 self.generate_integer_enum(nsid, def_name, i)
@@ -198,39 +222,43 @@ impl<'c> CodeGenerator<'c> {
                 if let LexArrayItem::Union(union) = &array.items {
                     let union_name = format!("{}Item", type_name);
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_def =
-                        self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                    let union_generated = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
-                    if needs_lifetime {
-                        Ok(quote! {
-                            #union_def
-
+                    let union_tokens = union_generated.into_tokens();
+                    let type_alias = if needs_lifetime {
+                        quote! {
                             #doc
                             pub type #ident<'a> = Vec<#union_ident<'a>>;
-                        })
+                        }
                     } else {
-                        Ok(quote! {
-                            #union_def
-
+                        quote! {
                             #doc
                             pub type #ident = Vec<#union_ident>;
-                        })
-                    }
+                        }
+                    };
+
+                    let type_defs = quote! {
+                        #union_tokens
+
+                        #type_alias
+                    };
+                    Ok(GeneratedCode::type_only(type_defs))
                 } else {
                     // Regular array item type
                     let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
-                    if needs_lifetime {
-                        Ok(quote! {
+                    let tokens = if needs_lifetime {
+                        quote! {
                             #doc
                             pub type #ident<'a> = Vec<#item_type>;
-                        })
+                        }
                     } else {
-                        Ok(quote! {
+                        quote! {
                             #doc
                             pub type #ident = Vec<#item_type>;
-                        })
-                    }
+                        }
+                    };
+                    Ok(GeneratedCode::type_only(tokens))
                 }
             }
             LexUserType::Boolean(_)
@@ -255,15 +283,16 @@ impl<'c> CodeGenerator<'c> {
                     }
                     _ => unreachable!(),
                 };
-                if needs_lifetime {
-                    Ok(quote! {
+                let tokens = if needs_lifetime {
+                    quote! {
                         pub type #ident<'a> = #rust_type;
-                    })
+                    }
                 } else {
-                    Ok(quote! {
+                    quote! {
                         pub type #ident = #rust_type;
-                    })
-                }
+                    }
+                };
+                Ok(GeneratedCode::type_only(tokens))
             }
             LexUserType::Blob(_) => Err(CodegenError::unsupported(
                 format!("top-level def type {:?}", def),
@@ -280,6 +309,7 @@ impl<'c> CodeGenerator<'c> {
                 // Top-level union generates an enum
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let refs: Vec<_> = union.refs.iter().cloned().collect();
+                // Union already returns GeneratedCode, so just forward it
                 self.generate_union(
                     nsid,
                     &type_name,
@@ -305,9 +335,10 @@ mod tests {
         let doc = corpus.get("app.bsky.feed.post").expect("get post");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("app.bsky.feed.post", "main", def)
             .expect("generate");
+        let tokens = generated.into_tokens();
 
         // Format and print for inspection
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
@@ -333,7 +364,7 @@ mod tests {
             "app.bsky.embed.external".into(),
         ];
 
-        let tokens = codegen
+        let generated = codegen
             .generate_union(
                 "app.bsky.feed.post",
                 "RecordEmbed",
@@ -342,6 +373,7 @@ mod tests {
                 None,
             )
             .expect("generate union");
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -367,9 +399,10 @@ mod tests {
             .expect("get getAuthorFeed");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("app.bsky.feed.getAuthorFeed", "main", def)
             .expect("generate");
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -398,9 +431,10 @@ mod tests {
             .expect("get label defs");
         let def = doc.defs.get("labelValue").expect("get labelValue def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("com.atproto.label.defs", "labelValue", def)
             .expect("generate");
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -484,9 +518,10 @@ mod tests {
             .expect("get createRecord");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("com.atproto.repo.createRecord", "main", def)
             .expect("generate");
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -519,9 +554,10 @@ mod tests {
             .expect("get subscribeRepos");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("com.atproto.sync.subscribeRepos", "main", def)
             .expect("generate");
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -568,9 +604,11 @@ mod tests {
         let doc = corpus.get("test.array.types").expect("get array types");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("test.array.types", "main", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -596,9 +634,11 @@ mod tests {
         let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("test.binary.types", "main", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -622,9 +662,11 @@ mod tests {
         let doc = corpus.get("test.empty.object").expect("get empty object");
         let def = doc.defs.get("emptyDef").expect("get emptyDef");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("test.empty.object", "emptyDef", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -646,9 +688,10 @@ mod tests {
 
         // Test main def
         let main_def = doc.defs.get("main").expect("get main def");
-        let main_tokens = codegen
+        let main_generated = codegen
             .generate_def("pub.leaflet.poll.definition", "main", main_def)
             .expect("generate main");
+        let main_tokens = main_generated.into_tokens();
         let main_file: syn::File = syn::parse2(main_tokens).expect("parse main tokens");
         let main_formatted = prettyplease::unparse(&main_file);
         println!("\nMain:\n{}\n", main_formatted);
@@ -658,9 +701,10 @@ mod tests {
 
         // Test option fragment
         let option_def = doc.defs.get("option").expect("get option def");
-        let option_tokens = codegen
+        let option_generated = codegen
             .generate_def("pub.leaflet.poll.definition", "option", option_def)
             .expect("generate option");
+        let option_tokens = option_generated.into_tokens();
         let option_file: syn::File = syn::parse2(option_tokens).expect("parse option tokens");
         let option_formatted = prettyplease::unparse(&option_file);
         println!("\nOption:\n{}\n", option_formatted);
@@ -669,9 +713,10 @@ mod tests {
 
         // Test vote fragment
         let vote_def = doc.defs.get("vote").expect("get vote def");
-        let vote_tokens = codegen
+        let vote_generated = codegen
             .generate_def("pub.leaflet.poll.definition", "vote", vote_def)
             .expect("generate vote");
+        let vote_tokens = vote_generated.into_tokens();
         let vote_file: syn::File = syn::parse2(vote_tokens).expect("parse vote tokens");
         let vote_formatted = prettyplease::unparse(&vote_file);
         println!("\nVote:\n{}\n", vote_formatted);
@@ -694,9 +739,11 @@ mod tests {
             .expect("get constraints");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("test.constraints.validation", "main", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -725,9 +772,11 @@ mod tests {
             .expect("get poll definition");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("pub.leaflet.poll.definition", "main", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);
@@ -750,9 +799,11 @@ mod tests {
         let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
 
-        let tokens = codegen
+        let generated = codegen
             .generate_def("test.binary.types", "main", def)
             .expect("generate");
+
+        let tokens = generated.into_tokens();
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");
         let formatted = prettyplease::unparse(&file);

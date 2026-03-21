@@ -22,6 +22,84 @@ pub struct Schema<'a> {
     pub lexicon: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SchemaGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Schema<'a>,
+}
+
+impl<'a> Schema<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SchemaRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SchemaRecord;
+impl jacquard_common::xrpc::XrpcResp for SchemaRecord {
+    const NSID: &'static str = "com.atproto.lexicon.schema";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SchemaGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
+    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Schema<'_> {
+    const NSID: &'static str = "com.atproto.lexicon.schema";
+    type Record = SchemaRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SchemaRecord {
+    const NSID: &'static str = "com.atproto.lexicon.schema";
+    type Record = SchemaRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Schema<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.lexicon.schema"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_lexicon_schema()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod schema_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,84 +200,6 @@ where
             lexicon: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Schema<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SchemaRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SchemaGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Schema<'a>,
-}
-
-impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
-    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Schema<'_> {
-    const NSID: &'static str = "com.atproto.lexicon.schema";
-    type Record = SchemaRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SchemaRecord;
-impl jacquard_common::xrpc::XrpcResp for SchemaRecord {
-    const NSID: &'static str = "com.atproto.lexicon.schema";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SchemaGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SchemaRecord {
-    const NSID: &'static str = "com.atproto.lexicon.schema";
-    type Record = SchemaRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Schema<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.lexicon.schema"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_lexicon_schema()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

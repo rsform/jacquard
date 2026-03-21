@@ -125,6 +125,209 @@ impl jacquard_common::IntoStatic for LabelPreferenceVisibility<'_> {
     }
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LabelerSubscription<'a> {
+    ///DID of the labeler service.
+    #[serde(borrow)]
+    pub did: jacquard_common::CowStr<'a>,
+}
+
+/// User preferences for the Margin application.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Preferences<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///If true, do not show the confirmation modal when opening external links.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disable_external_link_warning: std::option::Option<bool>,
+    ///List of hostnames to skip the external link warning modal for.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub external_link_skipped_hostnames: std::option::Option<
+        Vec<jacquard_common::CowStr<'a>>,
+    >,
+    ///Per-label visibility preferences for subscribed labelers.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub label_preferences: std::option::Option<
+        Vec<crate::at_margin::preferences::LabelPreference<'a>>,
+    >,
+    ///List of labeler services the user subscribes to for content moderation.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subscribed_labelers: std::option::Option<
+        Vec<crate::at_margin::preferences::LabelerSubscription<'a>>,
+    >,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PreferencesGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Preferences<'a>,
+}
+
+impl<'a> Preferences<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelPreference<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.preferences"
+    }
+    fn def_name() -> &'static str {
+        "labelPreference"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_preferences()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerSubscription<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.preferences"
+    }
+    fn def_name() -> &'static str {
+        "labelerSubscription"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_preferences()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PreferencesRecord;
+impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
+    const NSID: &'static str = "at.margin.preferences";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PreferencesGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
+    fn from(output: PreferencesGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Preferences<'_> {
+    const NSID: &'static str = "at.margin.preferences";
+    type Record = PreferencesRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PreferencesRecord {
+    const NSID: &'static str = "at.margin.preferences";
+    type Record = PreferencesRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.preferences"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_preferences()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.external_link_skipped_hostnames {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "external_link_skipped_hostnames",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.label_preferences {
+            #[allow(unused_comparisons)]
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "label_preferences",
+                    ),
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.subscribed_labelers {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subscribed_labelers",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_at_margin_preferences() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -384,95 +587,6 @@ fn lexicon_doc_at_margin_preferences() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelPreference<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.preferences"
-    }
-    fn def_name() -> &'static str {
-        "labelPreference"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_preferences()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelerSubscription<'a> {
-    ///DID of the labeler service.
-    #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerSubscription<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.preferences"
-    }
-    fn def_name() -> &'static str {
-        "labelerSubscription"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_preferences()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// User preferences for the Margin application.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Preferences<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///If true, do not show the confirmation modal when opening external links.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_external_link_warning: std::option::Option<bool>,
-    ///List of hostnames to skip the external link warning modal for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub external_link_skipped_hostnames: std::option::Option<
-        Vec<jacquard_common::CowStr<'a>>,
-    >,
-    ///Per-label visibility preferences for subscribed labelers.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub label_preferences: std::option::Option<
-        Vec<crate::at_margin::preferences::LabelPreference<'a>>,
-    >,
-    ///List of labeler services the user subscribes to for content moderation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub subscribed_labelers: std::option::Option<
-        Vec<crate::at_margin::preferences::LabelerSubscription<'a>>,
-    >,
-}
-
 pub mod preferences_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -664,119 +778,5 @@ where
             subscribed_labelers: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Preferences<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PreferencesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Preferences<'a>,
-}
-
-impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
-    fn from(output: PreferencesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Preferences<'_> {
-    const NSID: &'static str = "at.margin.preferences";
-    type Record = PreferencesRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PreferencesRecord;
-impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
-    const NSID: &'static str = "at.margin.preferences";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PreferencesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PreferencesRecord {
-    const NSID: &'static str = "at.margin.preferences";
-    type Record = PreferencesRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.preferences"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_preferences()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.external_link_skipped_hostnames {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "external_link_skipped_hostnames",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.label_preferences {
-            #[allow(unused_comparisons)]
-            if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label_preferences",
-                    ),
-                    max: 500usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.subscribed_labelers {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subscribed_labelers",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

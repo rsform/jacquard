@@ -21,6 +21,49 @@ pub struct GetTagList<'a> {
     pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTagListOutput<'a> {
+    ///A list of tags and their associated details
+    #[serde(borrow)]
+    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
+}
+
+/// Response type for
+///social.clippr.feed.getTagList
+pub struct GetTagListResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTagListResponse {
+    const NSID: &'static str = "social.clippr.feed.getTagList";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTagListOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagList<'a> {
+    const NSID: &'static str = "social.clippr.feed.getTagList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTagListResponse;
+}
+
+/// Endpoint type for
+///social.clippr.feed.getTagList
+pub struct GetTagListRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTagListRequest {
+    const PATH: &'static str = "/xrpc/social.clippr.feed.getTagList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTagList<'de>;
+    type Response = GetTagListResponse;
+}
+
 pub mod get_tag_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -96,47 +139,4 @@ where
             actor: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTagListOutput<'a> {
-    ///A list of tags and their associated details
-    #[serde(borrow)]
-    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
-}
-
-/// Response type for
-///social.clippr.feed.getTagList
-pub struct GetTagListResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTagListResponse {
-    const NSID: &'static str = "social.clippr.feed.getTagList";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTagListOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagList<'a> {
-    const NSID: &'static str = "social.clippr.feed.getTagList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTagListResponse;
-}
-
-/// Endpoint type for
-///social.clippr.feed.getTagList
-pub struct GetTagListRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTagListRequest {
-    const PATH: &'static str = "/xrpc/social.clippr.feed.getTagList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTagList<'de>;
-    type Response = GetTagListResponse;
 }

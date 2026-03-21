@@ -27,6 +27,84 @@ pub struct Vote<'a> {
     pub votes: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VoteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Vote<'a>,
+}
+
+impl<'a> Vote<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct VoteRecord;
+impl jacquard_common::xrpc::XrpcResp for VoteRecord {
+    const NSID: &'static str = "org.simocracy.vote";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = VoteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
+    fn from(output: VoteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Vote<'_> {
+    const NSID: &'static str = "org.simocracy.vote";
+    type Record = VoteRecord;
+}
+
+impl jacquard_common::types::collection::Collection for VoteRecord {
+    const NSID: &'static str = "org.simocracy.vote";
+    type Record = VoteRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.vote"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_vote()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod vote_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,50 +116,50 @@ pub mod vote_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Sim;
         type Votes;
+        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Sim = Unset;
         type Votes = Unset;
+        type Sim = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Votes = S::Votes;
         type Sim = S::Sim;
-        type Votes = S::Votes;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type CreatedAt = S::CreatedAt;
-        type Sim = Set<members::sim>;
-        type Votes = S::Votes;
     }
     ///State transition - sets the `votes` field to Set
     pub struct SetVotes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVotes<S> {}
     impl<S: State> State for SetVotes<S> {
         type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
         type Votes = Set<members::votes>;
+        type Sim = S::Sim;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type CreatedAt = S::CreatedAt;
+        type Votes = S::Votes;
+        type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `votes` field
         pub struct votes(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
     }
 }
 
@@ -175,8 +253,8 @@ impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
     S::CreatedAt: vote_state::IsSet,
-    S::Sim: vote_state::IsSet,
     S::Votes: vote_state::IsSet,
+    S::Sim: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -201,84 +279,6 @@ where
             votes: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, VoteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
-}
-
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Vote<'_> {
-    const NSID: &'static str = "org.simocracy.vote";
-    type Record = VoteRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct VoteRecord;
-impl jacquard_common::xrpc::XrpcResp for VoteRecord {
-    const NSID: &'static str = "org.simocracy.vote";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for VoteRecord {
-    const NSID: &'static str = "org.simocracy.vote";
-    type Record = VoteRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.vote"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_vote()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

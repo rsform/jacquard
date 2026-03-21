@@ -32,6 +32,2874 @@ pub struct AdultContentPref<'a> {
     pub enabled: bool,
 }
 
+/// If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BskyAppProgressGuide<'a> {
+    #[serde(borrow)]
+    pub guide: jacquard_common::CowStr<'a>,
+}
+
+/// A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BskyAppStatePref<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub active_progress_guide: std::option::Option<
+        crate::app_bsky::actor::BskyAppProgressGuide<'a>,
+    >,
+    ///Storage for NUXs the user has encountered.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub nuxs: std::option::Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
+    ///An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub queued_nudges: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentLabelPref<'a> {
+    #[serde(borrow)]
+    pub label: jacquard_common::CowStr<'a>,
+    ///Which labeler does this preference apply to? If undefined, applies globally.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labeler_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(borrow)]
+    pub visibility: ContentLabelPrefVisibility<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentLabelPrefVisibility<'a> {
+    Ignore,
+    Show,
+    Warn,
+    Hide,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ContentLabelPrefVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ignore => "ignore",
+            Self::Show => "show",
+            Self::Warn => "warn",
+            Self::Hide => "hide",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ContentLabelPrefVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "ignore" => Self::Ignore,
+            "show" => Self::Show,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ContentLabelPrefVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "ignore" => Self::Ignore,
+            "show" => Self::Show,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ContentLabelPrefVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ContentLabelPrefVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ContentLabelPrefVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ContentLabelPrefVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ContentLabelPrefVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ContentLabelPrefVisibility<'_> {
+    type Output = ContentLabelPrefVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentLabelPrefVisibility::Ignore => ContentLabelPrefVisibility::Ignore,
+            ContentLabelPrefVisibility::Show => ContentLabelPrefVisibility::Show,
+            ContentLabelPrefVisibility::Warn => ContentLabelPrefVisibility::Warn,
+            ContentLabelPrefVisibility::Hide => ContentLabelPrefVisibility::Hide,
+            ContentLabelPrefVisibility::Other(v) => {
+                ContentLabelPrefVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeclaredAgePref<'a> {
+    ///Indicates if the user has declared that they are over 13 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age13: std::option::Option<bool>,
+    ///Indicates if the user has declared that they are over 16 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age16: std::option::Option<bool>,
+    ///Indicates if the user has declared that they are over 18 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age18: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FeedViewPref<'a> {
+    ///The URI of the feed, or an identifier which describes the feed.
+    #[serde(borrow)]
+    pub feed: jacquard_common::CowStr<'a>,
+    ///Hide quote posts in the feed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hide_quote_posts: std::option::Option<bool>,
+    ///Hide replies in the feed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hide_replies: std::option::Option<bool>,
+    ///Hide replies in the feed if they do not have this number of likes.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hide_replies_by_like_count: std::option::Option<i64>,
+    ///Hide replies in the feed if they are not by followed users. Defaults to `true`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_feed_view_pref_hide_replies_by_unfollowed")]
+    pub hide_replies_by_unfollowed: std::option::Option<bool>,
+    ///Hide reposts in the feed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hide_reposts: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HiddenPostsPref<'a> {
+    ///A list of URIs of posts the account owner has hidden.
+    #[serde(borrow)]
+    pub items: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct InterestsPref<'a> {
+    ///A list of tags which describe the account owner's interests gathered during onboarding.
+    #[serde(borrow)]
+    pub tags: Vec<jacquard_common::CowStr<'a>>,
+}
+
+/// The subject's followers whom you also follow
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct KnownFollowers<'a> {
+    pub count: i64,
+    #[serde(borrow)]
+    pub followers: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LabelerPrefItem<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LabelersPref<'a> {
+    #[serde(borrow)]
+    pub labelers: Vec<crate::app_bsky::actor::LabelerPrefItem<'a>>,
+}
+
+/// Preferences for live events.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LiveEventPreferences<'a> {
+    ///A list of feed IDs that the user has hidden from live events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hidden_feed_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Whether to hide all feeds from live events. Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_live_event_preferences_hide_all_feeds")]
+    pub hide_all_feeds: std::option::Option<bool>,
+}
+
+/// A word that the account owner has muted.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MutedWord<'a> {
+    ///Groups of users to apply the muted word to. If undefined, applies to all users.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub actor_target: std::option::Option<MutedWordActorTarget<'a>>,
+    ///The date and time at which the muted word will expire and no longer be applied.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The intended targets of the muted word.
+    #[serde(borrow)]
+    pub targets: Vec<crate::app_bsky::actor::MutedWordTarget<'a>>,
+    ///The muted word itself.
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+/// Groups of users to apply the muted word to. If undefined, applies to all users.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MutedWordActorTarget<'a> {
+    All,
+    ExcludeFollowing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MutedWordActorTarget<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::ExcludeFollowing => "exclude-following",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MutedWordActorTarget<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "exclude-following" => Self::ExcludeFollowing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MutedWordActorTarget<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "exclude-following" => Self::ExcludeFollowing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MutedWordActorTarget<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MutedWordActorTarget<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MutedWordActorTarget<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MutedWordActorTarget<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MutedWordActorTarget<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MutedWordActorTarget<'_> {
+    type Output = MutedWordActorTarget<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MutedWordActorTarget::All => MutedWordActorTarget::All,
+            MutedWordActorTarget::ExcludeFollowing => {
+                MutedWordActorTarget::ExcludeFollowing
+            }
+            MutedWordActorTarget::Other(v) => {
+                MutedWordActorTarget::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MutedWordTarget<'a> {
+    Content,
+    Tag,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MutedWordTarget<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Content => "content",
+            Self::Tag => "tag",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MutedWordTarget<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "content" => Self::Content,
+            "tag" => Self::Tag,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MutedWordTarget<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "content" => Self::Content,
+            "tag" => Self::Tag,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for MutedWordTarget<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for MutedWordTarget<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for MutedWordTarget<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MutedWordTarget<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for MutedWordTarget<'_> {
+    type Output = MutedWordTarget<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MutedWordTarget::Content => MutedWordTarget::Content,
+            MutedWordTarget::Tag => MutedWordTarget::Tag,
+            MutedWordTarget::Other(v) => MutedWordTarget::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MutedWordsPref<'a> {
+    ///A list of words the account owner has muted.
+    #[serde(borrow)]
+    pub items: Vec<crate::app_bsky::actor::MutedWord<'a>>,
+}
+
+/// A new user experiences (NUX) storage object
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Nux<'a> {
+    ///Defaults to `false`.
+    #[serde(default = "_default_nux_completed")]
+    pub completed: bool,
+    ///Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The date and time at which the NUX will expire and should be considered completed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PersonalDetailsPref<'a> {
+    ///The birth date of account owner.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PostInteractionSettingsPref<'a> {
+    ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub postgate_embedding_rules: std::option::Option<
+        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
+    >,
+    ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threadgate_allow_rules: std::option::Option<
+        Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
+    >,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PreferencesItem<'a> {
+    #[serde(rename = "app.bsky.actor.defs#adultContentPref")]
+    AdultContentPref(Box<crate::app_bsky::actor::AdultContentPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#contentLabelPref")]
+    ContentLabelPref(Box<crate::app_bsky::actor::ContentLabelPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#savedFeedsPref")]
+    SavedFeedsPref(Box<crate::app_bsky::actor::SavedFeedsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#savedFeedsPrefV2")]
+    SavedFeedsPrefV2(Box<crate::app_bsky::actor::SavedFeedsPrefV2<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#personalDetailsPref")]
+    PersonalDetailsPref(Box<crate::app_bsky::actor::PersonalDetailsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#declaredAgePref")]
+    DeclaredAgePref(Box<crate::app_bsky::actor::DeclaredAgePref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#feedViewPref")]
+    FeedViewPref(Box<crate::app_bsky::actor::FeedViewPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#threadViewPref")]
+    ThreadViewPref(Box<crate::app_bsky::actor::ThreadViewPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#interestsPref")]
+    InterestsPref(Box<crate::app_bsky::actor::InterestsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#mutedWordsPref")]
+    MutedWordsPref(Box<crate::app_bsky::actor::MutedWordsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#hiddenPostsPref")]
+    HiddenPostsPref(Box<crate::app_bsky::actor::HiddenPostsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#bskyAppStatePref")]
+    BskyAppStatePref(Box<crate::app_bsky::actor::BskyAppStatePref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#labelersPref")]
+    LabelersPref(Box<crate::app_bsky::actor::LabelersPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#postInteractionSettingsPref")]
+    PostInteractionSettingsPref(
+        Box<crate::app_bsky::actor::PostInteractionSettingsPref<'a>>,
+    ),
+    #[serde(rename = "app.bsky.actor.defs#verificationPrefs")]
+    VerificationPrefs(Box<crate::app_bsky::actor::VerificationPrefs<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#liveEventPreferences")]
+    LiveEventPreferences(Box<crate::app_bsky::actor::LiveEventPreferences<'a>>),
+}
+
+pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileAssociated<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub activity_subscription: std::option::Option<
+        crate::app_bsky::actor::ProfileAssociatedActivitySubscription<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub chat: std::option::Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub feedgens: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub germ: std::option::Option<crate::app_bsky::actor::ProfileAssociatedGerm<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub labeler: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lists: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub starter_packs: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileAssociatedActivitySubscription<'a> {
+    #[serde(borrow)]
+    pub allow_subscriptions: ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    Followers,
+    Mutuals,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Followers => "followers",
+            Self::Mutuals => "mutuals",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "followers" => Self::Followers,
+            "mutuals" => Self::Mutuals,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "followers" => Self::Followers,
+            "mutuals" => Self::Mutuals,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de>
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
+    type Output = ProfileAssociatedActivitySubscriptionAllowSubscriptions<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::None => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::None
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(v) => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(
+                    v.into_static(),
+                )
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileAssociatedChat<'a> {
+    #[serde(borrow)]
+    pub allow_incoming: ProfileAssociatedChatAllowIncoming<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileAssociatedChatAllowIncoming<'a> {
+    All,
+    None,
+    Following,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileAssociatedChatAllowIncoming<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::None => "none",
+            Self::Following => "following",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileAssociatedChatAllowIncoming<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileAssociatedChatAllowIncoming<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileAssociatedChatAllowIncoming<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileAssociatedChatAllowIncoming<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileAssociatedChatAllowIncoming<'_> {
+    type Output = ProfileAssociatedChatAllowIncoming<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileAssociatedChatAllowIncoming::All => {
+                ProfileAssociatedChatAllowIncoming::All
+            }
+            ProfileAssociatedChatAllowIncoming::None => {
+                ProfileAssociatedChatAllowIncoming::None
+            }
+            ProfileAssociatedChatAllowIncoming::Following => {
+                ProfileAssociatedChatAllowIncoming::Following
+            }
+            ProfileAssociatedChatAllowIncoming::Other(v) => {
+                ProfileAssociatedChatAllowIncoming::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileAssociatedGerm<'a> {
+    #[serde(borrow)]
+    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
+    #[serde(borrow)]
+    pub show_button_to: ProfileAssociatedGermShowButtonTo<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileAssociatedGermShowButtonTo<'a> {
+    UsersIFollow,
+    Everyone,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileAssociatedGermShowButtonTo<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::UsersIFollow => "usersIFollow",
+            Self::Everyone => "everyone",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileAssociatedGermShowButtonTo<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "usersIFollow" => Self::UsersIFollow,
+            "everyone" => Self::Everyone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileAssociatedGermShowButtonTo<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "usersIFollow" => Self::UsersIFollow,
+            "everyone" => Self::Everyone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileAssociatedGermShowButtonTo<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileAssociatedGermShowButtonTo<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileAssociatedGermShowButtonTo<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileAssociatedGermShowButtonTo<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileAssociatedGermShowButtonTo<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileAssociatedGermShowButtonTo<'_> {
+    type Output = ProfileAssociatedGermShowButtonTo<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileAssociatedGermShowButtonTo::UsersIFollow => {
+                ProfileAssociatedGermShowButtonTo::UsersIFollow
+            }
+            ProfileAssociatedGermShowButtonTo::Everyone => {
+                ProfileAssociatedGermShowButtonTo::Everyone
+            }
+            ProfileAssociatedGermShowButtonTo::Other(v) => {
+                ProfileAssociatedGermShowButtonTo::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileViewBasic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileViewDetailed<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub banner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub followers_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub follows_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub joined_via_starter_pack: std::option::Option<
+        crate::app_bsky::graph::StarterPackViewBasic<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pinned_post: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub posts_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SavedFeed<'a> {
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    pub pinned: bool,
+    #[serde(borrow)]
+    pub r#type: SavedFeedType<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SavedFeedType<'a> {
+    Feed,
+    List,
+    Timeline,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SavedFeedType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Feed => "feed",
+            Self::List => "list",
+            Self::Timeline => "timeline",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SavedFeedType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "feed" => Self::Feed,
+            "list" => Self::List,
+            "timeline" => Self::Timeline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SavedFeedType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "feed" => Self::Feed,
+            "list" => Self::List,
+            "timeline" => Self::Timeline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SavedFeedType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SavedFeedType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SavedFeedType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SavedFeedType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SavedFeedType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SavedFeedType<'_> {
+    type Output = SavedFeedType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SavedFeedType::Feed => SavedFeedType::Feed,
+            SavedFeedType::List => SavedFeedType::List,
+            SavedFeedType::Timeline => SavedFeedType::Timeline,
+            SavedFeedType::Other(v) => SavedFeedType::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SavedFeedsPref<'a> {
+    #[serde(borrow)]
+    pub pinned: Vec<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(borrow)]
+    pub saved: Vec<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub timeline_index: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SavedFeedsPrefV2<'a> {
+    #[serde(borrow)]
+    pub items: Vec<crate::app_bsky::actor::SavedFeed<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ///An optional embed associated with the status.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
+    ///The date when this status will expire. The application might choose to no longer return the status after expiration.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///True if the status is not expired, false if it is expired. Only present if expiration was set.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_active: std::option::Option<bool>,
+    ///True if the user's go-live access has been disabled by a moderator, false otherwise.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_disabled: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    ///The status for the account.
+    #[serde(borrow)]
+    pub status: StatusViewStatus<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+/// The status for the account.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StatusViewStatus<'a> {
+    Live,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StatusViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Live => "app.bsky.actor.status#live",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StatusViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.actor.status#live" => Self::Live,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StatusViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.actor.status#live" => Self::Live,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StatusViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StatusViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StatusViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StatusViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StatusViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StatusViewStatus<'_> {
+    type Output = StatusViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StatusViewStatus::Live => StatusViewStatus::Live,
+            StatusViewStatus::Other(v) => StatusViewStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadViewPref<'a> {
+    ///Sorting mode for threads.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sort: std::option::Option<ThreadViewPrefSort<'a>>,
+}
+
+/// Sorting mode for threads.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThreadViewPrefSort<'a> {
+    Oldest,
+    Newest,
+    MostLikes,
+    Random,
+    Hotness,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThreadViewPrefSort<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Oldest => "oldest",
+            Self::Newest => "newest",
+            Self::MostLikes => "most-likes",
+            Self::Random => "random",
+            Self::Hotness => "hotness",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThreadViewPrefSort<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "oldest" => Self::Oldest,
+            "newest" => Self::Newest,
+            "most-likes" => Self::MostLikes,
+            "random" => Self::Random,
+            "hotness" => Self::Hotness,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThreadViewPrefSort<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "oldest" => Self::Oldest,
+            "newest" => Self::Newest,
+            "most-likes" => Self::MostLikes,
+            "random" => Self::Random,
+            "hotness" => Self::Hotness,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThreadViewPrefSort<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThreadViewPrefSort<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThreadViewPrefSort<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThreadViewPrefSort<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThreadViewPrefSort<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThreadViewPrefSort<'_> {
+    type Output = ThreadViewPrefSort<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThreadViewPrefSort::Oldest => ThreadViewPrefSort::Oldest,
+            ThreadViewPrefSort::Newest => ThreadViewPrefSort::Newest,
+            ThreadViewPrefSort::MostLikes => ThreadViewPrefSort::MostLikes,
+            ThreadViewPrefSort::Random => ThreadViewPrefSort::Random,
+            ThreadViewPrefSort::Hotness => ThreadViewPrefSort::Hotness,
+            ThreadViewPrefSort::Other(v) => ThreadViewPrefSort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Preferences for how verified accounts appear in the app.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationPrefs<'a> {
+    ///Hide the blue check badges for verified accounts and trusted verifiers. Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_verification_prefs_hide_badges")]
+    pub hide_badges: std::option::Option<bool>,
+}
+
+/// Represents the verification information about the user this object is attached to.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationState<'a> {
+    ///The user's status as a trusted verifier.
+    #[serde(borrow)]
+    pub trusted_verifier_status: VerificationStateTrustedVerifierStatus<'a>,
+    ///All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included.
+    #[serde(borrow)]
+    pub verifications: Vec<crate::app_bsky::actor::VerificationView<'a>>,
+    ///The user's status as a verified account.
+    #[serde(borrow)]
+    pub verified_status: VerificationStateVerifiedStatus<'a>,
+}
+
+/// The user's status as a trusted verifier.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VerificationStateTrustedVerifierStatus<'a> {
+    Valid,
+    Invalid,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VerificationStateTrustedVerifierStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Invalid => "invalid",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VerificationStateTrustedVerifierStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VerificationStateTrustedVerifierStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VerificationStateTrustedVerifierStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VerificationStateTrustedVerifierStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VerificationStateTrustedVerifierStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VerificationStateTrustedVerifierStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VerificationStateTrustedVerifierStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationStateTrustedVerifierStatus<'_> {
+    type Output = VerificationStateTrustedVerifierStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationStateTrustedVerifierStatus::Valid => {
+                VerificationStateTrustedVerifierStatus::Valid
+            }
+            VerificationStateTrustedVerifierStatus::Invalid => {
+                VerificationStateTrustedVerifierStatus::Invalid
+            }
+            VerificationStateTrustedVerifierStatus::None => {
+                VerificationStateTrustedVerifierStatus::None
+            }
+            VerificationStateTrustedVerifierStatus::Other(v) => {
+                VerificationStateTrustedVerifierStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The user's status as a verified account.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VerificationStateVerifiedStatus<'a> {
+    Valid,
+    Invalid,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VerificationStateVerifiedStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Invalid => "invalid",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VerificationStateVerifiedStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VerificationStateVerifiedStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VerificationStateVerifiedStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VerificationStateVerifiedStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VerificationStateVerifiedStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VerificationStateVerifiedStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VerificationStateVerifiedStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationStateVerifiedStatus<'_> {
+    type Output = VerificationStateVerifiedStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationStateVerifiedStatus::Valid => {
+                VerificationStateVerifiedStatus::Valid
+            }
+            VerificationStateVerifiedStatus::Invalid => {
+                VerificationStateVerifiedStatus::Invalid
+            }
+            VerificationStateVerifiedStatus::None => {
+                VerificationStateVerifiedStatus::None
+            }
+            VerificationStateVerifiedStatus::Other(v) => {
+                VerificationStateVerifiedStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// An individual verification for an associated subject.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationView<'a> {
+    ///Timestamp when the verification was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///True if the verification passes validation, otherwise false.
+    pub is_valid: bool,
+    ///The user who issued this verification.
+    #[serde(borrow)]
+    pub issuer: jacquard_common::types::string::Did<'a>,
+    ///The AT-URI of the verification record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerState<'a> {
+    ///This property is present only in selected cases, as an optimization.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub activity_subscription: std::option::Option<
+        crate::app_bsky::notification::ActivitySubscription<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blocked_by: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blocking: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blocking_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ///This property is present only in selected cases, as an optimization.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub known_followers: std::option::Option<crate::app_bsky::actor::KnownFollowers<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub muted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub muted_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdultContentPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "adultContentPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppProgressGuide<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "bskyAppProgressGuide"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.guide;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "guide",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppStatePref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "bskyAppStatePref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.nuxs {
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nuxs",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.queued_nudges {
+            #[allow(unused_comparisons)]
+            if value.len() > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "queued_nudges",
+                    ),
+                    max: 1000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "contentLabelPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeclaredAgePref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "declaredAgePref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "feedViewPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiddenPostsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "hiddenPostsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "interestsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.tags;
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KnownFollowers<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "knownFollowers"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.followers;
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "followers",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.followers;
+            #[allow(unused_comparisons)]
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "followers",
+                    ),
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPrefItem<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelerPrefItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelersPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelersPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveEventPreferences<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "liveEventPreferences"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWord<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "mutedWord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.value;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.value;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "value",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWordsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "mutedWordsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Nux<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "nux"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.data {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "data",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.data {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "data",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PersonalDetailsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "personalDetailsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostInteractionSettingsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "postInteractionSettingsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.postgate_embedding_rules {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "postgate_embedding_rules",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.threadgate_allow_rules {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "threadgate_allow_rules",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociated<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileAssociated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+for ProfileAssociatedActivitySubscription<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileAssociatedActivitySubscription"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileAssociatedChat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedGerm<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileAssociatedGerm"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2560usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileViewBasic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewDetailed<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileViewDetailed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 2560usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeed<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "savedFeed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "savedFeedsPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPrefV2<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "savedFeedsPrefV2"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "statusView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "threadViewPref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationPrefs<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationPrefs"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationState<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationView<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "viewerState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_adult_content_pref_enabled() -> bool {
     false
 }
@@ -2897,393 +5765,8 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdultContentPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "adultContentPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BskyAppProgressGuide<'a> {
-    #[serde(borrow)]
-    pub guide: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppProgressGuide<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "bskyAppProgressGuide"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.guide;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "guide",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BskyAppStatePref<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub active_progress_guide: std::option::Option<
-        crate::app_bsky::actor::BskyAppProgressGuide<'a>,
-    >,
-    ///Storage for NUXs the user has encountered.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub nuxs: std::option::Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
-    ///An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub queued_nudges: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppStatePref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "bskyAppStatePref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.nuxs {
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "nuxs",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.queued_nudges {
-            #[allow(unused_comparisons)]
-            if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "queued_nudges",
-                    ),
-                    max: 1000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ContentLabelPref<'a> {
-    #[serde(borrow)]
-    pub label: jacquard_common::CowStr<'a>,
-    ///Which labeler does this preference apply to? If undefined, applies globally.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labeler_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(borrow)]
-    pub visibility: ContentLabelPrefVisibility<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ContentLabelPrefVisibility<'a> {
-    Ignore,
-    Show,
-    Warn,
-    Hide,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ContentLabelPrefVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Ignore => "ignore",
-            Self::Show => "show",
-            Self::Warn => "warn",
-            Self::Hide => "hide",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ContentLabelPrefVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "ignore" => Self::Ignore,
-            "show" => Self::Show,
-            "warn" => Self::Warn,
-            "hide" => Self::Hide,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ContentLabelPrefVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ignore" => Self::Ignore,
-            "show" => Self::Show,
-            "warn" => Self::Warn,
-            "hide" => Self::Hide,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ContentLabelPrefVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ContentLabelPrefVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ContentLabelPrefVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ContentLabelPrefVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ContentLabelPrefVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ContentLabelPrefVisibility<'_> {
-    type Output = ContentLabelPrefVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ContentLabelPrefVisibility::Ignore => ContentLabelPrefVisibility::Ignore,
-            ContentLabelPrefVisibility::Show => ContentLabelPrefVisibility::Show,
-            ContentLabelPrefVisibility::Warn => ContentLabelPrefVisibility::Warn,
-            ContentLabelPrefVisibility::Hide => ContentLabelPrefVisibility::Hide,
-            ContentLabelPrefVisibility::Other(v) => {
-                ContentLabelPrefVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "contentLabelPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclaredAgePref<'a> {
-    ///Indicates if the user has declared that they are over 13 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age13: std::option::Option<bool>,
-    ///Indicates if the user has declared that they are over 16 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age16: std::option::Option<bool>,
-    ///Indicates if the user has declared that they are over 18 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age18: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeclaredAgePref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "declaredAgePref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedViewPref<'a> {
-    ///The URI of the feed, or an identifier which describes the feed.
-    #[serde(borrow)]
-    pub feed: jacquard_common::CowStr<'a>,
-    ///Hide quote posts in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_quote_posts: std::option::Option<bool>,
-    ///Hide replies in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies: std::option::Option<bool>,
-    ///Hide replies in the feed if they do not have this number of likes.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies_by_like_count: std::option::Option<i64>,
-    ///Hide replies in the feed if they are not by followed users. Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_feed_view_pref_hide_replies_by_unfollowed")]
-    pub hide_replies_by_unfollowed: std::option::Option<bool>,
-    ///Hide reposts in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_reposts: std::option::Option<bool>,
-}
-
 fn _default_feed_view_pref_hide_replies_by_unfollowed() -> std::option::Option<bool> {
     Some(true)
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "feedViewPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HiddenPostsPref<'a> {
-    ///A list of URIs of posts the account owner has hidden.
-    #[serde(borrow)]
-    pub items: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod hidden_posts_pref_state {
@@ -3391,40 +5874,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiddenPostsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "hiddenPostsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct InterestsPref<'a> {
-    ///A list of tags which describe the account owner's interests gathered during onboarding.
-    #[serde(borrow)]
-    pub tags: Vec<jacquard_common::CowStr<'a>>,
-}
-
 pub mod interests_pref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3526,54 +5975,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "interestsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.tags;
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// The subject's followers whom you also follow
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct KnownFollowers<'a> {
-    pub count: i64,
-    #[serde(borrow)]
-    pub followers: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
 }
 
 pub mod known_followers_state {
@@ -3716,65 +6117,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KnownFollowers<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "knownFollowers"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.followers;
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "followers",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.followers;
-            #[allow(unused_comparisons)]
-            if value.len() < 0usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "followers",
-                    ),
-                    min: 0usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelerPrefItem<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod labeler_pref_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3878,39 +6220,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPrefItem<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "labelerPrefItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelersPref<'a> {
-    #[serde(borrow)]
-    pub labelers: Vec<crate::app_bsky::actor::LabelerPrefItem<'a>>,
 }
 
 pub mod labelers_pref_state {
@@ -4018,46 +6327,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelersPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "labelersPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Preferences for live events.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveEventPreferences<'a> {
-    ///A list of feed IDs that the user has hidden from live events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hidden_feed_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Whether to hide all feeds from live events. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_live_event_preferences_hide_all_feeds")]
-    pub hide_all_feeds: std::option::Option<bool>,
-}
-
 fn _default_live_event_preferences_hide_all_feeds() -> std::option::Option<bool> {
     Some(false)
 }
@@ -4072,54 +6341,6 @@ impl Default for LiveEventPreferences<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveEventPreferences<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "liveEventPreferences"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A word that the account owner has muted.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MutedWord<'a> {
-    ///Groups of users to apply the muted word to. If undefined, applies to all users.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub actor_target: std::option::Option<MutedWordActorTarget<'a>>,
-    ///The date and time at which the muted word will expire and no longer be applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The intended targets of the muted word.
-    #[serde(borrow)]
-    pub targets: Vec<crate::app_bsky::actor::MutedWordTarget<'a>>,
-    ///The muted word itself.
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
 pub mod muted_word_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4130,37 +6351,37 @@ pub mod muted_word_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Targets;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Targets = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Targets = S::Targets;
+        type Value = Unset;
     }
     ///State transition - sets the `targets` field to Set
     pub struct SetTargets<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargets<S> {}
     impl<S: State> State for SetTargets<S> {
-        type Value = S::Value;
         type Targets = Set<members::targets>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Targets = S::Targets;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `targets` field
         pub struct targets(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -4287,8 +6508,8 @@ where
 impl<'a, S> MutedWordBuilder<'a, S>
 where
     S: muted_word_state::State,
-    S::Value: muted_word_state::IsSet,
     S::Targets: muted_word_state::IsSet,
+    S::Value: muted_word_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MutedWord<'a> {
@@ -4318,247 +6539,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Groups of users to apply the muted word to. If undefined, applies to all users.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MutedWordActorTarget<'a> {
-    All,
-    ExcludeFollowing,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MutedWordActorTarget<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::All => "all",
-            Self::ExcludeFollowing => "exclude-following",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MutedWordActorTarget<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "all" => Self::All,
-            "exclude-following" => Self::ExcludeFollowing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MutedWordActorTarget<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "exclude-following" => Self::ExcludeFollowing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MutedWordActorTarget<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MutedWordActorTarget<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MutedWordActorTarget<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MutedWordActorTarget<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MutedWordActorTarget<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MutedWordActorTarget<'_> {
-    type Output = MutedWordActorTarget<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MutedWordActorTarget::All => MutedWordActorTarget::All,
-            MutedWordActorTarget::ExcludeFollowing => {
-                MutedWordActorTarget::ExcludeFollowing
-            }
-            MutedWordActorTarget::Other(v) => {
-                MutedWordActorTarget::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWord<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "mutedWord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.value;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.value;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "value",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MutedWordTarget<'a> {
-    Content,
-    Tag,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MutedWordTarget<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Content => "content",
-            Self::Tag => "tag",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MutedWordTarget<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "content" => Self::Content,
-            "tag" => Self::Tag,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MutedWordTarget<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "content" => Self::Content,
-            "tag" => Self::Tag,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for MutedWordTarget<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for MutedWordTarget<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for MutedWordTarget<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MutedWordTarget<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for MutedWordTarget<'_> {
-    type Output = MutedWordTarget<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MutedWordTarget::Content => MutedWordTarget::Content,
-            MutedWordTarget::Tag => MutedWordTarget::Tag,
-            MutedWordTarget::Other(v) => MutedWordTarget::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MutedWordsPref<'a> {
-    ///A list of words the account owner has muted.
-    #[serde(borrow)]
-    pub items: Vec<crate::app_bsky::actor::MutedWord<'a>>,
 }
 
 pub mod muted_words_pref_state {
@@ -4664,50 +6644,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWordsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "mutedWordsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A new user experiences (NUX) storage object
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Nux<'a> {
-    ///Defaults to `false`.
-    #[serde(default = "_default_nux_completed")]
-    pub completed: bool,
-    ///Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date and time at which the NUX will expire and should be considered completed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
 }
 
 fn _default_nux_completed() -> bool {
@@ -4895,589 +6831,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Nux<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "nux"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.data {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "data",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.data {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "data",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PersonalDetailsPref<'a> {
-    ///The birth date of account owner.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PersonalDetailsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "personalDetailsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PostInteractionSettingsPref<'a> {
-    ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub postgate_embedding_rules: std::option::Option<
-        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
-    >,
-    ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate_allow_rules: std::option::Option<
-        Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
-    >,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<'a> {
-    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostInteractionSettingsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "postInteractionSettingsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.postgate_embedding_rules {
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "postgate_embedding_rules",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.threadgate_allow_rules {
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "threadgate_allow_rules",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PreferencesItem<'a> {
-    #[serde(rename = "app.bsky.actor.defs#adultContentPref")]
-    AdultContentPref(Box<crate::app_bsky::actor::AdultContentPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#contentLabelPref")]
-    ContentLabelPref(Box<crate::app_bsky::actor::ContentLabelPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#savedFeedsPref")]
-    SavedFeedsPref(Box<crate::app_bsky::actor::SavedFeedsPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#savedFeedsPrefV2")]
-    SavedFeedsPrefV2(Box<crate::app_bsky::actor::SavedFeedsPrefV2<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#personalDetailsPref")]
-    PersonalDetailsPref(Box<crate::app_bsky::actor::PersonalDetailsPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#declaredAgePref")]
-    DeclaredAgePref(Box<crate::app_bsky::actor::DeclaredAgePref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#feedViewPref")]
-    FeedViewPref(Box<crate::app_bsky::actor::FeedViewPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#threadViewPref")]
-    ThreadViewPref(Box<crate::app_bsky::actor::ThreadViewPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#interestsPref")]
-    InterestsPref(Box<crate::app_bsky::actor::InterestsPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#mutedWordsPref")]
-    MutedWordsPref(Box<crate::app_bsky::actor::MutedWordsPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#hiddenPostsPref")]
-    HiddenPostsPref(Box<crate::app_bsky::actor::HiddenPostsPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#bskyAppStatePref")]
-    BskyAppStatePref(Box<crate::app_bsky::actor::BskyAppStatePref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#labelersPref")]
-    LabelersPref(Box<crate::app_bsky::actor::LabelersPref<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#postInteractionSettingsPref")]
-    PostInteractionSettingsPref(
-        Box<crate::app_bsky::actor::PostInteractionSettingsPref<'a>>,
-    ),
-    #[serde(rename = "app.bsky.actor.defs#verificationPrefs")]
-    VerificationPrefs(Box<crate::app_bsky::actor::VerificationPrefs<'a>>),
-    #[serde(rename = "app.bsky.actor.defs#liveEventPreferences")]
-    LiveEventPreferences(Box<crate::app_bsky::actor::LiveEventPreferences<'a>>),
-}
-
-pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileAssociated<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
-        crate::app_bsky::actor::ProfileAssociatedActivitySubscription<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub chat: std::option::Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feedgens: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub germ: std::option::Option<crate::app_bsky::actor::ProfileAssociatedGerm<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub labeler: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lists: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starter_packs: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociated<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileAssociated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileAssociatedActivitySubscription<'a> {
-    #[serde(borrow)]
-    pub allow_subscriptions: ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    Followers,
-    Mutuals,
-    None,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Followers => "followers",
-            Self::Mutuals => "mutuals",
-            Self::None => "none",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "followers" => Self::Followers,
-            "mutuals" => Self::Mutuals,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "followers" => Self::Followers,
-            "mutuals" => Self::Mutuals,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de>
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic
-for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
-    type Output = ProfileAssociatedActivitySubscriptionAllowSubscriptions<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers => {
-                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers
-            }
-            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals => {
-                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals
-            }
-            ProfileAssociatedActivitySubscriptionAllowSubscriptions::None => {
-                ProfileAssociatedActivitySubscriptionAllowSubscriptions::None
-            }
-            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(v) => {
-                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(
-                    v.into_static(),
-                )
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for ProfileAssociatedActivitySubscription<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileAssociatedActivitySubscription"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileAssociatedChat<'a> {
-    #[serde(borrow)]
-    pub allow_incoming: ProfileAssociatedChatAllowIncoming<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileAssociatedChatAllowIncoming<'a> {
-    All,
-    None,
-    Following,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileAssociatedChatAllowIncoming<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::All => "all",
-            Self::None => "none",
-            Self::Following => "following",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileAssociatedChatAllowIncoming<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "all" => Self::All,
-            "none" => Self::None,
-            "following" => Self::Following,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileAssociatedChatAllowIncoming<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "none" => Self::None,
-            "following" => Self::Following,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileAssociatedChatAllowIncoming<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileAssociatedChatAllowIncoming<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ProfileAssociatedChatAllowIncoming<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ProfileAssociatedChatAllowIncoming<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileAssociatedChatAllowIncoming<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ProfileAssociatedChatAllowIncoming<'_> {
-    type Output = ProfileAssociatedChatAllowIncoming<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileAssociatedChatAllowIncoming::All => {
-                ProfileAssociatedChatAllowIncoming::All
-            }
-            ProfileAssociatedChatAllowIncoming::None => {
-                ProfileAssociatedChatAllowIncoming::None
-            }
-            ProfileAssociatedChatAllowIncoming::Following => {
-                ProfileAssociatedChatAllowIncoming::Following
-            }
-            ProfileAssociatedChatAllowIncoming::Other(v) => {
-                ProfileAssociatedChatAllowIncoming::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileAssociatedChat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileAssociatedGerm<'a> {
-    #[serde(borrow)]
-    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
-    #[serde(borrow)]
-    pub show_button_to: ProfileAssociatedGermShowButtonTo<'a>,
-}
-
 pub mod profile_associated_germ_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5488,37 +6841,37 @@ pub mod profile_associated_germ_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageMeUrl;
         type ShowButtonTo;
+        type MessageMeUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageMeUrl = Unset;
         type ShowButtonTo = Unset;
-    }
-    ///State transition - sets the `message_me_url` field to Set
-    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
-    impl<S: State> State for SetMessageMeUrl<S> {
-        type MessageMeUrl = Set<members::message_me_url>;
-        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Unset;
     }
     ///State transition - sets the `show_button_to` field to Set
     pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
     impl<S: State> State for SetShowButtonTo<S> {
-        type MessageMeUrl = S::MessageMeUrl;
         type ShowButtonTo = Set<members::show_button_to>;
+        type MessageMeUrl = S::MessageMeUrl;
+    }
+    ///State transition - sets the `message_me_url` field to Set
+    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
+    impl<S: State> State for SetMessageMeUrl<S> {
+        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Set<members::message_me_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_me_url` field
-        pub struct message_me_url(());
         ///Marker type for the `show_button_to` field
         pub struct show_button_to(());
+        ///Marker type for the `message_me_url` field
+        pub struct message_me_url(());
     }
 }
 
@@ -5600,8 +6953,8 @@ where
 impl<'a, S> ProfileAssociatedGermBuilder<'a, S>
 where
     S: profile_associated_germ_state::State,
-    S::MessageMeUrl: profile_associated_germ_state::IsSet,
     S::ShowButtonTo: profile_associated_germ_state::IsSet,
+    S::MessageMeUrl: profile_associated_germ_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileAssociatedGerm<'a> {
@@ -5627,170 +6980,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileAssociatedGermShowButtonTo<'a> {
-    UsersIFollow,
-    Everyone,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileAssociatedGermShowButtonTo<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::UsersIFollow => "usersIFollow",
-            Self::Everyone => "everyone",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileAssociatedGermShowButtonTo<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "usersIFollow" => Self::UsersIFollow,
-            "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileAssociatedGermShowButtonTo<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "usersIFollow" => Self::UsersIFollow,
-            "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileAssociatedGermShowButtonTo<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileAssociatedGermShowButtonTo<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ProfileAssociatedGermShowButtonTo<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ProfileAssociatedGermShowButtonTo<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileAssociatedGermShowButtonTo<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ProfileAssociatedGermShowButtonTo<'_> {
-    type Output = ProfileAssociatedGermShowButtonTo<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileAssociatedGermShowButtonTo::UsersIFollow => {
-                ProfileAssociatedGermShowButtonTo::UsersIFollow
-            }
-            ProfileAssociatedGermShowButtonTo::Everyone => {
-                ProfileAssociatedGermShowButtonTo::Everyone
-            }
-            ProfileAssociatedGermShowButtonTo::Other(v) => {
-                ProfileAssociatedGermShowButtonTo::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedGerm<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileAssociatedGerm"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
-}
-
 pub mod profile_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5801,37 +6990,37 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -6156,8 +7345,8 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Did: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
+    S::Did: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
@@ -6205,131 +7394,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2560usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileViewBasic<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_basic_state {
@@ -6702,128 +7766,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileViewBasic"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileViewDetailed<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub followers_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub joined_via_starter_pack: std::option::Option<
-        crate::app_bsky::graph::StarterPackViewBasic<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pinned_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-}
-
 pub mod profile_view_detailed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -6834,37 +7776,37 @@ pub mod profile_view_detailed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -7318,8 +8260,8 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S> ProfileViewDetailedBuilder<'a, S>
 where
     S: profile_view_detailed_state::State,
-    S::Handle: profile_view_detailed_state::IsSet,
     S::Did: profile_view_detailed_state::IsSet,
+    S::Handle: profile_view_detailed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileViewDetailed<'a> {
@@ -7383,104 +8325,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewDetailed<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileViewDetailed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2560usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 256usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SavedFeed<'a> {
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    pub pinned: bool,
-    #[serde(borrow)]
-    pub r#type: SavedFeedType<'a>,
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
 pub mod saved_feed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -7491,67 +8335,67 @@ pub mod saved_feed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Id;
         type Type;
         type Pinned;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Id = Unset;
         type Type = Unset;
         type Pinned = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Id = S::Id;
-        type Type = S::Type;
-        type Pinned = S::Pinned;
+        type Value = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Value = S::Value;
         type Id = Set<members::id>;
         type Type = S::Type;
         type Pinned = S::Pinned;
+        type Value = S::Value;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Value = S::Value;
         type Id = S::Id;
         type Type = Set<members::r#type>;
         type Pinned = S::Pinned;
+        type Value = S::Value;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPinned<S> {}
     impl<S: State> State for SetPinned<S> {
-        type Value = S::Value;
         type Id = S::Id;
         type Type = S::Type;
         type Pinned = Set<members::pinned>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Id = S::Id;
+        type Type = S::Type;
+        type Pinned = S::Pinned;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -7664,10 +8508,10 @@ where
 impl<'a, S> SavedFeedBuilder<'a, S>
 where
     S: saved_feed_state::State,
-    S::Value: saved_feed_state::IsSet,
     S::Id: saved_feed_state::IsSet,
     S::Type: saved_feed_state::IsSet,
     S::Pinned: saved_feed_state::IsSet,
+    S::Value: saved_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeed<'a> {
@@ -7695,136 +8539,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SavedFeedType<'a> {
-    Feed,
-    List,
-    Timeline,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SavedFeedType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Feed => "feed",
-            Self::List => "list",
-            Self::Timeline => "timeline",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SavedFeedType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "feed" => Self::Feed,
-            "list" => Self::List,
-            "timeline" => Self::Timeline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SavedFeedType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "feed" => Self::Feed,
-            "list" => Self::List,
-            "timeline" => Self::Timeline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SavedFeedType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SavedFeedType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SavedFeedType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SavedFeedType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SavedFeedType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SavedFeedType<'_> {
-    type Output = SavedFeedType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SavedFeedType::Feed => SavedFeedType::Feed,
-            SavedFeedType::List => SavedFeedType::List,
-            SavedFeedType::Timeline => SavedFeedType::Timeline,
-            SavedFeedType::Other(v) => SavedFeedType::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeed<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "savedFeed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SavedFeedsPref<'a> {
-    #[serde(borrow)]
-    pub pinned: Vec<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(borrow)]
-    pub saved: Vec<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub timeline_index: std::option::Option<i64>,
 }
 
 pub mod saved_feeds_pref_state {
@@ -7983,39 +8697,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "savedFeedsPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SavedFeedsPrefV2<'a> {
-    #[serde(borrow)]
-    pub items: Vec<crate::app_bsky::actor::SavedFeed<'a>>,
-}
-
 pub mod saved_feeds_pref_v2_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -8121,61 +8802,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPrefV2<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "savedFeedsPrefV2"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///An optional embed associated with the status.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
-    ///The date when this status will expire. The application might choose to no longer return the status after expiration.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///True if the status is not expired, false if it is expired. Only present if expiration was set.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_active: std::option::Option<bool>,
-    ///True if the user's go-live access has been disabled by a moderator, false otherwise.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_disabled: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    ///The status for the account.
-    #[serde(borrow)]
-    pub status: StatusViewStatus<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-}
-
 pub mod status_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -8186,37 +8812,37 @@ pub mod status_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Status;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Status = S::Status;
+        type Record = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Record = S::Record;
         type Status = Set<members::status>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Status = S::Status;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -8397,8 +9023,8 @@ impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
 impl<'a, S> StatusViewBuilder<'a, S>
 where
     S: status_view_state::State,
-    S::Record: status_view_state::IsSet,
     S::Status: status_view_state::IsSet,
+    S::Record: status_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StatusView<'a> {
@@ -8436,266 +9062,6 @@ where
     }
 }
 
-/// The status for the account.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StatusViewStatus<'a> {
-    Live,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> StatusViewStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Live => "app.bsky.actor.status#live",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for StatusViewStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "app.bsky.actor.status#live" => Self::Live,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for StatusViewStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "app.bsky.actor.status#live" => Self::Live,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StatusViewStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for StatusViewStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for StatusViewStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for StatusViewStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for StatusViewStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for StatusViewStatus<'_> {
-    type Output = StatusViewStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StatusViewStatus::Live => StatusViewStatus::Live,
-            StatusViewStatus::Other(v) => StatusViewStatus::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "statusView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadViewPref<'a> {
-    ///Sorting mode for threads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sort: std::option::Option<ThreadViewPrefSort<'a>>,
-}
-
-/// Sorting mode for threads.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThreadViewPrefSort<'a> {
-    Oldest,
-    Newest,
-    MostLikes,
-    Random,
-    Hotness,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThreadViewPrefSort<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Oldest => "oldest",
-            Self::Newest => "newest",
-            Self::MostLikes => "most-likes",
-            Self::Random => "random",
-            Self::Hotness => "hotness",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThreadViewPrefSort<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "oldest" => Self::Oldest,
-            "newest" => Self::Newest,
-            "most-likes" => Self::MostLikes,
-            "random" => Self::Random,
-            "hotness" => Self::Hotness,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThreadViewPrefSort<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "oldest" => Self::Oldest,
-            "newest" => Self::Newest,
-            "most-likes" => Self::MostLikes,
-            "random" => Self::Random,
-            "hotness" => Self::Hotness,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThreadViewPrefSort<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThreadViewPrefSort<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThreadViewPrefSort<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThreadViewPrefSort<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThreadViewPrefSort<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThreadViewPrefSort<'_> {
-    type Output = ThreadViewPrefSort<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThreadViewPrefSort::Oldest => ThreadViewPrefSort::Oldest,
-            ThreadViewPrefSort::Newest => ThreadViewPrefSort::Newest,
-            ThreadViewPrefSort::MostLikes => ThreadViewPrefSort::MostLikes,
-            ThreadViewPrefSort::Random => ThreadViewPrefSort::Random,
-            ThreadViewPrefSort::Hotness => ThreadViewPrefSort::Hotness,
-            ThreadViewPrefSort::Other(v) => ThreadViewPrefSort::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPref<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "threadViewPref"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Preferences for how verified accounts appear in the app.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationPrefs<'a> {
-    ///Hide the blue check badges for verified accounts and trusted verifiers. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_verification_prefs_hide_badges")]
-    pub hide_badges: std::option::Option<bool>,
-}
-
 fn _default_verification_prefs_hide_badges() -> std::option::Option<bool> {
     Some(false)
 }
@@ -8709,47 +9075,6 @@ impl Default for VerificationPrefs<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationPrefs<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "verificationPrefs"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Represents the verification information about the user this object is attached to.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationState<'a> {
-    ///The user's status as a trusted verifier.
-    #[serde(borrow)]
-    pub trusted_verifier_status: VerificationStateTrustedVerifierStatus<'a>,
-    ///All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included.
-    #[serde(borrow)]
-    pub verifications: Vec<crate::app_bsky::actor::VerificationView<'a>>,
-    ///The user's status as a verified account.
-    #[serde(borrow)]
-    pub verified_status: VerificationStateVerifiedStatus<'a>,
-}
-
 pub mod verification_state_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -8761,50 +9086,50 @@ pub mod verification_state_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type VerifiedStatus;
-        type TrustedVerifierStatus;
         type Verifications;
+        type TrustedVerifierStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type VerifiedStatus = Unset;
-        type TrustedVerifierStatus = Unset;
         type Verifications = Unset;
+        type TrustedVerifierStatus = Unset;
     }
     ///State transition - sets the `verified_status` field to Set
     pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
     impl<S: State> State for SetVerifiedStatus<S> {
         type VerifiedStatus = Set<members::verified_status>;
+        type Verifications = S::Verifications;
         type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type Verifications = S::Verifications;
-    }
-    ///State transition - sets the `trusted_verifier_status` field to Set
-    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
-    impl<S: State> State for SetTrustedVerifierStatus<S> {
-        type VerifiedStatus = S::VerifiedStatus;
-        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
-        type Verifications = S::Verifications;
     }
     ///State transition - sets the `verifications` field to Set
     pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifications<S> {}
     impl<S: State> State for SetVerifications<S> {
         type VerifiedStatus = S::VerifiedStatus;
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
         type Verifications = Set<members::verifications>;
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+    }
+    ///State transition - sets the `trusted_verifier_status` field to Set
+    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
+    impl<S: State> State for SetTrustedVerifierStatus<S> {
+        type VerifiedStatus = S::VerifiedStatus;
+        type Verifications = S::Verifications;
+        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `verified_status` field
         pub struct verified_status(());
-        ///Marker type for the `trusted_verifier_status` field
-        pub struct trusted_verifier_status(());
         ///Marker type for the `verifications` field
         pub struct verifications(());
+        ///Marker type for the `trusted_verifier_status` field
+        pub struct trusted_verifier_status(());
     }
 }
 
@@ -8901,8 +9226,8 @@ impl<'a, S> VerificationStateBuilder<'a, S>
 where
     S: verification_state_state::State,
     S::VerifiedStatus: verification_state_state::IsSet,
-    S::TrustedVerifierStatus: verification_state_state::IsSet,
     S::Verifications: verification_state_state::IsSet,
+    S::TrustedVerifierStatus: verification_state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationState<'a> {
@@ -8930,252 +9255,6 @@ where
     }
 }
 
-/// The user's status as a trusted verifier.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationStateTrustedVerifierStatus<'a> {
-    Valid,
-    Invalid,
-    None,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VerificationStateTrustedVerifierStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Valid => "valid",
-            Self::Invalid => "invalid",
-            Self::None => "none",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VerificationStateTrustedVerifierStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "valid" => Self::Valid,
-            "invalid" => Self::Invalid,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VerificationStateTrustedVerifierStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "invalid" => Self::Invalid,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VerificationStateTrustedVerifierStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VerificationStateTrustedVerifierStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VerificationStateTrustedVerifierStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VerificationStateTrustedVerifierStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VerificationStateTrustedVerifierStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VerificationStateTrustedVerifierStatus<'_> {
-    type Output = VerificationStateTrustedVerifierStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VerificationStateTrustedVerifierStatus::Valid => {
-                VerificationStateTrustedVerifierStatus::Valid
-            }
-            VerificationStateTrustedVerifierStatus::Invalid => {
-                VerificationStateTrustedVerifierStatus::Invalid
-            }
-            VerificationStateTrustedVerifierStatus::None => {
-                VerificationStateTrustedVerifierStatus::None
-            }
-            VerificationStateTrustedVerifierStatus::Other(v) => {
-                VerificationStateTrustedVerifierStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// The user's status as a verified account.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationStateVerifiedStatus<'a> {
-    Valid,
-    Invalid,
-    None,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VerificationStateVerifiedStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Valid => "valid",
-            Self::Invalid => "invalid",
-            Self::None => "none",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VerificationStateVerifiedStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "valid" => Self::Valid,
-            "invalid" => Self::Invalid,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VerificationStateVerifiedStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "invalid" => Self::Invalid,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VerificationStateVerifiedStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VerificationStateVerifiedStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VerificationStateVerifiedStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VerificationStateVerifiedStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VerificationStateVerifiedStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VerificationStateVerifiedStatus<'_> {
-    type Output = VerificationStateVerifiedStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VerificationStateVerifiedStatus::Valid => {
-                VerificationStateVerifiedStatus::Valid
-            }
-            VerificationStateVerifiedStatus::Invalid => {
-                VerificationStateVerifiedStatus::Invalid
-            }
-            VerificationStateVerifiedStatus::None => {
-                VerificationStateVerifiedStatus::None
-            }
-            VerificationStateVerifiedStatus::Other(v) => {
-                VerificationStateVerifiedStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationState<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "verificationState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An individual verification for an associated subject.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationView<'a> {
-    ///Timestamp when the verification was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///True if the verification passes validation, otherwise false.
-    pub is_valid: bool,
-    ///The user who issued this verification.
-    #[serde(borrow)]
-    pub issuer: jacquard_common::types::string::Did<'a>,
-    ///The AT-URI of the verification record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod verification_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -9186,67 +9265,67 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsValid;
-        type CreatedAt;
         type Issuer;
+        type IsValid;
         type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsValid = Unset;
-        type CreatedAt = Unset;
         type Issuer = Unset;
+        type IsValid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `is_valid` field to Set
-    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsValid<S> {}
-    impl<S: State> State for SetIsValid<S> {
-        type IsValid = Set<members::is_valid>;
-        type CreatedAt = S::CreatedAt;
-        type Issuer = S::Issuer;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type IsValid = S::IsValid;
-        type CreatedAt = Set<members::created_at>;
-        type Issuer = S::Issuer;
-        type Uri = S::Uri;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssuer<S> {}
     impl<S: State> State for SetIssuer<S> {
-        type IsValid = S::IsValid;
-        type CreatedAt = S::CreatedAt;
         type Issuer = Set<members::issuer>;
+        type IsValid = S::IsValid;
         type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `is_valid` field to Set
+    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsValid<S> {}
+    impl<S: State> State for SetIsValid<S> {
+        type Issuer = S::Issuer;
+        type IsValid = Set<members::is_valid>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IsValid = S::IsValid;
-        type CreatedAt = S::CreatedAt;
         type Issuer = S::Issuer;
+        type IsValid = S::IsValid;
         type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issuer = S::Issuer;
+        type IsValid = S::IsValid;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_valid` field
-        pub struct is_valid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
+        ///Marker type for the `is_valid` field
+        pub struct is_valid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -9359,10 +9438,10 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
-    S::IsValid: verification_view_state::IsSet,
-    S::CreatedAt: verification_view_state::IsSet,
     S::Issuer: verification_view_state::IsSet,
+    S::IsValid: verification_view_state::IsSet,
     S::Uri: verification_view_state::IsSet,
+    S::CreatedAt: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
@@ -9389,84 +9468,5 @@ where
             uri: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationView<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "verificationView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerState<'a> {
-    ///This property is present only in selected cases, as an optimization.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
-        crate::app_bsky::notification::ActivitySubscription<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub blocked_by: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub blocking: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub blocking_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///This property is present only in selected cases, as an optimization.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub known_followers: std::option::Option<crate::app_bsky::actor::KnownFollowers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub muted: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub muted_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "viewerState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

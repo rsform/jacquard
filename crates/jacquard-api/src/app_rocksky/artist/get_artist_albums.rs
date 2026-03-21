@@ -20,6 +20,50 @@ pub struct GetArtistAlbums<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetArtistAlbumsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub albums: std::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
+}
+
+/// Response type for
+///app.rocksky.artist.getArtistAlbums
+pub struct GetArtistAlbumsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetArtistAlbumsResponse {
+    const NSID: &'static str = "app.rocksky.artist.getArtistAlbums";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetArtistAlbumsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistAlbums<'a> {
+    const NSID: &'static str = "app.rocksky.artist.getArtistAlbums";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetArtistAlbumsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.artist.getArtistAlbums
+pub struct GetArtistAlbumsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetArtistAlbumsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistAlbums";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetArtistAlbums<'de>;
+    type Response = GetArtistAlbumsResponse;
+}
+
 pub mod get_artist_albums_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,48 +153,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetArtistAlbumsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub albums: std::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
-}
-
-/// Response type for
-///app.rocksky.artist.getArtistAlbums
-pub struct GetArtistAlbumsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetArtistAlbumsResponse {
-    const NSID: &'static str = "app.rocksky.artist.getArtistAlbums";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetArtistAlbumsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistAlbums<'a> {
-    const NSID: &'static str = "app.rocksky.artist.getArtistAlbums";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetArtistAlbumsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.artist.getArtistAlbums
-pub struct GetArtistAlbumsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetArtistAlbumsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistAlbums";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetArtistAlbums<'de>;
-    type Response = GetArtistAlbumsResponse;
 }

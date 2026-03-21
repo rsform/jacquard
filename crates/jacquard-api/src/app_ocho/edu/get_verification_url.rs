@@ -20,6 +20,50 @@ pub struct GetVerificationUrl<'a> {
     pub domain: jacquard_common::CowStr<'a>,
 }
 
+/// The intent data
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetVerificationUrlOutput<'a> {
+    #[serde(borrow)]
+    pub url: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.edu.getVerificationUrl
+pub struct GetVerificationUrlResponse;
+impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
+    const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetVerificationUrlOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<'a> {
+    const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetVerificationUrlResponse;
+}
+
+/// Endpoint type for
+///app.ocho.edu.getVerificationUrl
+pub struct GetVerificationUrlRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetVerificationUrlRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.edu.getVerificationUrl";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetVerificationUrl<'de>;
+    type Response = GetVerificationUrlResponse;
+}
+
 pub mod get_verification_url_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,48 +151,4 @@ where
             domain: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-/// The intent data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetVerificationUrlOutput<'a> {
-    #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.edu.getVerificationUrl
-pub struct GetVerificationUrlResponse;
-impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
-    const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetVerificationUrlOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<'a> {
-    const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetVerificationUrlResponse;
-}
-
-/// Endpoint type for
-///app.ocho.edu.getVerificationUrl
-pub struct GetVerificationUrlRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetVerificationUrlRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.edu.getVerificationUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetVerificationUrl<'de>;
-    type Response = GetVerificationUrlResponse;
 }

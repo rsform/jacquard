@@ -26,6 +26,109 @@ pub struct ConflictInfo<'a> {
     pub reason: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MergeCheck<'a> {
+    ///Target branch to merge into
+    #[serde(borrow)]
+    pub branch: jacquard_common::CowStr<'a>,
+    ///DID of the repository owner
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Name of the repository
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Patch or pull request to check for merge conflicts
+    #[serde(borrow)]
+    pub patch: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MergeCheckOutput<'a> {
+    ///List of files with merge conflicts
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub conflicts: std::option::Option<
+        Vec<crate::sh_tangled::repo::merge_check::ConflictInfo<'a>>,
+    >,
+    ///Error message if check failed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether the merge has conflicts
+    pub is_conflicted: bool,
+    ///Additional message about the merge check
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.mergeCheck"
+    }
+    fn def_name() -> &'static str {
+        "conflictInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_mergeCheck()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.mergeCheck
+pub struct MergeCheckResponse;
+impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
+    const NSID: &'static str = "sh.tangled.repo.mergeCheck";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MergeCheckOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
+    const NSID: &'static str = "sh.tangled.repo.mergeCheck";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = MergeCheckResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.mergeCheck
+pub struct MergeCheckRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.mergeCheck";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = MergeCheck<'de>;
+    type Response = MergeCheckResponse;
+}
+
 fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -221,49 +324,6 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.mergeCheck"
-    }
-    fn def_name() -> &'static str {
-        "conflictInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_mergeCheck()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MergeCheck<'a> {
-    ///Target branch to merge into
-    #[serde(borrow)]
-    pub branch: jacquard_common::CowStr<'a>,
-    ///DID of the repository owner
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///Name of the repository
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Patch or pull request to check for merge conflicts
-    #[serde(borrow)]
-    pub patch: jacquard_common::CowStr<'a>,
-}
-
 pub mod merge_check_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -274,67 +334,67 @@ pub mod merge_check_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Branch;
-        type Patch;
         type Did;
+        type Patch;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Branch = Unset;
-        type Patch = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Branch = S::Branch;
-        type Patch = S::Patch;
-        type Did = S::Did;
+        type Patch = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
-        type Name = S::Name;
         type Branch = Set<members::branch>;
+        type Did = S::Did;
         type Patch = S::Patch;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatch<S> {}
-    impl<S: State> State for SetPatch<S> {
         type Name = S::Name;
-        type Branch = S::Branch;
-        type Patch = Set<members::patch>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Name = S::Name;
         type Branch = S::Branch;
-        type Patch = S::Patch;
         type Did = Set<members::did>;
+        type Patch = S::Patch;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatch<S> {}
+    impl<S: State> State for SetPatch<S> {
+        type Branch = S::Branch;
+        type Did = S::Did;
+        type Patch = Set<members::patch>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Branch = S::Branch;
+        type Did = S::Did;
+        type Patch = S::Patch;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `branch` field
         pub struct branch(());
-        ///Marker type for the `patch` field
-        pub struct patch(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -447,10 +507,10 @@ where
 impl<'a, S> MergeCheckBuilder<'a, S>
 where
     S: merge_check_state::State,
-    S::Name: merge_check_state::IsSet,
     S::Branch: merge_check_state::IsSet,
-    S::Patch: merge_check_state::IsSet,
     S::Did: merge_check_state::IsSet,
+    S::Patch: merge_check_state::IsSet,
+    S::Name: merge_check_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MergeCheck<'a> {
@@ -478,64 +538,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MergeCheckOutput<'a> {
-    ///List of files with merge conflicts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub conflicts: std::option::Option<
-        Vec<crate::sh_tangled::repo::merge_check::ConflictInfo<'a>>,
-    >,
-    ///Error message if check failed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the merge has conflicts
-    pub is_conflicted: bool,
-    ///Additional message about the merge check
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///sh.tangled.repo.mergeCheck
-pub struct MergeCheckResponse;
-impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
-    const NSID: &'static str = "sh.tangled.repo.mergeCheck";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MergeCheckOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
-    const NSID: &'static str = "sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = MergeCheckResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.mergeCheck
-pub struct MergeCheckRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = MergeCheck<'de>;
-    type Response = MergeCheckResponse;
 }

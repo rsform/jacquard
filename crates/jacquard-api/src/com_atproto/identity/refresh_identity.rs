@@ -21,6 +21,108 @@ pub struct RefreshIdentity<'a> {
     pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshIdentityOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::com_atproto::identity::IdentityInfo<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RefreshIdentityError<'a> {
+    /// The resolution process confirmed that the handle does not resolve to any DID.
+    #[serde(rename = "HandleNotFound")]
+    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The DID resolution process confirmed that there is no current DID.
+    #[serde(rename = "DidNotFound")]
+    DidNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The DID previously existed, but has been deactivated.
+    #[serde(rename = "DidDeactivated")]
+    DidDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for RefreshIdentityError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::HandleNotFound(msg) => {
+                write!(f, "HandleNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DidNotFound(msg) => {
+                write!(f, "DidNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DidDeactivated(msg) => {
+                write!(f, "DidDeactivated")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.identity.refreshIdentity
+pub struct RefreshIdentityResponse;
+impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
+    const NSID: &'static str = "com.atproto.identity.refreshIdentity";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RefreshIdentityOutput<'de>;
+    type Err<'de> = RefreshIdentityError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
+    const NSID: &'static str = "com.atproto.identity.refreshIdentity";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RefreshIdentityResponse;
+}
+
+/// Endpoint type for
+///com.atproto.identity.refreshIdentity
+pub struct RefreshIdentityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.refreshIdentity";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RefreshIdentity<'de>;
+    type Response = RefreshIdentityResponse;
+}
+
 pub mod refresh_identity_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,106 +226,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RefreshIdentityOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::com_atproto::identity::IdentityInfo<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RefreshIdentityError<'a> {
-    /// The resolution process confirmed that the handle does not resolve to any DID.
-    #[serde(rename = "HandleNotFound")]
-    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The DID resolution process confirmed that there is no current DID.
-    #[serde(rename = "DidNotFound")]
-    DidNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The DID previously existed, but has been deactivated.
-    #[serde(rename = "DidDeactivated")]
-    DidDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for RefreshIdentityError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::HandleNotFound(msg) => {
-                write!(f, "HandleNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::DidNotFound(msg) => {
-                write!(f, "DidNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::DidDeactivated(msg) => {
-                write!(f, "DidDeactivated")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.identity.refreshIdentity
-pub struct RefreshIdentityResponse;
-impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
-    const NSID: &'static str = "com.atproto.identity.refreshIdentity";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RefreshIdentityOutput<'de>;
-    type Err<'de> = RefreshIdentityError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
-    const NSID: &'static str = "com.atproto.identity.refreshIdentity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = RefreshIdentityResponse;
-}
-
-/// Endpoint type for
-///com.atproto.identity.refreshIdentity
-pub struct RefreshIdentityRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.identity.refreshIdentity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = RefreshIdentity<'de>;
-    type Response = RefreshIdentityResponse;
 }

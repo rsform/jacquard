@@ -32,6 +32,96 @@ pub struct Ban<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BanGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Ban<'a>,
+}
+
+impl<'a> Ban<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BanRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BanRecord;
+impl jacquard_common::xrpc::XrpcResp for BanRecord {
+    const NSID: &'static str = "app.protoimsg.chat.ban";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BanGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BanGetRecordOutput<'_>> for Ban<'_> {
+    fn from(output: BanGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Ban<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.ban";
+    type Record = BanRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BanRecord {
+    const NSID: &'static str = "app.protoimsg.chat.ban";
+    type Record = BanRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ban<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.ban"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_ban()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.reason {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reason",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod ban_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,51 +132,51 @@ pub mod ban_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Room;
         type CreatedAt;
+        type Room;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Room = S::Room;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Subject = S::Subject;
-        type Room = Set<members::room>;
-        type CreatedAt = S::CreatedAt;
+        type Room = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Room = S::Room;
         type CreatedAt = Set<members::created_at>;
+        type Room = S::Room;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = Set<members::room>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = S::Room;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `room` field
+        pub struct room(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -196,9 +286,9 @@ where
 impl<'a, S> BanBuilder<'a, S>
 where
     S: ban_state::State,
-    S::Subject: ban_state::IsSet,
-    S::Room: ban_state::IsSet,
     S::CreatedAt: ban_state::IsSet,
+    S::Room: ban_state::IsSet,
+    S::Subject: ban_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ban<'a> {
@@ -225,96 +315,6 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Ban<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BanRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BanGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Ban<'a>,
-}
-
-impl From<BanGetRecordOutput<'_>> for Ban<'_> {
-    fn from(output: BanGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Ban<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.ban";
-    type Record = BanRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BanRecord;
-impl jacquard_common::xrpc::XrpcResp for BanRecord {
-    const NSID: &'static str = "app.protoimsg.chat.ban";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BanGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BanRecord {
-    const NSID: &'static str = "app.protoimsg.chat.ban";
-    type Record = BanRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ban<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.ban"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_ban()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.reason {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reason",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

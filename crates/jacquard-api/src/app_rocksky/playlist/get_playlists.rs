@@ -22,6 +22,52 @@ pub struct GetPlaylists {
     pub offset: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPlaylistsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub playlists: std::option::Option<
+        Vec<crate::app_rocksky::playlist::PlaylistViewBasic<'a>>,
+    >,
+}
+
+/// Response type for
+///app.rocksky.playlist.getPlaylists
+pub struct GetPlaylistsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPlaylistsResponse {
+    const NSID: &'static str = "app.rocksky.playlist.getPlaylists";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPlaylistsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetPlaylists {
+    const NSID: &'static str = "app.rocksky.playlist.getPlaylists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPlaylistsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.playlist.getPlaylists
+pub struct GetPlaylistsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPlaylistsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.playlist.getPlaylists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPlaylists;
+    type Response = GetPlaylistsResponse;
+}
+
 pub mod get_playlists_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -101,50 +147,4 @@ where
             offset: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPlaylistsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub playlists: std::option::Option<
-        Vec<crate::app_rocksky::playlist::PlaylistViewBasic<'a>>,
-    >,
-}
-
-/// Response type for
-///app.rocksky.playlist.getPlaylists
-pub struct GetPlaylistsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPlaylistsResponse {
-    const NSID: &'static str = "app.rocksky.playlist.getPlaylists";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPlaylistsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetPlaylists {
-    const NSID: &'static str = "app.rocksky.playlist.getPlaylists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPlaylistsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.playlist.getPlaylists
-pub struct GetPlaylistsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPlaylistsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.playlist.getPlaylists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPlaylists;
-    type Response = GetPlaylistsResponse;
 }

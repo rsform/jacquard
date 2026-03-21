@@ -10,6 +10,7 @@ use std::collections::BTreeMap;
 
 use super::CodeGenerator;
 use super::utils::{known_value_to_variant_name, make_ident, value_to_variant_name};
+use super::prettify::GeneratedCode;
 
 /// Enum variant kind for IntoStatic generation
 #[derive(Debug, Clone)]
@@ -33,13 +34,13 @@ impl<'c> CodeGenerator<'c> {
         parent_type_name: &str,
         properties: &BTreeMap<SmolStr, LexObjectProperty<'static>>,
         include_nested_objects: bool,
-    ) -> Result<Vec<TokenStream>> {
+    ) -> Result<Vec<GeneratedCode>> {
         let mut nested = Vec::new();
 
         for (field_name, field_type) in properties {
             match field_type {
                 LexObjectProperty::Union(union) => {
-                    // Skip empty, single-variant unions unless they're self-referential
+                    // Skip empty, single-variant unions unless they're self-referential.
                     if !union.refs.is_empty()
                         && (union.refs.len() > 1
                             || self.is_self_referential_union(nsid, parent_type_name, &union))
@@ -47,20 +48,19 @@ impl<'c> CodeGenerator<'c> {
                         let union_name =
                             self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
-                        let union_def =
-                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                        nested.push(union_def);
+                        nested.push(
+                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?,
+                        );
                     }
                 }
                 LexObjectProperty::Object(nested_obj) if include_nested_objects => {
                     let object_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    let obj_def = self.generate_object(nsid, &object_name, &nested_obj)?;
-                    nested.push(obj_def);
+                    nested.push(self.generate_object(nsid, &object_name, &nested_obj)?);
                 }
                 LexObjectProperty::Array(array) => {
                     if let LexArrayItem::Union(union) = &array.items {
-                        // Skip single-variant array unions
+                        // Skip single-variant array unions.
                         if union.refs.len() > 1 {
                             let union_name = self.generate_field_type_name(
                                 nsid,
@@ -69,17 +69,16 @@ impl<'c> CodeGenerator<'c> {
                                 "Item",
                             );
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def =
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                            nested.push(union_def);
+                            nested.push(
+                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?,
+                            );
                         }
                     }
                 }
                 LexObjectProperty::String(s) if s.known_values.is_some() => {
                     let enum_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    let enum_def = self.generate_inline_known_values_enum(&enum_name, s)?;
-                    nested.push(enum_def);
+                    nested.push(self.generate_inline_known_values_enum(&enum_name, s)?);
                 }
                 _ => {}
             }
@@ -93,7 +92,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         record: &LexRecord<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         match &record.record {
             crate::lexicon::LexRecordRecord::Object(obj) => {
                 let type_name = self.def_to_type_name(nsid, def_name);
@@ -119,8 +118,6 @@ impl<'c> CodeGenerator<'c> {
                     pub struct #ident<'a> {
                         #fields
                     }
-                    #(#default_fns)*
-                    #manual_default
                 };
 
                 // Generate custom builder if needed
@@ -204,23 +201,53 @@ impl<'c> CodeGenerator<'c> {
                 let (shared_fn, schema_impl) =
                     self.generate_schema_impl_with_shared(&type_name, nsid, "main", true);
 
-                Ok(quote! {
-                    #struct_def
-                    #builder
+                // Merge nested type buckets into parent buckets.
+                let mut nested_type_defs = TokenStream::new();
+                let mut nested_internals = TokenStream::new();
+                for nested in unions {
+                    nested_type_defs.extend(nested.type_defs);
+                    nested_internals.extend(nested.inherent_impls);
+                    nested_internals.extend(nested.trait_impls);
+                    nested_internals.extend(nested.internals);
+                }
 
+                // Categorize tokens into buckets.
+                let type_defs = quote! {
+                    #struct_def
+                    #nested_type_defs
+                    #output_wrapper
+                };
+
+                let inherent_impls = quote! {
                     impl<'a> #ident<'a> {
                         pub fn uri(uri: impl Into<jacquard_common::CowStr<'a>>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
                             jacquard_common::types::uri::RecordUri::try_from_uri(jacquard_common::types::string::AtUri::new_cow(uri.into())?)
                         }
                     }
-                    #(#unions)*
-                    #output_wrapper
+                };
+
+                let trait_impls = quote! {
+                    #record_marker
                     #from_impl
                     #collection_impl
-                    #record_marker
                     #collection_marker_impl
                     #schema_impl
+                };
+
+                let internals = quote! {
+                    #(#default_fns)*
+                    #manual_default
+                    #nested_internals
+                    #builder
                     #shared_fn
+                };
+
+                Ok(GeneratedCode {
+                    type_defs,
+                    inherent_impls,
+                    trait_impls,
+                    internals,
+                    imports: Default::default(),
                 })
             }
         }
@@ -232,7 +259,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         obj: &LexObject<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
@@ -266,7 +293,6 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         } else {
             quote! {
@@ -277,7 +303,6 @@ impl<'c> CodeGenerator<'c> {
                 pub struct #ident<'a> {
                     #fields
                 }
-                #(#default_fns)*
             }
         };
 
@@ -291,20 +316,47 @@ impl<'c> CodeGenerator<'c> {
             quote! {}
         };
 
-        // Generate union types and nested object types for this object
-        let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
+        // Generate union types and nested object types for this object.
+        let nested_items = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
 
-        // Generate LexiconSchema impl with shared lexicon_doc function
+        // Merge nested type buckets into parent buckets.
+        let mut nested_type_defs = TokenStream::new();
+        let mut nested_internals = TokenStream::new();
+        for nested in nested_items {
+            nested_type_defs.extend(nested.type_defs);
+            nested_internals.extend(nested.inherent_impls);
+            nested_internals.extend(nested.trait_impls);
+            nested_internals.extend(nested.internals);
+        }
+
+        // Generate LexiconSchema impl with shared lexicon_doc function.
         let (shared_fn, schema_impl) =
             self.generate_schema_impl_with_shared(&type_name, nsid, def_name, true);
 
-        Ok(quote! {
+        // Categorize tokens into buckets.
+        let type_defs = quote! {
             #struct_def
-            #manual_default
-            #builder
-            #(#unions)*
-            #shared_fn
+            #nested_type_defs
+        };
+
+        let trait_impls = quote! {
             #schema_impl
+        };
+
+        let internals = quote! {
+            #(#default_fns)*
+            #manual_default
+            #nested_internals
+            #builder
+            #shared_fn
+        };
+
+        Ok(GeneratedCode {
+            type_defs,
+            inherent_impls: TokenStream::new(),
+            trait_impls,
+            internals,
+            imports: Default::default(),
         })
     }
 
@@ -622,7 +674,7 @@ impl<'c> CodeGenerator<'c> {
         refs: &[jacquard_common::CowStr<'static>],
         description: Option<&str>,
         closed: Option<bool>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
 
         // Build variants using the union_codegen module
@@ -643,8 +695,8 @@ impl<'c> CodeGenerator<'c> {
         // Only add open_union if not closed
         let is_open = closed != Some(true);
 
-        if is_open {
-            Ok(quote! {
+        let enum_def = if is_open {
+            quote! {
                 #doc
                 #[jacquard_derive::open_union]
                 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
@@ -653,9 +705,9 @@ impl<'c> CodeGenerator<'c> {
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
-            })
+            }
         } else {
-            Ok(quote! {
+            quote! {
                 #doc
                 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                 #[serde(tag = "$type")]
@@ -663,8 +715,10 @@ impl<'c> CodeGenerator<'c> {
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
-            })
-        }
+            }
+        };
+
+        Ok(GeneratedCode::type_only(enum_def))
     }
 
     /// Generate enum for string with known values
@@ -673,7 +727,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         string: &LexString<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
@@ -728,7 +782,7 @@ impl<'c> CodeGenerator<'c> {
         let into_static_impl =
             self.generate_into_static_for_enum(&type_name, &variant_info, true, false);
 
-        Ok(quote! {
+        let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
@@ -798,7 +852,9 @@ impl<'c> CodeGenerator<'c> {
             }
 
             #into_static_impl
-        })
+        };
+
+        Ok(GeneratedCode::type_only(enum_def))
     }
 
     /// Generate enum for inline string property with known values.
@@ -808,7 +864,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         type_name: &str,
         string: &LexString<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
 
         let known_values = string.known_values.as_ref().unwrap();
@@ -862,7 +918,7 @@ impl<'c> CodeGenerator<'c> {
         let into_static_impl =
             self.generate_into_static_for_enum(type_name, &variant_info, true, false);
 
-        Ok(quote! {
+        let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
@@ -938,7 +994,9 @@ impl<'c> CodeGenerator<'c> {
             }
 
             #into_static_impl
-        })
+        };
+
+        Ok(GeneratedCode::type_only(enum_def))
     }
 
     /// Generate enum for integer with enum values
@@ -947,7 +1005,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         integer: &LexInteger<'static>,
-    ) -> Result<TokenStream> {
+    ) -> Result<GeneratedCode> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
@@ -976,7 +1034,7 @@ impl<'c> CodeGenerator<'c> {
 
         let doc = self.generate_doc_comment(integer.description.as_ref());
 
-        Ok(quote! {
+        let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
             pub enum #ident {
@@ -1021,7 +1079,9 @@ impl<'c> CodeGenerator<'c> {
                     Ok(Self::from(n))
                 }
             }
-        })
+        };
+
+        Ok(GeneratedCode::type_only(enum_def))
     }
 
     /// Generate IntoStatic impl for a struct

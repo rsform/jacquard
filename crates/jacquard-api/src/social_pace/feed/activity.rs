@@ -50,6 +50,130 @@ pub struct Activity<'a> {
     pub r#type: crate::social_pace::feed::ActivityType<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivityGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Activity<'a>,
+}
+
+impl<'a> Activity<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ActivityRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ActivityRecord;
+impl jacquard_common::xrpc::XrpcResp for ActivityRecord {
+    const NSID: &'static str = "social.pace.feed.activity";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ActivityGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
+    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Activity<'_> {
+    const NSID: &'static str = "social.pace.feed.activity";
+    type Record = ActivityRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ActivityRecord {
+    const NSID: &'static str = "social.pace.feed.activity";
+    type Record = ActivityRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+    fn nsid() -> &'static str {
+        "social.pace.feed.activity"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_pace_feed_activity()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.distance_units {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "distance_units",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.route {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "application/vnd.garmin.tcx+xml",
+                    "application/gpx+xml.",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "route",
+                        ),
+                        accepted: vec![
+                            "application/vnd.garmin.tcx+xml".to_string(),
+                            "application/gpx+xml.".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod activity_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -60,67 +184,67 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type EndedAt;
+        type StartedAt;
         type CreatedAt;
         type Type;
-        type StartedAt;
-        type EndedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type EndedAt = Unset;
+        type StartedAt = Unset;
         type CreatedAt = Unset;
         type Type = Unset;
-        type StartedAt = Unset;
-        type EndedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type StartedAt = S::StartedAt;
-        type EndedAt = S::EndedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type StartedAt = S::StartedAt;
-        type EndedAt = S::EndedAt;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type StartedAt = Set<members::started_at>;
-        type EndedAt = S::EndedAt;
     }
     ///State transition - sets the `ended_at` field to Set
     pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndedAt<S> {}
     impl<S: State> State for SetEndedAt<S> {
+        type EndedAt = Set<members::ended_at>;
+        type StartedAt = S::StartedAt;
         type CreatedAt = S::CreatedAt;
         type Type = S::Type;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type EndedAt = S::EndedAt;
+        type StartedAt = Set<members::started_at>;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EndedAt = S::EndedAt;
         type StartedAt = S::StartedAt;
-        type EndedAt = Set<members::ended_at>;
+        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type EndedAt = S::EndedAt;
+        type StartedAt = S::StartedAt;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
     }
 }
 
@@ -349,10 +473,10 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
+    S::EndedAt: activity_state::IsSet,
+    S::StartedAt: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
     S::Type: activity_state::IsSet,
-    S::StartedAt: activity_state::IsSet,
-    S::EndedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -391,130 +515,6 @@ where
             r#type: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Activity<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ActivityRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Activity<'a>,
-}
-
-impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
-    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Activity<'_> {
-    const NSID: &'static str = "social.pace.feed.activity";
-    type Record = ActivityRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ActivityRecord;
-impl jacquard_common::xrpc::XrpcResp for ActivityRecord {
-    const NSID: &'static str = "social.pace.feed.activity";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ActivityGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ActivityRecord {
-    const NSID: &'static str = "social.pace.feed.activity";
-    type Record = ActivityRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
-    fn nsid() -> &'static str {
-        "social.pace.feed.activity"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_pace_feed_activity()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.distance_units {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_units",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.route {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "application/vnd.garmin.tcx+xml",
-                    "application/gpx+xml.",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "route",
-                        ),
-                        accepted: vec![
-                            "application/vnd.garmin.tcx+xml".to_string(),
-                            "application/gpx+xml.".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

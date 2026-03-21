@@ -38,6 +38,97 @@ pub struct Reminder<'a> {
     pub trigger_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReminderGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Reminder<'a>,
+}
+
+impl<'a> Reminder<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReminderRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ReminderRecord;
+impl jacquard_common::xrpc::XrpcResp for ReminderRecord {
+    const NSID: &'static str = "net.jbsm.jb.reminder";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ReminderGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReminderGetRecordOutput<'_>> for Reminder<'_> {
+    fn from(output: ReminderGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Reminder<'_> {
+    const NSID: &'static str = "net.jbsm.jb.reminder";
+    type Record = ReminderRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ReminderRecord {
+    const NSID: &'static str = "net.jbsm.jb.reminder";
+    type Record = ReminderRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reminder<'a> {
+    fn nsid() -> &'static str {
+        "net.jbsm.jb.reminder"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_jbsm_jb_reminder()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.subject;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subject",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_reminder_occurred() -> std::option::Option<bool> {
     Some(false)
 }
@@ -53,8 +144,8 @@ pub mod reminder_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type TriggerAt;
         type Subject;
+        type TriggerAt;
         type Requester;
     }
     /// Empty state - all required fields are unset
@@ -62,8 +153,8 @@ pub mod reminder_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type TriggerAt = Unset;
         type Subject = Unset;
+        type TriggerAt = Unset;
         type Requester = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -71,17 +162,8 @@ pub mod reminder_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
         type TriggerAt = S::TriggerAt;
-        type Subject = S::Subject;
-        type Requester = S::Requester;
-    }
-    ///State transition - sets the `trigger_at` field to Set
-    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
-    impl<S: State> State for SetTriggerAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type TriggerAt = Set<members::trigger_at>;
-        type Subject = S::Subject;
         type Requester = S::Requester;
     }
     ///State transition - sets the `subject` field to Set
@@ -89,8 +171,17 @@ pub mod reminder_state {
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type CreatedAt = S::CreatedAt;
-        type TriggerAt = S::TriggerAt;
         type Subject = Set<members::subject>;
+        type TriggerAt = S::TriggerAt;
+        type Requester = S::Requester;
+    }
+    ///State transition - sets the `trigger_at` field to Set
+    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
+    impl<S: State> State for SetTriggerAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type TriggerAt = Set<members::trigger_at>;
         type Requester = S::Requester;
     }
     ///State transition - sets the `requester` field to Set
@@ -98,8 +189,8 @@ pub mod reminder_state {
     impl<S: State> sealed::Sealed for SetRequester<S> {}
     impl<S: State> State for SetRequester<S> {
         type CreatedAt = S::CreatedAt;
-        type TriggerAt = S::TriggerAt;
         type Subject = S::Subject;
+        type TriggerAt = S::TriggerAt;
         type Requester = Set<members::requester>;
     }
     /// Marker types for field names
@@ -107,10 +198,10 @@ pub mod reminder_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `trigger_at` field
-        pub struct trigger_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `trigger_at` field
+        pub struct trigger_at(());
         ///Marker type for the `requester` field
         pub struct requester(());
     }
@@ -260,8 +351,8 @@ impl<'a, S> ReminderBuilder<'a, S>
 where
     S: reminder_state::State,
     S::CreatedAt: reminder_state::IsSet,
-    S::TriggerAt: reminder_state::IsSet,
     S::Subject: reminder_state::IsSet,
+    S::TriggerAt: reminder_state::IsSet,
     S::Requester: reminder_state::IsSet,
 {
     /// Build the final struct
@@ -293,97 +384,6 @@ where
             trigger_at: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Reminder<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReminderRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReminderGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reminder<'a>,
-}
-
-impl From<ReminderGetRecordOutput<'_>> for Reminder<'_> {
-    fn from(output: ReminderGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Reminder<'_> {
-    const NSID: &'static str = "net.jbsm.jb.reminder";
-    type Record = ReminderRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ReminderRecord;
-impl jacquard_common::xrpc::XrpcResp for ReminderRecord {
-    const NSID: &'static str = "net.jbsm.jb.reminder";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReminderGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ReminderRecord {
-    const NSID: &'static str = "net.jbsm.jb.reminder";
-    type Record = ReminderRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reminder<'a> {
-    fn nsid() -> &'static str {
-        "net.jbsm.jb.reminder"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_jbsm_jb_reminder()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.subject;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subject",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

@@ -52,6 +52,228 @@ pub struct Scan<'a> {
     pub vuln_report_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScanGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Scan<'a>,
+}
+
+impl<'a> Scan<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ScanRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ScanRecord;
+impl jacquard_common::xrpc::XrpcResp for ScanRecord {
+    const NSID: &'static str = "io.atcr.hold.scan";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ScanGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ScanGetRecordOutput<'_>> for Scan<'_> {
+    fn from(output: ScanGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Scan<'_> {
+    const NSID: &'static str = "io.atcr.hold.scan";
+    type Record = ScanRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ScanRecord {
+    const NSID: &'static str = "io.atcr.hold.scan";
+    type Record = ScanRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.scan"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_scan()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.critical;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "critical",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.high;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "high",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.low;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "low",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.medium;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "medium",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.repository;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.sbom_blob {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["application/spdx+json"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "sbom_blob",
+                        ),
+                        accepted: vec!["application/spdx+json".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.scanner_version;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scanner_version",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.total;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.vuln_report_blob {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["application/vnd.atcr.vulnerabilities+json"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "vuln_report_blob",
+                        ),
+                        accepted: vec![
+                            "application/vnd.atcr.vulnerabilities+json".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod scan_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -62,205 +284,205 @@ pub mod scan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Critical;
-        type Low;
-        type UserDid;
-        type Manifest;
-        type High;
-        type Repository;
         type Total;
-        type ScannerVersion;
         type ScannedAt;
+        type ScannerVersion;
+        type Low;
+        type Critical;
+        type Repository;
+        type Manifest;
         type Medium;
+        type UserDid;
+        type High;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Critical = Unset;
-        type Low = Unset;
-        type UserDid = Unset;
-        type Manifest = Unset;
-        type High = Unset;
-        type Repository = Unset;
         type Total = Unset;
-        type ScannerVersion = Unset;
         type ScannedAt = Unset;
+        type ScannerVersion = Unset;
+        type Low = Unset;
+        type Critical = Unset;
+        type Repository = Unset;
+        type Manifest = Unset;
         type Medium = Unset;
-    }
-    ///State transition - sets the `critical` field to Set
-    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCritical<S> {}
-    impl<S: State> State for SetCritical<S> {
-        type Critical = Set<members::critical>;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `low` field to Set
-    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLow<S> {}
-    impl<S: State> State for SetLow<S> {
-        type Critical = S::Critical;
-        type Low = Set<members::low>;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = Set<members::user_did>;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetManifest<S> {}
-    impl<S: State> State for SetManifest<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = Set<members::manifest>;
-        type High = S::High;
-        type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `high` field to Set
-    pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHigh<S> {}
-    impl<S: State> State for SetHigh<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = Set<members::high>;
-        type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = Set<members::repository>;
-        type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
+        type UserDid = Unset;
+        type High = Unset;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
         type Total = Set<members::total>;
+        type ScannedAt = S::ScannedAt;
         type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `scanner_version` field to Set
-    pub struct SetScannerVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScannerVersion<S> {}
-    impl<S: State> State for SetScannerVersion<S> {
-        type Critical = S::Critical;
         type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
+        type Critical = S::Critical;
         type Repository = S::Repository;
-        type Total = S::Total;
-        type ScannerVersion = Set<members::scanner_version>;
-        type ScannedAt = S::ScannedAt;
+        type Manifest = S::Manifest;
         type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
     }
     ///State transition - sets the `scanned_at` field to Set
     pub struct SetScannedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScannedAt<S> {}
     impl<S: State> State for SetScannedAt<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
         type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
         type ScannedAt = Set<members::scanned_at>;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
         type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `scanner_version` field to Set
+    pub struct SetScannerVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScannerVersion<S> {}
+    impl<S: State> State for SetScannerVersion<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = Set<members::scanner_version>;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `low` field to Set
+    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLow<S> {}
+    impl<S: State> State for SetLow<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = Set<members::low>;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `critical` field to Set
+    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCritical<S> {}
+    impl<S: State> State for SetCritical<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = Set<members::critical>;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = Set<members::repository>;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = Set<members::manifest>;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = S::High;
     }
     ///State transition - sets the `medium` field to Set
     pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedium<S> {}
     impl<S: State> State for SetMedium<S> {
-        type Critical = S::Critical;
-        type Low = S::Low;
-        type UserDid = S::UserDid;
-        type Manifest = S::Manifest;
-        type High = S::High;
-        type Repository = S::Repository;
         type Total = S::Total;
-        type ScannerVersion = S::ScannerVersion;
         type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
         type Medium = Set<members::medium>;
+        type UserDid = S::UserDid;
+        type High = S::High;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = Set<members::user_did>;
+        type High = S::High;
+    }
+    ///State transition - sets the `high` field to Set
+    pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHigh<S> {}
+    impl<S: State> State for SetHigh<S> {
+        type Total = S::Total;
+        type ScannedAt = S::ScannedAt;
+        type ScannerVersion = S::ScannerVersion;
+        type Low = S::Low;
+        type Critical = S::Critical;
+        type Repository = S::Repository;
+        type Manifest = S::Manifest;
+        type Medium = S::Medium;
+        type UserDid = S::UserDid;
+        type High = Set<members::high>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `critical` field
-        pub struct critical(());
-        ///Marker type for the `low` field
-        pub struct low(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
-        ///Marker type for the `high` field
-        pub struct high(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `total` field
         pub struct total(());
-        ///Marker type for the `scanner_version` field
-        pub struct scanner_version(());
         ///Marker type for the `scanned_at` field
         pub struct scanned_at(());
+        ///Marker type for the `scanner_version` field
+        pub struct scanner_version(());
+        ///Marker type for the `low` field
+        pub struct low(());
+        ///Marker type for the `critical` field
+        pub struct critical(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
         ///Marker type for the `medium` field
         pub struct medium(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+        ///Marker type for the `high` field
+        pub struct high(());
     }
 }
 
@@ -546,16 +768,16 @@ impl<'a, S: scan_state::State> ScanBuilder<'a, S> {
 impl<'a, S> ScanBuilder<'a, S>
 where
     S: scan_state::State,
-    S::Critical: scan_state::IsSet,
-    S::Low: scan_state::IsSet,
-    S::UserDid: scan_state::IsSet,
-    S::Manifest: scan_state::IsSet,
-    S::High: scan_state::IsSet,
-    S::Repository: scan_state::IsSet,
     S::Total: scan_state::IsSet,
-    S::ScannerVersion: scan_state::IsSet,
     S::ScannedAt: scan_state::IsSet,
+    S::ScannerVersion: scan_state::IsSet,
+    S::Low: scan_state::IsSet,
+    S::Critical: scan_state::IsSet,
+    S::Repository: scan_state::IsSet,
+    S::Manifest: scan_state::IsSet,
     S::Medium: scan_state::IsSet,
+    S::UserDid: scan_state::IsSet,
+    S::High: scan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scan<'a> {
@@ -598,228 +820,6 @@ where
             vuln_report_blob: self.__unsafe_private_named.11,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Scan<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ScanRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScanGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Scan<'a>,
-}
-
-impl From<ScanGetRecordOutput<'_>> for Scan<'_> {
-    fn from(output: ScanGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Scan<'_> {
-    const NSID: &'static str = "io.atcr.hold.scan";
-    type Record = ScanRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ScanRecord;
-impl jacquard_common::xrpc::XrpcResp for ScanRecord {
-    const NSID: &'static str = "io.atcr.hold.scan";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ScanGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ScanRecord {
-    const NSID: &'static str = "io.atcr.hold.scan";
-    type Record = ScanRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.scan"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_scan()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.critical;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "critical",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.high;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "high",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.low;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "low",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.medium;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "medium",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.repository;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.sbom_blob {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["application/spdx+json"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "sbom_blob",
-                        ),
-                        accepted: vec!["application/spdx+json".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.scanner_version;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scanner_version",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.total;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.vuln_report_blob {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["application/vnd.atcr.vulnerabilities+json"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "vuln_report_blob",
-                        ),
-                        accepted: vec![
-                            "application/vnd.atcr.vulnerabilities+json".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

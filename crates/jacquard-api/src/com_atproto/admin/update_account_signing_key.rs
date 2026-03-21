@@ -24,6 +24,36 @@ pub struct UpdateAccountSigningKey<'a> {
     pub signing_key: jacquard_common::types::string::Did<'a>,
 }
 
+/// Response type for
+///com.atproto.admin.updateAccountSigningKey
+pub struct UpdateAccountSigningKeyResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
+    const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
+    const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateAccountSigningKeyResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.updateAccountSigningKey
+pub struct UpdateAccountSigningKeyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateAccountSigningKey<'de>;
+    type Response = UpdateAccountSigningKeyResponse;
+}
+
 pub mod update_account_signing_key_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -174,34 +204,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.admin.updateAccountSigningKey
-pub struct UpdateAccountSigningKeyResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
-    const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
-    const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateAccountSigningKeyResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.updateAccountSigningKey
-pub struct UpdateAccountSigningKeyRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateAccountSigningKey<'de>;
-    type Response = UpdateAccountSigningKeyResponse;
 }

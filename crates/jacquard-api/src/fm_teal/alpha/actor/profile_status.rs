@@ -29,6 +29,193 @@ pub struct ProfileStatus<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// The onboarding completion status
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileStatusCompletedOnboarding<'a> {
+    None,
+    ProfileOnboarding,
+    PlayOnboarding,
+    Complete,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileStatusCompletedOnboarding<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::ProfileOnboarding => "profileOnboarding",
+            Self::PlayOnboarding => "playOnboarding",
+            Self::Complete => "complete",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileStatusCompletedOnboarding<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "profileOnboarding" => Self::ProfileOnboarding,
+            "playOnboarding" => Self::PlayOnboarding,
+            "complete" => Self::Complete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileStatusCompletedOnboarding<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "profileOnboarding" => Self::ProfileOnboarding,
+            "playOnboarding" => Self::PlayOnboarding,
+            "complete" => Self::Complete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileStatusCompletedOnboarding<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileStatusCompletedOnboarding<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileStatusCompletedOnboarding<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileStatusCompletedOnboarding<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileStatusCompletedOnboarding<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<'_> {
+    type Output = ProfileStatusCompletedOnboarding<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileStatusCompletedOnboarding::None => {
+                ProfileStatusCompletedOnboarding::None
+            }
+            ProfileStatusCompletedOnboarding::ProfileOnboarding => {
+                ProfileStatusCompletedOnboarding::ProfileOnboarding
+            }
+            ProfileStatusCompletedOnboarding::PlayOnboarding => {
+                ProfileStatusCompletedOnboarding::PlayOnboarding
+            }
+            ProfileStatusCompletedOnboarding::Complete => {
+                ProfileStatusCompletedOnboarding::Complete
+            }
+            ProfileStatusCompletedOnboarding::Other(v) => {
+                ProfileStatusCompletedOnboarding::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileStatusGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ProfileStatus<'a>,
+}
+
+impl<'a> ProfileStatus<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ProfileStatusRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfileStatusRecord;
+impl jacquard_common::xrpc::XrpcResp for ProfileStatusRecord {
+    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProfileStatusGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ProfileStatusGetRecordOutput<'_>> for ProfileStatus<'_> {
+    fn from(output: ProfileStatusGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for ProfileStatus<'_> {
+    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
+    type Record = ProfileStatusRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ProfileStatusRecord {
+    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
+    type Record = ProfileStatusRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileStatus<'a> {
+    fn nsid() -> &'static str {
+        "fm.teal.alpha.actor.profileStatus"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fm_teal_alpha_actor_profileStatus()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod profile_status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -175,193 +362,6 @@ where
             updated_at: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ProfileStatus<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProfileStatusRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// The onboarding completion status
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileStatusCompletedOnboarding<'a> {
-    None,
-    ProfileOnboarding,
-    PlayOnboarding,
-    Complete,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileStatusCompletedOnboarding<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::ProfileOnboarding => "profileOnboarding",
-            Self::PlayOnboarding => "playOnboarding",
-            Self::Complete => "complete",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileStatusCompletedOnboarding<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "profileOnboarding" => Self::ProfileOnboarding,
-            "playOnboarding" => Self::PlayOnboarding,
-            "complete" => Self::Complete,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileStatusCompletedOnboarding<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "profileOnboarding" => Self::ProfileOnboarding,
-            "playOnboarding" => Self::PlayOnboarding,
-            "complete" => Self::Complete,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileStatusCompletedOnboarding<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileStatusCompletedOnboarding<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ProfileStatusCompletedOnboarding<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ProfileStatusCompletedOnboarding<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileStatusCompletedOnboarding<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<'_> {
-    type Output = ProfileStatusCompletedOnboarding<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileStatusCompletedOnboarding::None => {
-                ProfileStatusCompletedOnboarding::None
-            }
-            ProfileStatusCompletedOnboarding::ProfileOnboarding => {
-                ProfileStatusCompletedOnboarding::ProfileOnboarding
-            }
-            ProfileStatusCompletedOnboarding::PlayOnboarding => {
-                ProfileStatusCompletedOnboarding::PlayOnboarding
-            }
-            ProfileStatusCompletedOnboarding::Complete => {
-                ProfileStatusCompletedOnboarding::Complete
-            }
-            ProfileStatusCompletedOnboarding::Other(v) => {
-                ProfileStatusCompletedOnboarding::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileStatusGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ProfileStatus<'a>,
-}
-
-impl From<ProfileStatusGetRecordOutput<'_>> for ProfileStatus<'_> {
-    fn from(output: ProfileStatusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for ProfileStatus<'_> {
-    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
-    type Record = ProfileStatusRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ProfileStatusRecord;
-impl jacquard_common::xrpc::XrpcResp for ProfileStatusRecord {
-    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileStatusGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ProfileStatusRecord {
-    const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
-    type Record = ProfileStatusRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileStatus<'a> {
-    fn nsid() -> &'static str {
-        "fm.teal.alpha.actor.profileStatus"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fm_teal_alpha_actor_profileStatus()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

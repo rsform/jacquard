@@ -20,6 +20,48 @@ pub struct GetStarterPacks<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStarterPacksOutput<'a> {
+    #[serde(borrow)]
+    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
+}
+
+/// Response type for
+///app.bsky.graph.getStarterPacks
+pub struct GetStarterPacksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetStarterPacksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacks<'a> {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStarterPacksResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getStarterPacks
+pub struct GetStarterPacksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStarterPacks<'de>;
+    type Response = GetStarterPacksResponse;
+}
+
 pub mod get_starter_packs_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetStarterPacksOutput<'a> {
-    #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
-}
-
-/// Response type for
-///app.bsky.graph.getStarterPacks
-pub struct GetStarterPacksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
-    const NSID: &'static str = "app.bsky.graph.getStarterPacks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacks<'a> {
-    const NSID: &'static str = "app.bsky.graph.getStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetStarterPacksResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getStarterPacks
-pub struct GetStarterPacksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStarterPacks<'de>;
-    type Response = GetStarterPacksResponse;
 }

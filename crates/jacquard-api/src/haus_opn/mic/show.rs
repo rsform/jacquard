@@ -37,6 +37,254 @@ pub struct Show<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ShowSchedule<'a> {
+    Daily,
+    Weekly,
+    Biweekly,
+    Monthly,
+    Irregular,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ShowSchedule<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Daily => "daily",
+            Self::Weekly => "weekly",
+            Self::Biweekly => "biweekly",
+            Self::Monthly => "monthly",
+            Self::Irregular => "irregular",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ShowSchedule<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "daily" => Self::Daily,
+            "weekly" => Self::Weekly,
+            "biweekly" => Self::Biweekly,
+            "monthly" => Self::Monthly,
+            "irregular" => Self::Irregular,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ShowSchedule<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "daily" => Self::Daily,
+            "weekly" => Self::Weekly,
+            "biweekly" => Self::Biweekly,
+            "monthly" => Self::Monthly,
+            "irregular" => Self::Irregular,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ShowSchedule<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ShowSchedule<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ShowSchedule<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ShowSchedule<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ShowSchedule<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ShowSchedule<'_> {
+    type Output = ShowSchedule<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ShowSchedule::Daily => ShowSchedule::Daily,
+            ShowSchedule::Weekly => ShowSchedule::Weekly,
+            ShowSchedule::Biweekly => ShowSchedule::Biweekly,
+            ShowSchedule::Monthly => ShowSchedule::Monthly,
+            ShowSchedule::Irregular => ShowSchedule::Irregular,
+            ShowSchedule::Other(v) => ShowSchedule::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ShowGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Show<'a>,
+}
+
+impl<'a> Show<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ShowRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShowRecord;
+impl jacquard_common::xrpc::XrpcResp for ShowRecord {
+    const NSID: &'static str = "haus.opn.mic.show";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ShowGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ShowGetRecordOutput<'_>> for Show<'_> {
+    fn from(output: ShowGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Show<'_> {
+    const NSID: &'static str = "haus.opn.mic.show";
+    type Record = ShowRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ShowRecord {
+    const NSID: &'static str = "haus.opn.mic.show";
+    type Record = ShowRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
+    fn nsid() -> &'static str {
+        "haus.opn.mic.show"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_haus_opn_mic_show()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cover_art {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.cover_art {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "cover_art",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod show_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -49,8 +297,8 @@ pub mod show_state {
     pub trait State: sealed::Sealed {
         type Title;
         type Artist;
-        type CreatedAt;
         type Schedule;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -58,8 +306,8 @@ pub mod show_state {
     impl State for Empty {
         type Title = Unset;
         type Artist = Unset;
-        type CreatedAt = Unset;
         type Schedule = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -67,8 +315,8 @@ pub mod show_state {
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
         type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
         type Schedule = S::Schedule;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
@@ -76,17 +324,8 @@ pub mod show_state {
     impl<S: State> State for SetArtist<S> {
         type Title = S::Title;
         type Artist = Set<members::artist>;
+        type Schedule = S::Schedule;
         type CreatedAt = S::CreatedAt;
-        type Schedule = S::Schedule;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type CreatedAt = Set<members::created_at>;
-        type Schedule = S::Schedule;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
@@ -94,8 +333,17 @@ pub mod show_state {
     impl<S: State> State for SetSchedule<S> {
         type Title = S::Title;
         type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
         type Schedule = Set<members::schedule>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Schedule = S::Schedule;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -104,10 +352,10 @@ pub mod show_state {
         pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -262,8 +510,8 @@ where
     S: show_state::State,
     S::Title: show_state::IsSet,
     S::Artist: show_state::IsSet,
-    S::CreatedAt: show_state::IsSet,
     S::Schedule: show_state::IsSet,
+    S::CreatedAt: show_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Show<'a> {
@@ -294,254 +542,6 @@ where
             title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Show<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ShowRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ShowSchedule<'a> {
-    Daily,
-    Weekly,
-    Biweekly,
-    Monthly,
-    Irregular,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ShowSchedule<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Daily => "daily",
-            Self::Weekly => "weekly",
-            Self::Biweekly => "biweekly",
-            Self::Monthly => "monthly",
-            Self::Irregular => "irregular",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ShowSchedule<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "daily" => Self::Daily,
-            "weekly" => Self::Weekly,
-            "biweekly" => Self::Biweekly,
-            "monthly" => Self::Monthly,
-            "irregular" => Self::Irregular,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ShowSchedule<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "daily" => Self::Daily,
-            "weekly" => Self::Weekly,
-            "biweekly" => Self::Biweekly,
-            "monthly" => Self::Monthly,
-            "irregular" => Self::Irregular,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ShowSchedule<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ShowSchedule<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ShowSchedule<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ShowSchedule<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ShowSchedule<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ShowSchedule<'_> {
-    type Output = ShowSchedule<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ShowSchedule::Daily => ShowSchedule::Daily,
-            ShowSchedule::Weekly => ShowSchedule::Weekly,
-            ShowSchedule::Biweekly => ShowSchedule::Biweekly,
-            ShowSchedule::Monthly => ShowSchedule::Monthly,
-            ShowSchedule::Irregular => ShowSchedule::Irregular,
-            ShowSchedule::Other(v) => ShowSchedule::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ShowGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Show<'a>,
-}
-
-impl From<ShowGetRecordOutput<'_>> for Show<'_> {
-    fn from(output: ShowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Show<'_> {
-    const NSID: &'static str = "haus.opn.mic.show";
-    type Record = ShowRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ShowRecord;
-impl jacquard_common::xrpc::XrpcResp for ShowRecord {
-    const NSID: &'static str = "haus.opn.mic.show";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ShowGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ShowRecord {
-    const NSID: &'static str = "haus.opn.mic.show";
-    type Record = ShowRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
-    fn nsid() -> &'static str {
-        "haus.opn.mic.show"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_haus_opn_mic_show()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cover_art {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover_art",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.cover_art {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover_art",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

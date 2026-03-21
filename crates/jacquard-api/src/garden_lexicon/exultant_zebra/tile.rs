@@ -33,6 +33,546 @@ pub struct Interactions<'a> {
     pub services: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// A tile with a name and associated resource or bundle.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Tile<'a> {
+    ///Declared aspect ratio for tile rendering.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub aspect_ratio: std::option::Option<TileAspectRatio<'a>>,
+    ///The tile content, either a single resource or a bundle.
+    #[serde(borrow)]
+    pub content: TileContent<'a>,
+    ///Optional rich text description of the tile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Rich text facets for the description (links, mentions, hashtags).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ///Optional icon image for the tile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///Declaration of the XRPC methods, collections, and services this tile interacts with.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub interactions: std::option::Option<
+        crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>,
+    >,
+    ///Optional loading screen image for the tile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub loading_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///The name of the tile.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub params: std::option::Option<
+        Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>,
+    >,
+}
+
+/// Declared aspect ratio for tile rendering.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TileAspectRatio<'a> {
+    _11,
+    _21,
+    _31,
+    _12,
+    _13,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TileAspectRatio<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_11 => "1:1",
+            Self::_21 => "2:1",
+            Self::_31 => "3:1",
+            Self::_12 => "1:2",
+            Self::_13 => "1:3",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TileAspectRatio<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "1:1" => Self::_11,
+            "2:1" => Self::_21,
+            "3:1" => Self::_31,
+            "1:2" => Self::_12,
+            "1:3" => Self::_13,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TileAspectRatio<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "1:1" => Self::_11,
+            "2:1" => Self::_21,
+            "3:1" => Self::_31,
+            "1:2" => Self::_12,
+            "1:3" => Self::_13,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TileAspectRatio<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TileAspectRatio<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TileAspectRatio<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TileAspectRatio<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TileAspectRatio<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
+    type Output = TileAspectRatio<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TileAspectRatio::_11 => TileAspectRatio::_11,
+            TileAspectRatio::_21 => TileAspectRatio::_21,
+            TileAspectRatio::_31 => TileAspectRatio::_31,
+            TileAspectRatio::_12 => TileAspectRatio::_12,
+            TileAspectRatio::_13 => TileAspectRatio::_13,
+            TileAspectRatio::Other(v) => TileAspectRatio::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum TileContent<'a> {
+    #[serde(rename = "garden.lexicon.exultant-zebra.masl#resource")]
+    MaslResource(Box<crate::garden_lexicon::exultant_zebra::masl::Resource<'a>>),
+    #[serde(rename = "garden.lexicon.exultant-zebra.masl#main")]
+    Masl(Box<crate::garden_lexicon::exultant_zebra::masl::Masl<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TileGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Tile<'a>,
+}
+
+/// Declares an input parameter for a tile, similar to XRPC query parameters.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Param<'a> {
+    ///Default value for this parameter, encoded as a string.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub default: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Human-readable description of this parameter.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Parameter name, used as a URL search param key. Must not start with an underscore.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Whether this parameter must be provided before loading the tile.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub required: std::option::Option<bool>,
+    ///Parameter value type.
+    #[serde(borrow)]
+    pub r#type: ParamType<'a>,
+}
+
+/// Parameter value type.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ParamType<'a> {
+    String,
+    Integer,
+    Boolean,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ParamType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::String => "string",
+            Self::Integer => "integer",
+            Self::Boolean => "boolean",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ParamType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "string" => Self::String,
+            "integer" => Self::Integer,
+            "boolean" => Self::Boolean,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ParamType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "string" => Self::String,
+            "integer" => Self::Integer,
+            "boolean" => Self::Boolean,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ParamType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ParamType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ParamType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ParamType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ParamType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ParamType<'_> {
+    type Output = ParamType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ParamType::String => ParamType::String,
+            ParamType::Integer => ParamType::Integer,
+            ParamType::Boolean => ParamType::Boolean,
+            ParamType::Other(v) => ParamType::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> Tile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interactions<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.tile"
+    }
+    fn def_name() -> &'static str {
+        "interactions"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_tile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TileRecord;
+impl jacquard_common::xrpc::XrpcResp for TileRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TileGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TileGetRecordOutput<'_>> for Tile<'_> {
+    fn from(output: TileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Tile<'_> {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
+    type Record = TileRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TileRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
+    type Record = TileRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.tile"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_tile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.icon {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "icon",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.loading_image {
+            {
+                let size = value.blob().size;
+                if size > 1048576usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "loading_image",
+                        ),
+                        max: 1048576usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.loading_image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "loading_image",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.tile"
+    }
+    fn def_name() -> &'static str {
+        "param"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_tile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -436,76 +976,6 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> ::jacquard_lexicon::lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interactions<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.tile"
-    }
-    fn def_name() -> &'static str {
-        "interactions"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_tile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A tile with a name and associated resource or bundle.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Tile<'a> {
-    ///Declared aspect ratio for tile rendering.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<TileAspectRatio<'a>>,
-    ///The tile content, either a single resource or a bundle.
-    #[serde(borrow)]
-    pub content: TileContent<'a>,
-    ///Optional rich text description of the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Rich text facets for the description (links, mentions, hashtags).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Optional icon image for the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///Declaration of the XRPC methods, collections, and services this tile interacts with.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub interactions: std::option::Option<
-        crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>,
-    >,
-    ///Optional loading screen image for the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub loading_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///The name of the tile.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub params: std::option::Option<
-        Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>,
-    >,
-}
-
 pub mod tile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -516,37 +986,37 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Content;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Content = S::Content;
+        type Name = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Name = S::Name;
         type Content = Set<members::content>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -774,8 +1244,8 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S> TileBuilder<'a, S>
 where
     S: tile_state::State,
-    S::Name: tile_state::IsSet,
     S::Content: tile_state::IsSet,
+    S::Name: tile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tile<'a> {
@@ -812,475 +1282,5 @@ where
             params: self.__unsafe_private_named.8,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Tile<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Declared aspect ratio for tile rendering.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TileAspectRatio<'a> {
-    _11,
-    _21,
-    _31,
-    _12,
-    _13,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TileAspectRatio<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_11 => "1:1",
-            Self::_21 => "2:1",
-            Self::_31 => "3:1",
-            Self::_12 => "1:2",
-            Self::_13 => "1:3",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TileAspectRatio<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "1:1" => Self::_11,
-            "2:1" => Self::_21,
-            "3:1" => Self::_31,
-            "1:2" => Self::_12,
-            "1:3" => Self::_13,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TileAspectRatio<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1:1" => Self::_11,
-            "2:1" => Self::_21,
-            "3:1" => Self::_31,
-            "1:2" => Self::_12,
-            "1:3" => Self::_13,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TileAspectRatio<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TileAspectRatio<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TileAspectRatio<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TileAspectRatio<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TileAspectRatio<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
-    type Output = TileAspectRatio<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TileAspectRatio::_11 => TileAspectRatio::_11,
-            TileAspectRatio::_21 => TileAspectRatio::_21,
-            TileAspectRatio::_31 => TileAspectRatio::_31,
-            TileAspectRatio::_12 => TileAspectRatio::_12,
-            TileAspectRatio::_13 => TileAspectRatio::_13,
-            TileAspectRatio::Other(v) => TileAspectRatio::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TileContent<'a> {
-    #[serde(rename = "garden.lexicon.exultant-zebra.masl#resource")]
-    MaslResource(Box<crate::garden_lexicon::exultant_zebra::masl::Resource<'a>>),
-    #[serde(rename = "garden.lexicon.exultant-zebra.masl#main")]
-    Masl(Box<crate::garden_lexicon::exultant_zebra::masl::Masl<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tile<'a>,
-}
-
-impl From<TileGetRecordOutput<'_>> for Tile<'_> {
-    fn from(output: TileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Tile<'_> {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
-    type Record = TileRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TileRecord;
-impl jacquard_common::xrpc::XrpcResp for TileRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TileRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
-    type Record = TileRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.tile"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_tile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.icon {
-            {
-                let size = value.blob().size;
-                if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        max: 1048576usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.icon {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "icon",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.loading_image {
-            {
-                let size = value.blob().size;
-                if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "loading_image",
-                        ),
-                        max: 1048576usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.loading_image {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "loading_image",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Declares an input parameter for a tile, similar to XRPC query parameters.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Param<'a> {
-    ///Default value for this parameter, encoded as a string.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub default: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Human-readable description of this parameter.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Parameter name, used as a URL search param key. Must not start with an underscore.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Whether this parameter must be provided before loading the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub required: std::option::Option<bool>,
-    ///Parameter value type.
-    #[serde(borrow)]
-    pub r#type: ParamType<'a>,
-}
-
-/// Parameter value type.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ParamType<'a> {
-    String,
-    Integer,
-    Boolean,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ParamType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::String => "string",
-            Self::Integer => "integer",
-            Self::Boolean => "boolean",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ParamType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ParamType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ParamType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ParamType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ParamType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ParamType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ParamType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ParamType<'_> {
-    type Output = ParamType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ParamType::String => ParamType::String,
-            ParamType::Integer => ParamType::Integer,
-            ParamType::Boolean => ParamType::Boolean,
-            ParamType::Other(v) => ParamType::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.tile"
-    }
-    fn def_name() -> &'static str {
-        "param"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_tile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

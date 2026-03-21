@@ -23,122 +23,6 @@ pub struct Declaration<'a> {
     pub allow_subscriptions: DeclarationAllowSubscriptions<'a>,
 }
 
-pub mod declaration_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type AllowSubscriptions;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type AllowSubscriptions = Unset;
-    }
-    ///State transition - sets the `allow_subscriptions` field to Set
-    pub struct SetAllowSubscriptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowSubscriptions<S> {}
-    impl<S: State> State for SetAllowSubscriptions<S> {
-        type AllowSubscriptions = Set<members::allow_subscriptions>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `allow_subscriptions` field
-        pub struct allow_subscriptions(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<DeclarationAllowSubscriptions<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Declaration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeclarationBuilder<'a, declaration_state::Empty> {
-        DeclarationBuilder::new()
-    }
-}
-
-impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> DeclarationBuilder<'a, S>
-where
-    S: declaration_state::State,
-    S::AllowSubscriptions: declaration_state::IsUnset,
-{
-    /// Set the `allowSubscriptions` field (required)
-    pub fn allow_subscriptions(
-        mut self,
-        value: impl Into<DeclarationAllowSubscriptions<'a>>,
-    ) -> DeclarationBuilder<'a, declaration_state::SetAllowSubscriptions<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> DeclarationBuilder<'a, S>
-where
-    S: declaration_state::State,
-    S::AllowSubscriptions: declaration_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Declaration<'a> {
-        Declaration {
-            allow_subscriptions: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Declaration<'a> {
-        Declaration {
-            allow_subscriptions: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DeclarationAllowSubscriptions<'a> {
@@ -260,16 +144,17 @@ pub struct DeclarationGetRecordOutput<'a> {
     pub value: Declaration<'a>,
 }
 
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Declaration<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
-    const NSID: &'static str = "app.bsky.notification.declaration";
-    type Record = DeclarationRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -280,6 +165,18 @@ impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DeclarationGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
+    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Declaration<'_> {
+    const NSID: &'static str = "app.bsky.notification.declaration";
+    type Record = DeclarationRecord;
 }
 
 impl jacquard_common::types::collection::Collection for DeclarationRecord {
@@ -301,6 +198,109 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
+    }
+}
+
+pub mod declaration_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AllowSubscriptions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AllowSubscriptions = Unset;
+    }
+    ///State transition - sets the `allow_subscriptions` field to Set
+    pub struct SetAllowSubscriptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowSubscriptions<S> {}
+    impl<S: State> State for SetAllowSubscriptions<S> {
+        type AllowSubscriptions = Set<members::allow_subscriptions>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `allow_subscriptions` field
+        pub struct allow_subscriptions(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeclarationBuilder<'a, S: declaration_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<DeclarationAllowSubscriptions<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Declaration<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeclarationBuilder<'a, declaration_state::Empty> {
+        DeclarationBuilder::new()
+    }
+}
+
+impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeclarationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeclarationBuilder<'a, S>
+where
+    S: declaration_state::State,
+    S::AllowSubscriptions: declaration_state::IsUnset,
+{
+    /// Set the `allowSubscriptions` field (required)
+    pub fn allow_subscriptions(
+        mut self,
+        value: impl Into<DeclarationAllowSubscriptions<'a>>,
+    ) -> DeclarationBuilder<'a, declaration_state::SetAllowSubscriptions<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeclarationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeclarationBuilder<'a, S>
+where
+    S: declaration_state::State,
+    S::AllowSubscriptions: declaration_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Declaration<'a> {
+        Declaration {
+            allow_subscriptions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Declaration<'a> {
+        Declaration {
+            allow_subscriptions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

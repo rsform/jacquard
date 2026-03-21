@@ -5,18 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_include_all_user_records() -> std::option::Option<bool> {
-    Some(false)
-}
-
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -97,6 +85,63 @@ pub struct QueryEvents<'a> {
     pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub with_strike: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryEventsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub events: Vec<crate::tools_ozone::moderation::ModEventView<'a>>,
+}
+
+/// Response type for
+///tools.ozone.moderation.queryEvents
+pub struct QueryEventsResponse;
+impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.queryEvents";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QueryEventsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.queryEvents";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = QueryEventsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.queryEvents
+pub struct QueryEventsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryEvents";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = QueryEvents<'de>;
+    type Response = QueryEventsResponse;
+}
+
+fn _default_include_all_user_records() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("desc"))
 }
 
 pub mod query_events_state {
@@ -627,49 +672,4 @@ where
             with_strike: self.__unsafe_private_named.22,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QueryEventsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub events: Vec<crate::tools_ozone::moderation::ModEventView<'a>>,
-}
-
-/// Response type for
-///tools.ozone.moderation.queryEvents
-pub struct QueryEventsResponse;
-impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.queryEvents";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QueryEventsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = QueryEventsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.queryEvents
-pub struct QueryEventsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryEvents";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = QueryEvents<'de>;
-    type Response = QueryEventsResponse;
 }

@@ -22,6 +22,48 @@ pub struct SeekParams<'a> {
     pub position: i64,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct Seek;
+/// Response type for
+///app.rocksky.player.seek
+pub struct SeekResponse;
+impl jacquard_common::xrpc::XrpcResp for SeekResponse {
+    const NSID: &'static str = "app.rocksky.player.seek";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for Seek {
+    const NSID: &'static str = "app.rocksky.player.seek";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SeekResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.player.seek
+pub struct SeekRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.player.seek";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Seek;
+    type Response = SeekResponse;
+}
+
 pub mod seek_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -132,46 +174,4 @@ where
             position: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct Seek;
-/// Response type for
-///app.rocksky.player.seek
-pub struct SeekResponse;
-impl jacquard_common::xrpc::XrpcResp for SeekResponse {
-    const NSID: &'static str = "app.rocksky.player.seek";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for Seek {
-    const NSID: &'static str = "app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SeekResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.player.seek
-pub struct SeekRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Seek;
-    type Response = SeekResponse;
 }

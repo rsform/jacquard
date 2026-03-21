@@ -20,6 +20,49 @@ pub struct GetStats<'a> {
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStatsOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::stats::StatsView<'a>,
+}
+
+/// Response type for
+///app.rocksky.stats.getStats
+pub struct GetStatsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
+    const NSID: &'static str = "app.rocksky.stats.getStats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetStatsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStats<'a> {
+    const NSID: &'static str = "app.rocksky.stats.getStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStatsResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.stats.getStats
+pub struct GetStatsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.stats.getStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStats<'de>;
+    type Response = GetStatsResponse;
+}
+
 pub mod get_stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetStatsOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::stats::StatsView<'a>,
-}
-
-/// Response type for
-///app.rocksky.stats.getStats
-pub struct GetStatsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
-    const NSID: &'static str = "app.rocksky.stats.getStats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStatsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStats<'a> {
-    const NSID: &'static str = "app.rocksky.stats.getStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetStatsResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.stats.getStats
-pub struct GetStatsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.stats.getStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStats<'de>;
-    type Response = GetStatsResponse;
 }

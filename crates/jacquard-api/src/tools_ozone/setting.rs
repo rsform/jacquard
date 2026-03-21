@@ -45,6 +45,241 @@ pub struct DefsOption<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DefsOptionManagerRole<'a> {
+    RoleModerator,
+    RoleTriage,
+    RoleAdmin,
+    RoleVerifier,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DefsOptionManagerRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
+            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
+            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
+            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DefsOptionManagerRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DefsOptionManagerRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DefsOptionManagerRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DefsOptionManagerRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DefsOptionManagerRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DefsOptionManagerRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DefsOptionManagerRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DefsOptionManagerRole<'_> {
+    type Output = DefsOptionManagerRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DefsOptionManagerRole::RoleModerator => DefsOptionManagerRole::RoleModerator,
+            DefsOptionManagerRole::RoleTriage => DefsOptionManagerRole::RoleTriage,
+            DefsOptionManagerRole::RoleAdmin => DefsOptionManagerRole::RoleAdmin,
+            DefsOptionManagerRole::RoleVerifier => DefsOptionManagerRole::RoleVerifier,
+            DefsOptionManagerRole::Other(v) => {
+                DefsOptionManagerRole::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DefsOptionScope<'a> {
+    Instance,
+    Personal,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DefsOptionScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Instance => "instance",
+            Self::Personal => "personal",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DefsOptionScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DefsOptionScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DefsOptionScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DefsOptionScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DefsOptionScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DefsOptionScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DefsOptionScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DefsOptionScope<'_> {
+    type Output = DefsOptionScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DefsOptionScope::Instance => DefsOptionScope::Instance,
+            DefsOptionScope::Personal => DefsOptionScope::Personal,
+            DefsOptionScope::Other(v) => DefsOptionScope::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.setting.defs"
+    }
+    fn def_name() -> &'static str {
+        "option"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_setting_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10240usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 10240usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1024usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1024usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod defs_option_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -55,105 +290,105 @@ pub mod defs_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdatedBy;
-        type Value;
+        type Key;
         type CreatedBy;
+        type LastUpdatedBy;
         type Did;
         type Scope;
-        type Key;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdatedBy = Unset;
-        type Value = Unset;
+        type Key = Unset;
         type CreatedBy = Unset;
+        type LastUpdatedBy = Unset;
         type Did = Unset;
         type Scope = Unset;
-        type Key = Unset;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type Value = S::Value;
-        type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
-        type Scope = S::Scope;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = Set<members::value>;
-        type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
-        type Scope = S::Scope;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type CreatedBy = Set<members::created_by>;
-        type Did = S::Did;
-        type Scope = S::Scope;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type CreatedBy = S::CreatedBy;
-        type Did = Set<members::did>;
-        type Scope = S::Scope;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type CreatedBy = S::CreatedBy;
-        type Did = S::Did;
-        type Scope = Set<members::scope>;
-        type Key = S::Key;
+        type Value = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
+        type Key = Set<members::key>;
         type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
         type Did = S::Did;
         type Scope = S::Scope;
-        type Key = Set<members::key>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Key = S::Key;
+        type CreatedBy = Set<members::created_by>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = Set<members::did>;
+        type Scope = S::Scope;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Scope = Set<members::scope>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `scope` field
         pub struct scope(());
-        ///Marker type for the `key` field
-        pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -397,12 +632,12 @@ where
 impl<'a, S> DefsOptionBuilder<'a, S>
 where
     S: defs_option_state::State,
-    S::LastUpdatedBy: defs_option_state::IsSet,
-    S::Value: defs_option_state::IsSet,
+    S::Key: defs_option_state::IsSet,
     S::CreatedBy: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
     S::Did: defs_option_state::IsSet,
     S::Scope: defs_option_state::IsSet,
-    S::Key: defs_option_state::IsSet,
+    S::Value: defs_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefsOption<'a> {
@@ -440,194 +675,6 @@ where
             updated_at: self.__unsafe_private_named.8,
             value: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DefsOptionManagerRole<'a> {
-    RoleModerator,
-    RoleTriage,
-    RoleAdmin,
-    RoleVerifier,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> DefsOptionManagerRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
-            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
-            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
-            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for DefsOptionManagerRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
-            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
-            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for DefsOptionManagerRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
-            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
-            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DefsOptionManagerRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for DefsOptionManagerRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for DefsOptionManagerRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for DefsOptionManagerRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for DefsOptionManagerRole<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for DefsOptionManagerRole<'_> {
-    type Output = DefsOptionManagerRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DefsOptionManagerRole::RoleModerator => DefsOptionManagerRole::RoleModerator,
-            DefsOptionManagerRole::RoleTriage => DefsOptionManagerRole::RoleTriage,
-            DefsOptionManagerRole::RoleAdmin => DefsOptionManagerRole::RoleAdmin,
-            DefsOptionManagerRole::RoleVerifier => DefsOptionManagerRole::RoleVerifier,
-            DefsOptionManagerRole::Other(v) => {
-                DefsOptionManagerRole::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DefsOptionScope<'a> {
-    Instance,
-    Personal,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> DefsOptionScope<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Instance => "instance",
-            Self::Personal => "personal",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for DefsOptionScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "instance" => Self::Instance,
-            "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for DefsOptionScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "instance" => Self::Instance,
-            "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DefsOptionScope<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for DefsOptionScope<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for DefsOptionScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for DefsOptionScope<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for DefsOptionScope<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for DefsOptionScope<'_> {
-    type Output = DefsOptionScope<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DefsOptionScope::Instance => DefsOptionScope::Instance,
-            DefsOptionScope::Personal => DefsOptionScope::Personal,
-            DefsOptionScope::Other(v) => DefsOptionScope::Other(v.into_static()),
         }
     }
 }
@@ -839,52 +886,5 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.setting.defs"
-    }
-    fn def_name() -> &'static str {
-        "option"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_setting_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10240usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 10240usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1024usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

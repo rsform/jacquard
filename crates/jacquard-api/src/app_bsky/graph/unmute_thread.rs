@@ -21,6 +21,36 @@ pub struct UnmuteThread<'a> {
     pub root: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///app.bsky.graph.unmuteThread
+pub struct UnmuteThreadResponse;
+impl jacquard_common::xrpc::XrpcResp for UnmuteThreadResponse {
+    const NSID: &'static str = "app.bsky.graph.unmuteThread";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteThread<'a> {
+    const NSID: &'static str = "app.bsky.graph.unmuteThread";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UnmuteThreadResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.unmuteThread
+pub struct UnmuteThreadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UnmuteThread<'de>;
+    type Response = UnmuteThreadResponse;
+}
+
 pub mod unmute_thread_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.graph.unmuteThread
-pub struct UnmuteThreadResponse;
-impl jacquard_common::xrpc::XrpcResp for UnmuteThreadResponse {
-    const NSID: &'static str = "app.bsky.graph.unmuteThread";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteThread<'a> {
-    const NSID: &'static str = "app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UnmuteThreadResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.unmuteThread
-pub struct UnmuteThreadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UnmuteThread<'de>;
-    type Response = UnmuteThreadResponse;
 }

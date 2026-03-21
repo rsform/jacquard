@@ -32,215 +32,6 @@ pub struct Report<'a> {
     pub reason: ReportReason<'a>,
 }
 
-pub mod report_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Reason;
-        type BeaconUri;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type CreatedAt = Unset;
-        type Reason = Unset;
-        type BeaconUri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Reason = S::Reason;
-        type BeaconUri = S::BeaconUri;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type CreatedAt = S::CreatedAt;
-        type Reason = Set<members::reason>;
-        type BeaconUri = S::BeaconUri;
-    }
-    ///State transition - sets the `beacon_uri` field to Set
-    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
-    impl<S: State> State for SetBeaconUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Reason = S::Reason;
-        type BeaconUri = Set<members::beacon_uri>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ReportBuilder<'a, S: report_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<ReportReason<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Report<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReportBuilder<'a, report_state::Empty> {
-        ReportBuilder::new()
-    }
-}
-
-impl<'a> ReportBuilder<'a, report_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ReportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ReportBuilder<'a, S>
-where
-    S: report_state::State,
-    S::BeaconUri: report_state::IsUnset,
-{
-    /// Set the `beaconUri` field (required)
-    pub fn beacon_uri(
-        mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> ReportBuilder<'a, report_state::SetBeaconUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ReportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ReportBuilder<'a, S>
-where
-    S: report_state::State,
-    S::CreatedAt: report_state::IsUnset,
-{
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> ReportBuilder<'a, report_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ReportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: report_state::State> ReportBuilder<'a, S> {
-    /// Set the `details` field (optional)
-    pub fn details(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `details` field to an Option value (optional)
-    pub fn maybe_details(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S> ReportBuilder<'a, S>
-where
-    S: report_state::State,
-    S::Reason: report_state::IsUnset,
-{
-    /// Set the `reason` field (required)
-    pub fn reason(
-        mut self,
-        value: impl Into<ReportReason<'a>>,
-    ) -> ReportBuilder<'a, report_state::SetReason<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        ReportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ReportBuilder<'a, S>
-where
-    S: report_state::State,
-    S::CreatedAt: report_state::IsSet,
-    S::Reason: report_state::IsSet,
-    S::BeaconUri: report_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Report<'a> {
-        Report {
-            beacon_uri: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            details: self.__unsafe_private_named.2,
-            reason: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Report<'a> {
-        Report {
-            beacon_uri: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            details: self.__unsafe_private_named.2,
-            reason: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Report<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReportRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Reason for the report
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReportReason<'a> {
@@ -371,16 +162,17 @@ pub struct ReportGetRecordOutput<'a> {
     pub value: Report<'a>,
 }
 
-impl From<ReportGetRecordOutput<'_>> for Report<'_> {
-    fn from(output: ReportGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Report<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReportRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Report<'_> {
-    const NSID: &'static str = "app.beaconbits.report";
-    type Record = ReportRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -391,6 +183,18 @@ impl jacquard_common::xrpc::XrpcResp for ReportRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ReportGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReportGetRecordOutput<'_>> for Report<'_> {
+    fn from(output: ReportGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Report<'_> {
+    const NSID: &'static str = "app.beaconbits.report";
+    type Record = ReportRecord;
 }
 
 impl jacquard_common::types::collection::Collection for ReportRecord {
@@ -449,6 +253,202 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod report_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Reason;
+        type BeaconUri;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Reason = Unset;
+        type BeaconUri = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Reason = Set<members::reason>;
+        type BeaconUri = S::BeaconUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `beacon_uri` field to Set
+    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
+    impl<S: State> State for SetBeaconUri<S> {
+        type Reason = S::Reason;
+        type BeaconUri = Set<members::beacon_uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Reason = S::Reason;
+        type BeaconUri = S::BeaconUri;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReportBuilder<'a, S: report_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ReportReason<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Report<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReportBuilder<'a, report_state::Empty> {
+        ReportBuilder::new()
+    }
+}
+
+impl<'a> ReportBuilder<'a, report_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReportBuilder<'a, S>
+where
+    S: report_state::State,
+    S::BeaconUri: report_state::IsUnset,
+{
+    /// Set the `beaconUri` field (required)
+    pub fn beacon_uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ReportBuilder<'a, report_state::SetBeaconUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReportBuilder<'a, S>
+where
+    S: report_state::State,
+    S::CreatedAt: report_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReportBuilder<'a, report_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: report_state::State> ReportBuilder<'a, S> {
+    /// Set the `details` field (optional)
+    pub fn details(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `details` field to an Option value (optional)
+    pub fn maybe_details(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ReportBuilder<'a, S>
+where
+    S: report_state::State,
+    S::Reason: report_state::IsUnset,
+{
+    /// Set the `reason` field (required)
+    pub fn reason(
+        mut self,
+        value: impl Into<ReportReason<'a>>,
+    ) -> ReportBuilder<'a, report_state::SetReason<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReportBuilder<'a, S>
+where
+    S: report_state::State,
+    S::Reason: report_state::IsSet,
+    S::BeaconUri: report_state::IsSet,
+    S::CreatedAt: report_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Report<'a> {
+        Report {
+            beacon_uri: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            details: self.__unsafe_private_named.2,
+            reason: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Report<'a> {
+        Report {
+            beacon_uri: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            details: self.__unsafe_private_named.2,
+            reason: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

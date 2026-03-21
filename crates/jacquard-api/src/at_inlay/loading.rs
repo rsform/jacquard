@@ -23,6 +23,53 @@ pub struct Loading<'a> {
     pub fallback: crate::at_inlay::Element<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LoadingOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///at.inlay.Loading
+pub struct LoadingResponse;
+impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
+    const NSID: &'static str = "at.inlay.Loading";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LoadingOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Loading<'a> {
+    const NSID: &'static str = "at.inlay.Loading";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = LoadingResponse;
+}
+
+/// Endpoint type for
+///at.inlay.Loading
+pub struct LoadingRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
+    const PATH: &'static str = "/xrpc/at.inlay.Loading";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Loading<'de>;
+    type Response = LoadingResponse;
+}
+
 pub mod loading_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,51 +208,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LoadingOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///at.inlay.Loading
-pub struct LoadingResponse;
-impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
-    const NSID: &'static str = "at.inlay.Loading";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LoadingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Loading<'a> {
-    const NSID: &'static str = "at.inlay.Loading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = LoadingResponse;
-}
-
-/// Endpoint type for
-///at.inlay.Loading
-pub struct LoadingRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
-    const PATH: &'static str = "/xrpc/at.inlay.Loading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Loading<'de>;
-    type Response = LoadingResponse;
 }

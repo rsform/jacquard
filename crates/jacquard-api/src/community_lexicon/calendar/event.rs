@@ -109,6 +109,487 @@ pub struct Event<'a> {
     >,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EventLocationsItem<'a> {
+    #[serde(rename = "community.lexicon.calendar.event#uri")]
+    Uri(Box<crate::community_lexicon::calendar::event::Uri<'a>>),
+    #[serde(rename = "community.lexicon.location.address")]
+    Address(Box<crate::community_lexicon::location::address::Address<'a>>),
+    #[serde(rename = "community.lexicon.location.fsq")]
+    Fsq(Box<crate::community_lexicon::location::fsq::Fsq<'a>>),
+    #[serde(rename = "community.lexicon.location.geo")]
+    Geo(Box<crate::community_lexicon::location::geo::Geo<'a>>),
+    #[serde(rename = "community.lexicon.location.hthree")]
+    Hthree(Box<crate::community_lexicon::location::hthree::Hthree<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Event<'a>,
+}
+
+/// The mode of the event.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Mode<'a> {
+    CommunityLexiconCalendarEventHybrid,
+    CommunityLexiconCalendarEventInperson,
+    CommunityLexiconCalendarEventVirtual,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Mode<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::CommunityLexiconCalendarEventHybrid => {
+                "community.lexicon.calendar.event#hybrid"
+            }
+            Self::CommunityLexiconCalendarEventInperson => {
+                "community.lexicon.calendar.event#inperson"
+            }
+            Self::CommunityLexiconCalendarEventVirtual => {
+                "community.lexicon.calendar.event#virtual"
+            }
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Mode<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
+            "community.lexicon.calendar.event#inperson" => {
+                Self::CommunityLexiconCalendarEventInperson
+            }
+            "community.lexicon.calendar.event#virtual" => {
+                Self::CommunityLexiconCalendarEventVirtual
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Mode<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
+            "community.lexicon.calendar.event#inperson" => {
+                Self::CommunityLexiconCalendarEventInperson
+            }
+            "community.lexicon.calendar.event#virtual" => {
+                Self::CommunityLexiconCalendarEventVirtual
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Mode<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Mode<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Mode<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Mode<'_> {
+    type Output = Mode<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Mode::CommunityLexiconCalendarEventHybrid => {
+                Mode::CommunityLexiconCalendarEventHybrid
+            }
+            Mode::CommunityLexiconCalendarEventInperson => {
+                Mode::CommunityLexiconCalendarEventInperson
+            }
+            Mode::CommunityLexiconCalendarEventVirtual => {
+                Mode::CommunityLexiconCalendarEventVirtual
+            }
+            Mode::Other(v) => Mode::Other(v.into_static()),
+        }
+    }
+}
+
+/// The event has been created, but not finalized.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Planned;
+impl std::fmt::Display for Planned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "planned")
+    }
+}
+
+/// The event has been postponed and a new start date has not been set.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Postponed;
+impl std::fmt::Display for Postponed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "postponed")
+    }
+}
+
+/// The event has been rescheduled.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Rescheduled;
+impl std::fmt::Display for Rescheduled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "rescheduled")
+    }
+}
+
+/// The event has been created and scheduled.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Scheduled;
+impl std::fmt::Display for Scheduled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "scheduled")
+    }
+}
+
+/// The status of the event.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Status<'a> {
+    CommunityLexiconCalendarEventCancelled,
+    CommunityLexiconCalendarEventPlanned,
+    CommunityLexiconCalendarEventPostponed,
+    CommunityLexiconCalendarEventRescheduled,
+    CommunityLexiconCalendarEventScheduled,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Status<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::CommunityLexiconCalendarEventCancelled => {
+                "community.lexicon.calendar.event#cancelled"
+            }
+            Self::CommunityLexiconCalendarEventPlanned => {
+                "community.lexicon.calendar.event#planned"
+            }
+            Self::CommunityLexiconCalendarEventPostponed => {
+                "community.lexicon.calendar.event#postponed"
+            }
+            Self::CommunityLexiconCalendarEventRescheduled => {
+                "community.lexicon.calendar.event#rescheduled"
+            }
+            Self::CommunityLexiconCalendarEventScheduled => {
+                "community.lexicon.calendar.event#scheduled"
+            }
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Status<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "community.lexicon.calendar.event#cancelled" => {
+                Self::CommunityLexiconCalendarEventCancelled
+            }
+            "community.lexicon.calendar.event#planned" => {
+                Self::CommunityLexiconCalendarEventPlanned
+            }
+            "community.lexicon.calendar.event#postponed" => {
+                Self::CommunityLexiconCalendarEventPostponed
+            }
+            "community.lexicon.calendar.event#rescheduled" => {
+                Self::CommunityLexiconCalendarEventRescheduled
+            }
+            "community.lexicon.calendar.event#scheduled" => {
+                Self::CommunityLexiconCalendarEventScheduled
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Status<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "community.lexicon.calendar.event#cancelled" => {
+                Self::CommunityLexiconCalendarEventCancelled
+            }
+            "community.lexicon.calendar.event#planned" => {
+                Self::CommunityLexiconCalendarEventPlanned
+            }
+            "community.lexicon.calendar.event#postponed" => {
+                Self::CommunityLexiconCalendarEventPostponed
+            }
+            "community.lexicon.calendar.event#rescheduled" => {
+                Self::CommunityLexiconCalendarEventRescheduled
+            }
+            "community.lexicon.calendar.event#scheduled" => {
+                Self::CommunityLexiconCalendarEventScheduled
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Status<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Status<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Status<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Status<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Status<'_> {
+    type Output = Status<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Status::CommunityLexiconCalendarEventCancelled => {
+                Status::CommunityLexiconCalendarEventCancelled
+            }
+            Status::CommunityLexiconCalendarEventPlanned => {
+                Status::CommunityLexiconCalendarEventPlanned
+            }
+            Status::CommunityLexiconCalendarEventPostponed => {
+                Status::CommunityLexiconCalendarEventPostponed
+            }
+            Status::CommunityLexiconCalendarEventRescheduled => {
+                Status::CommunityLexiconCalendarEventRescheduled
+            }
+            Status::CommunityLexiconCalendarEventScheduled => {
+                Status::CommunityLexiconCalendarEventScheduled
+            }
+            Status::Other(v) => Status::Other(v.into_static()),
+        }
+    }
+}
+
+/// A URI associated with the event.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Uri<'a> {
+    ///The display name of the URI.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::UriValue<'a>,
+}
+
+/// A virtual event that takes place online.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Virtual;
+impl std::fmt::Display for Virtual {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "virtual")
+    }
+}
+
+impl<'a> Event<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EventRecord;
+impl jacquard_common::xrpc::XrpcResp for EventRecord {
+    const NSID: &'static str = "community.lexicon.calendar.event";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EventGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EventGetRecordOutput<'_>> for Event<'_> {
+    fn from(output: EventGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Event<'_> {
+    const NSID: &'static str = "community.lexicon.calendar.event";
+    type Record = EventRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EventRecord {
+    const NSID: &'static str = "community.lexicon.calendar.event";
+    type Record = EventRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.event"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_calendar_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.event"
+    }
+    fn def_name() -> &'static str {
+        "uri"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_calendar_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -119,37 +600,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -372,8 +853,8 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Name: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::Name: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -410,109 +891,6 @@ where
             uris: self.__unsafe_private_named.8,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EventRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum EventLocationsItem<'a> {
-    #[serde(rename = "community.lexicon.calendar.event#uri")]
-    Uri(Box<crate::community_lexicon::calendar::event::Uri<'a>>),
-    #[serde(rename = "community.lexicon.location.address")]
-    Address(Box<crate::community_lexicon::location::address::Address<'a>>),
-    #[serde(rename = "community.lexicon.location.fsq")]
-    Fsq(Box<crate::community_lexicon::location::fsq::Fsq<'a>>),
-    #[serde(rename = "community.lexicon.location.geo")]
-    Geo(Box<crate::community_lexicon::location::geo::Geo<'a>>),
-    #[serde(rename = "community.lexicon.location.hthree")]
-    Hthree(Box<crate::community_lexicon::location::hthree::Hthree<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
-}
-
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Event<'_> {
-    const NSID: &'static str = "community.lexicon.calendar.event";
-    type Record = EventRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EventRecord;
-impl jacquard_common::xrpc::XrpcResp for EventRecord {
-    const NSID: &'static str = "community.lexicon.calendar.event";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EventRecord {
-    const NSID: &'static str = "community.lexicon.calendar.event";
-    type Record = EventRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.calendar.event"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_calendar_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -876,349 +1254,6 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
     }
 }
 
-/// The mode of the event.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<'a> {
-    CommunityLexiconCalendarEventHybrid,
-    CommunityLexiconCalendarEventInperson,
-    CommunityLexiconCalendarEventVirtual,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Mode<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::CommunityLexiconCalendarEventHybrid => {
-                "community.lexicon.calendar.event#hybrid"
-            }
-            Self::CommunityLexiconCalendarEventInperson => {
-                "community.lexicon.calendar.event#inperson"
-            }
-            Self::CommunityLexiconCalendarEventVirtual => {
-                "community.lexicon.calendar.event#virtual"
-            }
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Mode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "community.lexicon.calendar.event#hybrid" => {
-                Self::CommunityLexiconCalendarEventHybrid
-            }
-            "community.lexicon.calendar.event#inperson" => {
-                Self::CommunityLexiconCalendarEventInperson
-            }
-            "community.lexicon.calendar.event#virtual" => {
-                Self::CommunityLexiconCalendarEventVirtual
-            }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Mode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "community.lexicon.calendar.event#hybrid" => {
-                Self::CommunityLexiconCalendarEventHybrid
-            }
-            "community.lexicon.calendar.event#inperson" => {
-                Self::CommunityLexiconCalendarEventInperson
-            }
-            "community.lexicon.calendar.event#virtual" => {
-                Self::CommunityLexiconCalendarEventVirtual
-            }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Mode<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Mode<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Mode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Mode<'_> {
-    type Output = Mode<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Mode::CommunityLexiconCalendarEventHybrid => {
-                Mode::CommunityLexiconCalendarEventHybrid
-            }
-            Mode::CommunityLexiconCalendarEventInperson => {
-                Mode::CommunityLexiconCalendarEventInperson
-            }
-            Mode::CommunityLexiconCalendarEventVirtual => {
-                Mode::CommunityLexiconCalendarEventVirtual
-            }
-            Mode::Other(v) => Mode::Other(v.into_static()),
-        }
-    }
-}
-
-/// The event has been created, but not finalized.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Planned;
-impl std::fmt::Display for Planned {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "planned")
-    }
-}
-
-/// The event has been postponed and a new start date has not been set.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Postponed;
-impl std::fmt::Display for Postponed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "postponed")
-    }
-}
-
-/// The event has been rescheduled.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Rescheduled;
-impl std::fmt::Display for Rescheduled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "rescheduled")
-    }
-}
-
-/// The event has been created and scheduled.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Scheduled;
-impl std::fmt::Display for Scheduled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "scheduled")
-    }
-}
-
-/// The status of the event.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Status<'a> {
-    CommunityLexiconCalendarEventCancelled,
-    CommunityLexiconCalendarEventPlanned,
-    CommunityLexiconCalendarEventPostponed,
-    CommunityLexiconCalendarEventRescheduled,
-    CommunityLexiconCalendarEventScheduled,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Status<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::CommunityLexiconCalendarEventCancelled => {
-                "community.lexicon.calendar.event#cancelled"
-            }
-            Self::CommunityLexiconCalendarEventPlanned => {
-                "community.lexicon.calendar.event#planned"
-            }
-            Self::CommunityLexiconCalendarEventPostponed => {
-                "community.lexicon.calendar.event#postponed"
-            }
-            Self::CommunityLexiconCalendarEventRescheduled => {
-                "community.lexicon.calendar.event#rescheduled"
-            }
-            Self::CommunityLexiconCalendarEventScheduled => {
-                "community.lexicon.calendar.event#scheduled"
-            }
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Status<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "community.lexicon.calendar.event#cancelled" => {
-                Self::CommunityLexiconCalendarEventCancelled
-            }
-            "community.lexicon.calendar.event#planned" => {
-                Self::CommunityLexiconCalendarEventPlanned
-            }
-            "community.lexicon.calendar.event#postponed" => {
-                Self::CommunityLexiconCalendarEventPostponed
-            }
-            "community.lexicon.calendar.event#rescheduled" => {
-                Self::CommunityLexiconCalendarEventRescheduled
-            }
-            "community.lexicon.calendar.event#scheduled" => {
-                Self::CommunityLexiconCalendarEventScheduled
-            }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Status<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "community.lexicon.calendar.event#cancelled" => {
-                Self::CommunityLexiconCalendarEventCancelled
-            }
-            "community.lexicon.calendar.event#planned" => {
-                Self::CommunityLexiconCalendarEventPlanned
-            }
-            "community.lexicon.calendar.event#postponed" => {
-                Self::CommunityLexiconCalendarEventPostponed
-            }
-            "community.lexicon.calendar.event#rescheduled" => {
-                Self::CommunityLexiconCalendarEventRescheduled
-            }
-            "community.lexicon.calendar.event#scheduled" => {
-                Self::CommunityLexiconCalendarEventScheduled
-            }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Status<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Status<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Status<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Status<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Status<'_> {
-    type Output = Status<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Status::CommunityLexiconCalendarEventCancelled => {
-                Status::CommunityLexiconCalendarEventCancelled
-            }
-            Status::CommunityLexiconCalendarEventPlanned => {
-                Status::CommunityLexiconCalendarEventPlanned
-            }
-            Status::CommunityLexiconCalendarEventPostponed => {
-                Status::CommunityLexiconCalendarEventPostponed
-            }
-            Status::CommunityLexiconCalendarEventRescheduled => {
-                Status::CommunityLexiconCalendarEventRescheduled
-            }
-            Status::CommunityLexiconCalendarEventScheduled => {
-                Status::CommunityLexiconCalendarEventScheduled
-            }
-            Status::Other(v) => Status::Other(v.into_static()),
-        }
-    }
-}
-
-/// A URI associated with the event.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Uri<'a> {
-    ///The display name of the URI.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod uri_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1340,40 +1375,5 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.calendar.event"
-    }
-    fn def_name() -> &'static str {
-        "uri"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_calendar_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A virtual event that takes place online.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Virtual;
-impl std::fmt::Display for Virtual {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "virtual")
     }
 }

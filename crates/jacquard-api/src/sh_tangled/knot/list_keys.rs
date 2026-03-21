@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(100i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,143 @@ pub struct ListKeys<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListKeysOutput<'a> {
+    ///Pagination cursor for next page
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub keys: Vec<crate::sh_tangled::knot::list_keys::PublicKey<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListKeysError<'a> {
+    /// Failed to retrieve public keys
+    #[serde(rename = "InternalServerError")]
+    InternalServerError(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ListKeysError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InternalServerError(msg) => {
+                write!(f, "InternalServerError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublicKey<'a> {
+    ///Key upload timestamp
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///DID associated with the public key
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Public key contents
+    #[serde(borrow)]
+    pub key: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///sh.tangled.knot.listKeys
+pub struct ListKeysResponse;
+impl jacquard_common::xrpc::XrpcResp for ListKeysResponse {
+    const NSID: &'static str = "sh.tangled.knot.listKeys";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListKeysOutput<'de>;
+    type Err<'de> = ListKeysError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListKeys<'a> {
+    const NSID: &'static str = "sh.tangled.knot.listKeys";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListKeysResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.knot.listKeys
+pub struct ListKeysRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.knot.listKeys";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListKeys<'de>;
+    type Response = ListKeysResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.knot.listKeys"
+    }
+    fn def_name() -> &'static str {
+        "publicKey"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_knot_listKeys()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 4096usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    max: 4096usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(100i64)
 }
 
 pub mod list_keys_state {
@@ -116,109 +249,6 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListKeysOutput<'a> {
-    ///Pagination cursor for next page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub keys: Vec<crate::sh_tangled::knot::list_keys::PublicKey<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListKeysError<'a> {
-    /// Failed to retrieve public keys
-    #[serde(rename = "InternalServerError")]
-    InternalServerError(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ListKeysError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InternalServerError(msg) => {
-                write!(f, "InternalServerError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.knot.listKeys
-pub struct ListKeysResponse;
-impl jacquard_common::xrpc::XrpcResp for ListKeysResponse {
-    const NSID: &'static str = "sh.tangled.knot.listKeys";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListKeysOutput<'de>;
-    type Err<'de> = ListKeysError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListKeys<'a> {
-    const NSID: &'static str = "sh.tangled.knot.listKeys";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListKeysResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.knot.listKeys
-pub struct ListKeysRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.knot.listKeys";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListKeys<'de>;
-    type Response = ListKeysResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicKey<'a> {
-    ///Key upload timestamp
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///DID associated with the public key
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///Public key contents
-    #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
 }
 
 pub mod public_key_state {
@@ -545,35 +575,5 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.knot.listKeys"
-    }
-    fn def_name() -> &'static str {
-        "publicKey"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_knot_listKeys()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 4096usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    max: 4096usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

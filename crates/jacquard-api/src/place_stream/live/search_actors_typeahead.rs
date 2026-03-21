@@ -25,6 +25,85 @@ pub struct Actor<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsTypeahead<'a> {
+    ///Defaults to `10`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub q: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsTypeaheadOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::place_stream::live::search_actors_typeahead::Actor<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Actor<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.live.searchActorsTypeahead"
+    }
+    fn def_name() -> &'static str {
+        "actor"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_live_searchActorsTypeahead()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///place.stream.live.searchActorsTypeahead
+pub struct SearchActorsTypeaheadResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
+    const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchActorsTypeaheadOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
+    const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchActorsTypeaheadResponse;
+}
+
+/// Endpoint type for
+///place.stream.live.searchActorsTypeahead
+pub struct SearchActorsTypeaheadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.searchActorsTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActorsTypeahead<'de>;
+    type Response = SearchActorsTypeaheadResponse;
+}
+
 pub mod actor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -293,45 +372,8 @@ fn lexicon_doc_place_stream_live_searchActorsTypeahead() -> ::jacquard_lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Actor<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.live.searchActorsTypeahead"
-    }
-    fn def_name() -> &'static str {
-        "actor"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_live_searchActorsTypeahead()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(10i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsTypeahead<'a> {
-    ///Defaults to `10`. Min: 1. Max: 100.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub q: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod search_actors_typeahead_state {
@@ -421,46 +463,4 @@ where
             q: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsTypeaheadOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::place_stream::live::search_actors_typeahead::Actor<'a>>,
-}
-
-/// Response type for
-///place.stream.live.searchActorsTypeahead
-pub struct SearchActorsTypeaheadResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
-    const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
-    const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchActorsTypeaheadResponse;
-}
-
-/// Endpoint type for
-///place.stream.live.searchActorsTypeahead
-pub struct SearchActorsTypeaheadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
-    const PATH: &'static str = "/xrpc/place.stream.live.searchActorsTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActorsTypeahead<'de>;
-    type Response = SearchActorsTypeaheadResponse;
 }

@@ -37,6 +37,95 @@ pub struct SetStats<'a> {
     pub repository: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SetStatsOutput<'a> {
+    ///Whether the stats were successfully updated
+    pub success: bool,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SetStatsError<'a> {
+    #[serde(rename = "InvalidOwner")]
+    InvalidOwner(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidRepository")]
+    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SetStatsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidOwner(msg) => {
+                write!(f, "InvalidOwner")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRepository(msg) => {
+                write!(f, "InvalidRepository")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///io.atcr.hold.setStats
+pub struct SetStatsResponse;
+impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
+    const NSID: &'static str = "io.atcr.hold.setStats";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SetStatsOutput<'de>;
+    type Err<'de> = SetStatsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
+    const NSID: &'static str = "io.atcr.hold.setStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SetStatsResponse;
+}
+
+/// Endpoint type for
+///io.atcr.hold.setStats
+pub struct SetStatsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
+    const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SetStats<'de>;
+    type Response = SetStatsResponse;
+}
+
 pub mod set_stats_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -251,93 +340,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SetStatsOutput<'a> {
-    ///Whether the stats were successfully updated
-    pub success: bool,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SetStatsError<'a> {
-    #[serde(rename = "InvalidOwner")]
-    InvalidOwner(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidRepository")]
-    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SetStatsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidOwner(msg) => {
-                write!(f, "InvalidOwner")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRepository(msg) => {
-                write!(f, "InvalidRepository")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///io.atcr.hold.setStats
-pub struct SetStatsResponse;
-impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
-    const NSID: &'static str = "io.atcr.hold.setStats";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SetStatsOutput<'de>;
-    type Err<'de> = SetStatsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
-    const NSID: &'static str = "io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SetStatsResponse;
-}
-
-/// Endpoint type for
-///io.atcr.hold.setStats
-pub struct SetStatsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
-    const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SetStats<'de>;
-    type Response = SetStatsResponse;
 }

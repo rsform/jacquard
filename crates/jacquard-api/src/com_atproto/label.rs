@@ -53,6 +53,739 @@ pub struct Label<'a> {
     pub ver: std::option::Option<i64>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LabelValue<'a> {
+    Hide,
+    NoPromote,
+    Warn,
+    NoUnauthenticated,
+    DmcaViolation,
+    Doxxing,
+    Porn,
+    Sexual,
+    Nudity,
+    Nsfl,
+    Gore,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> LabelValue<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hide => "!hide",
+            Self::NoPromote => "!no-promote",
+            Self::Warn => "!warn",
+            Self::NoUnauthenticated => "!no-unauthenticated",
+            Self::DmcaViolation => "dmca-violation",
+            Self::Doxxing => "doxxing",
+            Self::Porn => "porn",
+            Self::Sexual => "sexual",
+            Self::Nudity => "nudity",
+            Self::Nsfl => "nsfl",
+            Self::Gore => "gore",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for LabelValue<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "!hide" => Self::Hide,
+            "!no-promote" => Self::NoPromote,
+            "!warn" => Self::Warn,
+            "!no-unauthenticated" => Self::NoUnauthenticated,
+            "dmca-violation" => Self::DmcaViolation,
+            "doxxing" => Self::Doxxing,
+            "porn" => Self::Porn,
+            "sexual" => Self::Sexual,
+            "nudity" => Self::Nudity,
+            "nsfl" => Self::Nsfl,
+            "gore" => Self::Gore,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for LabelValue<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "!hide" => Self::Hide,
+            "!no-promote" => Self::NoPromote,
+            "!warn" => Self::Warn,
+            "!no-unauthenticated" => Self::NoUnauthenticated,
+            "dmca-violation" => Self::DmcaViolation,
+            "doxxing" => Self::Doxxing,
+            "porn" => Self::Porn,
+            "sexual" => Self::Sexual,
+            "nudity" => Self::Nudity,
+            "nsfl" => Self::Nsfl,
+            "gore" => Self::Gore,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for LabelValue<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for LabelValue<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for LabelValue<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for LabelValue<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for LabelValue<'_> {
+    type Output = LabelValue<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LabelValue::Hide => LabelValue::Hide,
+            LabelValue::NoPromote => LabelValue::NoPromote,
+            LabelValue::Warn => LabelValue::Warn,
+            LabelValue::NoUnauthenticated => LabelValue::NoUnauthenticated,
+            LabelValue::DmcaViolation => LabelValue::DmcaViolation,
+            LabelValue::Doxxing => LabelValue::Doxxing,
+            LabelValue::Porn => LabelValue::Porn,
+            LabelValue::Sexual => LabelValue::Sexual,
+            LabelValue::Nudity => LabelValue::Nudity,
+            LabelValue::Nsfl => LabelValue::Nsfl,
+            LabelValue::Gore => LabelValue::Gore,
+            LabelValue::Other(v) => LabelValue::Other(v.into_static()),
+        }
+    }
+}
+
+/// Declares a label value and its expected interpretations and behaviors.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LabelValueDefinition<'a> {
+    ///Does the user need to have adult content enabled in order to configure this label?
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub adult_only: std::option::Option<bool>,
+    ///What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
+    #[serde(borrow)]
+    pub blurs: LabelValueDefinitionBlurs<'a>,
+    ///The default setting for this label.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub default_setting: std::option::Option<LabelValueDefinitionDefaultSetting<'a>>,
+    ///The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
+    #[serde(borrow)]
+    pub identifier: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub locales: Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>,
+    ///How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
+    #[serde(borrow)]
+    pub severity: LabelValueDefinitionSeverity<'a>,
+}
+
+/// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LabelValueDefinitionBlurs<'a> {
+    Content,
+    Media,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> LabelValueDefinitionBlurs<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Content => "content",
+            Self::Media => "media",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for LabelValueDefinitionBlurs<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "content" => Self::Content,
+            "media" => Self::Media,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for LabelValueDefinitionBlurs<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "content" => Self::Content,
+            "media" => Self::Media,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for LabelValueDefinitionBlurs<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for LabelValueDefinitionBlurs<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for LabelValueDefinitionBlurs<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionBlurs<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for LabelValueDefinitionBlurs<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for LabelValueDefinitionBlurs<'_> {
+    type Output = LabelValueDefinitionBlurs<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LabelValueDefinitionBlurs::Content => LabelValueDefinitionBlurs::Content,
+            LabelValueDefinitionBlurs::Media => LabelValueDefinitionBlurs::Media,
+            LabelValueDefinitionBlurs::None => LabelValueDefinitionBlurs::None,
+            LabelValueDefinitionBlurs::Other(v) => {
+                LabelValueDefinitionBlurs::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The default setting for this label.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LabelValueDefinitionDefaultSetting<'a> {
+    Ignore,
+    Warn,
+    Hide,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> LabelValueDefinitionDefaultSetting<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ignore => "ignore",
+            Self::Warn => "warn",
+            Self::Hide => "hide",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for LabelValueDefinitionDefaultSetting<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "ignore" => Self::Ignore,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for LabelValueDefinitionDefaultSetting<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "ignore" => Self::Ignore,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for LabelValueDefinitionDefaultSetting<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for LabelValueDefinitionDefaultSetting<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for LabelValueDefinitionDefaultSetting<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionDefaultSetting<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for LabelValueDefinitionDefaultSetting<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for LabelValueDefinitionDefaultSetting<'_> {
+    type Output = LabelValueDefinitionDefaultSetting<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LabelValueDefinitionDefaultSetting::Ignore => {
+                LabelValueDefinitionDefaultSetting::Ignore
+            }
+            LabelValueDefinitionDefaultSetting::Warn => {
+                LabelValueDefinitionDefaultSetting::Warn
+            }
+            LabelValueDefinitionDefaultSetting::Hide => {
+                LabelValueDefinitionDefaultSetting::Hide
+            }
+            LabelValueDefinitionDefaultSetting::Other(v) => {
+                LabelValueDefinitionDefaultSetting::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LabelValueDefinitionSeverity<'a> {
+    Inform,
+    Alert,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> LabelValueDefinitionSeverity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Inform => "inform",
+            Self::Alert => "alert",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for LabelValueDefinitionSeverity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "inform" => Self::Inform,
+            "alert" => Self::Alert,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for LabelValueDefinitionSeverity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "inform" => Self::Inform,
+            "alert" => Self::Alert,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for LabelValueDefinitionSeverity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for LabelValueDefinitionSeverity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for LabelValueDefinitionSeverity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionSeverity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for LabelValueDefinitionSeverity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for LabelValueDefinitionSeverity<'_> {
+    type Output = LabelValueDefinitionSeverity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LabelValueDefinitionSeverity::Inform => LabelValueDefinitionSeverity::Inform,
+            LabelValueDefinitionSeverity::Alert => LabelValueDefinitionSeverity::Alert,
+            LabelValueDefinitionSeverity::None => LabelValueDefinitionSeverity::None,
+            LabelValueDefinitionSeverity::Other(v) => {
+                LabelValueDefinitionSeverity::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Strings which describe the label in the UI, localized into a specific language.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LabelValueDefinitionStrings<'a> {
+    ///A longer description of what the label means and why it might be applied.
+    #[serde(borrow)]
+    pub description: jacquard_common::CowStr<'a>,
+    ///The code of the language these strings are written in.
+    pub lang: jacquard_common::types::string::Language,
+    ///A short human-readable name for the label.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+/// Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SelfLabel<'a> {
+    ///The short string name of the value or type of this label.
+    #[serde(borrow)]
+    pub val: jacquard_common::CowStr<'a>,
+}
+
+/// Metadata tags on an atproto record, published by the author within the record.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SelfLabels<'a> {
+    #[serde(borrow)]
+    pub values: Vec<crate::com_atproto::label::SelfLabel<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.defs"
+    }
+    fn def_name() -> &'static str {
+        "label"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.val;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "val",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelValueDefinition"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.identifier;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "identifier",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.identifier;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "identifier",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrings<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelValueDefinitionStrings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.defs"
+    }
+    fn def_name() -> &'static str {
+        "selfLabel"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.val;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "val",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.defs"
+    }
+    fn def_name() -> &'static str {
+        "selfLabels"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.values;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "values",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod label_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -63,67 +796,67 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
         type Cts;
-        type Val;
+        type Src;
         type Uri;
+        type Val;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
         type Cts = Unset;
-        type Val = Unset;
+        type Src = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Cts = S::Cts;
-        type Val = S::Val;
-        type Uri = S::Uri;
+        type Val = Unset;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Src = S::Src;
         type Cts = Set<members::cts>;
-        type Val = S::Val;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVal<S> {}
-    impl<S: State> State for SetVal<S> {
         type Src = S::Src;
-        type Cts = S::Cts;
-        type Val = Set<members::val>;
         type Uri = S::Uri;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Cts = S::Cts;
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Val = S::Val;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Src = S::Src;
         type Cts = S::Cts;
-        type Val = S::Val;
+        type Src = S::Src;
         type Uri = Set<members::uri>;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Cts = S::Cts;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
-        ///Marker type for the `val` field
-        pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
     }
 }
 
@@ -334,10 +1067,10 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
 impl<'a, S> LabelBuilder<'a, S>
 where
     S: label_state::State,
-    S::Src: label_state::IsSet,
     S::Cts: label_state::IsSet,
-    S::Val: label_state::IsSet,
+    S::Src: label_state::IsSet,
     S::Uri: label_state::IsSet,
+    S::Val: label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Label<'a> {
@@ -903,196 +1636,6 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.defs"
-    }
-    fn def_name() -> &'static str {
-        "label"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.val;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "val",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValue<'a> {
-    Hide,
-    NoPromote,
-    Warn,
-    NoUnauthenticated,
-    DmcaViolation,
-    Doxxing,
-    Porn,
-    Sexual,
-    Nudity,
-    Nsfl,
-    Gore,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> LabelValue<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Hide => "!hide",
-            Self::NoPromote => "!no-promote",
-            Self::Warn => "!warn",
-            Self::NoUnauthenticated => "!no-unauthenticated",
-            Self::DmcaViolation => "dmca-violation",
-            Self::Doxxing => "doxxing",
-            Self::Porn => "porn",
-            Self::Sexual => "sexual",
-            Self::Nudity => "nudity",
-            Self::Nsfl => "nsfl",
-            Self::Gore => "gore",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for LabelValue<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "!hide" => Self::Hide,
-            "!no-promote" => Self::NoPromote,
-            "!warn" => Self::Warn,
-            "!no-unauthenticated" => Self::NoUnauthenticated,
-            "dmca-violation" => Self::DmcaViolation,
-            "doxxing" => Self::Doxxing,
-            "porn" => Self::Porn,
-            "sexual" => Self::Sexual,
-            "nudity" => Self::Nudity,
-            "nsfl" => Self::Nsfl,
-            "gore" => Self::Gore,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for LabelValue<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "!hide" => Self::Hide,
-            "!no-promote" => Self::NoPromote,
-            "!warn" => Self::Warn,
-            "!no-unauthenticated" => Self::NoUnauthenticated,
-            "dmca-violation" => Self::DmcaViolation,
-            "doxxing" => Self::Doxxing,
-            "porn" => Self::Porn,
-            "sexual" => Self::Sexual,
-            "nudity" => Self::Nudity,
-            "nsfl" => Self::Nsfl,
-            "gore" => Self::Gore,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for LabelValue<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValue<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for LabelValue<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for LabelValue<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for LabelValue<'_> {
-    type Output = LabelValue<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LabelValue::Hide => LabelValue::Hide,
-            LabelValue::NoPromote => LabelValue::NoPromote,
-            LabelValue::Warn => LabelValue::Warn,
-            LabelValue::NoUnauthenticated => LabelValue::NoUnauthenticated,
-            LabelValue::DmcaViolation => LabelValue::DmcaViolation,
-            LabelValue::Doxxing => LabelValue::Doxxing,
-            LabelValue::Porn => LabelValue::Porn,
-            LabelValue::Sexual => LabelValue::Sexual,
-            LabelValue::Nudity => LabelValue::Nudity,
-            LabelValue::Nsfl => LabelValue::Nsfl,
-            LabelValue::Gore => LabelValue::Gore,
-            LabelValue::Other(v) => LabelValue::Other(v.into_static()),
-        }
-    }
-}
-
-/// Declares a label value and its expected interpretations and behaviors.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelValueDefinition<'a> {
-    ///Does the user need to have adult content enabled in order to configure this label?
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub adult_only: std::option::Option<bool>,
-    ///What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
-    #[serde(borrow)]
-    pub blurs: LabelValueDefinitionBlurs<'a>,
-    ///The default setting for this label.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub default_setting: std::option::Option<LabelValueDefinitionDefaultSetting<'a>>,
-    ///The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
-    #[serde(borrow)]
-    pub identifier: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub locales: Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>,
-    ///How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
-    #[serde(borrow)]
-    pub severity: LabelValueDefinitionSeverity<'a>,
-}
-
 pub mod label_value_definition_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1355,372 +1898,6 @@ where
     }
 }
 
-/// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionBlurs<'a> {
-    Content,
-    Media,
-    None,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> LabelValueDefinitionBlurs<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Content => "content",
-            Self::Media => "media",
-            Self::None => "none",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionBlurs<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "content" => Self::Content,
-            "media" => Self::Media,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for LabelValueDefinitionBlurs<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "content" => Self::Content,
-            "media" => Self::Media,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionBlurs<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for LabelValueDefinitionBlurs<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for LabelValueDefinitionBlurs<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionBlurs<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for LabelValueDefinitionBlurs<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for LabelValueDefinitionBlurs<'_> {
-    type Output = LabelValueDefinitionBlurs<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LabelValueDefinitionBlurs::Content => LabelValueDefinitionBlurs::Content,
-            LabelValueDefinitionBlurs::Media => LabelValueDefinitionBlurs::Media,
-            LabelValueDefinitionBlurs::None => LabelValueDefinitionBlurs::None,
-            LabelValueDefinitionBlurs::Other(v) => {
-                LabelValueDefinitionBlurs::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// The default setting for this label.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionDefaultSetting<'a> {
-    Ignore,
-    Warn,
-    Hide,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> LabelValueDefinitionDefaultSetting<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Ignore => "ignore",
-            Self::Warn => "warn",
-            Self::Hide => "hide",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionDefaultSetting<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "ignore" => Self::Ignore,
-            "warn" => Self::Warn,
-            "hide" => Self::Hide,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for LabelValueDefinitionDefaultSetting<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ignore" => Self::Ignore,
-            "warn" => Self::Warn,
-            "hide" => Self::Hide,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionDefaultSetting<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for LabelValueDefinitionDefaultSetting<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for LabelValueDefinitionDefaultSetting<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionDefaultSetting<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for LabelValueDefinitionDefaultSetting<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for LabelValueDefinitionDefaultSetting<'_> {
-    type Output = LabelValueDefinitionDefaultSetting<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LabelValueDefinitionDefaultSetting::Ignore => {
-                LabelValueDefinitionDefaultSetting::Ignore
-            }
-            LabelValueDefinitionDefaultSetting::Warn => {
-                LabelValueDefinitionDefaultSetting::Warn
-            }
-            LabelValueDefinitionDefaultSetting::Hide => {
-                LabelValueDefinitionDefaultSetting::Hide
-            }
-            LabelValueDefinitionDefaultSetting::Other(v) => {
-                LabelValueDefinitionDefaultSetting::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionSeverity<'a> {
-    Inform,
-    Alert,
-    None,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> LabelValueDefinitionSeverity<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Inform => "inform",
-            Self::Alert => "alert",
-            Self::None => "none",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "inform" => Self::Inform,
-            "alert" => Self::Alert,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for LabelValueDefinitionSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "inform" => Self::Inform,
-            "alert" => Self::Alert,
-            "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionSeverity<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for LabelValueDefinitionSeverity<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for LabelValueDefinitionSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionSeverity<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for LabelValueDefinitionSeverity<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for LabelValueDefinitionSeverity<'_> {
-    type Output = LabelValueDefinitionSeverity<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LabelValueDefinitionSeverity::Inform => LabelValueDefinitionSeverity::Inform,
-            LabelValueDefinitionSeverity::Alert => LabelValueDefinitionSeverity::Alert,
-            LabelValueDefinitionSeverity::None => LabelValueDefinitionSeverity::None,
-            LabelValueDefinitionSeverity::Other(v) => {
-                LabelValueDefinitionSeverity::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.defs"
-    }
-    fn def_name() -> &'static str {
-        "labelValueDefinition"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.identifier;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "identifier",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.identifier;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identifier",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Strings which describe the label in the UI, localized into a specific language.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelValueDefinitionStrings<'a> {
-    ///A longer description of what the label means and why it might be applied.
-    #[serde(borrow)]
-    pub description: jacquard_common::CowStr<'a>,
-    ///The code of the language these strings are written in.
-    pub lang: jacquard_common::types::string::Language,
-    ///A short human-readable name for the label.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
 pub mod label_value_definition_strings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1731,51 +1908,51 @@ pub mod label_value_definition_strings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type Name;
         type Lang;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type Name = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Name = S::Name;
-        type Lang = S::Lang;
+        type Description = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Description = S::Description;
         type Name = Set<members::name>;
         type Lang = S::Lang;
+        type Description = S::Description;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Description = S::Description;
         type Name = S::Name;
         type Lang = Set<members::lang>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Name = S::Name;
+        type Lang = S::Lang;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -1885,9 +2062,9 @@ where
 impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
 where
     S: label_value_definition_strings_state::State,
-    S::Description: label_value_definition_strings_state::IsSet,
     S::Name: label_value_definition_strings_state::IsSet,
     S::Lang: label_value_definition_strings_state::IsSet,
+    S::Description: label_value_definition_strings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelValueDefinitionStrings<'a> {
@@ -1913,153 +2090,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrings<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.defs"
-    }
-    fn def_name() -> &'static str {
-        "labelValueDefinitionStrings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.description;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabel<'a> {
-    ///The short string name of the value or type of this label.
-    #[serde(borrow)]
-    pub val: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.defs"
-    }
-    fn def_name() -> &'static str {
-        "selfLabel"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.val;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "val",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Metadata tags on an atproto record, published by the author within the record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabels<'a> {
-    #[serde(borrow)]
-    pub values: Vec<crate::com_atproto::label::SelfLabel<'a>>,
 }
 
 pub mod self_labels_state {
@@ -2164,35 +2194,5 @@ where
             values: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.defs"
-    }
-    fn def_name() -> &'static str {
-        "selfLabels"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.values;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "values",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

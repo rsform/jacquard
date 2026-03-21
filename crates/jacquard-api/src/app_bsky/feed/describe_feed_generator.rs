@@ -21,6 +21,122 @@ pub struct Feed<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Links<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub privacy_policy: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub terms_of_service: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DescribeFeedGeneratorOutput<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub feeds: Vec<crate::app_bsky::feed::describe_feed_generator::Feed<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub links: std::option::Option<
+        crate::app_bsky::feed::describe_feed_generator::Links<'a>,
+    >,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.describeFeedGenerator"
+    }
+    fn def_name() -> &'static str {
+        "feed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_describeFeedGenerator()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.describeFeedGenerator"
+    }
+    fn def_name() -> &'static str {
+        "links"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_describeFeedGenerator()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct DescribeFeedGenerator;
+/// Response type for
+///app.bsky.feed.describeFeedGenerator
+pub struct DescribeFeedGeneratorResponse;
+impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
+    const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DescribeFeedGeneratorOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for DescribeFeedGenerator {
+    const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DescribeFeedGeneratorResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.describeFeedGenerator
+pub struct DescribeFeedGeneratorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.describeFeedGenerator";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DescribeFeedGenerator;
+    type Response = DescribeFeedGeneratorResponse;
+}
+
 pub mod feed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -231,120 +347,4 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.describeFeedGenerator"
-    }
-    fn def_name() -> &'static str {
-        "feed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_describeFeedGenerator()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Links<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub privacy_policy: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub terms_of_service: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.describeFeedGenerator"
-    }
-    fn def_name() -> &'static str {
-        "links"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_describeFeedGenerator()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DescribeFeedGeneratorOutput<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub feeds: Vec<crate::app_bsky::feed::describe_feed_generator::Feed<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub links: std::option::Option<
-        crate::app_bsky::feed::describe_feed_generator::Links<'a>,
-    >,
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct DescribeFeedGenerator;
-/// Response type for
-///app.bsky.feed.describeFeedGenerator
-pub struct DescribeFeedGeneratorResponse;
-impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
-    const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for DescribeFeedGenerator {
-    const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = DescribeFeedGeneratorResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.describeFeedGenerator
-pub struct DescribeFeedGeneratorRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.describeFeedGenerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeFeedGenerator;
-    type Response = DescribeFeedGeneratorResponse;
 }

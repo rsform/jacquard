@@ -26,6 +26,399 @@ pub struct CodeThemeFile<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+pub type CodeThemeName<'a> = jacquard_common::CowStr<'a>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Font<'a> {
+    ///Font for a notebook
+    #[serde(borrow)]
+    pub value: FontValue<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FontValue<'a> {
+    #[serde(rename = "sh.weaver.notebook.theme#fontName")]
+    FontName(Box<crate::sh_weaver::notebook::theme::FontName<'a>>),
+    #[serde(rename = "sh.weaver.notebook.theme#fontFile")]
+    FontFile(Box<crate::sh_weaver::notebook::theme::FontFile<'a>>),
+}
+
+/// Custom woff(2) or ttf font file
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FontFile<'a> {
+    #[serde(borrow)]
+    pub content: jacquard_common::types::blob::BlobRef<'a>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+pub type FontName<'a> = jacquard_common::CowStr<'a>;
+/// Theme for a notebook
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Theme<'a> {
+    ///Syntax highlighting theme for dark mode
+    #[serde(borrow)]
+    pub dark_code_theme: ThemeDarkCodeTheme<'a>,
+    ///Reference to a dark colour scheme
+    #[serde(borrow)]
+    pub dark_scheme: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///Defaults to `"auto"`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_theme_default_theme")]
+    #[serde(borrow)]
+    pub default_theme: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
+    #[serde(borrow)]
+    pub fonts: ThemeFonts<'a>,
+    ///Syntax highlighting theme for light mode
+    #[serde(borrow)]
+    pub light_code_theme: ThemeLightCodeTheme<'a>,
+    ///Reference to a light colour scheme
+    #[serde(borrow)]
+    pub light_scheme: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    #[serde(borrow)]
+    pub spacing: ThemeSpacing<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemeDarkCodeTheme<'a> {
+    #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
+    CodeThemeName(Box<crate::sh_weaver::notebook::theme::CodeThemeName<'a>>),
+    #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
+    CodeThemeFile(Box<crate::sh_weaver::notebook::theme::CodeThemeFile<'a>>),
+}
+
+/// Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeFonts<'a> {
+    #[serde(borrow)]
+    pub body: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
+    #[serde(borrow)]
+    pub heading: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
+    #[serde(borrow)]
+    pub monospace: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThemeLightCodeTheme<'a> {
+    #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
+    CodeThemeName(Box<crate::sh_weaver::notebook::theme::CodeThemeName<'a>>),
+    #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
+    CodeThemeFile(Box<crate::sh_weaver::notebook::theme::CodeThemeFile<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeSpacing<'a> {
+    #[serde(borrow)]
+    pub base_size: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub line_height: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub scale: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThemeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Theme<'a>,
+}
+
+impl<'a> Theme<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ThemeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeThemeFile<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.theme"
+    }
+    fn def_name() -> &'static str {
+        "codeThemeFile"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.content;
+            {
+                let size = value.blob().size;
+                if size > 20000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 20000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.content;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Font<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.theme"
+    }
+    fn def_name() -> &'static str {
+        "font"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FontFile<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.theme"
+    }
+    fn def_name() -> &'static str {
+        "fontFile"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.content;
+            {
+                let size = value.blob().size;
+                if size > 20000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        max: 20000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.content;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ThemeRecord;
+impl jacquard_common::xrpc::XrpcResp for ThemeRecord {
+    const NSID: &'static str = "sh.weaver.notebook.theme";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ThemeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
+    fn from(output: ThemeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Theme<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.theme";
+    type Record = ThemeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ThemeRecord {
+    const NSID: &'static str = "sh.weaver.notebook.theme";
+    type Record = ThemeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.theme"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod code_theme_file_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,51 +429,51 @@ pub mod code_theme_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type Name;
         type Did;
+        type Name;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type Name = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Content = S::Content;
-        type Name = Set<members::name>;
-        type Did = S::Did;
+        type Name = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Content = S::Content;
-        type Name = S::Name;
         type Did = Set<members::did>;
+        type Name = S::Name;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Name = Set<members::name>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -173,9 +566,9 @@ where
 impl<'a, S> CodeThemeFileBuilder<'a, S>
 where
     S: code_theme_file_state::State,
-    S::Content: code_theme_file_state::IsSet,
-    S::Name: code_theme_file_state::IsSet,
     S::Did: code_theme_file_state::IsSet,
+    S::Name: code_theme_file_state::IsSet,
+    S::Content: code_theme_file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeThemeFile<'a> {
@@ -658,85 +1051,6 @@ fn lexicon_doc_sh_weaver_notebook_theme() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeThemeFile<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.theme"
-    }
-    fn def_name() -> &'static str {
-        "codeThemeFile"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.content;
-            {
-                let size = value.blob().size;
-                if size > 20000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        max: 20000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.content;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-pub type CodeThemeName<'a> = jacquard_common::CowStr<'a>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Font<'a> {
-    ///Font for a notebook
-    #[serde(borrow)]
-    pub value: FontValue<'a>,
-}
-
 pub mod font_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -840,63 +1154,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum FontValue<'a> {
-    #[serde(rename = "sh.weaver.notebook.theme#fontName")]
-    FontName(Box<crate::sh_weaver::notebook::theme::FontName<'a>>),
-    #[serde(rename = "sh.weaver.notebook.theme#fontFile")]
-    FontFile(Box<crate::sh_weaver::notebook::theme::FontFile<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Font<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.theme"
-    }
-    fn def_name() -> &'static str {
-        "font"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Custom woff(2) or ttf font file
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FontFile<'a> {
-    #[serde(borrow)]
-    pub content: jacquard_common::types::blob::BlobRef<'a>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
 pub mod font_file_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -907,51 +1164,51 @@ pub mod font_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type Content;
         type Name;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type Content = Unset;
         type Name = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Content = S::Content;
-        type Name = Set<members::name>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
         type Content = S::Content;
         type Name = S::Name;
-        type Did = Set<members::did>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Did = S::Did;
+        type Content = Set<members::content>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Content = S::Content;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
@@ -1044,9 +1301,9 @@ where
 impl<'a, S> FontFileBuilder<'a, S>
 where
     S: font_file_state::State,
+    S::Did: font_file_state::IsSet,
     S::Content: font_file_state::IsSet,
     S::Name: font_file_state::IsSet,
-    S::Did: font_file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FontFile<'a> {
@@ -1074,12 +1331,18 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FontFile<'a> {
+fn _default_theme_default_theme() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
+    Some(jacquard_common::CowStr::from("auto"))
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeFonts<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
     fn def_name() -> &'static str {
-        "fontFile"
+        "ThemeFonts"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_theme()
@@ -1087,96 +1350,202 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FontFile<'a> {
     fn validate(
         &self,
     ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.content;
-            {
-                let size = value.blob().size;
-                if size > 20000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        max: 20000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.content;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "content",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
 
-pub type FontName<'a> = jacquard_common::CowStr<'a>;
-/// Theme for a notebook
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Theme<'a> {
-    ///Syntax highlighting theme for dark mode
-    #[serde(borrow)]
-    pub dark_code_theme: ThemeDarkCodeTheme<'a>,
-    ///Reference to a dark colour scheme
-    #[serde(borrow)]
-    pub dark_scheme: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///Defaults to `"auto"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_theme_default_theme")]
-    #[serde(borrow)]
-    pub default_theme: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
-    #[serde(borrow)]
-    pub fonts: ThemeFonts<'a>,
-    ///Syntax highlighting theme for light mode
-    #[serde(borrow)]
-    pub light_code_theme: ThemeLightCodeTheme<'a>,
-    ///Reference to a light colour scheme
-    #[serde(borrow)]
-    pub light_scheme: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(borrow)]
-    pub spacing: ThemeSpacing<'a>,
+pub mod theme_fonts_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Heading;
+        type Monospace;
+        type Body;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Heading = Unset;
+        type Monospace = Unset;
+        type Body = Unset;
+    }
+    ///State transition - sets the `heading` field to Set
+    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeading<S> {}
+    impl<S: State> State for SetHeading<S> {
+        type Heading = Set<members::heading>;
+        type Monospace = S::Monospace;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `monospace` field to Set
+    pub struct SetMonospace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonospace<S> {}
+    impl<S: State> State for SetMonospace<S> {
+        type Heading = S::Heading;
+        type Monospace = Set<members::monospace>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Heading = S::Heading;
+        type Monospace = S::Monospace;
+        type Body = Set<members::body>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `heading` field
+        pub struct heading(());
+        ///Marker type for the `monospace` field
+        pub struct monospace(());
+        ///Marker type for the `body` field
+        pub struct body(());
+    }
 }
 
-fn _default_theme_default_theme() -> std::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("auto"))
+/// Builder for constructing an instance of this type
+pub struct ThemeFontsBuilder<'a, S: theme_fonts_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ThemeFonts<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
+        ThemeFontsBuilder::new()
+    }
+}
+
+impl<'a> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThemeFontsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThemeFontsBuilder<'a, S>
+where
+    S: theme_fonts_state::State,
+    S::Body: theme_fonts_state::IsUnset,
+{
+    /// Set the `body` field (required)
+    pub fn body(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetBody<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ThemeFontsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThemeFontsBuilder<'a, S>
+where
+    S: theme_fonts_state::State,
+    S::Heading: theme_fonts_state::IsUnset,
+{
+    /// Set the `heading` field (required)
+    pub fn heading(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetHeading<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ThemeFontsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThemeFontsBuilder<'a, S>
+where
+    S: theme_fonts_state::State,
+    S::Monospace: theme_fonts_state::IsUnset,
+{
+    /// Set the `monospace` field (required)
+    pub fn monospace(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
+    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetMonospace<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ThemeFontsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThemeFontsBuilder<'a, S>
+where
+    S: theme_fonts_state::State,
+    S::Heading: theme_fonts_state::IsSet,
+    S::Monospace: theme_fonts_state::IsSet,
+    S::Body: theme_fonts_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ThemeFonts<'a> {
+        ThemeFonts {
+            body: self.__unsafe_private_named.0.unwrap(),
+            heading: self.__unsafe_private_named.1.unwrap(),
+            monospace: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ThemeFonts<'a> {
+        ThemeFonts {
+            body: self.__unsafe_private_named.0.unwrap(),
+            heading: self.__unsafe_private_named.1.unwrap(),
+            monospace: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeSpacing<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.theme"
+    }
+    fn def_name() -> &'static str {
+        "ThemeSpacing"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_theme()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
 }
 
 pub mod theme_state {
@@ -1189,105 +1558,105 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type DarkCodeTheme;
         type Fonts;
         type LightScheme;
+        type Spacing;
         type LightCodeTheme;
         type DarkScheme;
-        type DarkCodeTheme;
-        type Spacing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type DarkCodeTheme = Unset;
         type Fonts = Unset;
         type LightScheme = Unset;
+        type Spacing = Unset;
         type LightCodeTheme = Unset;
         type DarkScheme = Unset;
-        type DarkCodeTheme = Unset;
-        type Spacing = Unset;
-    }
-    ///State transition - sets the `fonts` field to Set
-    pub struct SetFonts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFonts<S> {}
-    impl<S: State> State for SetFonts<S> {
-        type Fonts = Set<members::fonts>;
-        type LightScheme = S::LightScheme;
-        type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = S::DarkScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-    }
-    ///State transition - sets the `light_scheme` field to Set
-    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
-    impl<S: State> State for SetLightScheme<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = Set<members::light_scheme>;
-        type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = S::DarkScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-    }
-    ///State transition - sets the `light_code_theme` field to Set
-    pub struct SetLightCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
-    impl<S: State> State for SetLightCodeTheme<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = S::LightScheme;
-        type LightCodeTheme = Set<members::light_code_theme>;
-        type DarkScheme = S::DarkScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-    }
-    ///State transition - sets the `dark_scheme` field to Set
-    pub struct SetDarkScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
-    impl<S: State> State for SetDarkScheme<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = S::LightScheme;
-        type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = Set<members::dark_scheme>;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
     }
     ///State transition - sets the `dark_code_theme` field to Set
     pub struct SetDarkCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDarkCodeTheme<S> {}
     impl<S: State> State for SetDarkCodeTheme<S> {
+        type DarkCodeTheme = Set<members::dark_code_theme>;
         type Fonts = S::Fonts;
         type LightScheme = S::LightScheme;
+        type Spacing = S::Spacing;
         type LightCodeTheme = S::LightCodeTheme;
         type DarkScheme = S::DarkScheme;
-        type DarkCodeTheme = Set<members::dark_code_theme>;
+    }
+    ///State transition - sets the `fonts` field to Set
+    pub struct SetFonts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFonts<S> {}
+    impl<S: State> State for SetFonts<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = Set<members::fonts>;
+        type LightScheme = S::LightScheme;
         type Spacing = S::Spacing;
+        type LightCodeTheme = S::LightCodeTheme;
+        type DarkScheme = S::DarkScheme;
+    }
+    ///State transition - sets the `light_scheme` field to Set
+    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
+    impl<S: State> State for SetLightScheme<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type LightScheme = Set<members::light_scheme>;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = S::LightCodeTheme;
+        type DarkScheme = S::DarkScheme;
     }
     ///State transition - sets the `spacing` field to Set
     pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSpacing<S> {}
     impl<S: State> State for SetSpacing<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
         type Fonts = S::Fonts;
         type LightScheme = S::LightScheme;
+        type Spacing = Set<members::spacing>;
         type LightCodeTheme = S::LightCodeTheme;
         type DarkScheme = S::DarkScheme;
+    }
+    ///State transition - sets the `light_code_theme` field to Set
+    pub struct SetLightCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
+    impl<S: State> State for SetLightCodeTheme<S> {
         type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = Set<members::spacing>;
+        type Fonts = S::Fonts;
+        type LightScheme = S::LightScheme;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = Set<members::light_code_theme>;
+        type DarkScheme = S::DarkScheme;
+    }
+    ///State transition - sets the `dark_scheme` field to Set
+    pub struct SetDarkScheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
+    impl<S: State> State for SetDarkScheme<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type LightScheme = S::LightScheme;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = S::LightCodeTheme;
+        type DarkScheme = Set<members::dark_scheme>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `dark_code_theme` field
+        pub struct dark_code_theme(());
         ///Marker type for the `fonts` field
         pub struct fonts(());
         ///Marker type for the `light_scheme` field
         pub struct light_scheme(());
+        ///Marker type for the `spacing` field
+        pub struct spacing(());
         ///Marker type for the `light_code_theme` field
         pub struct light_code_theme(());
         ///Marker type for the `dark_scheme` field
         pub struct dark_scheme(());
-        ///Marker type for the `dark_code_theme` field
-        pub struct dark_code_theme(());
-        ///Marker type for the `spacing` field
-        pub struct spacing(());
     }
 }
 
@@ -1460,12 +1829,12 @@ where
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
+    S::DarkCodeTheme: theme_state::IsSet,
     S::Fonts: theme_state::IsSet,
     S::LightScheme: theme_state::IsSet,
+    S::Spacing: theme_state::IsSet,
     S::LightCodeTheme: theme_state::IsSet,
     S::DarkScheme: theme_state::IsSet,
-    S::DarkCodeTheme: theme_state::IsSet,
-    S::Spacing: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
@@ -1504,374 +1873,5 @@ where
             spacing: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Theme<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ThemeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeDarkCodeTheme<'a> {
-    #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
-    CodeThemeName(Box<crate::sh_weaver::notebook::theme::CodeThemeName<'a>>),
-    #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
-    CodeThemeFile(Box<crate::sh_weaver::notebook::theme::CodeThemeFile<'a>>),
-}
-
-/// Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeFonts<'a> {
-    #[serde(borrow)]
-    pub body: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
-    #[serde(borrow)]
-    pub heading: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
-    #[serde(borrow)]
-    pub monospace: Vec<crate::sh_weaver::notebook::theme::Font<'a>>,
-}
-
-pub mod theme_fonts_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Monospace;
-        type Heading;
-        type Body;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Monospace = Unset;
-        type Heading = Unset;
-        type Body = Unset;
-    }
-    ///State transition - sets the `monospace` field to Set
-    pub struct SetMonospace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonospace<S> {}
-    impl<S: State> State for SetMonospace<S> {
-        type Monospace = Set<members::monospace>;
-        type Heading = S::Heading;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `heading` field to Set
-    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeading<S> {}
-    impl<S: State> State for SetHeading<S> {
-        type Monospace = S::Monospace;
-        type Heading = Set<members::heading>;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Monospace = S::Monospace;
-        type Heading = S::Heading;
-        type Body = Set<members::body>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `monospace` field
-        pub struct monospace(());
-        ///Marker type for the `heading` field
-        pub struct heading(());
-        ///Marker type for the `body` field
-        pub struct body(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ThemeFontsBuilder<'a, S: theme_fonts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-        ::core::option::Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> ThemeFonts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
-        ThemeFontsBuilder::new()
-    }
-}
-
-impl<'a> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ThemeFontsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ThemeFontsBuilder<'a, S>
-where
-    S: theme_fonts_state::State,
-    S::Body: theme_fonts_state::IsUnset,
-{
-    /// Set the `body` field (required)
-    pub fn body(
-        mut self,
-        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ThemeFontsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ThemeFontsBuilder<'a, S>
-where
-    S: theme_fonts_state::State,
-    S::Heading: theme_fonts_state::IsUnset,
-{
-    /// Set the `heading` field (required)
-    pub fn heading(
-        mut self,
-        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetHeading<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ThemeFontsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ThemeFontsBuilder<'a, S>
-where
-    S: theme_fonts_state::State,
-    S::Monospace: theme_fonts_state::IsUnset,
-{
-    /// Set the `monospace` field (required)
-    pub fn monospace(
-        mut self,
-        value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetMonospace<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        ThemeFontsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ThemeFontsBuilder<'a, S>
-where
-    S: theme_fonts_state::State,
-    S::Monospace: theme_fonts_state::IsSet,
-    S::Heading: theme_fonts_state::IsSet,
-    S::Body: theme_fonts_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> ThemeFonts<'a> {
-        ThemeFonts {
-            body: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            monospace: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> ThemeFonts<'a> {
-        ThemeFonts {
-            body: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            monospace: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeFonts<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.theme"
-    }
-    fn def_name() -> &'static str {
-        "ThemeFonts"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeLightCodeTheme<'a> {
-    #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
-    CodeThemeName(Box<crate::sh_weaver::notebook::theme::CodeThemeName<'a>>),
-    #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
-    CodeThemeFile(Box<crate::sh_weaver::notebook::theme::CodeThemeFile<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeSpacing<'a> {
-    #[serde(borrow)]
-    pub base_size: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub line_height: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub scale: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeSpacing<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.theme"
-    }
-    fn def_name() -> &'static str {
-        "ThemeSpacing"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThemeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Theme<'a>,
-}
-
-impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
-    fn from(output: ThemeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Theme<'_> {
-    const NSID: &'static str = "sh.weaver.notebook.theme";
-    type Record = ThemeRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ThemeRecord;
-impl jacquard_common::xrpc::XrpcResp for ThemeRecord {
-    const NSID: &'static str = "sh.weaver.notebook.theme";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThemeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ThemeRecord {
-    const NSID: &'static str = "sh.weaver.notebook.theme";
-    type Record = ThemeRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.theme"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_theme()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

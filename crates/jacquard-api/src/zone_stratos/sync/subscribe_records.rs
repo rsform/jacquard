@@ -32,6 +32,478 @@ pub struct Commit<'a> {
     pub time: jacquard_common::types::string::Datetime,
 }
 
+/// An informational message about the subscription state.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Info<'a> {
+    ///Additional details about the info message.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The type of info message.
+    #[serde(borrow)]
+    pub name: InfoName<'a>,
+}
+
+/// The type of info message.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InfoName<'a> {
+    OutdatedCursor,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> InfoName<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::OutdatedCursor => "OutdatedCursor",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for InfoName<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "OutdatedCursor" => Self::OutdatedCursor,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for InfoName<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "OutdatedCursor" => Self::OutdatedCursor,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for InfoName<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for InfoName<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for InfoName<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for InfoName<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for InfoName<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for InfoName<'_> {
+    type Output = InfoName<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InfoName::OutdatedCursor => InfoName::OutdatedCursor,
+            InfoName::Other(v) => InfoName::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscribeRecords<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///(max length: 253)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubscribeRecordsMessage<'a> {
+    #[serde(rename = "#commit")]
+    Commit(Box<crate::zone_stratos::sync::subscribe_records::Commit<'a>>),
+    #[serde(rename = "#info")]
+    Info(Box<crate::zone_stratos::sync::subscribe_records::Info<'a>>),
+}
+
+impl<'a> SubscribeRecordsMessage<'a> {
+    /// Decode a framed DAG-CBOR message (header + body).
+    pub fn decode_framed<'de: 'a>(
+        bytes: &'de [u8],
+    ) -> Result<SubscribeRecordsMessage<'a>, jacquard_common::error::DecodeError> {
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
+        match header.t.as_str() {
+            "#commit" => {
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
+                Ok(Self::Commit(Box::new(variant)))
+            }
+            "#info" => {
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
+                Ok(Self::Info(Box::new(variant)))
+            }
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
+        }
+    }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubscribeRecordsError<'a> {
+    /// Cursor is in the future.
+    #[serde(rename = "FutureCursor")]
+    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Authentication is required.
+    #[serde(rename = "AuthRequired")]
+    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SubscribeRecordsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::FutureCursor(msg) => {
+                write!(f, "FutureCursor")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::AuthRequired(msg) => {
+                write!(f, "AuthRequired")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// A single record operation within a commit.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordOp<'a> {
+    ///The type of operation.
+    #[serde(borrow)]
+    pub action: RecordOpAction<'a>,
+    ///The CID of the record. Present for create and update operations.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+    ///The record path (collection/rkey).
+    #[serde(borrow)]
+    pub path: jacquard_common::CowStr<'a>,
+    ///The record content. Present for create and update operations.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+
+/// The type of operation.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RecordOpAction<'a> {
+    Create,
+    Update,
+    Delete,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RecordOpAction<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Create => "create",
+            Self::Update => "update",
+            Self::Delete => "delete",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RecordOpAction<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "create" => Self::Create,
+            "update" => Self::Update,
+            "delete" => Self::Delete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RecordOpAction<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "create" => Self::Create,
+            "update" => Self::Update,
+            "delete" => Self::Delete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RecordOpAction<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RecordOpAction<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RecordOpAction<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RecordOpAction<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RecordOpAction<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RecordOpAction<'_> {
+    type Output = RecordOpAction<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RecordOpAction::Create => RecordOpAction::Create,
+            RecordOpAction::Update => RecordOpAction::Update,
+            RecordOpAction::Delete => RecordOpAction::Delete,
+            RecordOpAction::Other(v) => RecordOpAction::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.sync.subscribeRecords"
+    }
+    fn def_name() -> &'static str {
+        "commit"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_sync_subscribeRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.sync.subscribeRecords"
+    }
+    fn def_name() -> &'static str {
+        "info"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_sync_subscribeRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1024usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 1024usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+///Stream response type for
+///zone.stratos.sync.subscribeRecords
+pub struct SubscribeRecordsStream;
+impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
+    const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    type Message<'de> = SubscribeRecordsMessage<'de>;
+    type Error<'de> = SubscribeRecordsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<'a> {
+    const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    type Stream = SubscribeRecordsStream;
+}
+
+pub struct SubscribeRecordsEndpoint;
+impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
+    const PATH: &'static str = "/xrpc/zone.stratos.sync.subscribeRecords";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
+    type Params<'de> = SubscribeRecords<'de>;
+    type Stream = SubscribeRecordsStream;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordOp<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.sync.subscribeRecords"
+    }
+    fn def_name() -> &'static str {
+        "recordOp"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_sync_subscribeRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.action;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "action",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.path;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod commit_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,85 +514,85 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Time;
-        type Did;
         type Seq;
-        type Rev;
+        type Did;
         type Ops;
+        type Time;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Time = Unset;
-        type Did = Unset;
         type Seq = Unset;
-        type Rev = Unset;
+        type Did = Unset;
         type Ops = Unset;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Time = Set<members::time>;
-        type Did = S::Did;
-        type Seq = S::Seq;
-        type Rev = S::Rev;
-        type Ops = S::Ops;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Time = S::Time;
-        type Did = Set<members::did>;
-        type Seq = S::Seq;
-        type Rev = S::Rev;
-        type Ops = S::Ops;
+        type Time = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Time = S::Time;
-        type Did = S::Did;
         type Seq = Set<members::seq>;
-        type Rev = S::Rev;
-        type Ops = S::Ops;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Time = S::Time;
         type Did = S::Did;
-        type Seq = S::Seq;
-        type Rev = Set<members::rev>;
         type Ops = S::Ops;
+        type Time = S::Time;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Did = Set<members::did>;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `ops` field to Set
     pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOps<S> {}
     impl<S: State> State for SetOps<S> {
-        type Time = S::Time;
-        type Did = S::Did;
         type Seq = S::Seq;
-        type Rev = S::Rev;
+        type Did = S::Did;
         type Ops = Set<members::ops>;
+        type Time = S::Time;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Ops = S::Ops;
+        type Time = Set<members::time>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `time` field
-        pub struct time(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `seq` field
         pub struct seq(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `ops` field
         pub struct ops(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -255,11 +727,11 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Time: commit_state::IsSet,
-    S::Did: commit_state::IsSet,
     S::Seq: commit_state::IsSet,
-    S::Rev: commit_state::IsSet,
+    S::Did: commit_state::IsSet,
     S::Ops: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -653,193 +1125,6 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.sync.subscribeRecords"
-    }
-    fn def_name() -> &'static str {
-        "commit"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_sync_subscribeRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An informational message about the subscription state.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Info<'a> {
-    ///Additional details about the info message.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The type of info message.
-    #[serde(borrow)]
-    pub name: InfoName<'a>,
-}
-
-/// The type of info message.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum InfoName<'a> {
-    OutdatedCursor,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> InfoName<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::OutdatedCursor => "OutdatedCursor",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for InfoName<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "OutdatedCursor" => Self::OutdatedCursor,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for InfoName<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "OutdatedCursor" => Self::OutdatedCursor,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for InfoName<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for InfoName<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for InfoName<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for InfoName<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for InfoName<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for InfoName<'_> {
-    type Output = InfoName<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            InfoName::OutdatedCursor => InfoName::OutdatedCursor,
-            InfoName::Other(v) => InfoName::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.sync.subscribeRecords"
-    }
-    fn def_name() -> &'static str {
-        "info"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_sync_subscribeRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1024usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 1024usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeRecords<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///(max length: 253)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod subscribe_records_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -961,290 +1246,5 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             domain: self.__unsafe_private_named.2,
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeRecordsMessage<'a> {
-    #[serde(rename = "#commit")]
-    Commit(Box<crate::zone_stratos::sync::subscribe_records::Commit<'a>>),
-    #[serde(rename = "#info")]
-    Info(Box<crate::zone_stratos::sync::subscribe_records::Info<'a>>),
-}
-
-impl<'a> SubscribeRecordsMessage<'a> {
-    /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
-        bytes: &'de [u8],
-    ) -> Result<SubscribeRecordsMessage<'a>, jacquard_common::error::DecodeError> {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
-            bytes,
-        )?;
-        match header.t.as_str() {
-            "#commit" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
-                Ok(Self::Commit(Box::new(variant)))
-            }
-            "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
-                Ok(Self::Info(Box::new(variant)))
-            }
-            unknown => {
-                Err(
-                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
-                )
-            }
-        }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeRecordsError<'a> {
-    /// Cursor is in the future.
-    #[serde(rename = "FutureCursor")]
-    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Authentication is required.
-    #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SubscribeRecordsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::FutureCursor(msg) => {
-                write!(f, "FutureCursor")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::AuthRequired(msg) => {
-                write!(f, "AuthRequired")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-///Stream response type for
-///zone.stratos.sync.subscribeRecords
-pub struct SubscribeRecordsStream;
-impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
-    const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Message<'de> = SubscribeRecordsMessage<'de>;
-    type Error<'de> = SubscribeRecordsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<'a> {
-    const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Stream = SubscribeRecordsStream;
-}
-
-pub struct SubscribeRecordsEndpoint;
-impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
-    const PATH: &'static str = "/xrpc/zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
-    type Params<'de> = SubscribeRecords<'de>;
-    type Stream = SubscribeRecordsStream;
-}
-
-/// A single record operation within a commit.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordOp<'a> {
-    ///The type of operation.
-    #[serde(borrow)]
-    pub action: RecordOpAction<'a>,
-    ///The CID of the record. Present for create and update operations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
-    ///The record path (collection/rkey).
-    #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
-    ///The record content. Present for create and update operations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
-}
-
-/// The type of operation.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RecordOpAction<'a> {
-    Create,
-    Update,
-    Delete,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RecordOpAction<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Create => "create",
-            Self::Update => "update",
-            Self::Delete => "delete",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RecordOpAction<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "create" => Self::Create,
-            "update" => Self::Update,
-            "delete" => Self::Delete,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RecordOpAction<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "create" => Self::Create,
-            "update" => Self::Update,
-            "delete" => Self::Delete,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RecordOpAction<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RecordOpAction<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RecordOpAction<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RecordOpAction<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RecordOpAction<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RecordOpAction<'_> {
-    type Output = RecordOpAction<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RecordOpAction::Create => RecordOpAction::Create,
-            RecordOpAction::Update => RecordOpAction::Update,
-            RecordOpAction::Delete => RecordOpAction::Delete,
-            RecordOpAction::Other(v) => RecordOpAction::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordOp<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.sync.subscribeRecords"
-    }
-    fn def_name() -> &'static str {
-        "recordOp"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_sync_subscribeRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.action;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "action",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.path;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_index() -> std::option::Option<i64> {
-    Some(0i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,96 @@ pub struct GetBookEntry<'a> {
     pub index: std::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBookEntryOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::sh_weaver::notebook::BookEntryView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetBookEntryError<'a> {
+    #[serde(rename = "NotebookNotFound")]
+    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "EntryNotFound")]
+    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetBookEntryError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotebookNotFound(msg) => {
+                write!(f, "NotebookNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::EntryNotFound(msg) => {
+                write!(f, "EntryNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getBookEntry
+pub struct GetBookEntryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBookEntryResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetBookEntryOutput<'de>;
+    type Err<'de> = GetBookEntryError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookEntry<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBookEntryResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getBookEntry
+pub struct GetBookEntryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getBookEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBookEntry<'de>;
+    type Response = GetBookEntryResponse;
+}
+
+fn _default_index() -> std::option::Option<i64> {
+    Some(0i64)
 }
 
 pub mod get_book_entry_state {
@@ -132,90 +218,4 @@ where
             notebook: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBookEntryOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::sh_weaver::notebook::BookEntryView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBookEntryError<'a> {
-    #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetBookEntryError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotebookNotFound(msg) => {
-                write!(f, "NotebookNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::EntryNotFound(msg) => {
-                write!(f, "EntryNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.getBookEntry
-pub struct GetBookEntryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBookEntryResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBookEntryOutput<'de>;
-    type Err<'de> = GetBookEntryError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookEntry<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBookEntryResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getBookEntry
-pub struct GetBookEntryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getBookEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBookEntry<'de>;
-    type Response = GetBookEntryResponse;
 }

@@ -20,6 +20,55 @@ pub struct GetFolder<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFolderOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub public: std::option::Option<bool>,
+}
+
+/// Response type for
+///app.blebbit.authr.folder.getFolder
+pub struct GetFolderResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFolderResponse {
+    const NSID: &'static str = "app.blebbit.authr.folder.getFolder";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFolderOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolder<'a> {
+    const NSID: &'static str = "app.blebbit.authr.folder.getFolder";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFolderResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.folder.getFolder
+pub struct GetFolderRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFolderRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolder";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFolder<'de>;
+    type Response = GetFolderResponse;
+}
+
 pub mod get_folder_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,53 +156,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFolderOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: std::option::Option<bool>,
-}
-
-/// Response type for
-///app.blebbit.authr.folder.getFolder
-pub struct GetFolderResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFolderResponse {
-    const NSID: &'static str = "app.blebbit.authr.folder.getFolder";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFolderOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolder<'a> {
-    const NSID: &'static str = "app.blebbit.authr.folder.getFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFolderResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.folder.getFolder
-pub struct GetFolderRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFolderRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFolder<'de>;
-    type Response = GetFolderResponse;
 }

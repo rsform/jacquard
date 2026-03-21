@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -34,6 +30,76 @@ pub struct SearchPosts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchPostsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub results: Vec<SearchPostsOutputResultsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchPostsOutputResultsItem<'a> {
+    #[serde(rename = "social.showcase.defs#itemView")]
+    ItemView(Box<crate::social_showcase::ItemView<'a>>),
+    #[serde(rename = "social.showcase.defs#collectionView")]
+    CollectionView(Box<crate::social_showcase::CollectionView<'a>>),
+    #[serde(rename = "social.showcase.defs#profileView")]
+    ProfileView(Box<crate::social_showcase::ProfileView<'a>>),
+}
+
+/// Response type for
+///social.showcase.feed.searchPosts
+pub struct SearchPostsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
+    const NSID: &'static str = "social.showcase.feed.searchPosts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchPostsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchPosts<'a> {
+    const NSID: &'static str = "social.showcase.feed.searchPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchPostsResponse;
+}
+
+/// Endpoint type for
+///social.showcase.feed.searchPosts
+pub struct SearchPostsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.feed.searchPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchPosts<'de>;
+    type Response = SearchPostsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod search_posts_state {
@@ -176,70 +242,4 @@ where
             r#type: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchPostsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub results: Vec<SearchPostsOutputResultsItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchPostsOutputResultsItem<'a> {
-    #[serde(rename = "social.showcase.defs#itemView")]
-    ItemView(Box<crate::social_showcase::ItemView<'a>>),
-    #[serde(rename = "social.showcase.defs#collectionView")]
-    CollectionView(Box<crate::social_showcase::CollectionView<'a>>),
-    #[serde(rename = "social.showcase.defs#profileView")]
-    ProfileView(Box<crate::social_showcase::ProfileView<'a>>),
-}
-
-/// Response type for
-///social.showcase.feed.searchPosts
-pub struct SearchPostsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
-    const NSID: &'static str = "social.showcase.feed.searchPosts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchPosts<'a> {
-    const NSID: &'static str = "social.showcase.feed.searchPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchPostsResponse;
-}
-
-/// Endpoint type for
-///social.showcase.feed.searchPosts
-pub struct SearchPostsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.feed.searchPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchPosts<'de>;
-    type Response = SearchPostsResponse;
 }

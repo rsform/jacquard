@@ -26,6 +26,84 @@ pub struct Journal<'a> {
     pub journal: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct JournalGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Journal<'a>,
+}
+
+impl<'a> Journal<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, JournalRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct JournalRecord;
+impl jacquard_common::xrpc::XrpcResp for JournalRecord {
+    const NSID: &'static str = "top.launchpadx.agent.journal";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = JournalGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<JournalGetRecordOutput<'_>> for Journal<'_> {
+    fn from(output: JournalGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Journal<'_> {
+    const NSID: &'static str = "top.launchpadx.agent.journal";
+    type Record = JournalRecord;
+}
+
+impl jacquard_common::types::collection::Collection for JournalRecord {
+    const NSID: &'static str = "top.launchpadx.agent.journal";
+    type Record = JournalRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Journal<'a> {
+    fn nsid() -> &'static str {
+        "top.launchpadx.agent.journal"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_top_launchpadx_agent_journal()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod journal_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -147,84 +225,6 @@ where
             journal: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Journal<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, JournalRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct JournalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Journal<'a>,
-}
-
-impl From<JournalGetRecordOutput<'_>> for Journal<'_> {
-    fn from(output: JournalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Journal<'_> {
-    const NSID: &'static str = "top.launchpadx.agent.journal";
-    type Record = JournalRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct JournalRecord;
-impl jacquard_common::xrpc::XrpcResp for JournalRecord {
-    const NSID: &'static str = "top.launchpadx.agent.journal";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = JournalGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for JournalRecord {
-    const NSID: &'static str = "top.launchpadx.agent.journal";
-    type Record = JournalRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Journal<'a> {
-    fn nsid() -> &'static str {
-        "top.launchpadx.agent.journal"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_top_launchpadx_agent_journal()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

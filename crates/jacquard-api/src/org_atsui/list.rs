@@ -29,6 +29,104 @@ pub struct List<'a> {
     pub query: jacquard_common::types::string::Nsid<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response shape from a List data source query.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Page<'a> {
+    ///Opaque pagination token. Absent means no more items.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Elements to render as list rows.
+    #[serde(borrow)]
+    pub items: Vec<crate::at_inlay::Element<'a>>,
+}
+
+/// Response type for
+///org.atsui.List
+pub struct ListResponse;
+impl jacquard_common::xrpc::XrpcResp for ListResponse {
+    const NSID: &'static str = "org.atsui.List";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for List<'a> {
+    const NSID: &'static str = "org.atsui.List";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ListResponse;
+}
+
+/// Endpoint type for
+///org.atsui.List
+pub struct ListRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.List";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = List<'de>;
+    type Response = ListResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+    fn nsid() -> &'static str {
+        "org.atsui.List"
+    }
+    fn def_name() -> &'static str {
+        "page"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atsui_List()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.cursor {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cursor",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,37 +137,37 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Query;
         type Did;
+        type Query;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Query = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `query` field to Set
-    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuery<S> {}
-    impl<S: State> State for SetQuery<S> {
-        type Query = Set<members::query>;
-        type Did = S::Did;
+        type Query = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Query = S::Query;
         type Did = Set<members::did>;
+        type Query = S::Query;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuery<S> {}
+    impl<S: State> State for SetQuery<S> {
+        type Did = S::Did;
+        type Query = Set<members::query>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `query` field
-        pub struct query(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `query` field
+        pub struct query(());
     }
 }
 
@@ -162,8 +260,8 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Query: list_state::IsSet,
     S::Did: list_state::IsSet,
+    S::Query: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -189,75 +287,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.List
-pub struct ListResponse;
-impl jacquard_common::xrpc::XrpcResp for ListResponse {
-    const NSID: &'static str = "org.atsui.List";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for List<'a> {
-    const NSID: &'static str = "org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ListResponse;
-}
-
-/// Endpoint type for
-///org.atsui.List
-pub struct ListRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.List";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = List<'de>;
-    type Response = ListResponse;
-}
-
-/// Response shape from a List data source query.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Page<'a> {
-    ///Opaque pagination token. Absent means no more items.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Elements to render as list rows.
-    #[serde(borrow)]
-    pub items: Vec<crate::at_inlay::Element<'a>>,
 }
 
 pub mod page_state {
@@ -542,34 +571,5 @@ fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
-    fn nsid() -> &'static str {
-        "org.atsui.List"
-    }
-    fn def_name() -> &'static str {
-        "page"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atsui_List()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.cursor {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cursor",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

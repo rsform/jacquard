@@ -25,6 +25,36 @@ pub struct UpdateActorAccess<'a> {
     pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Response type for
+///chat.bsky.moderation.updateActorAccess
+pub struct UpdateActorAccessResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
+    const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<'a> {
+    const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateActorAccessResponse;
+}
+
+/// Endpoint type for
+///chat.bsky.moderation.updateActorAccess
+pub struct UpdateActorAccessRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateActorAccess<'de>;
+    type Response = UpdateActorAccessResponse;
+}
+
 pub mod update_actor_access_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,37 +65,37 @@ pub mod update_actor_access_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AllowAccess;
         type Actor;
+        type AllowAccess;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AllowAccess = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `allow_access` field to Set
-    pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
-    impl<S: State> State for SetAllowAccess<S> {
-        type AllowAccess = Set<members::allow_access>;
-        type Actor = S::Actor;
+        type AllowAccess = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type AllowAccess = S::AllowAccess;
         type Actor = Set<members::actor>;
+        type AllowAccess = S::AllowAccess;
+    }
+    ///State transition - sets the `allow_access` field to Set
+    pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
+    impl<S: State> State for SetAllowAccess<S> {
+        type Actor = S::Actor;
+        type AllowAccess = Set<members::allow_access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `allow_access` field
-        pub struct allow_access(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `allow_access` field
+        pub struct allow_access(());
     }
 }
 
@@ -155,8 +185,8 @@ impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
 impl<'a, S> UpdateActorAccessBuilder<'a, S>
 where
     S: update_actor_access_state::State,
-    S::AllowAccess: update_actor_access_state::IsSet,
     S::Actor: update_actor_access_state::IsSet,
+    S::AllowAccess: update_actor_access_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateActorAccess<'a> {
@@ -182,34 +212,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///chat.bsky.moderation.updateActorAccess
-pub struct UpdateActorAccessResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
-    const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<'a> {
-    const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateActorAccessResponse;
-}
-
-/// Endpoint type for
-///chat.bsky.moderation.updateActorAccess
-pub struct UpdateActorAccessRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
-    const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateActorAccess<'de>;
-    type Response = UpdateActorAccessResponse;
 }

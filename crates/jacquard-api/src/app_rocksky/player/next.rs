@@ -21,6 +21,48 @@ pub struct NextParams<'a> {
     pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct Next;
+/// Response type for
+///app.rocksky.player.next
+pub struct NextResponse;
+impl jacquard_common::xrpc::XrpcResp for NextResponse {
+    const NSID: &'static str = "app.rocksky.player.next";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for Next {
+    const NSID: &'static str = "app.rocksky.player.next";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = NextResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.player.next
+pub struct NextRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.player.next";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Next;
+    type Response = NextResponse;
+}
+
 pub mod next_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -94,46 +136,4 @@ where
             player_id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct Next;
-/// Response type for
-///app.rocksky.player.next
-pub struct NextResponse;
-impl jacquard_common::xrpc::XrpcResp for NextResponse {
-    const NSID: &'static str = "app.rocksky.player.next";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for Next {
-    const NSID: &'static str = "app.rocksky.player.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = NextResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.player.next
-pub struct NextRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.player.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Next;
-    type Response = NextResponse;
 }

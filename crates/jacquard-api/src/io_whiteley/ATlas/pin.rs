@@ -32,6 +32,135 @@ pub struct Pin<'a> {
     pub website: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PinGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pin<'a>,
+}
+
+impl<'a> Pin<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PinRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PinRecord;
+impl jacquard_common::xrpc::XrpcResp for PinRecord {
+    const NSID: &'static str = "io.whiteley.ATlas.pin";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PinGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PinGetRecordOutput<'_>> for Pin<'_> {
+    fn from(output: PinGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pin<'_> {
+    const NSID: &'static str = "io.whiteley.ATlas.pin";
+    type Record = PinRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PinRecord {
+    const NSID: &'static str = "io.whiteley.ATlas.pin";
+    type Record = PinRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pin<'a> {
+    fn nsid() -> &'static str {
+        "io.whiteley.ATlas.pin"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_whiteley_ATlas_pin()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.latitude;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "latitude",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.longitude;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longitude",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.website {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "website",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod pin_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,85 +171,85 @@ pub mod pin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PlacedAt;
+        type Did;
+        type Latitude;
         type Description;
         type Longitude;
-        type Latitude;
-        type Did;
-        type PlacedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PlacedAt = Unset;
+        type Did = Unset;
+        type Latitude = Unset;
         type Description = Unset;
         type Longitude = Unset;
-        type Latitude = Unset;
-        type Did = Unset;
-        type PlacedAt = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Longitude = S::Longitude;
-        type Latitude = S::Latitude;
-        type Did = S::Did;
-        type PlacedAt = S::PlacedAt;
-    }
-    ///State transition - sets the `longitude` field to Set
-    pub struct SetLongitude<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongitude<S> {}
-    impl<S: State> State for SetLongitude<S> {
-        type Description = S::Description;
-        type Longitude = Set<members::longitude>;
-        type Latitude = S::Latitude;
-        type Did = S::Did;
-        type PlacedAt = S::PlacedAt;
-    }
-    ///State transition - sets the `latitude` field to Set
-    pub struct SetLatitude<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatitude<S> {}
-    impl<S: State> State for SetLatitude<S> {
-        type Description = S::Description;
-        type Longitude = S::Longitude;
-        type Latitude = Set<members::latitude>;
-        type Did = S::Did;
-        type PlacedAt = S::PlacedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Description = S::Description;
-        type Longitude = S::Longitude;
-        type Latitude = S::Latitude;
-        type Did = Set<members::did>;
-        type PlacedAt = S::PlacedAt;
     }
     ///State transition - sets the `placed_at` field to Set
     pub struct SetPlacedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlacedAt<S> {}
     impl<S: State> State for SetPlacedAt<S> {
+        type PlacedAt = Set<members::placed_at>;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
         type Description = S::Description;
         type Longitude = S::Longitude;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type PlacedAt = S::PlacedAt;
+        type Did = Set<members::did>;
         type Latitude = S::Latitude;
+        type Description = S::Description;
+        type Longitude = S::Longitude;
+    }
+    ///State transition - sets the `latitude` field to Set
+    pub struct SetLatitude<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLatitude<S> {}
+    impl<S: State> State for SetLatitude<S> {
+        type PlacedAt = S::PlacedAt;
         type Did = S::Did;
-        type PlacedAt = Set<members::placed_at>;
+        type Latitude = Set<members::latitude>;
+        type Description = S::Description;
+        type Longitude = S::Longitude;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type PlacedAt = S::PlacedAt;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
+        type Description = Set<members::description>;
+        type Longitude = S::Longitude;
+    }
+    ///State transition - sets the `longitude` field to Set
+    pub struct SetLongitude<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLongitude<S> {}
+    impl<S: State> State for SetLongitude<S> {
+        type PlacedAt = S::PlacedAt;
+        type Did = S::Did;
+        type Latitude = S::Latitude;
+        type Description = S::Description;
+        type Longitude = Set<members::longitude>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `placed_at` field
+        pub struct placed_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `latitude` field
+        pub struct latitude(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `longitude` field
         pub struct longitude(());
-        ///Marker type for the `latitude` field
-        pub struct latitude(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `placed_at` field
-        pub struct placed_at(());
     }
 }
 
@@ -270,11 +399,11 @@ impl<'a, S: pin_state::State> PinBuilder<'a, S> {
 impl<'a, S> PinBuilder<'a, S>
 where
     S: pin_state::State,
+    S::PlacedAt: pin_state::IsSet,
+    S::Did: pin_state::IsSet,
+    S::Latitude: pin_state::IsSet,
     S::Description: pin_state::IsSet,
     S::Longitude: pin_state::IsSet,
-    S::Latitude: pin_state::IsSet,
-    S::Did: pin_state::IsSet,
-    S::PlacedAt: pin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pin<'a> {
@@ -305,135 +434,6 @@ where
             website: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Pin<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PinRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PinGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pin<'a>,
-}
-
-impl From<PinGetRecordOutput<'_>> for Pin<'_> {
-    fn from(output: PinGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Pin<'_> {
-    const NSID: &'static str = "io.whiteley.ATlas.pin";
-    type Record = PinRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PinRecord;
-impl jacquard_common::xrpc::XrpcResp for PinRecord {
-    const NSID: &'static str = "io.whiteley.ATlas.pin";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PinGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PinRecord {
-    const NSID: &'static str = "io.whiteley.ATlas.pin";
-    type Record = PinRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pin<'a> {
-    fn nsid() -> &'static str {
-        "io.whiteley.ATlas.pin"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_whiteley_ATlas_pin()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.latitude;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "latitude",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.longitude;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longitude",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.website {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "website",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

@@ -20,6 +20,48 @@ pub struct IsVerified<'a> {
     pub domain: jacquard_common::CowStr<'a>,
 }
 
+/// Whether the user is verified on that domain
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IsVerifiedOutput<'a> {
+    pub verified: bool,
+}
+
+/// Response type for
+///app.ocho.edu.isVerified
+pub struct IsVerifiedResponse;
+impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
+    const NSID: &'static str = "app.ocho.edu.isVerified";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = IsVerifiedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for IsVerified<'a> {
+    const NSID: &'static str = "app.ocho.edu.isVerified";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = IsVerifiedResponse;
+}
+
+/// Endpoint type for
+///app.ocho.edu.isVerified
+pub struct IsVerifiedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.edu.isVerified";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = IsVerified<'de>;
+    type Response = IsVerifiedResponse;
+}
+
 pub mod is_verified_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,46 +149,4 @@ where
             domain: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-/// Whether the user is verified on that domain
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct IsVerifiedOutput<'a> {
-    pub verified: bool,
-}
-
-/// Response type for
-///app.ocho.edu.isVerified
-pub struct IsVerifiedResponse;
-impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
-    const NSID: &'static str = "app.ocho.edu.isVerified";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = IsVerifiedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for IsVerified<'a> {
-    const NSID: &'static str = "app.ocho.edu.isVerified";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = IsVerifiedResponse;
-}
-
-/// Endpoint type for
-///app.ocho.edu.isVerified
-pub struct IsVerifiedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.edu.isVerified";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = IsVerified<'de>;
-    type Response = IsVerifiedResponse;
 }

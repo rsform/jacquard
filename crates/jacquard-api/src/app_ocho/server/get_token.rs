@@ -20,6 +20,49 @@ pub struct GetToken<'a> {
     pub aud: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTokenOutput<'a> {
+    #[serde(borrow)]
+    pub token: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.server.getToken
+pub struct GetTokenResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTokenResponse {
+    const NSID: &'static str = "app.ocho.server.getToken";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTokenOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetToken<'a> {
+    const NSID: &'static str = "app.ocho.server.getToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTokenResponse;
+}
+
+/// Endpoint type for
+///app.ocho.server.getToken
+pub struct GetTokenRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.server.getToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetToken<'de>;
+    type Response = GetTokenResponse;
+}
+
 pub mod get_token_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             aud: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTokenOutput<'a> {
-    #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.server.getToken
-pub struct GetTokenResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTokenResponse {
-    const NSID: &'static str = "app.ocho.server.getToken";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTokenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetToken<'a> {
-    const NSID: &'static str = "app.ocho.server.getToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTokenResponse;
-}
-
-/// Endpoint type for
-///app.ocho.server.getToken
-pub struct GetTokenRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.server.getToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetToken<'de>;
-    type Response = GetTokenResponse;
 }

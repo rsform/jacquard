@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,55 @@ pub struct GetActorSubscriptions<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorSubscriptionsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub subscriptions: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+/// Response type for
+///sh.weaver.graph.getActorSubscriptions
+pub struct GetActorSubscriptionsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorSubscriptionsResponse {
+    const NSID: &'static str = "sh.weaver.graph.getActorSubscriptions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorSubscriptionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorSubscriptions<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getActorSubscriptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorSubscriptionsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getActorSubscriptions
+pub struct GetActorSubscriptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorSubscriptionsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getActorSubscriptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorSubscriptions<'de>;
+    type Response = GetActorSubscriptionsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_actor_subscriptions_state {
@@ -156,49 +201,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorSubscriptionsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub subscriptions: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-/// Response type for
-///sh.weaver.graph.getActorSubscriptions
-pub struct GetActorSubscriptionsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorSubscriptionsResponse {
-    const NSID: &'static str = "sh.weaver.graph.getActorSubscriptions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorSubscriptionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorSubscriptions<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getActorSubscriptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorSubscriptionsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getActorSubscriptions
-pub struct GetActorSubscriptionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorSubscriptionsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getActorSubscriptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorSubscriptions<'de>;
-    type Response = GetActorSubscriptionsResponse;
 }

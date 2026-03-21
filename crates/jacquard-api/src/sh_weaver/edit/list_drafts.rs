@@ -37,6 +37,90 @@ pub struct DraftView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListDrafts<'a> {
+    #[serde(borrow)]
+    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Defaults to `50`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListDraftsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub drafts: Vec<crate::sh_weaver::edit::list_drafts::DraftView<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.listDrafts"
+    }
+    fn def_name() -> &'static str {
+        "draftView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_listDrafts()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///sh.weaver.edit.listDrafts
+pub struct ListDraftsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
+    const NSID: &'static str = "sh.weaver.edit.listDrafts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListDraftsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListDrafts<'a> {
+    const NSID: &'static str = "sh.weaver.edit.listDrafts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListDraftsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.edit.listDrafts
+pub struct ListDraftsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.edit.listDrafts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListDrafts<'de>;
+    type Response = ListDraftsResponse;
+}
+
 pub mod draft_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -499,47 +583,8 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> ::jacquard_lexicon::lexicon::Lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.listDrafts"
-    }
-    fn def_name() -> &'static str {
-        "draftView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_listDrafts()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(50i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListDrafts<'a> {
-    #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
 }
 
 pub mod list_drafts_state {
@@ -664,49 +709,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListDraftsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub drafts: Vec<crate::sh_weaver::edit::list_drafts::DraftView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.edit.listDrafts
-pub struct ListDraftsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
-    const NSID: &'static str = "sh.weaver.edit.listDrafts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListDraftsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListDrafts<'a> {
-    const NSID: &'static str = "sh.weaver.edit.listDrafts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListDraftsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.edit.listDrafts
-pub struct ListDraftsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.edit.listDrafts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListDrafts<'de>;
-    type Response = ListDraftsResponse;
 }

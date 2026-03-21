@@ -36,6 +36,107 @@ pub struct IndexedRecord<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSliceRecords<'a> {
+    ///Pagination cursor from previous response
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Maximum number of records to return Defaults to `50`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_get_slice_records_limit")]
+    pub limit: std::option::Option<i64>,
+    ///AT-URI of the slice to query
+    #[serde(borrow)]
+    pub slice: jacquard_common::CowStr<'a>,
+    ///Sorting configuration for result ordering
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sort_by: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///Flexible filtering conditions for querying records
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSliceRecordsOutput<'a> {
+    ///Pagination cursor for next page
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub records: Vec<crate::network_slices::slice::get_slice_records::IndexedRecord<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndexedRecord<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.getSliceRecords"
+    }
+    fn def_name() -> &'static str {
+        "indexedRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_slice_getSliceRecords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///network.slices.slice.getSliceRecords
+pub struct GetSliceRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
+    const NSID: &'static str = "network.slices.slice.getSliceRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSliceRecordsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<'a> {
+    const NSID: &'static str = "network.slices.slice.getSliceRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GetSliceRecordsResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.getSliceRecords
+pub struct GetSliceRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSliceRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetSliceRecords<'de>;
+    type Response = GetSliceRecordsResponse;
+}
+
 pub mod indexed_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -46,105 +147,105 @@ pub mod indexed_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Uri;
-        type Did;
-        type Cid;
         type Collection;
         type Value;
+        type IndexedAt;
+        type Uri;
+        type Cid;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Uri = Unset;
-        type Did = Unset;
-        type Cid = Unset;
         type Collection = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Did = S::Did;
-        type Cid = S::Cid;
-        type Collection = S::Collection;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
-        type Cid = S::Cid;
-        type Collection = S::Collection;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Did = Set<members::did>;
-        type Cid = S::Cid;
-        type Collection = S::Collection;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Did = S::Did;
-        type Cid = Set<members::cid>;
-        type Collection = S::Collection;
-        type Value = S::Value;
+        type IndexedAt = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Did = S::Did;
-        type Cid = S::Cid;
         type Collection = Set<members::collection>;
         type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Did = S::Did;
-        type Cid = S::Cid;
         type Collection = S::Collection;
         type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -297,12 +398,12 @@ where
 impl<'a, S> IndexedRecordBuilder<'a, S>
 where
     S: indexed_record_state::State,
-    S::IndexedAt: indexed_record_state::IsSet,
-    S::Uri: indexed_record_state::IsSet,
-    S::Did: indexed_record_state::IsSet,
-    S::Cid: indexed_record_state::IsSet,
     S::Collection: indexed_record_state::IsSet,
     S::Value: indexed_record_state::IsSet,
+    S::IndexedAt: indexed_record_state::IsSet,
+    S::Uri: indexed_record_state::IsSet,
+    S::Cid: indexed_record_state::IsSet,
+    S::Did: indexed_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndexedRecord<'a> {
@@ -600,107 +701,6 @@ fn lexicon_doc_network_slices_slice_getSliceRecords() -> ::jacquard_lexicon::lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndexedRecord<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.slice.getSliceRecords"
-    }
-    fn def_name() -> &'static str {
-        "indexedRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_slice_getSliceRecords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSliceRecords<'a> {
-    ///Pagination cursor from previous response
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of records to return Defaults to `50`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_get_slice_records_limit")]
-    pub limit: std::option::Option<i64>,
-    ///AT-URI of the slice to query
-    #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
-    ///Sorting configuration for result ordering
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sort_by: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Flexible filtering conditions for querying records
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
-}
-
 fn _default_get_slice_records_limit() -> std::option::Option<i64> {
     Some(50i64)
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSliceRecordsOutput<'a> {
-    ///Pagination cursor for next page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub records: Vec<crate::network_slices::slice::get_slice_records::IndexedRecord<'a>>,
-}
-
-/// Response type for
-///network.slices.slice.getSliceRecords
-pub struct GetSliceRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
-    const NSID: &'static str = "network.slices.slice.getSliceRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSliceRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<'a> {
-    const NSID: &'static str = "network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = GetSliceRecordsResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.getSliceRecords
-pub struct GetSliceRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.getSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = GetSliceRecords<'de>;
-    type Response = GetSliceRecordsResponse;
 }

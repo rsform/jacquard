@@ -22,6 +22,92 @@ pub struct DismissMatch<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DismissMatchOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DismissMatchError<'a> {
+    #[serde(rename = "InvalidDid")]
+    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InternalError")]
+    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DismissMatchError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidDid(msg) => {
+                write!(f, "InvalidDid")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InternalError(msg) => {
+                write!(f, "InternalError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.contact.dismissMatch
+pub struct DismissMatchResponse;
+impl jacquard_common::xrpc::XrpcResp for DismissMatchResponse {
+    const NSID: &'static str = "app.bsky.contact.dismissMatch";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DismissMatchOutput<'de>;
+    type Err<'de> = DismissMatchError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
+    const NSID: &'static str = "app.bsky.contact.dismissMatch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DismissMatchResponse;
+}
+
+/// Endpoint type for
+///app.bsky.contact.dismissMatch
+pub struct DismissMatchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DismissMatchRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.contact.dismissMatch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DismissMatch<'de>;
+    type Response = DismissMatchResponse;
+}
+
 pub mod dismiss_match_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,90 +211,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DismissMatchOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DismissMatchError<'a> {
-    #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DismissMatchError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidDid(msg) => {
-                write!(f, "InvalidDid")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InternalError(msg) => {
-                write!(f, "InternalError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.contact.dismissMatch
-pub struct DismissMatchResponse;
-impl jacquard_common::xrpc::XrpcResp for DismissMatchResponse {
-    const NSID: &'static str = "app.bsky.contact.dismissMatch";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DismissMatchOutput<'de>;
-    type Err<'de> = DismissMatchError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
-    const NSID: &'static str = "app.bsky.contact.dismissMatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DismissMatchResponse;
-}
-
-/// Endpoint type for
-///app.bsky.contact.dismissMatch
-pub struct DismissMatchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DismissMatchRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.contact.dismissMatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DismissMatch<'de>;
-    type Response = DismissMatchResponse;
 }

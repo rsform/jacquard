@@ -29,12 +29,6 @@ pub struct RequestCrew<'a> {
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-fn _default_request_crew_role() -> std::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("member"))
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -229,4 +223,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     );
     type Request<'de> = RequestCrew<'de>;
     type Response = RequestCrewResponse;
+}
+
+fn _default_request_crew_role() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
+    Some(jacquard_common::CowStr::from("member"))
 }

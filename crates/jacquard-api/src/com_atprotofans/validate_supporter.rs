@@ -24,6 +24,89 @@ pub struct ValidateSupporter<'a> {
     pub supporter: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ValidateSupporterOutput<'a> {
+    ///Hydrated profile of the supporter, if available.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile: std::option::Option<
+        crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
+    >,
+    ///Whether the supporter relationship exists and the required attestation is valid.
+    pub valid: bool,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ValidateSupporterError<'a> {
+    /// Invalid DID format or missing required parameters.
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ValidateSupporterError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atprotofans.validateSupporter
+pub struct ValidateSupporterResponse;
+impl jacquard_common::xrpc::XrpcResp for ValidateSupporterResponse {
+    const NSID: &'static str = "com.atprotofans.validateSupporter";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ValidateSupporterOutput<'de>;
+    type Err<'de> = ValidateSupporterError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ValidateSupporter<'a> {
+    const NSID: &'static str = "com.atprotofans.validateSupporter";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ValidateSupporterResponse;
+}
+
+/// Endpoint type for
+///com.atprotofans.validateSupporter
+pub struct ValidateSupporterRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ValidateSupporterRequest {
+    const PATH: &'static str = "/xrpc/com.atprotofans.validateSupporter";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ValidateSupporter<'de>;
+    type Response = ValidateSupporterResponse;
+}
+
 pub mod validate_supporter_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,51 +117,51 @@ pub mod validate_supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Supporter;
         type Subject;
         type Signer;
+        type Supporter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Supporter = Unset;
         type Subject = Unset;
         type Signer = Unset;
-    }
-    ///State transition - sets the `supporter` field to Set
-    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSupporter<S> {}
-    impl<S: State> State for SetSupporter<S> {
-        type Supporter = Set<members::supporter>;
-        type Subject = S::Subject;
-        type Signer = S::Signer;
+        type Supporter = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Supporter = S::Supporter;
         type Subject = Set<members::subject>;
         type Signer = S::Signer;
+        type Supporter = S::Supporter;
     }
     ///State transition - sets the `signer` field to Set
     pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigner<S> {}
     impl<S: State> State for SetSigner<S> {
-        type Supporter = S::Supporter;
         type Subject = S::Subject;
         type Signer = Set<members::signer>;
+        type Supporter = S::Supporter;
+    }
+    ///State transition - sets the `supporter` field to Set
+    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSupporter<S> {}
+    impl<S: State> State for SetSupporter<S> {
+        type Subject = S::Subject;
+        type Signer = S::Signer;
+        type Supporter = Set<members::supporter>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `supporter` field
-        pub struct supporter(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `signer` field
         pub struct signer(());
+        ///Marker type for the `supporter` field
+        pub struct supporter(());
     }
 }
 
@@ -171,9 +254,9 @@ where
 impl<'a, S> ValidateSupporterBuilder<'a, S>
 where
     S: validate_supporter_state::State,
-    S::Supporter: validate_supporter_state::IsSet,
     S::Subject: validate_supporter_state::IsSet,
     S::Signer: validate_supporter_state::IsSet,
+    S::Supporter: validate_supporter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValidateSupporter<'a> {
@@ -183,87 +266,4 @@ where
             supporter: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ValidateSupporterOutput<'a> {
-    ///Hydrated profile of the supporter, if available.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile: std::option::Option<
-        crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
-    >,
-    ///Whether the supporter relationship exists and the required attestation is valid.
-    pub valid: bool,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ValidateSupporterError<'a> {
-    /// Invalid DID format or missing required parameters.
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ValidateSupporterError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atprotofans.validateSupporter
-pub struct ValidateSupporterResponse;
-impl jacquard_common::xrpc::XrpcResp for ValidateSupporterResponse {
-    const NSID: &'static str = "com.atprotofans.validateSupporter";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ValidateSupporterOutput<'de>;
-    type Err<'de> = ValidateSupporterError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ValidateSupporter<'a> {
-    const NSID: &'static str = "com.atprotofans.validateSupporter";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ValidateSupporterResponse;
-}
-
-/// Endpoint type for
-///com.atprotofans.validateSupporter
-pub struct ValidateSupporterRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ValidateSupporterRequest {
-    const PATH: &'static str = "/xrpc/com.atprotofans.validateSupporter";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ValidateSupporter<'de>;
-    type Response = ValidateSupporterResponse;
 }

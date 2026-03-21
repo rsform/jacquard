@@ -23,6 +23,671 @@ pub struct BodyExternal<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+/// Component rendered by the host from a serialized element tree
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyTemplate<'a> {
+    ///Serialized element tree with bindings
+    #[serde(borrow)]
+    pub node: jacquard_common::types::value::Data<'a>,
+}
+
+/// Component record - declares an implementation of a type
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Component<'a> {
+    ///How this component is rendered. Omit for primitives rendered by the host.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub body: std::option::Option<ComponentBody<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Ordered list of pack URIs (import stack). First pack that exports an NSID wins.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub imports: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ///NSID this component implements (also the XRPC procedure)
+    #[serde(borrow)]
+    pub r#type: jacquard_common::types::string::Nsid<'a>,
+    ///Last update timestamp. Set by the publish flow to bust cached responses.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Platform-managed deployment metadata
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub via: std::option::Option<crate::at_inlay::ViaValtown<'a>>,
+    ///What data this component views and which prop receives it
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub view: std::option::Option<crate::at_inlay::component::View<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ComponentBody<'a> {
+    #[serde(rename = "at.inlay.component#bodyExternal")]
+    BodyExternal(Box<crate::at_inlay::component::BodyExternal<'a>>),
+    #[serde(rename = "at.inlay.component#bodyTemplate")]
+    BodyTemplate(Box<crate::at_inlay::component::BodyTemplate<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ComponentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Component<'a>,
+}
+
+/// Declares what data this component views and which prop receives it.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct View<'a> {
+    ///Data types this view accepts.
+    #[serde(borrow)]
+    pub accepts: Vec<ViewAcceptsItem<'a>>,
+    ///Which component prop receives the view data.
+    #[serde(borrow)]
+    pub prop: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewAcceptsItem<'a> {
+    #[serde(rename = "at.inlay.component#viewRecord")]
+    ViewRecord(Box<crate::at_inlay::component::ViewRecord<'a>>),
+    #[serde(rename = "at.inlay.component#viewPrimitive")]
+    ViewPrimitive(Box<crate::at_inlay::component::ViewPrimitive<'a>>),
+}
+
+/// View accepts a primitive value type.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewPrimitive<'a> {
+    ///String format constraint. Only applies when type is 'string'.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub format: std::option::Option<ViewPrimitiveFormat<'a>>,
+    ///Lexicon primitive type.
+    #[serde(borrow)]
+    pub r#type: ViewPrimitiveType<'a>,
+}
+
+/// String format constraint. Only applies when type is 'string'.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ViewPrimitiveFormat<'a> {
+    AtUri,
+    Did,
+    Datetime,
+    Uri,
+    Handle,
+    AtIdentifier,
+    Nsid,
+    Cid,
+    Language,
+    RecordKey,
+    Tid,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ViewPrimitiveFormat<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AtUri => "at-uri",
+            Self::Did => "did",
+            Self::Datetime => "datetime",
+            Self::Uri => "uri",
+            Self::Handle => "handle",
+            Self::AtIdentifier => "at-identifier",
+            Self::Nsid => "nsid",
+            Self::Cid => "cid",
+            Self::Language => "language",
+            Self::RecordKey => "record-key",
+            Self::Tid => "tid",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ViewPrimitiveFormat<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "at-uri" => Self::AtUri,
+            "did" => Self::Did,
+            "datetime" => Self::Datetime,
+            "uri" => Self::Uri,
+            "handle" => Self::Handle,
+            "at-identifier" => Self::AtIdentifier,
+            "nsid" => Self::Nsid,
+            "cid" => Self::Cid,
+            "language" => Self::Language,
+            "record-key" => Self::RecordKey,
+            "tid" => Self::Tid,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ViewPrimitiveFormat<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "at-uri" => Self::AtUri,
+            "did" => Self::Did,
+            "datetime" => Self::Datetime,
+            "uri" => Self::Uri,
+            "handle" => Self::Handle,
+            "at-identifier" => Self::AtIdentifier,
+            "nsid" => Self::Nsid,
+            "cid" => Self::Cid,
+            "language" => Self::Language,
+            "record-key" => Self::RecordKey,
+            "tid" => Self::Tid,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ViewPrimitiveFormat<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ViewPrimitiveFormat<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ViewPrimitiveFormat<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveFormat<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ViewPrimitiveFormat<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ViewPrimitiveFormat<'_> {
+    type Output = ViewPrimitiveFormat<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewPrimitiveFormat::AtUri => ViewPrimitiveFormat::AtUri,
+            ViewPrimitiveFormat::Did => ViewPrimitiveFormat::Did,
+            ViewPrimitiveFormat::Datetime => ViewPrimitiveFormat::Datetime,
+            ViewPrimitiveFormat::Uri => ViewPrimitiveFormat::Uri,
+            ViewPrimitiveFormat::Handle => ViewPrimitiveFormat::Handle,
+            ViewPrimitiveFormat::AtIdentifier => ViewPrimitiveFormat::AtIdentifier,
+            ViewPrimitiveFormat::Nsid => ViewPrimitiveFormat::Nsid,
+            ViewPrimitiveFormat::Cid => ViewPrimitiveFormat::Cid,
+            ViewPrimitiveFormat::Language => ViewPrimitiveFormat::Language,
+            ViewPrimitiveFormat::RecordKey => ViewPrimitiveFormat::RecordKey,
+            ViewPrimitiveFormat::Tid => ViewPrimitiveFormat::Tid,
+            ViewPrimitiveFormat::Other(v) => ViewPrimitiveFormat::Other(v.into_static()),
+        }
+    }
+}
+
+/// Lexicon primitive type.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ViewPrimitiveType<'a> {
+    String,
+    Integer,
+    Boolean,
+    Blob,
+    CidLink,
+    Bytes,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ViewPrimitiveType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::String => "string",
+            Self::Integer => "integer",
+            Self::Boolean => "boolean",
+            Self::Blob => "blob",
+            Self::CidLink => "cid-link",
+            Self::Bytes => "bytes",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ViewPrimitiveType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "string" => Self::String,
+            "integer" => Self::Integer,
+            "boolean" => Self::Boolean,
+            "blob" => Self::Blob,
+            "cid-link" => Self::CidLink,
+            "bytes" => Self::Bytes,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ViewPrimitiveType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "string" => Self::String,
+            "integer" => Self::Integer,
+            "boolean" => Self::Boolean,
+            "blob" => Self::Blob,
+            "cid-link" => Self::CidLink,
+            "bytes" => Self::Bytes,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ViewPrimitiveType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ViewPrimitiveType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ViewPrimitiveType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ViewPrimitiveType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ViewPrimitiveType<'_> {
+    type Output = ViewPrimitiveType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewPrimitiveType::String => ViewPrimitiveType::String,
+            ViewPrimitiveType::Integer => ViewPrimitiveType::Integer,
+            ViewPrimitiveType::Boolean => ViewPrimitiveType::Boolean,
+            ViewPrimitiveType::Blob => ViewPrimitiveType::Blob,
+            ViewPrimitiveType::CidLink => ViewPrimitiveType::CidLink,
+            ViewPrimitiveType::Bytes => ViewPrimitiveType::Bytes,
+            ViewPrimitiveType::Other(v) => ViewPrimitiveType::Other(v.into_static()),
+        }
+    }
+}
+
+/// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewRecord<'a> {
+    ///The collection this component views. Omit for any-collection.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collection: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    ///The record key, baked from the collection's lexicon at authoring time. Presence enables DID expansion and identity page routing.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rkey: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Component<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ComponentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyExternal<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "bodyExternal"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyTemplate<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "bodyTemplate"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ComponentRecord;
+impl jacquard_common::xrpc::XrpcResp for ComponentRecord {
+    const NSID: &'static str = "at.inlay.component";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ComponentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ComponentGetRecordOutput<'_>> for Component<'_> {
+    fn from(output: ComponentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Component<'_> {
+    const NSID: &'static str = "at.inlay.component";
+    type Record = ComponentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ComponentRecord {
+    const NSID: &'static str = "at.inlay.component";
+    type Record = ComponentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Component<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 1000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "view"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.accepts;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accepts",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.prop;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "prop",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewPrimitive<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "viewPrimitive"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.format {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "format",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.component"
+    }
+    fn def_name() -> &'static str {
+        "viewRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_component()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.rkey {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rkey",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod body_external_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -580,41 +1245,6 @@ fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyExternal<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "bodyExternal"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Component rendered by the host from a serialized element tree
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BodyTemplate<'a> {
-    ///Serialized element tree with bindings
-    #[serde(borrow)]
-    pub node: jacquard_common::types::value::Data<'a>,
-}
-
 pub mod body_template_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -718,65 +1348,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyTemplate<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "bodyTemplate"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Component record - declares an implementation of a type
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Component<'a> {
-    ///How this component is rendered. Omit for primitives rendered by the host.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub body: std::option::Option<ComponentBody<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Ordered list of pack URIs (import stack). First pack that exports an NSID wins.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub imports: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ///NSID this component implements (also the XRPC procedure)
-    #[serde(borrow)]
-    pub r#type: jacquard_common::types::string::Nsid<'a>,
-    ///Last update timestamp. Set by the publish flow to bust cached responses.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Platform-managed deployment metadata
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub via: std::option::Option<crate::at_inlay::ViaValtown<'a>>,
-    ///What data this component views and which prop receives it
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub view: std::option::Option<crate::at_inlay::component::View<'a>>,
 }
 
 pub mod component_state {
@@ -1029,154 +1600,6 @@ where
     }
 }
 
-impl<'a> Component<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ComponentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ComponentBody<'a> {
-    #[serde(rename = "at.inlay.component#bodyExternal")]
-    BodyExternal(Box<crate::at_inlay::component::BodyExternal<'a>>),
-    #[serde(rename = "at.inlay.component#bodyTemplate")]
-    BodyTemplate(Box<crate::at_inlay::component::BodyTemplate<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ComponentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Component<'a>,
-}
-
-impl From<ComponentGetRecordOutput<'_>> for Component<'_> {
-    fn from(output: ComponentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Component<'_> {
-    const NSID: &'static str = "at.inlay.component";
-    type Record = ComponentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ComponentRecord;
-impl jacquard_common::xrpc::XrpcResp for ComponentRecord {
-    const NSID: &'static str = "at.inlay.component";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ComponentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ComponentRecord {
-    const NSID: &'static str = "at.inlay.component";
-    type Record = ComponentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Component<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Declares what data this component views and which prop receives it.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    ///Data types this view accepts.
-    #[serde(borrow)]
-    pub accepts: Vec<ViewAcceptsItem<'a>>,
-    ///Which component prop receives the view data.
-    #[serde(borrow)]
-    pub prop: jacquard_common::CowStr<'a>,
-}
-
 pub mod view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1314,428 +1737,5 @@ where
             prop: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewAcceptsItem<'a> {
-    #[serde(rename = "at.inlay.component#viewRecord")]
-    ViewRecord(Box<crate::at_inlay::component::ViewRecord<'a>>),
-    #[serde(rename = "at.inlay.component#viewPrimitive")]
-    ViewPrimitive(Box<crate::at_inlay::component::ViewPrimitive<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "view"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.accepts;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "accepts",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.prop;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "prop",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// View accepts a primitive value type.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewPrimitive<'a> {
-    ///String format constraint. Only applies when type is 'string'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub format: std::option::Option<ViewPrimitiveFormat<'a>>,
-    ///Lexicon primitive type.
-    #[serde(borrow)]
-    pub r#type: ViewPrimitiveType<'a>,
-}
-
-/// String format constraint. Only applies when type is 'string'.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveFormat<'a> {
-    AtUri,
-    Did,
-    Datetime,
-    Uri,
-    Handle,
-    AtIdentifier,
-    Nsid,
-    Cid,
-    Language,
-    RecordKey,
-    Tid,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ViewPrimitiveFormat<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::AtUri => "at-uri",
-            Self::Did => "did",
-            Self::Datetime => "datetime",
-            Self::Uri => "uri",
-            Self::Handle => "handle",
-            Self::AtIdentifier => "at-identifier",
-            Self::Nsid => "nsid",
-            Self::Cid => "cid",
-            Self::Language => "language",
-            Self::RecordKey => "record-key",
-            Self::Tid => "tid",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ViewPrimitiveFormat<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "at-uri" => Self::AtUri,
-            "did" => Self::Did,
-            "datetime" => Self::Datetime,
-            "uri" => Self::Uri,
-            "handle" => Self::Handle,
-            "at-identifier" => Self::AtIdentifier,
-            "nsid" => Self::Nsid,
-            "cid" => Self::Cid,
-            "language" => Self::Language,
-            "record-key" => Self::RecordKey,
-            "tid" => Self::Tid,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ViewPrimitiveFormat<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "at-uri" => Self::AtUri,
-            "did" => Self::Did,
-            "datetime" => Self::Datetime,
-            "uri" => Self::Uri,
-            "handle" => Self::Handle,
-            "at-identifier" => Self::AtIdentifier,
-            "nsid" => Self::Nsid,
-            "cid" => Self::Cid,
-            "language" => Self::Language,
-            "record-key" => Self::RecordKey,
-            "tid" => Self::Tid,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ViewPrimitiveFormat<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ViewPrimitiveFormat<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ViewPrimitiveFormat<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveFormat<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ViewPrimitiveFormat<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ViewPrimitiveFormat<'_> {
-    type Output = ViewPrimitiveFormat<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ViewPrimitiveFormat::AtUri => ViewPrimitiveFormat::AtUri,
-            ViewPrimitiveFormat::Did => ViewPrimitiveFormat::Did,
-            ViewPrimitiveFormat::Datetime => ViewPrimitiveFormat::Datetime,
-            ViewPrimitiveFormat::Uri => ViewPrimitiveFormat::Uri,
-            ViewPrimitiveFormat::Handle => ViewPrimitiveFormat::Handle,
-            ViewPrimitiveFormat::AtIdentifier => ViewPrimitiveFormat::AtIdentifier,
-            ViewPrimitiveFormat::Nsid => ViewPrimitiveFormat::Nsid,
-            ViewPrimitiveFormat::Cid => ViewPrimitiveFormat::Cid,
-            ViewPrimitiveFormat::Language => ViewPrimitiveFormat::Language,
-            ViewPrimitiveFormat::RecordKey => ViewPrimitiveFormat::RecordKey,
-            ViewPrimitiveFormat::Tid => ViewPrimitiveFormat::Tid,
-            ViewPrimitiveFormat::Other(v) => ViewPrimitiveFormat::Other(v.into_static()),
-        }
-    }
-}
-
-/// Lexicon primitive type.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveType<'a> {
-    String,
-    Integer,
-    Boolean,
-    Blob,
-    CidLink,
-    Bytes,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ViewPrimitiveType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::String => "string",
-            Self::Integer => "integer",
-            Self::Boolean => "boolean",
-            Self::Blob => "blob",
-            Self::CidLink => "cid-link",
-            Self::Bytes => "bytes",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ViewPrimitiveType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            "blob" => Self::Blob,
-            "cid-link" => Self::CidLink,
-            "bytes" => Self::Bytes,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ViewPrimitiveType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            "blob" => Self::Blob,
-            "cid-link" => Self::CidLink,
-            "bytes" => Self::Bytes,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ViewPrimitiveType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ViewPrimitiveType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ViewPrimitiveType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ViewPrimitiveType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ViewPrimitiveType<'_> {
-    type Output = ViewPrimitiveType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ViewPrimitiveType::String => ViewPrimitiveType::String,
-            ViewPrimitiveType::Integer => ViewPrimitiveType::Integer,
-            ViewPrimitiveType::Boolean => ViewPrimitiveType::Boolean,
-            ViewPrimitiveType::Blob => ViewPrimitiveType::Blob,
-            ViewPrimitiveType::CidLink => ViewPrimitiveType::CidLink,
-            ViewPrimitiveType::Bytes => ViewPrimitiveType::Bytes,
-            ViewPrimitiveType::Other(v) => ViewPrimitiveType::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewPrimitive<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "viewPrimitive"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.format {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "format",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewRecord<'a> {
-    ///The collection this component views. Omit for any-collection.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub collection: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
-    ///The record key, baked from the collection's lexicon at authoring time. Presence enables DID expansion and identity page routing.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rkey: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.component"
-    }
-    fn def_name() -> &'static str {
-        "viewRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_component()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.rkey {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rkey",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

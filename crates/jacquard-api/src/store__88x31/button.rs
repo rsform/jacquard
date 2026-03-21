@@ -36,213 +36,6 @@ pub struct Button<'a> {
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-pub mod button_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Blob;
-        type PostedAt;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Blob = Unset;
-        type PostedAt = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type PostedAt = S::PostedAt;
-    }
-    ///State transition - sets the `posted_at` field to Set
-    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
-    impl<S: State> State for SetPostedAt<S> {
-        type Blob = S::Blob;
-        type PostedAt = Set<members::posted_at>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
-        ///Marker type for the `posted_at` field
-        pub struct posted_at(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ButtonBuilder<'a, S: button_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Button<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ButtonBuilder<'a, button_state::Empty> {
-        ButtonBuilder::new()
-    }
-}
-
-impl<'a> ButtonBuilder<'a, button_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ButtonBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
-    /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> ButtonBuilder<'a, S>
-where
-    S: button_state::State,
-    S::Blob: button_state::IsUnset,
-{
-    /// Set the `blob` field (required)
-    pub fn blob(
-        mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> ButtonBuilder<'a, button_state::SetBlob<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ButtonBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
-    /// Set the `href` field (optional)
-    pub fn href(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `href` field to an Option value (optional)
-    pub fn maybe_href(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S> ButtonBuilder<'a, S>
-where
-    S: button_state::State,
-    S::PostedAt: button_state::IsUnset,
-{
-    /// Set the `postedAt` field (required)
-    pub fn posted_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> ButtonBuilder<'a, button_state::SetPostedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        ButtonBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
-    /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S> ButtonBuilder<'a, S>
-where
-    S: button_state::State,
-    S::Blob: button_state::IsSet,
-    S::PostedAt: button_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Button<'a> {
-        Button {
-            alt: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            href: self.__unsafe_private_named.2,
-            posted_at: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Button<'a> {
-        Button {
-            alt: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            href: self.__unsafe_private_named.2,
-            posted_at: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Button<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ButtonRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,
@@ -264,16 +57,17 @@ pub struct ButtonGetRecordOutput<'a> {
     pub value: Button<'a>,
 }
 
-impl From<ButtonGetRecordOutput<'_>> for Button<'_> {
-    fn from(output: ButtonGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Button<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ButtonRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Button<'_> {
-    const NSID: &'static str = "store.88x31.button";
-    type Record = ButtonRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -284,6 +78,18 @@ impl jacquard_common::xrpc::XrpcResp for ButtonRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ButtonGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ButtonGetRecordOutput<'_>> for Button<'_> {
+    fn from(output: ButtonGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Button<'_> {
+    const NSID: &'static str = "store.88x31.button";
+    type Record = ButtonRecord;
 }
 
 impl jacquard_common::types::collection::Collection for ButtonRecord {
@@ -439,6 +245,200 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod button_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type PostedAt;
+        type Blob;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type PostedAt = Unset;
+        type Blob = Unset;
+    }
+    ///State transition - sets the `posted_at` field to Set
+    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
+    impl<S: State> State for SetPostedAt<S> {
+        type PostedAt = Set<members::posted_at>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type PostedAt = S::PostedAt;
+        type Blob = Set<members::blob>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `posted_at` field
+        pub struct posted_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ButtonBuilder<'a, S: button_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Button<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ButtonBuilder<'a, button_state::Empty> {
+        ButtonBuilder::new()
+    }
+}
+
+impl<'a> ButtonBuilder<'a, button_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ButtonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
+    /// Set the `alt` field (optional)
+    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alt` field to an Option value (optional)
+    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ButtonBuilder<'a, S>
+where
+    S: button_state::State,
+    S::Blob: button_state::IsUnset,
+{
+    /// Set the `blob` field (required)
+    pub fn blob(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> ButtonBuilder<'a, button_state::SetBlob<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ButtonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
+    /// Set the `href` field (optional)
+    pub fn href(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `href` field to an Option value (optional)
+    pub fn maybe_href(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ButtonBuilder<'a, S>
+where
+    S: button_state::State,
+    S::PostedAt: button_state::IsUnset,
+{
+    /// Set the `postedAt` field (required)
+    pub fn posted_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ButtonBuilder<'a, button_state::SetPostedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ButtonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ButtonBuilder<'a, S>
+where
+    S: button_state::State,
+    S::PostedAt: button_state::IsSet,
+    S::Blob: button_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Button<'a> {
+        Button {
+            alt: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            href: self.__unsafe_private_named.2,
+            posted_at: self.__unsafe_private_named.3.unwrap(),
+            title: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Button<'a> {
+        Button {
+            alt: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            href: self.__unsafe_private_named.2,
+            posted_at: self.__unsafe_private_named.3.unwrap(),
+            title: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
     }
 }
 

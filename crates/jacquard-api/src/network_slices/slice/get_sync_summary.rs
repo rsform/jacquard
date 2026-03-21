@@ -23,6 +23,99 @@ pub struct CollectionSummary<'a> {
     pub is_external: bool,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSyncSummary<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub external_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub repos: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(borrow)]
+    pub slice: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSyncSummaryOutput<'a> {
+    ///The actual limit applied (user-specified or default)
+    pub applied_limit: i64,
+    ///Number of repositories after applying limit
+    pub capped_repos: i64,
+    #[serde(borrow)]
+    pub collections_summary: Vec<
+        crate::network_slices::slice::get_sync_summary::CollectionSummary<'a>,
+    >,
+    ///Total number of repositories that would be synced
+    pub total_repos: i64,
+    ///Whether the sync would be limited by maxRepos
+    pub would_be_capped: bool,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummary<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.getSyncSummary"
+    }
+    fn def_name() -> &'static str {
+        "collectionSummary"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_slice_getSyncSummary()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///network.slices.slice.getSyncSummary
+pub struct GetSyncSummaryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSyncSummaryResponse {
+    const NSID: &'static str = "network.slices.slice.getSyncSummary";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSyncSummaryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSyncSummary<'a> {
+    const NSID: &'static str = "network.slices.slice.getSyncSummary";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSyncSummaryResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.getSyncSummary
+pub struct GetSyncSummaryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSyncSummary";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSyncSummary<'de>;
+    type Response = GetSyncSummaryResponse;
+}
+
 pub mod collection_summary_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,50 +127,50 @@ pub mod collection_summary_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type EstimatedRepos;
         type IsExternal;
+        type EstimatedRepos;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type EstimatedRepos = Unset;
         type IsExternal = Unset;
+        type EstimatedRepos = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Collection = Set<members::collection>;
+        type IsExternal = S::IsExternal;
         type EstimatedRepos = S::EstimatedRepos;
-        type IsExternal = S::IsExternal;
-    }
-    ///State transition - sets the `estimated_repos` field to Set
-    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
-    impl<S: State> State for SetEstimatedRepos<S> {
-        type Collection = S::Collection;
-        type EstimatedRepos = Set<members::estimated_repos>;
-        type IsExternal = S::IsExternal;
     }
     ///State transition - sets the `is_external` field to Set
     pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsExternal<S> {}
     impl<S: State> State for SetIsExternal<S> {
         type Collection = S::Collection;
-        type EstimatedRepos = S::EstimatedRepos;
         type IsExternal = Set<members::is_external>;
+        type EstimatedRepos = S::EstimatedRepos;
+    }
+    ///State transition - sets the `estimated_repos` field to Set
+    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
+    impl<S: State> State for SetEstimatedRepos<S> {
+        type Collection = S::Collection;
+        type IsExternal = S::IsExternal;
+        type EstimatedRepos = Set<members::estimated_repos>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `estimated_repos` field
-        pub struct estimated_repos(());
         ///Marker type for the `is_external` field
         pub struct is_external(());
+        ///Marker type for the `estimated_repos` field
+        pub struct estimated_repos(());
     }
 }
 
@@ -171,8 +264,8 @@ impl<'a, S> CollectionSummaryBuilder<'a, S>
 where
     S: collection_summary_state::State,
     S::Collection: collection_summary_state::IsSet,
-    S::EstimatedRepos: collection_summary_state::IsSet,
     S::IsExternal: collection_summary_state::IsSet,
+    S::EstimatedRepos: collection_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionSummary<'a> {
@@ -386,47 +479,6 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummary<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.slice.getSyncSummary"
-    }
-    fn def_name() -> &'static str {
-        "collectionSummary"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_slice_getSyncSummary()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSyncSummary<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub external_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub repos: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
-}
-
 pub mod get_sync_summary_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -579,56 +631,4 @@ where
             slice: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSyncSummaryOutput<'a> {
-    ///The actual limit applied (user-specified or default)
-    pub applied_limit: i64,
-    ///Number of repositories after applying limit
-    pub capped_repos: i64,
-    #[serde(borrow)]
-    pub collections_summary: Vec<
-        crate::network_slices::slice::get_sync_summary::CollectionSummary<'a>,
-    >,
-    ///Total number of repositories that would be synced
-    pub total_repos: i64,
-    ///Whether the sync would be limited by maxRepos
-    pub would_be_capped: bool,
-}
-
-/// Response type for
-///network.slices.slice.getSyncSummary
-pub struct GetSyncSummaryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSyncSummaryResponse {
-    const NSID: &'static str = "network.slices.slice.getSyncSummary";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSyncSummaryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSyncSummary<'a> {
-    const NSID: &'static str = "network.slices.slice.getSyncSummary";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSyncSummaryResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.getSyncSummary
-pub struct GetSyncSummaryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.getSyncSummary";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSyncSummary<'de>;
-    type Response = GetSyncSummaryResponse;
 }

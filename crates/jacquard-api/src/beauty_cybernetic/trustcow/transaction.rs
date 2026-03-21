@@ -43,6 +43,121 @@ pub struct Transaction<'a> {
     pub transaction_id: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TransactionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Transaction<'a>,
+}
+
+impl<'a> Transaction<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TransactionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TransactionRecord;
+impl jacquard_common::xrpc::XrpcResp for TransactionRecord {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TransactionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
+    fn from(output: TransactionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Transaction<'_> {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
+    type Record = TransactionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TransactionRecord {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
+    type Record = TransactionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
+    fn nsid() -> &'static str {
+        "beauty.cybernetic.trustcow.transaction"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_beauty_cybernetic_trustcow_transaction()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.currency {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "currency",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.transaction_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "transaction_id",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod transaction_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -53,67 +168,67 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TransactionId;
-        type ServiceProvider;
-        type ServiceConsumer;
         type CreatedAt;
+        type TransactionId;
+        type ServiceConsumer;
+        type ServiceProvider;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TransactionId = Unset;
-        type ServiceProvider = Unset;
-        type ServiceConsumer = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `transaction_id` field to Set
-    pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTransactionId<S> {}
-    impl<S: State> State for SetTransactionId<S> {
-        type TransactionId = Set<members::transaction_id>;
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
-    impl<S: State> State for SetServiceProvider<S> {
-        type TransactionId = S::TransactionId;
-        type ServiceProvider = Set<members::service_provider>;
-        type ServiceConsumer = S::ServiceConsumer;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `service_consumer` field to Set
-    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
-    impl<S: State> State for SetServiceConsumer<S> {
-        type TransactionId = S::TransactionId;
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = Set<members::service_consumer>;
-        type CreatedAt = S::CreatedAt;
+        type TransactionId = Unset;
+        type ServiceConsumer = Unset;
+        type ServiceProvider = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type TransactionId = S::TransactionId;
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
         type CreatedAt = Set<members::created_at>;
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
+        type ServiceProvider = S::ServiceProvider;
+    }
+    ///State transition - sets the `transaction_id` field to Set
+    pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTransactionId<S> {}
+    impl<S: State> State for SetTransactionId<S> {
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = Set<members::transaction_id>;
+        type ServiceConsumer = S::ServiceConsumer;
+        type ServiceProvider = S::ServiceProvider;
+    }
+    ///State transition - sets the `service_consumer` field to Set
+    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
+    impl<S: State> State for SetServiceConsumer<S> {
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = Set<members::service_consumer>;
+        type ServiceProvider = S::ServiceProvider;
+    }
+    ///State transition - sets the `service_provider` field to Set
+    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
+    impl<S: State> State for SetServiceProvider<S> {
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
+        type ServiceProvider = Set<members::service_provider>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `transaction_id` field
-        pub struct transaction_id(());
-        ///Marker type for the `service_provider` field
-        pub struct service_provider(());
-        ///Marker type for the `service_consumer` field
-        pub struct service_consumer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `transaction_id` field
+        pub struct transaction_id(());
+        ///Marker type for the `service_consumer` field
+        pub struct service_consumer(());
+        ///Marker type for the `service_provider` field
+        pub struct service_provider(());
     }
 }
 
@@ -280,10 +395,10 @@ where
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::TransactionId: transaction_state::IsSet,
-    S::ServiceProvider: transaction_state::IsSet,
-    S::ServiceConsumer: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
+    S::TransactionId: transaction_state::IsSet,
+    S::ServiceConsumer: transaction_state::IsSet,
+    S::ServiceProvider: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
@@ -316,121 +431,6 @@ where
             transaction_id: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Transaction<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TransactionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TransactionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Transaction<'a>,
-}
-
-impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
-    fn from(output: TransactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Transaction<'_> {
-    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
-    type Record = TransactionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TransactionRecord;
-impl jacquard_common::xrpc::XrpcResp for TransactionRecord {
-    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TransactionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TransactionRecord {
-    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
-    type Record = TransactionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
-    fn nsid() -> &'static str {
-        "beauty.cybernetic.trustcow.transaction"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_beauty_cybernetic_trustcow_transaction()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.currency {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "currency",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.transaction_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transaction_id",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

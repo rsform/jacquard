@@ -23,6 +23,23 @@ pub struct TileEmbed<'a> {
     pub tile: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TileEmbed<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.tileEmbed"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_tileEmbed()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod tile_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -174,22 +191,5 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_tileEmbed() -> ::jacquard_lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TileEmbed<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.tileEmbed"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_tileEmbed()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

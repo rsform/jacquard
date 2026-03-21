@@ -40,6 +40,23 @@ pub struct ApiKeyView<'a> {
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ApiKeyView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.apikey.defs"
+    }
+    fn def_name() -> &'static str {
+        "apiKeyView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_apikey_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -149,22 +166,5 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ApiKeyView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.apikey.defs"
-    }
-    fn def_name() -> &'static str {
-        "apiKeyView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_apikey_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -34,6 +34,84 @@ pub struct Page<'a> {
     pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PageGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Page<'a>,
+}
+
+impl<'a> Page<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PageRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PageRecord;
+impl jacquard_common::xrpc::XrpcResp for PageRecord {
+    const NSID: &'static str = "sh.weaver.notebook.page";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PageGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PageGetRecordOutput<'_>> for Page<'_> {
+    fn from(output: PageGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Page<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.page";
+    type Record = PageRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PageRecord {
+    const NSID: &'static str = "sh.weaver.notebook.page";
+    type Record = PageRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.page"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_page()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod page_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -252,84 +330,6 @@ where
             title: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Page<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PageRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PageGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Page<'a>,
-}
-
-impl From<PageGetRecordOutput<'_>> for Page<'_> {
-    fn from(output: PageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Page<'_> {
-    const NSID: &'static str = "sh.weaver.notebook.page";
-    type Record = PageRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PageRecord;
-impl jacquard_common::xrpc::XrpcResp for PageRecord {
-    const NSID: &'static str = "sh.weaver.notebook.page";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PageGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PageRecord {
-    const NSID: &'static str = "sh.weaver.notebook.page";
-    type Record = PageRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.page"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_page()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -20,6 +20,49 @@ pub struct GetAccountInfo<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountInfoOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::com_atproto::admin::AccountView<'a>,
+}
+
+/// Response type for
+///com.atproto.admin.getAccountInfo
+pub struct GetAccountInfoResponse;
+impl jacquard_common::xrpc::XrpcResp for GetAccountInfoResponse {
+    const NSID: &'static str = "com.atproto.admin.getAccountInfo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetAccountInfoOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfo<'a> {
+    const NSID: &'static str = "com.atproto.admin.getAccountInfo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountInfoResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.getAccountInfo
+pub struct GetAccountInfoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfoRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountInfo<'de>;
+    type Response = GetAccountInfoResponse;
+}
+
 pub mod get_account_info_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAccountInfoOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::com_atproto::admin::AccountView<'a>,
-}
-
-/// Response type for
-///com.atproto.admin.getAccountInfo
-pub struct GetAccountInfoResponse;
-impl jacquard_common::xrpc::XrpcResp for GetAccountInfoResponse {
-    const NSID: &'static str = "com.atproto.admin.getAccountInfo";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountInfoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfo<'a> {
-    const NSID: &'static str = "com.atproto.admin.getAccountInfo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetAccountInfoResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.getAccountInfo
-pub struct GetAccountInfoRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfoRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAccountInfo<'de>;
-    type Response = GetAccountInfoResponse;
 }

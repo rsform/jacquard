@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -24,6 +20,52 @@ pub struct GetLatest {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLatestOutput<'a> {
+    #[serde(borrow)]
+    pub plays: Vec<crate::fm_teal::alpha::feed::PlayView<'a>>,
+}
+
+/// Response type for
+///fm.teal.alpha.stats.getLatest
+pub struct GetLatestResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLatestResponse {
+    const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLatestOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetLatest {
+    const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLatestResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.stats.getLatest
+pub struct GetLatestRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLatestRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getLatest";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLatest;
+    type Response = GetLatestResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_latest_state {
@@ -91,46 +133,4 @@ where
             limit: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLatestOutput<'a> {
-    #[serde(borrow)]
-    pub plays: Vec<crate::fm_teal::alpha::feed::PlayView<'a>>,
-}
-
-/// Response type for
-///fm.teal.alpha.stats.getLatest
-pub struct GetLatestResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLatestResponse {
-    const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLatestOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetLatest {
-    const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLatestResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.stats.getLatest
-pub struct GetLatestRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLatestRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getLatest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLatest;
-    type Response = GetLatestResponse;
 }

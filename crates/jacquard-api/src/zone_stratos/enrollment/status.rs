@@ -20,6 +20,58 @@ pub struct Status<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusOutput<'a> {
+    ///Authoritative boundaries assigned. Only included when request is authenticated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub boundaries: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    ///The DID that was checked.
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Whether the DID is enrolled in this Stratos service.
+    pub enrolled: bool,
+    ///When the DID was enrolled, if enrolled.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub enrolled_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Response type for
+///zone.stratos.enrollment.status
+pub struct StatusResponse;
+impl jacquard_common::xrpc::XrpcResp for StatusResponse {
+    const NSID: &'static str = "zone.stratos.enrollment.status";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StatusOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Status<'a> {
+    const NSID: &'static str = "zone.stratos.enrollment.status";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = StatusResponse;
+}
+
+/// Endpoint type for
+///zone.stratos.enrollment.status
+pub struct StatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
+    const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Status<'de>;
+    type Response = StatusResponse;
+}
+
 pub mod status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,56 +161,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusOutput<'a> {
-    ///Authoritative boundaries assigned. Only included when request is authenticated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub boundaries: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    ///The DID that was checked.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    ///Whether the DID is enrolled in this Stratos service.
-    pub enrolled: bool,
-    ///When the DID was enrolled, if enrolled.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enrolled_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-/// Response type for
-///zone.stratos.enrollment.status
-pub struct StatusResponse;
-impl jacquard_common::xrpc::XrpcResp for StatusResponse {
-    const NSID: &'static str = "zone.stratos.enrollment.status";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Status<'a> {
-    const NSID: &'static str = "zone.stratos.enrollment.status";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = StatusResponse;
-}
-
-/// Endpoint type for
-///zone.stratos.enrollment.status
-pub struct StatusRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
-    const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Status<'de>;
-    type Response = StatusResponse;
 }

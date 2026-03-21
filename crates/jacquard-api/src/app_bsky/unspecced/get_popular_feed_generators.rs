@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -30,6 +26,55 @@ pub struct GetPopularFeedGenerators<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub query: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPopularFeedGeneratorsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getPopularFeedGenerators
+pub struct GetPopularFeedGeneratorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPopularFeedGeneratorsResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPopularFeedGeneratorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularFeedGenerators<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPopularFeedGeneratorsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getPopularFeedGenerators
+pub struct GetPopularFeedGeneratorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPopularFeedGeneratorsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPopularFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPopularFeedGenerators<'de>;
+    type Response = GetPopularFeedGeneratorsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_popular_feed_generators_state {
@@ -152,49 +197,4 @@ where
             query: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPopularFeedGeneratorsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getPopularFeedGenerators
-pub struct GetPopularFeedGeneratorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPopularFeedGeneratorsResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPopularFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularFeedGenerators<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPopularFeedGeneratorsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getPopularFeedGenerators
-pub struct GetPopularFeedGeneratorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPopularFeedGeneratorsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPopularFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPopularFeedGenerators<'de>;
-    type Response = GetPopularFeedGeneratorsResponse;
 }

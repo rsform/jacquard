@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("relevance"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -47,6 +39,59 @@ pub struct SearchNotebooks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchNotebooksOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notebooks: Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.searchNotebooks
+pub struct SearchNotebooksResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchNotebooksResponse {
+    const NSID: &'static str = "sh.weaver.notebook.searchNotebooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchNotebooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchNotebooks<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.searchNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchNotebooksResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.searchNotebooks
+pub struct SearchNotebooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchNotebooksRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.searchNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchNotebooks<'de>;
+    type Response = SearchNotebooksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
+}
+
+fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("relevance"))
 }
 
 pub mod search_notebooks_state {
@@ -252,49 +297,4 @@ where
             tags: self.__unsafe_private_named.6,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchNotebooksOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notebooks: Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.searchNotebooks
-pub struct SearchNotebooksResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchNotebooksResponse {
-    const NSID: &'static str = "sh.weaver.notebook.searchNotebooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchNotebooks<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.searchNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchNotebooksResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.searchNotebooks
-pub struct SearchNotebooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchNotebooksRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.searchNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchNotebooks<'de>;
-    type Response = SearchNotebooksResponse;
 }

@@ -60,383 +60,6 @@ pub struct Sprite<'a> {
     pub width: std::option::Option<i64>,
 }
 
-fn _default_sprite_animation_speed() -> std::option::Option<i64> {
-    Some(200i64)
-}
-
-pub mod sprite_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Engine;
-        type SpriteSheet;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type CreatedAt = Unset;
-        type Engine = Unset;
-        type SpriteSheet = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Engine = S::Engine;
-        type SpriteSheet = S::SpriteSheet;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type CreatedAt = S::CreatedAt;
-        type Engine = Set<members::engine>;
-        type SpriteSheet = S::SpriteSheet;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type CreatedAt = S::CreatedAt;
-        type Engine = S::Engine;
-        type SpriteSheet = Set<members::sprite_sheet>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `engine` field
-        pub struct engine(());
-        ///Marker type for the `sprite_sheet` field
-        pub struct sprite_sheet(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct SpriteBuilder<'a, S: sprite_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<SpriteEngine<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Sprite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpriteBuilder<'a, sprite_state::Empty> {
-        SpriteBuilder::new()
-    }
-}
-
-impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        SpriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `animationSpeed` field (optional)
-    pub fn animation_speed(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `animationSpeed` field to an Option value (optional)
-    pub fn maybe_animation_speed(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `columns` field (optional)
-    pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `columns` field to an Option value (optional)
-    pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S> SpriteBuilder<'a, S>
-where
-    S: sprite_state::State,
-    S::CreatedAt: sprite_state::IsUnset,
-{
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> SpriteBuilder<'a, sprite_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        SpriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> SpriteBuilder<'a, S>
-where
-    S: sprite_state::State,
-    S::Engine: sprite_state::IsUnset,
-{
-    /// Set the `engine` field (required)
-    pub fn engine(
-        mut self,
-        value: impl Into<SpriteEngine<'a>>,
-    ) -> SpriteBuilder<'a, sprite_state::SetEngine<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        SpriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `frameHeight` field (optional)
-    pub fn frame_height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `frameHeight` field to an Option value (optional)
-    pub fn maybe_frame_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `frameWidth` field (optional)
-    pub fn frame_width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `frameWidth` field to an Option value (optional)
-    pub fn maybe_frame_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `frames` field (optional)
-    pub fn frames(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `frames` field to an Option value (optional)
-    pub fn maybe_frames(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `height` field (optional)
-    pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
-        self
-    }
-    /// Set the `height` field to an Option value (optional)
-    pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
-        self
-    }
-    /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `rows` field (optional)
-    pub fn rows(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
-        self
-    }
-    /// Set the `rows` field to an Option value (optional)
-    pub fn maybe_rows(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
-        self
-    }
-}
-
-impl<'a, S> SpriteBuilder<'a, S>
-where
-    S: sprite_state::State,
-    S::SpriteSheet: sprite_state::IsUnset,
-{
-    /// Set the `spriteSheet` field (required)
-    pub fn sprite_sheet(
-        mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> SpriteBuilder<'a, sprite_state::SetSpriteSheet<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
-        SpriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
-        self
-    }
-    /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
-        self.__unsafe_private_named.11 = value;
-        self
-    }
-}
-
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
-    /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
-        self
-    }
-    /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.12 = value;
-        self
-    }
-}
-
-impl<'a, S> SpriteBuilder<'a, S>
-where
-    S: sprite_state::State,
-    S::CreatedAt: sprite_state::IsSet,
-    S::Engine: sprite_state::IsSet,
-    S::SpriteSheet: sprite_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Sprite<'a> {
-        Sprite {
-            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
-            columns: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            engine: self.__unsafe_private_named.3.unwrap(),
-            frame_height: self.__unsafe_private_named.4,
-            frame_width: self.__unsafe_private_named.5,
-            frames: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8,
-            rows: self.__unsafe_private_named.9,
-            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
-            updated_at: self.__unsafe_private_named.11,
-            width: self.__unsafe_private_named.12,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Sprite<'a> {
-        Sprite {
-            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
-            columns: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            engine: self.__unsafe_private_named.3.unwrap(),
-            frame_height: self.__unsafe_private_named.4,
-            frame_width: self.__unsafe_private_named.5,
-            frames: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8,
-            rows: self.__unsafe_private_named.9,
-            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
-            updated_at: self.__unsafe_private_named.11,
-            width: self.__unsafe_private_named.12,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Sprite<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SpriteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// The game engine format this sprite is designed for. Determines animation interpretation.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SpriteEngine<'a> {
@@ -557,16 +180,17 @@ pub struct SpriteGetRecordOutput<'a> {
     pub value: Sprite<'a>,
 }
 
-impl From<SpriteGetRecordOutput<'_>> for Sprite<'_> {
-    fn from(output: SpriteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Sprite<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SpriteRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Sprite<'_> {
-    const NSID: &'static str = "actor.rpg.sprite";
-    type Record = SpriteRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -577,6 +201,18 @@ impl jacquard_common::xrpc::XrpcResp for SpriteRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = SpriteGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SpriteGetRecordOutput<'_>> for Sprite<'_> {
+    fn from(output: SpriteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Sprite<'_> {
+    const NSID: &'static str = "actor.rpg.sprite";
+    type Record = SpriteRecord;
 }
 
 impl jacquard_common::types::collection::Collection for SpriteRecord {
@@ -848,6 +484,370 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
             }
         }
         Ok(())
+    }
+}
+
+fn _default_sprite_animation_speed() -> std::option::Option<i64> {
+    Some(200i64)
+}
+
+pub mod sprite_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Engine;
+        type SpriteSheet;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Engine = Unset;
+        type SpriteSheet = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Engine = Set<members::engine>;
+        type SpriteSheet = S::SpriteSheet;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
+    impl<S: State> State for SetSpriteSheet<S> {
+        type Engine = S::Engine;
+        type SpriteSheet = Set<members::sprite_sheet>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Engine = S::Engine;
+        type SpriteSheet = S::SpriteSheet;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `engine` field
+        pub struct engine(());
+        ///Marker type for the `sprite_sheet` field
+        pub struct sprite_sheet(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SpriteBuilder<'a, S: sprite_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<SpriteEngine<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Sprite<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SpriteBuilder<'a, sprite_state::Empty> {
+        SpriteBuilder::new()
+    }
+}
+
+impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SpriteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `animationSpeed` field (optional)
+    pub fn animation_speed(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `animationSpeed` field to an Option value (optional)
+    pub fn maybe_animation_speed(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `columns` field (optional)
+    pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `columns` field to an Option value (optional)
+    pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> SpriteBuilder<'a, S>
+where
+    S: sprite_state::State,
+    S::CreatedAt: sprite_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SpriteBuilder<'a, sprite_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SpriteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SpriteBuilder<'a, S>
+where
+    S: sprite_state::State,
+    S::Engine: sprite_state::IsUnset,
+{
+    /// Set the `engine` field (required)
+    pub fn engine(
+        mut self,
+        value: impl Into<SpriteEngine<'a>>,
+    ) -> SpriteBuilder<'a, sprite_state::SetEngine<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SpriteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `frameHeight` field (optional)
+    pub fn frame_height(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `frameHeight` field to an Option value (optional)
+    pub fn maybe_frame_height(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `frameWidth` field (optional)
+    pub fn frame_width(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `frameWidth` field to an Option value (optional)
+    pub fn maybe_frame_width(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `frames` field (optional)
+    pub fn frames(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `frames` field to an Option value (optional)
+    pub fn maybe_frames(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `height` field (optional)
+    pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `height` field to an Option value (optional)
+    pub fn maybe_height(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `rows` field (optional)
+    pub fn rows(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `rows` field to an Option value (optional)
+    pub fn maybe_rows(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S> SpriteBuilder<'a, S>
+where
+    S: sprite_state::State,
+    S::SpriteSheet: sprite_state::IsUnset,
+{
+    /// Set the `spriteSheet` field (required)
+    pub fn sprite_sheet(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> SpriteBuilder<'a, sprite_state::SetSpriteSheet<S>> {
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        SpriteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+    /// Set the `width` field (optional)
+    pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `width` field to an Option value (optional)
+    pub fn maybe_width(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S> SpriteBuilder<'a, S>
+where
+    S: sprite_state::State,
+    S::Engine: sprite_state::IsSet,
+    S::SpriteSheet: sprite_state::IsSet,
+    S::CreatedAt: sprite_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Sprite<'a> {
+        Sprite {
+            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
+            columns: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            engine: self.__unsafe_private_named.3.unwrap(),
+            frame_height: self.__unsafe_private_named.4,
+            frame_width: self.__unsafe_private_named.5,
+            frames: self.__unsafe_private_named.6,
+            height: self.__unsafe_private_named.7,
+            name: self.__unsafe_private_named.8,
+            rows: self.__unsafe_private_named.9,
+            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
+            updated_at: self.__unsafe_private_named.11,
+            width: self.__unsafe_private_named.12,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Sprite<'a> {
+        Sprite {
+            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
+            columns: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            engine: self.__unsafe_private_named.3.unwrap(),
+            frame_height: self.__unsafe_private_named.4,
+            frame_width: self.__unsafe_private_named.5,
+            frames: self.__unsafe_private_named.6,
+            height: self.__unsafe_private_named.7,
+            name: self.__unsafe_private_named.8,
+            rows: self.__unsafe_private_named.9,
+            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
+            updated_at: self.__unsafe_private_named.11,
+            width: self.__unsafe_private_named.12,
+            extra_data: Some(extra_data),
+        }
     }
 }
 

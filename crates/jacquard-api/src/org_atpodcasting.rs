@@ -788,6 +788,145 @@ impl jacquard_common::IntoStatic for AppleCategoryValue<'_> {
     }
 }
 
+/// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EpisodeRef<'a> {
+    ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
+    #[serde(borrow)]
+    pub feed_item_guid: jacquard_common::CowStr<'a>,
+    ///URL of the podcast's RSS feed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
+    #[serde(borrow)]
+    pub podcast_guid: jacquard_common::CowStr<'a>,
+}
+
+/// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PodcastRef<'a> {
+    ///URL of the podcast's RSS feed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
+    #[serde(borrow)]
+    pub podcast_guid: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppleCategory<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.defs"
+    }
+    fn def_name() -> &'static str {
+        "appleCategory"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.defs"
+    }
+    fn def_name() -> &'static str {
+        "episodeRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.feed_item_guid;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_item_guid",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.podcast_guid;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 36usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "podcast_guid",
+                    ),
+                    max: 36usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
+    fn nsid() -> &'static str {
+        "org.atpodcasting.defs"
+    }
+    fn def_name() -> &'static str {
+        "podcastRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atpodcasting_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.podcast_guid;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 36usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "podcast_guid",
+                    ),
+                    max: 36usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -994,144 +1133,5 @@ fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppleCategory<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.defs"
-    }
-    fn def_name() -> &'static str {
-        "appleCategory"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EpisodeRef<'a> {
-    ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
-    #[serde(borrow)]
-    pub feed_item_guid: jacquard_common::CowStr<'a>,
-    ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
-    #[serde(borrow)]
-    pub podcast_guid: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.defs"
-    }
-    fn def_name() -> &'static str {
-        "episodeRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.feed_item_guid;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_item_guid",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.podcast_guid;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 36usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "podcast_guid",
-                    ),
-                    max: 36usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PodcastRef<'a> {
-    ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
-    #[serde(borrow)]
-    pub podcast_guid: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
-    fn nsid() -> &'static str {
-        "org.atpodcasting.defs"
-    }
-    fn def_name() -> &'static str {
-        "podcastRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atpodcasting_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.podcast_guid;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 36usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "podcast_guid",
-                    ),
-                    max: 36usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

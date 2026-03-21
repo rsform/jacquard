@@ -27,6 +27,53 @@ pub struct Event<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventOutput<'a> {
+    ///AT URI of the created event record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///st.lifepo.event
+pub struct EventResponse;
+impl jacquard_common::xrpc::XrpcResp for EventResponse {
+    const NSID: &'static str = "st.lifepo.event";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EventOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Event<'a> {
+    const NSID: &'static str = "st.lifepo.event";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = EventResponse;
+}
+
+/// Endpoint type for
+///st.lifepo.event
+pub struct EventRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for EventRequest {
+    const PATH: &'static str = "/xrpc/st.lifepo.event";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Event<'de>;
+    type Response = EventResponse;
+}
+
 pub mod event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -209,51 +256,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventOutput<'a> {
-    ///AT URI of the created event record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-/// Response type for
-///st.lifepo.event
-pub struct EventResponse;
-impl jacquard_common::xrpc::XrpcResp for EventResponse {
-    const NSID: &'static str = "st.lifepo.event";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Event<'a> {
-    const NSID: &'static str = "st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = EventResponse;
-}
-
-/// Endpoint type for
-///st.lifepo.event
-pub struct EventRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for EventRequest {
-    const PATH: &'static str = "/xrpc/st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Event<'de>;
-    type Response = EventResponse;
 }

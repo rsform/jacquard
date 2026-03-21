@@ -21,6 +21,84 @@ pub struct Steps<'a> {
     pub steps: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StepsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Steps<'a>,
+}
+
+impl<'a> Steps<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, StepsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct StepsRecord;
+impl jacquard_common::xrpc::XrpcResp for StepsRecord {
+    const NSID: &'static str = "dev.baileytownsend.health.steps";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StepsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
+    fn from(output: StepsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Steps<'_> {
+    const NSID: &'static str = "dev.baileytownsend.health.steps";
+    type Record = StepsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for StepsRecord {
+    const NSID: &'static str = "dev.baileytownsend.health.steps";
+    type Record = StepsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Steps<'a> {
+    fn nsid() -> &'static str {
+        "dev.baileytownsend.health.steps"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_baileytownsend_health_steps()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod steps_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -31,37 +109,37 @@ pub mod steps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
         type CreatedAt;
+        type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type Steps = Set<members::steps>;
-        type CreatedAt = S::CreatedAt;
+        type Steps = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Steps = S::Steps;
         type CreatedAt = Set<members::created_at>;
+        type Steps = S::Steps;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSteps<S> {}
+    impl<S: State> State for SetSteps<S> {
+        type CreatedAt = S::CreatedAt;
+        type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
     }
 }
 
@@ -134,8 +212,8 @@ where
 impl<'a, S> StepsBuilder<'a, S>
 where
     S: steps_state::State,
-    S::Steps: steps_state::IsSet,
     S::CreatedAt: steps_state::IsSet,
+    S::Steps: steps_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Steps<'a> {
@@ -158,84 +236,6 @@ where
             steps: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Steps<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StepsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StepsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Steps<'a>,
-}
-
-impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
-    fn from(output: StepsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Steps<'_> {
-    const NSID: &'static str = "dev.baileytownsend.health.steps";
-    type Record = StepsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct StepsRecord;
-impl jacquard_common::xrpc::XrpcResp for StepsRecord {
-    const NSID: &'static str = "dev.baileytownsend.health.steps";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = StepsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for StepsRecord {
-    const NSID: &'static str = "dev.baileytownsend.health.steps";
-    type Record = StepsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Steps<'a> {
-    fn nsid() -> &'static str {
-        "dev.baileytownsend.health.steps"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_baileytownsend_health_steps()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -24,163 +24,6 @@ pub struct Astral<'a> {
     pub powers: Vec<crate::dev_vielle::dnd::astral::Power<'a>>,
 }
 
-fn _default_astral_points() -> i64 {
-    0i64
-}
-
-pub mod astral_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Points;
-        type Powers;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Points = Unset;
-        type Powers = Unset;
-    }
-    ///State transition - sets the `points` field to Set
-    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoints<S> {}
-    impl<S: State> State for SetPoints<S> {
-        type Points = Set<members::points>;
-        type Powers = S::Powers;
-    }
-    ///State transition - sets the `powers` field to Set
-    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPowers<S> {}
-    impl<S: State> State for SetPowers<S> {
-        type Points = S::Points;
-        type Powers = Set<members::powers>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `points` field
-        pub struct points(());
-        ///Marker type for the `powers` field
-        pub struct powers(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct AstralBuilder<'a, S: astral_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<crate::dev_vielle::dnd::astral::Power<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Astral<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AstralBuilder<'a, astral_state::Empty> {
-        AstralBuilder::new()
-    }
-}
-
-impl<'a> AstralBuilder<'a, astral_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        AstralBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AstralBuilder<'a, S>
-where
-    S: astral_state::State,
-    S::Points: astral_state::IsUnset,
-{
-    /// Set the `points` field (required)
-    pub fn points(
-        mut self,
-        value: impl Into<i64>,
-    ) -> AstralBuilder<'a, astral_state::SetPoints<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        AstralBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AstralBuilder<'a, S>
-where
-    S: astral_state::State,
-    S::Powers: astral_state::IsUnset,
-{
-    /// Set the `powers` field (required)
-    pub fn powers(
-        mut self,
-        value: impl Into<Vec<crate::dev_vielle::dnd::astral::Power<'a>>>,
-    ) -> AstralBuilder<'a, astral_state::SetPowers<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        AstralBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AstralBuilder<'a, S>
-where
-    S: astral_state::State,
-    S::Points: astral_state::IsSet,
-    S::Powers: astral_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Astral<'a> {
-        Astral {
-            points: self.__unsafe_private_named.0.unwrap(),
-            powers: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Astral<'a> {
-        Astral {
-            points: self.__unsafe_private_named.0.unwrap(),
-            powers: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Astral<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AstralRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,
@@ -200,129 +43,6 @@ pub struct AstralGetRecordOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
     pub value: Astral<'a>,
-}
-
-impl From<AstralGetRecordOutput<'_>> for Astral<'_> {
-    fn from(output: AstralGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Astral<'_> {
-    const NSID: &'static str = "dev.vielle.dnd.astral";
-    type Record = AstralRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AstralRecord;
-impl jacquard_common::xrpc::XrpcResp for AstralRecord {
-    const NSID: &'static str = "dev.vielle.dnd.astral";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AstralGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AstralRecord {
-    const NSID: &'static str = "dev.vielle.dnd.astral";
-    type Record = AstralRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Astral<'a> {
-    fn nsid() -> &'static str {
-        "dev.vielle.dnd.astral"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_vielle_dnd_astral()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.vielle.dnd.astral"),
-        revision: None,
-        description: None,
-        defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("points"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("powers")
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "points",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "powers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#power"),
-                                    }),
-                                    min_length: None,
-                                    max_length: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("power"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
-            );
-            map
-        },
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -511,5 +231,285 @@ impl jacquard_common::IntoStatic for Power<'_> {
             Power::DevVielleDndPowerInvalid => Power::DevVielleDndPowerInvalid,
             Power::Other(v) => Power::Other(v.into_static()),
         }
+    }
+}
+
+impl<'a> Astral<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AstralRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AstralRecord;
+impl jacquard_common::xrpc::XrpcResp for AstralRecord {
+    const NSID: &'static str = "dev.vielle.dnd.astral";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AstralGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AstralGetRecordOutput<'_>> for Astral<'_> {
+    fn from(output: AstralGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Astral<'_> {
+    const NSID: &'static str = "dev.vielle.dnd.astral";
+    type Record = AstralRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AstralRecord {
+    const NSID: &'static str = "dev.vielle.dnd.astral";
+    type Record = AstralRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Astral<'a> {
+    fn nsid() -> &'static str {
+        "dev.vielle.dnd.astral"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_vielle_dnd_astral()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_astral_points() -> i64 {
+    0i64
+}
+
+pub mod astral_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Points;
+        type Powers;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Points = Unset;
+        type Powers = Unset;
+    }
+    ///State transition - sets the `points` field to Set
+    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoints<S> {}
+    impl<S: State> State for SetPoints<S> {
+        type Points = Set<members::points>;
+        type Powers = S::Powers;
+    }
+    ///State transition - sets the `powers` field to Set
+    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPowers<S> {}
+    impl<S: State> State for SetPowers<S> {
+        type Points = S::Points;
+        type Powers = Set<members::powers>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `points` field
+        pub struct points(());
+        ///Marker type for the `powers` field
+        pub struct powers(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AstralBuilder<'a, S: astral_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<Vec<crate::dev_vielle::dnd::astral::Power<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Astral<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AstralBuilder<'a, astral_state::Empty> {
+        AstralBuilder::new()
+    }
+}
+
+impl<'a> AstralBuilder<'a, astral_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AstralBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AstralBuilder<'a, S>
+where
+    S: astral_state::State,
+    S::Points: astral_state::IsUnset,
+{
+    /// Set the `points` field (required)
+    pub fn points(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AstralBuilder<'a, astral_state::SetPoints<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AstralBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AstralBuilder<'a, S>
+where
+    S: astral_state::State,
+    S::Powers: astral_state::IsUnset,
+{
+    /// Set the `powers` field (required)
+    pub fn powers(
+        mut self,
+        value: impl Into<Vec<crate::dev_vielle::dnd::astral::Power<'a>>>,
+    ) -> AstralBuilder<'a, astral_state::SetPowers<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AstralBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AstralBuilder<'a, S>
+where
+    S: astral_state::State,
+    S::Points: astral_state::IsSet,
+    S::Powers: astral_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Astral<'a> {
+        Astral {
+            points: self.__unsafe_private_named.0.unwrap(),
+            powers: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Astral<'a> {
+        Astral {
+            points: self.__unsafe_private_named.0.unwrap(),
+            powers: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: ::jacquard_common::CowStr::new_static("dev.vielle.dnd.astral"),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::alloc::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: None,
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("points"),
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static("powers")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "points",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "powers",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static("#power"),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("power"),
+                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                    description: None,
+                    format: None,
+                    default: None,
+                    min_length: None,
+                    max_length: None,
+                    min_graphemes: None,
+                    max_graphemes: None,
+                    r#enum: None,
+                    r#const: None,
+                    known_values: None,
+                }),
+            );
+            map
+        },
     }
 }

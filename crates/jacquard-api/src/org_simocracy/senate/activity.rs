@@ -46,278 +46,6 @@ pub struct Activity<'a> {
     pub status: std::option::Option<ActivityStatus<'a>>,
 }
 
-pub mod activity_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ActivityType;
-        type CommitteeSims;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type CreatedAt = Unset;
-        type ActivityType = Unset;
-        type CommitteeSims = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ActivityType = S::ActivityType;
-        type CommitteeSims = S::CommitteeSims;
-    }
-    ///State transition - sets the `activity_type` field to Set
-    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivityType<S> {}
-    impl<S: State> State for SetActivityType<S> {
-        type CreatedAt = S::CreatedAt;
-        type ActivityType = Set<members::activity_type>;
-        type CommitteeSims = S::CommitteeSims;
-    }
-    ///State transition - sets the `committee_sims` field to Set
-    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
-    impl<S: State> State for SetCommitteeSims<S> {
-        type CreatedAt = S::CreatedAt;
-        type ActivityType = S::ActivityType;
-        type CommitteeSims = Set<members::committee_sims>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `activity_type` field
-        pub struct activity_type(());
-        ///Marker type for the `committee_sims` field
-        pub struct committee_sims(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<ActivityActivityType<'a>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<ActivityStatus<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Activity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActivityBuilder<'a, activity_state::Empty> {
-        ActivityBuilder::new()
-    }
-}
-
-impl<'a> ActivityBuilder<'a, activity_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivityBuilder<'a, S>
-where
-    S: activity_state::State,
-    S::ActivityType: activity_state::IsUnset,
-{
-    /// Set the `activityType` field (required)
-    pub fn activity_type(
-        mut self,
-        value: impl Into<ActivityActivityType<'a>>,
-    ) -> ActivityBuilder<'a, activity_state::SetActivityType<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivityBuilder<'a, S>
-where
-    S: activity_state::State,
-    S::CommitteeSims: activity_state::IsUnset,
-{
-    /// Set the `committeeSims` field (required)
-    pub fn committee_sims(
-        mut self,
-        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> ActivityBuilder<'a, activity_state::SetCommitteeSims<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivityBuilder<'a, S>
-where
-    S: activity_state::State,
-    S::CreatedAt: activity_state::IsUnset,
-{
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
-    /// Set the `evaluation` field (optional)
-    pub fn evaluation(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `evaluation` field to an Option value (optional)
-    pub fn maybe_evaluation(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
-    /// Set the `proposalText` field (optional)
-    pub fn proposal_text(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `proposalText` field to an Option value (optional)
-    pub fn maybe_proposal_text(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
-    /// Set the `resultSummary` field (optional)
-    pub fn result_summary(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `resultSummary` field to an Option value (optional)
-    pub fn maybe_result_summary(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
-    /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<ActivityStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<ActivityStatus<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S> ActivityBuilder<'a, S>
-where
-    S: activity_state::State,
-    S::CreatedAt: activity_state::IsSet,
-    S::ActivityType: activity_state::IsSet,
-    S::CommitteeSims: activity_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Activity<'a> {
-        Activity {
-            activity_type: self.__unsafe_private_named.0.unwrap(),
-            committee_sims: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            evaluation: self.__unsafe_private_named.3,
-            proposal_text: self.__unsafe_private_named.4,
-            result_summary: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Activity<'a> {
-        Activity {
-            activity_type: self.__unsafe_private_named.0.unwrap(),
-            committee_sims: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            evaluation: self.__unsafe_private_named.3,
-            proposal_text: self.__unsafe_private_named.4,
-            result_summary: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Activity<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ActivityRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Type of senate activity
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActivityActivityType<'a> {
@@ -535,16 +263,17 @@ pub struct ActivityGetRecordOutput<'a> {
     pub value: Activity<'a>,
 }
 
-impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
-    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Activity<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ActivityRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Activity<'_> {
-    const NSID: &'static str = "org.simocracy.senate.activity";
-    type Record = ActivityRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -555,6 +284,18 @@ impl jacquard_common::xrpc::XrpcResp for ActivityRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ActivityGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
+    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Activity<'_> {
+    const NSID: &'static str = "org.simocracy.senate.activity";
+    type Record = ActivityRecord;
 }
 
 impl jacquard_common::types::collection::Collection for ActivityRecord {
@@ -613,6 +354,265 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod activity_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CommitteeSims;
+        type CreatedAt;
+        type ActivityType;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CommitteeSims = Unset;
+        type CreatedAt = Unset;
+        type ActivityType = Unset;
+    }
+    ///State transition - sets the `committee_sims` field to Set
+    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
+    impl<S: State> State for SetCommitteeSims<S> {
+        type CommitteeSims = Set<members::committee_sims>;
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = S::ActivityType;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CommitteeSims = S::CommitteeSims;
+        type CreatedAt = Set<members::created_at>;
+        type ActivityType = S::ActivityType;
+    }
+    ///State transition - sets the `activity_type` field to Set
+    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivityType<S> {}
+    impl<S: State> State for SetActivityType<S> {
+        type CommitteeSims = S::CommitteeSims;
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = Set<members::activity_type>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `committee_sims` field
+        pub struct committee_sims(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `activity_type` field
+        pub struct activity_type(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActivityBuilder<'a, S: activity_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ActivityActivityType<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActivityStatus<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Activity<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActivityBuilder<'a, activity_state::Empty> {
+        ActivityBuilder::new()
+    }
+}
+
+impl<'a> ActivityBuilder<'a, activity_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActivityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivityBuilder<'a, S>
+where
+    S: activity_state::State,
+    S::ActivityType: activity_state::IsUnset,
+{
+    /// Set the `activityType` field (required)
+    pub fn activity_type(
+        mut self,
+        value: impl Into<ActivityActivityType<'a>>,
+    ) -> ActivityBuilder<'a, activity_state::SetActivityType<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ActivityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivityBuilder<'a, S>
+where
+    S: activity_state::State,
+    S::CommitteeSims: activity_state::IsUnset,
+{
+    /// Set the `committeeSims` field (required)
+    pub fn committee_sims(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> ActivityBuilder<'a, activity_state::SetCommitteeSims<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ActivityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivityBuilder<'a, S>
+where
+    S: activity_state::State,
+    S::CreatedAt: activity_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ActivityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+    /// Set the `evaluation` field (optional)
+    pub fn evaluation(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `evaluation` field to an Option value (optional)
+    pub fn maybe_evaluation(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+    /// Set the `proposalText` field (optional)
+    pub fn proposal_text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `proposalText` field to an Option value (optional)
+    pub fn maybe_proposal_text(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+    /// Set the `resultSummary` field (optional)
+    pub fn result_summary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `resultSummary` field to an Option value (optional)
+    pub fn maybe_result_summary(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(mut self, value: impl Into<Option<ActivityStatus<'a>>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<ActivityStatus<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> ActivityBuilder<'a, S>
+where
+    S: activity_state::State,
+    S::CommitteeSims: activity_state::IsSet,
+    S::CreatedAt: activity_state::IsSet,
+    S::ActivityType: activity_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Activity<'a> {
+        Activity {
+            activity_type: self.__unsafe_private_named.0.unwrap(),
+            committee_sims: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            evaluation: self.__unsafe_private_named.3,
+            proposal_text: self.__unsafe_private_named.4,
+            result_summary: self.__unsafe_private_named.5,
+            status: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Activity<'a> {
+        Activity {
+            activity_type: self.__unsafe_private_named.0.unwrap(),
+            committee_sims: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            evaluation: self.__unsafe_private_named.3,
+            proposal_text: self.__unsafe_private_named.4,
+            result_summary: self.__unsafe_private_named.5,
+            status: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
     }
 }
 

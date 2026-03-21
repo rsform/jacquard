@@ -26,6 +26,96 @@ pub struct RevokeVerifications<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RevokeVerificationsOutput<'a> {
+    ///List of verification uris that couldn't be revoked, including failure reasons
+    #[serde(borrow)]
+    pub failed_revocations: Vec<
+        crate::tools_ozone::verification::revoke_verifications::RevokeError<'a>,
+    >,
+    ///List of verification uris successfully revoked
+    #[serde(borrow)]
+    pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+/// Error object for failed revocations
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RevokeError<'a> {
+    ///Description of the error that occurred during revocation.
+    #[serde(borrow)]
+    pub error: jacquard_common::CowStr<'a>,
+    ///The AT-URI of the verification record that failed to revoke.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///tools.ozone.verification.revokeVerifications
+pub struct RevokeVerificationsResponse;
+impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
+    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RevokeVerificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
+    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RevokeVerificationsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.verification.revokeVerifications
+pub struct RevokeVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.revokeVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RevokeVerifications<'de>;
+    type Response = RevokeVerificationsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RevokeError<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.verification.revokeVerifications"
+    }
+    fn def_name() -> &'static str {
+        "revokeError"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_verification_revokeVerifications()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod revoke_verifications_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -151,79 +241,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RevokeVerificationsOutput<'a> {
-    ///List of verification uris that couldn't be revoked, including failure reasons
-    #[serde(borrow)]
-    pub failed_revocations: Vec<
-        crate::tools_ozone::verification::revoke_verifications::RevokeError<'a>,
-    >,
-    ///List of verification uris successfully revoked
-    #[serde(borrow)]
-    pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
-}
-
-/// Response type for
-///tools.ozone.verification.revokeVerifications
-pub struct RevokeVerificationsResponse;
-impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
-    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RevokeVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
-    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = RevokeVerificationsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.verification.revokeVerifications
-pub struct RevokeVerificationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = RevokeVerifications<'de>;
-    type Response = RevokeVerificationsResponse;
-}
-
-/// Error object for failed revocations
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RevokeError<'a> {
-    ///Description of the error that occurred during revocation.
-    #[serde(borrow)]
-    pub error: jacquard_common::CowStr<'a>,
-    ///The AT-URI of the verification record that failed to revoke.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod revoke_error_state {
@@ -530,22 +547,5 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RevokeError<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.verification.revokeVerifications"
-    }
-    fn def_name() -> &'static str {
-        "revokeError"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_verification_revokeVerifications()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

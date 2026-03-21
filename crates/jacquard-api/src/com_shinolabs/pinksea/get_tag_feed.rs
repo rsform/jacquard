@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -28,6 +24,52 @@ pub struct GetTagFeed<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTagFeedOutput<'a> {
+    #[serde(borrow)]
+    pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
+}
+
+/// Response type for
+///com.shinolabs.pinksea.getTagFeed
+pub struct GetTagFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTagFeedResponse {
+    const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTagFeedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagFeed<'a> {
+    const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTagFeedResponse;
+}
+
+/// Endpoint type for
+///com.shinolabs.pinksea.getTagFeed
+pub struct GetTagFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTagFeedRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getTagFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTagFeed<'de>;
+    type Response = GetTagFeedResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_tag_feed_state {
@@ -155,46 +197,4 @@ where
             tag: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTagFeedOutput<'a> {
-    #[serde(borrow)]
-    pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
-}
-
-/// Response type for
-///com.shinolabs.pinksea.getTagFeed
-pub struct GetTagFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTagFeedResponse {
-    const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTagFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagFeed<'a> {
-    const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTagFeedResponse;
-}
-
-/// Endpoint type for
-///com.shinolabs.pinksea.getTagFeed
-pub struct GetTagFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTagFeedRequest {
-    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getTagFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTagFeed<'de>;
-    type Response = GetTagFeedResponse;
 }

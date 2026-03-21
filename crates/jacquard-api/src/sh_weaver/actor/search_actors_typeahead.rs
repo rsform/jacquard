@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct SearchActorsTypeahead<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsTypeaheadOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+}
+
+/// Response type for
+///sh.weaver.actor.searchActorsTypeahead
+pub struct SearchActorsTypeaheadResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
+    const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchActorsTypeaheadOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
+    const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchActorsTypeaheadResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.actor.searchActorsTypeahead
+pub struct SearchActorsTypeaheadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.actor.searchActorsTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActorsTypeahead<'de>;
+    type Response = SearchActorsTypeaheadResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod search_actors_typeahead_state {
@@ -135,46 +177,4 @@ where
             q: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsTypeaheadOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-}
-
-/// Response type for
-///sh.weaver.actor.searchActorsTypeahead
-pub struct SearchActorsTypeaheadResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
-    const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
-    const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchActorsTypeaheadResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.actor.searchActorsTypeahead
-pub struct SearchActorsTypeaheadRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.actor.searchActorsTypeahead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActorsTypeahead<'de>;
-    type Response = SearchActorsTypeaheadResponse;
 }

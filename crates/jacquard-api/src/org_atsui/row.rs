@@ -42,207 +42,6 @@ pub struct Row<'a> {
     pub sticky: std::option::Option<bool>,
 }
 
-pub mod row_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Children;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Children = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct RowBuilder<'a, S: row_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<RowAlign<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<RowGap<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<RowJustify<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Row<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RowBuilder<'a, row_state::Empty> {
-        RowBuilder::new()
-    }
-}
-
-impl<'a> RowBuilder<'a, row_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        RowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `align` field (optional)
-    pub fn align(mut self, value: impl Into<Option<RowAlign<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `align` field to an Option value (optional)
-    pub fn maybe_align(mut self, value: Option<RowAlign<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> RowBuilder<'a, S>
-where
-    S: row_state::State,
-    S::Children: row_state::IsUnset,
-{
-    /// Set the `children` field (required)
-    pub fn children(
-        mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
-    ) -> RowBuilder<'a, row_state::SetChildren<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        RowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `gap` field (optional)
-    pub fn gap(mut self, value: impl Into<Option<RowGap<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `gap` field to an Option value (optional)
-    pub fn maybe_gap(mut self, value: Option<RowGap<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `inset` field (optional)
-    pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `inset` field to an Option value (optional)
-    pub fn maybe_inset(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `justify` field (optional)
-    pub fn justify(mut self, value: impl Into<Option<RowJustify<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `justify` field to an Option value (optional)
-    pub fn maybe_justify(mut self, value: Option<RowJustify<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `opaque` field (optional)
-    pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `opaque` field to an Option value (optional)
-    pub fn maybe_opaque(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<'a, S: row_state::State> RowBuilder<'a, S> {
-    /// Set the `sticky` field (optional)
-    pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `sticky` field to an Option value (optional)
-    pub fn maybe_sticky(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S> RowBuilder<'a, S>
-where
-    S: row_state::State,
-    S::Children: row_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Row<'a> {
-        Row {
-            align: self.__unsafe_private_named.0,
-            children: self.__unsafe_private_named.1.unwrap(),
-            gap: self.__unsafe_private_named.2,
-            inset: self.__unsafe_private_named.3,
-            justify: self.__unsafe_private_named.4,
-            opaque: self.__unsafe_private_named.5,
-            sticky: self.__unsafe_private_named.6,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Row<'a> {
-        Row {
-            align: self.__unsafe_private_named.0,
-            children: self.__unsafe_private_named.1.unwrap(),
-            gap: self.__unsafe_private_named.2,
-            inset: self.__unsafe_private_named.3,
-            justify: self.__unsafe_private_named.4,
-            opaque: self.__unsafe_private_named.5,
-            sticky: self.__unsafe_private_named.6,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 /// Cross-axis (vertical) alignment of children.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RowAlign<'a> {
@@ -585,4 +384,205 @@ impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     );
     type Request<'de> = Row<'de>;
     type Response = RowResponse;
+}
+
+pub mod row_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Children;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Children = Unset;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Children = Set<members::children>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `children` field
+        pub struct children(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RowBuilder<'a, S: row_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<RowAlign<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<RowGap<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<RowJustify<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Row<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RowBuilder<'a, row_state::Empty> {
+        RowBuilder::new()
+    }
+}
+
+impl<'a> RowBuilder<'a, row_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `align` field (optional)
+    pub fn align(mut self, value: impl Into<Option<RowAlign<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `align` field to an Option value (optional)
+    pub fn maybe_align(mut self, value: Option<RowAlign<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RowBuilder<'a, S>
+where
+    S: row_state::State,
+    S::Children: row_state::IsUnset,
+{
+    /// Set the `children` field (required)
+    pub fn children(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> RowBuilder<'a, row_state::SetChildren<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `gap` field (optional)
+    pub fn gap(mut self, value: impl Into<Option<RowGap<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `gap` field to an Option value (optional)
+    pub fn maybe_gap(mut self, value: Option<RowGap<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `inset` field (optional)
+    pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `inset` field to an Option value (optional)
+    pub fn maybe_inset(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `justify` field (optional)
+    pub fn justify(mut self, value: impl Into<Option<RowJustify<'a>>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `justify` field to an Option value (optional)
+    pub fn maybe_justify(mut self, value: Option<RowJustify<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `opaque` field (optional)
+    pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `opaque` field to an Option value (optional)
+    pub fn maybe_opaque(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: row_state::State> RowBuilder<'a, S> {
+    /// Set the `sticky` field (optional)
+    pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `sticky` field to an Option value (optional)
+    pub fn maybe_sticky(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> RowBuilder<'a, S>
+where
+    S: row_state::State,
+    S::Children: row_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Row<'a> {
+        Row {
+            align: self.__unsafe_private_named.0,
+            children: self.__unsafe_private_named.1.unwrap(),
+            gap: self.__unsafe_private_named.2,
+            inset: self.__unsafe_private_named.3,
+            justify: self.__unsafe_private_named.4,
+            opaque: self.__unsafe_private_named.5,
+            sticky: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Row<'a> {
+        Row {
+            align: self.__unsafe_private_named.0,
+            children: self.__unsafe_private_named.1.unwrap(),
+            gap: self.__unsafe_private_named.2,
+            inset: self.__unsafe_private_named.3,
+            justify: self.__unsafe_private_named.4,
+            opaque: self.__unsafe_private_named.5,
+            sticky: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }

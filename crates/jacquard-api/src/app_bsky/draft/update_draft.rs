@@ -21,6 +21,36 @@ pub struct UpdateDraft<'a> {
     pub draft: crate::app_bsky::draft::DraftWithId<'a>,
 }
 
+/// Response type for
+///app.bsky.draft.updateDraft
+pub struct UpdateDraftResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateDraftResponse {
+    const NSID: &'static str = "app.bsky.draft.updateDraft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateDraft<'a> {
+    const NSID: &'static str = "app.bsky.draft.updateDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateDraftResponse;
+}
+
+/// Endpoint type for
+///app.bsky.draft.updateDraft
+pub struct UpdateDraftRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateDraftRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.draft.updateDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateDraft<'de>;
+    type Response = UpdateDraftResponse;
+}
+
 pub mod update_draft_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.draft.updateDraft
-pub struct UpdateDraftResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateDraftResponse {
-    const NSID: &'static str = "app.bsky.draft.updateDraft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateDraft<'a> {
-    const NSID: &'static str = "app.bsky.draft.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateDraftResponse;
-}
-
-/// Endpoint type for
-///app.bsky.draft.updateDraft
-pub struct UpdateDraftRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateDraftRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.draft.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateDraft<'de>;
-    type Response = UpdateDraftResponse;
 }

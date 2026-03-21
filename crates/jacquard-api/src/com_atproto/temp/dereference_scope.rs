@@ -20,6 +20,85 @@ pub struct DereferenceScope<'a> {
     pub scope: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DereferenceScopeOutput<'a> {
+    ///The full oauth permission scope
+    #[serde(borrow)]
+    pub scope: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DereferenceScopeError<'a> {
+    /// An invalid scope reference was provided.
+    #[serde(rename = "InvalidScopeReference")]
+    InvalidScopeReference(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DereferenceScopeError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidScopeReference(msg) => {
+                write!(f, "InvalidScopeReference")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.temp.dereferenceScope
+pub struct DereferenceScopeResponse;
+impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
+    const NSID: &'static str = "com.atproto.temp.dereferenceScope";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DereferenceScopeOutput<'de>;
+    type Err<'de> = DereferenceScopeError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
+    const NSID: &'static str = "com.atproto.temp.dereferenceScope";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DereferenceScopeResponse;
+}
+
+/// Endpoint type for
+///com.atproto.temp.dereferenceScope
+pub struct DereferenceScopeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DereferenceScope<'de>;
+    type Response = DereferenceScopeResponse;
+}
+
 pub mod dereference_scope_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,83 +186,4 @@ where
             scope: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DereferenceScopeOutput<'a> {
-    ///The full oauth permission scope
-    #[serde(borrow)]
-    pub scope: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DereferenceScopeError<'a> {
-    /// An invalid scope reference was provided.
-    #[serde(rename = "InvalidScopeReference")]
-    InvalidScopeReference(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DereferenceScopeError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidScopeReference(msg) => {
-                write!(f, "InvalidScopeReference")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.temp.dereferenceScope
-pub struct DereferenceScopeResponse;
-impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
-    const NSID: &'static str = "com.atproto.temp.dereferenceScope";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DereferenceScopeOutput<'de>;
-    type Err<'de> = DereferenceScopeError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
-    const NSID: &'static str = "com.atproto.temp.dereferenceScope";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = DereferenceScopeResponse;
-}
-
-/// Endpoint type for
-///com.atproto.temp.dereferenceScope
-pub struct DereferenceScopeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DereferenceScope<'de>;
-    type Response = DereferenceScopeResponse;
 }

@@ -24,6 +24,84 @@ pub struct SubscribeAccept<'a> {
     pub subscribe: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscribeAcceptGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: SubscribeAccept<'a>,
+}
+
+impl<'a> SubscribeAccept<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SubscribeAcceptRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SubscribeAcceptRecord;
+impl jacquard_common::xrpc::XrpcResp for SubscribeAcceptRecord {
+    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SubscribeAcceptGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SubscribeAcceptGetRecordOutput<'_>> for SubscribeAccept<'_> {
+    fn from(output: SubscribeAcceptGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for SubscribeAccept<'_> {
+    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
+    type Record = SubscribeAcceptRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SubscribeAcceptRecord {
+    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
+    type Record = SubscribeAcceptRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribeAccept<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.subscribeAccept"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_subscribeAccept()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod subscribe_accept_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,37 +112,37 @@ pub mod subscribe_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subscribe;
         type CreatedAt;
+        type Subscribe;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subscribe = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subscribe` field to Set
-    pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubscribe<S> {}
-    impl<S: State> State for SetSubscribe<S> {
-        type Subscribe = Set<members::subscribe>;
-        type CreatedAt = S::CreatedAt;
+        type Subscribe = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subscribe = S::Subscribe;
         type CreatedAt = Set<members::created_at>;
+        type Subscribe = S::Subscribe;
+    }
+    ///State transition - sets the `subscribe` field to Set
+    pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubscribe<S> {}
+    impl<S: State> State for SetSubscribe<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subscribe = Set<members::subscribe>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subscribe` field
-        pub struct subscribe(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subscribe` field
+        pub struct subscribe(());
     }
 }
 
@@ -137,8 +215,8 @@ where
 impl<'a, S> SubscribeAcceptBuilder<'a, S>
 where
     S: subscribe_accept_state::State,
-    S::Subscribe: subscribe_accept_state::IsSet,
     S::CreatedAt: subscribe_accept_state::IsSet,
+    S::Subscribe: subscribe_accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscribeAccept<'a> {
@@ -161,84 +239,6 @@ where
             subscribe: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> SubscribeAccept<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SubscribeAcceptRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeAcceptGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SubscribeAccept<'a>,
-}
-
-impl From<SubscribeAcceptGetRecordOutput<'_>> for SubscribeAccept<'_> {
-    fn from(output: SubscribeAcceptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for SubscribeAccept<'_> {
-    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
-    type Record = SubscribeAcceptRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SubscribeAcceptRecord;
-impl jacquard_common::xrpc::XrpcResp for SubscribeAcceptRecord {
-    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscribeAcceptGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SubscribeAcceptRecord {
-    const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
-    type Record = SubscribeAcceptRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribeAccept<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.subscribeAccept"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_subscribeAccept()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

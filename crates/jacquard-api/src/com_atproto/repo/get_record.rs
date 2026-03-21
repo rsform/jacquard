@@ -29,6 +29,87 @@ pub struct GetRecord<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRecordError<'a> {
+    #[serde(rename = "RecordNotFound")]
+    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRecordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RecordNotFound(msg) => {
+                write!(f, "RecordNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.repo.getRecord
+pub struct GetRecordResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
+    const NSID: &'static str = "com.atproto.repo.getRecord";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRecordOutput<'de>;
+    type Err<'de> = GetRecordError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
+    const NSID: &'static str = "com.atproto.repo.getRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecordResponse;
+}
+
+/// Endpoint type for
+///com.atproto.repo.getRecord
+pub struct GetRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.getRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecord<'de>;
+    type Response = GetRecordResponse;
+}
+
 pub mod get_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,51 +120,51 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Collection;
         type Rkey;
         type Repo;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Collection = Unset;
         type Rkey = Unset;
         type Repo = Unset;
-        type Collection = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Repo = S::Repo;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Rkey = S::Rkey;
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
         type Rkey = S::Rkey;
         type Repo = S::Repo;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Collection = S::Collection;
+        type Rkey = S::Rkey;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
@@ -204,9 +285,9 @@ where
 impl<'a, S> GetRecordBuilder<'a, S>
 where
     S: get_record_state::State,
+    S::Collection: get_record_state::IsSet,
     S::Rkey: get_record_state::IsSet,
     S::Repo: get_record_state::IsSet,
-    S::Collection: get_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetRecord<'a> {
@@ -217,85 +298,4 @@ where
             rkey: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordError<'a> {
-    #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRecordError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RecordNotFound(msg) => {
-                write!(f, "RecordNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.repo.getRecord
-pub struct GetRecordResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
-    const NSID: &'static str = "com.atproto.repo.getRecord";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordOutput<'de>;
-    type Err<'de> = GetRecordError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
-    const NSID: &'static str = "com.atproto.repo.getRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRecordResponse;
-}
-
-/// Endpoint type for
-///com.atproto.repo.getRecord
-pub struct GetRecordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.repo.getRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecord<'de>;
-    type Response = GetRecordResponse;
 }

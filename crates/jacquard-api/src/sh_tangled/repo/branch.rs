@@ -22,131 +22,6 @@ pub struct Branch<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-pub mod branch_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Repo;
-        type Name;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Repo = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
-        type Name = Set<members::name>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `name` field
-        pub struct name(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct BranchBuilder<'a, S: branch_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Branch<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BranchBuilder<'a, branch_state::Empty> {
-        BranchBuilder::new()
-    }
-}
-
-impl<'a> BranchBuilder<'a, branch_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> BranchBuilder<'a, S>
-where
-    S: branch_state::State,
-    S::Name: branch_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> BranchBuilder<'a, branch_state::SetName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> BranchBuilder<'a, S>
-where
-    S: branch_state::State,
-    S::Repo: branch_state::IsUnset,
-{
-    /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> BranchBuilder<'a, branch_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> BranchBuilder<'a, S>
-where
-    S: branch_state::State,
-    S::Repo: branch_state::IsSet,
-    S::Name: branch_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Branch<'a> {
-        Branch {
-            name: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -238,6 +113,28 @@ impl core::fmt::Display for BranchError<'_> {
     }
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Signature<'a> {
+    ///Author email
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+    ///Author name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Author timestamp
+    pub when: jacquard_common::types::string::Datetime,
+}
+
 /// Response type for
 ///sh.tangled.repo.branch
 pub struct BranchResponse;
@@ -264,26 +161,146 @@ impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {
     type Response = BranchResponse;
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
-    ///Author email
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-    ///Author name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
-    pub when: jacquard_common::types::string::Datetime,
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.branch"
+    }
+    fn def_name() -> &'static str {
+        "signature"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_branch()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+pub mod branch_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Repo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Repo = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Repo = Set<members::repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BranchBuilder<'a, S: branch_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Branch<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BranchBuilder<'a, branch_state::Empty> {
+        BranchBuilder::new()
+    }
+}
+
+impl<'a> BranchBuilder<'a, branch_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BranchBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BranchBuilder<'a, S>
+where
+    S: branch_state::State,
+    S::Name: branch_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BranchBuilder<'a, branch_state::SetName<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BranchBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BranchBuilder<'a, S>
+where
+    S: branch_state::State,
+    S::Repo: branch_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BranchBuilder<'a, branch_state::SetRepo<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BranchBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BranchBuilder<'a, S>
+where
+    S: branch_state::State,
+    S::Name: branch_state::IsSet,
+    S::Repo: branch_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Branch<'a> {
+        Branch {
+            name: self.__unsafe_private_named.0.unwrap(),
+            repo: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 pub mod signature_state {
@@ -297,50 +314,50 @@ pub mod signature_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Email;
-        type Name;
         type When;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Email = Unset;
-        type Name = Unset;
         type When = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
         type Email = Set<members::email>;
+        type When = S::When;
         type Name = S::Name;
-        type When = S::When;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Email = S::Email;
-        type Name = Set<members::name>;
-        type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type Email = S::Email;
-        type Name = S::Name;
         type When = Set<members::when>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Email = S::Email;
+        type When = S::When;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `email` field
         pub struct email(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -434,8 +451,8 @@ impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
     S::Email: signature_state::IsSet,
-    S::Name: signature_state::IsSet,
     S::When: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -619,22 +636,5 @@ fn lexicon_doc_sh_tangled_repo_branch() -> ::jacquard_lexicon::lexicon::LexiconD
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.branch"
-    }
-    fn def_name() -> &'static str {
-        "signature"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_branch()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

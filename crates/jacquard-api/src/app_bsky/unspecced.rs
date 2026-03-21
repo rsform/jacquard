@@ -73,6 +73,796 @@ pub struct AgeAssuranceEvent<'a> {
     pub status: AgeAssuranceEventStatus<'a>,
 }
 
+/// The status of the age assurance process.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AgeAssuranceEventStatus<'a> {
+    Unknown,
+    Pending,
+    Assured,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AgeAssuranceEventStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AgeAssuranceEventStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AgeAssuranceEventStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AgeAssuranceEventStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AgeAssuranceEventStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AgeAssuranceEventStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceEventStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AgeAssuranceEventStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AgeAssuranceEventStatus<'_> {
+    type Output = AgeAssuranceEventStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AgeAssuranceEventStatus::Unknown => AgeAssuranceEventStatus::Unknown,
+            AgeAssuranceEventStatus::Pending => AgeAssuranceEventStatus::Pending,
+            AgeAssuranceEventStatus::Assured => AgeAssuranceEventStatus::Assured,
+            AgeAssuranceEventStatus::Other(v) => {
+                AgeAssuranceEventStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeAssuranceState<'a> {
+    ///The timestamp when this state was last updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The status of the age assurance process.
+    #[serde(borrow)]
+    pub status: AgeAssuranceStateStatus<'a>,
+}
+
+/// The status of the age assurance process.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AgeAssuranceStateStatus<'a> {
+    Unknown,
+    Pending,
+    Assured,
+    Blocked,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AgeAssuranceStateStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Blocked => "blocked",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AgeAssuranceStateStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AgeAssuranceStateStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AgeAssuranceStateStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AgeAssuranceStateStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AgeAssuranceStateStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceStateStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AgeAssuranceStateStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AgeAssuranceStateStatus<'_> {
+    type Output = AgeAssuranceStateStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AgeAssuranceStateStatus::Unknown => AgeAssuranceStateStatus::Unknown,
+            AgeAssuranceStateStatus::Pending => AgeAssuranceStateStatus::Pending,
+            AgeAssuranceStateStatus::Assured => AgeAssuranceStateStatus::Assured,
+            AgeAssuranceStateStatus::Blocked => AgeAssuranceStateStatus::Blocked,
+            AgeAssuranceStateStatus::Other(v) => {
+                AgeAssuranceStateStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchActor<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchPost<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchStarterPack<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonTrend<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    pub post_count: i64,
+    pub started_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<SkeletonTrendStatus<'a>>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SkeletonTrendStatus<'a> {
+    Hot,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SkeletonTrendStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SkeletonTrendStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SkeletonTrendStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SkeletonTrendStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SkeletonTrendStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SkeletonTrendStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SkeletonTrendStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SkeletonTrendStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SkeletonTrendStatus<'_> {
+    type Output = SkeletonTrendStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SkeletonTrendStatus::Hot => SkeletonTrendStatus::Hot,
+            SkeletonTrendStatus::Other(v) => SkeletonTrendStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemBlocked<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemNoUnauthenticated<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemNotFound<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemPost<'a> {
+    ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
+    pub hidden_by_threadgate: bool,
+    ///This post has more parents that were not present in the response. This is just a boolean, without the number of parents.
+    pub more_parents: bool,
+    ///This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate.
+    pub more_replies: i64,
+    ///This is by an account muted by the viewer requesting it.
+    pub muted_by_viewer: bool,
+    ///This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
+    pub op_thread: bool,
+    #[serde(borrow)]
+    pub post: crate::app_bsky::feed::PostView<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendView<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    pub post_count: i64,
+    pub started_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<TrendViewStatus<'a>>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendViewStatus<'a> {
+    Hot,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendViewStatus<'_> {
+    type Output = TrendViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendViewStatus::Hot => TrendViewStatus::Hot,
+            TrendViewStatus::Other(v) => TrendViewStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendingTopic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceEvent<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "ageAssuranceEvent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceState<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "ageAssuranceState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchActor<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "skeletonSearchActor"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchPost<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "skeletonSearchPost"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "skeletonSearchStarterPack"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonTrend<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "skeletonTrend"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemBlocked<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "threadItemBlocked"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemNoUnauthenticated<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "threadItemNoUnauthenticated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemNotFound<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "threadItemNotFound"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemPost<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "threadItemPost"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendView<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "trendView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendingTopic<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.defs"
+    }
+    fn def_name() -> &'static str {
+        "trendingTopic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod age_assurance_event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -347,102 +1137,6 @@ where
             init_ua: self.__unsafe_private_named.6,
             status: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// The status of the age assurance process.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AgeAssuranceEventStatus<'a> {
-    Unknown,
-    Pending,
-    Assured,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> AgeAssuranceEventStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Unknown => "unknown",
-            Self::Pending => "pending",
-            Self::Assured => "assured",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AgeAssuranceEventStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "unknown" => Self::Unknown,
-            "pending" => Self::Pending,
-            "assured" => Self::Assured,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for AgeAssuranceEventStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "unknown" => Self::Unknown,
-            "pending" => Self::Pending,
-            "assured" => Self::Assured,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AgeAssuranceEventStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for AgeAssuranceEventStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for AgeAssuranceEventStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceEventStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for AgeAssuranceEventStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for AgeAssuranceEventStatus<'_> {
-    type Output = AgeAssuranceEventStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AgeAssuranceEventStatus::Unknown => AgeAssuranceEventStatus::Unknown,
-            AgeAssuranceEventStatus::Pending => AgeAssuranceEventStatus::Pending,
-            AgeAssuranceEventStatus::Assured => AgeAssuranceEventStatus::Assured,
-            AgeAssuranceEventStatus::Other(v) => {
-                AgeAssuranceEventStatus::Other(v.into_static())
-            }
         }
     }
 }
@@ -1388,179 +2082,6 @@ fn lexicon_doc_app_bsky_unspecced_defs() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceEvent<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "ageAssuranceEvent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AgeAssuranceState<'a> {
-    ///The timestamp when this state was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The status of the age assurance process.
-    #[serde(borrow)]
-    pub status: AgeAssuranceStateStatus<'a>,
-}
-
-/// The status of the age assurance process.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AgeAssuranceStateStatus<'a> {
-    Unknown,
-    Pending,
-    Assured,
-    Blocked,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> AgeAssuranceStateStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Unknown => "unknown",
-            Self::Pending => "pending",
-            Self::Assured => "assured",
-            Self::Blocked => "blocked",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AgeAssuranceStateStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "unknown" => Self::Unknown,
-            "pending" => Self::Pending,
-            "assured" => Self::Assured,
-            "blocked" => Self::Blocked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for AgeAssuranceStateStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "unknown" => Self::Unknown,
-            "pending" => Self::Pending,
-            "assured" => Self::Assured,
-            "blocked" => Self::Blocked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AgeAssuranceStateStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for AgeAssuranceStateStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for AgeAssuranceStateStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceStateStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for AgeAssuranceStateStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for AgeAssuranceStateStatus<'_> {
-    type Output = AgeAssuranceStateStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AgeAssuranceStateStatus::Unknown => AgeAssuranceStateStatus::Unknown,
-            AgeAssuranceStateStatus::Pending => AgeAssuranceStateStatus::Pending,
-            AgeAssuranceStateStatus::Assured => AgeAssuranceStateStatus::Assured,
-            AgeAssuranceStateStatus::Blocked => AgeAssuranceStateStatus::Blocked,
-            AgeAssuranceStateStatus::Other(v) => {
-                AgeAssuranceStateStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceState<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "ageAssuranceState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchActor<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod skeleton_search_actor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1666,39 +2187,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchActor<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "skeletonSearchActor"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchPost<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod skeleton_search_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1802,39 +2290,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchPost<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "skeletonSearchPost"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchStarterPack<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod skeleton_search_starter_pack_state {
@@ -1953,53 +2408,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "skeletonSearchStarterPack"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonTrend<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<SkeletonTrendStatus<'a>>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
-
 pub mod skeleton_trend_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2010,105 +2418,105 @@ pub mod skeleton_trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Link;
-        type StartedAt;
-        type DisplayName;
-        type Topic;
         type PostCount;
+        type DisplayName;
         type Dids;
+        type Topic;
+        type StartedAt;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Link = Unset;
-        type StartedAt = Unset;
-        type DisplayName = Unset;
-        type Topic = Unset;
         type PostCount = Unset;
+        type DisplayName = Unset;
         type Dids = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Link = Set<members::link>;
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
-        type Topic = S::Topic;
-        type PostCount = S::PostCount;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Link = S::Link;
-        type StartedAt = Set<members::started_at>;
-        type DisplayName = S::DisplayName;
-        type Topic = S::Topic;
-        type PostCount = S::PostCount;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type DisplayName = Set<members::display_name>;
-        type Topic = S::Topic;
-        type PostCount = S::PostCount;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
-        type Topic = Set<members::topic>;
-        type PostCount = S::PostCount;
-        type Dids = S::Dids;
+        type Topic = Unset;
+        type StartedAt = Unset;
+        type Link = Unset;
     }
     ///State transition - sets the `post_count` field to Set
     pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostCount<S> {}
     impl<S: State> State for SetPostCount<S> {
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
-        type Topic = S::Topic;
         type PostCount = Set<members::post_count>;
+        type DisplayName = S::DisplayName;
         type Dids = S::Dids;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type PostCount = S::PostCount;
+        type DisplayName = Set<members::display_name>;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDids<S> {}
     impl<S: State> State for SetDids<S> {
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
-        type Topic = S::Topic;
         type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
         type Dids = Set<members::dids>;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = Set<members::topic>;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type StartedAt = Set<members::started_at>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `post_count` field
         pub struct post_count(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `dids` field
         pub struct dids(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -2292,12 +2700,12 @@ where
 impl<'a, S> SkeletonTrendBuilder<'a, S>
 where
     S: skeleton_trend_state::State,
-    S::Link: skeleton_trend_state::IsSet,
-    S::StartedAt: skeleton_trend_state::IsSet,
-    S::DisplayName: skeleton_trend_state::IsSet,
-    S::Topic: skeleton_trend_state::IsSet,
     S::PostCount: skeleton_trend_state::IsSet,
+    S::DisplayName: skeleton_trend_state::IsSet,
     S::Dids: skeleton_trend_state::IsSet,
+    S::Topic: skeleton_trend_state::IsSet,
+    S::StartedAt: skeleton_trend_state::IsSet,
+    S::Link: skeleton_trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SkeletonTrend<'a> {
@@ -2333,122 +2741,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SkeletonTrendStatus<'a> {
-    Hot,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SkeletonTrendStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Hot => "hot",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SkeletonTrendStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SkeletonTrendStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SkeletonTrendStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SkeletonTrendStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SkeletonTrendStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SkeletonTrendStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SkeletonTrendStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SkeletonTrendStatus<'_> {
-    type Output = SkeletonTrendStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SkeletonTrendStatus::Hot => SkeletonTrendStatus::Hot,
-            SkeletonTrendStatus::Other(v) => SkeletonTrendStatus::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonTrend<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "skeletonTrend"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemBlocked<'a> {
-    #[serde(borrow)]
-    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
 }
 
 pub mod thread_item_blocked_state {
@@ -2556,109 +2848,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemBlocked<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "threadItemBlocked"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemNoUnauthenticated<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemNoUnauthenticated<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "threadItemNoUnauthenticated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemNotFound<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemNotFound<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "threadItemNotFound"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemPost<'a> {
-    ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
-    pub hidden_by_threadgate: bool,
-    ///This post has more parents that were not present in the response. This is just a boolean, without the number of parents.
-    pub more_parents: bool,
-    ///This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate.
-    pub more_replies: i64,
-    ///This is by an account muted by the viewer requesting it.
-    pub muted_by_viewer: bool,
-    ///This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
-    pub op_thread: bool,
-    #[serde(borrow)]
-    pub post: crate::app_bsky::feed::PostView<'a>,
-}
-
 pub mod thread_item_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2669,105 +2858,105 @@ pub mod thread_item_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type HiddenByThreadgate;
-        type MoreReplies;
-        type MutedByViewer;
-        type OpThread;
-        type Post;
         type MoreParents;
+        type MutedByViewer;
+        type MoreReplies;
+        type Post;
+        type OpThread;
+        type HiddenByThreadgate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type HiddenByThreadgate = Unset;
-        type MoreReplies = Unset;
-        type MutedByViewer = Unset;
-        type OpThread = Unset;
-        type Post = Unset;
         type MoreParents = Unset;
-    }
-    ///State transition - sets the `hidden_by_threadgate` field to Set
-    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
-    impl<S: State> State for SetHiddenByThreadgate<S> {
-        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
-        type MoreReplies = S::MoreReplies;
-        type MutedByViewer = S::MutedByViewer;
-        type OpThread = S::OpThread;
-        type Post = S::Post;
-        type MoreParents = S::MoreParents;
-    }
-    ///State transition - sets the `more_replies` field to Set
-    pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
-    impl<S: State> State for SetMoreReplies<S> {
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MoreReplies = Set<members::more_replies>;
-        type MutedByViewer = S::MutedByViewer;
-        type OpThread = S::OpThread;
-        type Post = S::Post;
-        type MoreParents = S::MoreParents;
-    }
-    ///State transition - sets the `muted_by_viewer` field to Set
-    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
-    impl<S: State> State for SetMutedByViewer<S> {
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MoreReplies = S::MoreReplies;
-        type MutedByViewer = Set<members::muted_by_viewer>;
-        type OpThread = S::OpThread;
-        type Post = S::Post;
-        type MoreParents = S::MoreParents;
-    }
-    ///State transition - sets the `op_thread` field to Set
-    pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOpThread<S> {}
-    impl<S: State> State for SetOpThread<S> {
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MoreReplies = S::MoreReplies;
-        type MutedByViewer = S::MutedByViewer;
-        type OpThread = Set<members::op_thread>;
-        type Post = S::Post;
-        type MoreParents = S::MoreParents;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MoreReplies = S::MoreReplies;
-        type MutedByViewer = S::MutedByViewer;
-        type OpThread = S::OpThread;
-        type Post = Set<members::post>;
-        type MoreParents = S::MoreParents;
+        type MutedByViewer = Unset;
+        type MoreReplies = Unset;
+        type Post = Unset;
+        type OpThread = Unset;
+        type HiddenByThreadgate = Unset;
     }
     ///State transition - sets the `more_parents` field to Set
     pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMoreParents<S> {}
     impl<S: State> State for SetMoreParents<S> {
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MoreReplies = S::MoreReplies;
-        type MutedByViewer = S::MutedByViewer;
-        type OpThread = S::OpThread;
-        type Post = S::Post;
         type MoreParents = Set<members::more_parents>;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+    }
+    ///State transition - sets the `muted_by_viewer` field to Set
+    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
+    impl<S: State> State for SetMutedByViewer<S> {
+        type MoreParents = S::MoreParents;
+        type MutedByViewer = Set<members::muted_by_viewer>;
+        type MoreReplies = S::MoreReplies;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+    }
+    ///State transition - sets the `more_replies` field to Set
+    pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
+    impl<S: State> State for SetMoreReplies<S> {
+        type MoreParents = S::MoreParents;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = Set<members::more_replies>;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type MoreParents = S::MoreParents;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+        type Post = Set<members::post>;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+    }
+    ///State transition - sets the `op_thread` field to Set
+    pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOpThread<S> {}
+    impl<S: State> State for SetOpThread<S> {
+        type MoreParents = S::MoreParents;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+        type Post = S::Post;
+        type OpThread = Set<members::op_thread>;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+    }
+    ///State transition - sets the `hidden_by_threadgate` field to Set
+    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
+    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type MoreParents = S::MoreParents;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hidden_by_threadgate` field
-        pub struct hidden_by_threadgate(());
-        ///Marker type for the `more_replies` field
-        pub struct more_replies(());
-        ///Marker type for the `muted_by_viewer` field
-        pub struct muted_by_viewer(());
-        ///Marker type for the `op_thread` field
-        pub struct op_thread(());
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `more_parents` field
         pub struct more_parents(());
+        ///Marker type for the `muted_by_viewer` field
+        pub struct muted_by_viewer(());
+        ///Marker type for the `more_replies` field
+        pub struct more_replies(());
+        ///Marker type for the `post` field
+        pub struct post(());
+        ///Marker type for the `op_thread` field
+        pub struct op_thread(());
+        ///Marker type for the `hidden_by_threadgate` field
+        pub struct hidden_by_threadgate(());
     }
 }
 
@@ -2920,12 +3109,12 @@ where
 impl<'a, S> ThreadItemPostBuilder<'a, S>
 where
     S: thread_item_post_state::State,
-    S::HiddenByThreadgate: thread_item_post_state::IsSet,
-    S::MoreReplies: thread_item_post_state::IsSet,
-    S::MutedByViewer: thread_item_post_state::IsSet,
-    S::OpThread: thread_item_post_state::IsSet,
-    S::Post: thread_item_post_state::IsSet,
     S::MoreParents: thread_item_post_state::IsSet,
+    S::MutedByViewer: thread_item_post_state::IsSet,
+    S::MoreReplies: thread_item_post_state::IsSet,
+    S::Post: thread_item_post_state::IsSet,
+    S::OpThread: thread_item_post_state::IsSet,
+    S::HiddenByThreadgate: thread_item_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItemPost<'a> {
@@ -2959,53 +3148,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemPost<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "threadItemPost"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendView<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<TrendViewStatus<'a>>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
-
 pub mod trend_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3016,105 +3158,105 @@ pub mod trend_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
         type Link;
-        type StartedAt;
-        type PostCount;
-        type Actors;
         type DisplayName;
+        type Topic;
+        type StartedAt;
+        type Actors;
+        type PostCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
         type Link = Unset;
-        type StartedAt = Unset;
-        type PostCount = Unset;
-        type Actors = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Topic = Set<members::topic>;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type DisplayName = S::DisplayName;
+        type Topic = Unset;
+        type StartedAt = Unset;
+        type Actors = Unset;
+        type PostCount = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
-        type Topic = S::Topic;
         type Link = Set<members::link>;
-        type StartedAt = S::StartedAt;
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
         type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
         type Topic = S::Topic;
-        type Link = S::Link;
-        type StartedAt = Set<members::started_at>;
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostCount<S> {}
-    impl<S: State> State for SetPostCount<S> {
-        type Topic = S::Topic;
-        type Link = S::Link;
         type StartedAt = S::StartedAt;
-        type PostCount = Set<members::post_count>;
         type Actors = S::Actors;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
         type PostCount = S::PostCount;
-        type Actors = Set<members::actors>;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Topic = S::Topic;
         type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
         type DisplayName = Set<members::display_name>;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Actors = S::Actors;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type Link = S::Link;
+        type DisplayName = S::DisplayName;
+        type Topic = Set<members::topic>;
+        type StartedAt = S::StartedAt;
+        type Actors = S::Actors;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Link = S::Link;
+        type DisplayName = S::DisplayName;
+        type Topic = S::Topic;
+        type StartedAt = Set<members::started_at>;
+        type Actors = S::Actors;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type Link = S::Link;
+        type DisplayName = S::DisplayName;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Actors = Set<members::actors>;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type Link = S::Link;
+        type DisplayName = S::DisplayName;
+        type Topic = S::Topic;
+        type StartedAt = S::StartedAt;
+        type Actors = S::Actors;
+        type PostCount = Set<members::post_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `link` field
         pub struct link(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
-        ///Marker type for the `actors` field
-        pub struct actors(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
     }
 }
 
@@ -3298,12 +3440,12 @@ where
 impl<'a, S> TrendViewBuilder<'a, S>
 where
     S: trend_view_state::State,
-    S::Topic: trend_view_state::IsSet,
     S::Link: trend_view_state::IsSet,
-    S::StartedAt: trend_view_state::IsSet,
-    S::PostCount: trend_view_state::IsSet,
-    S::Actors: trend_view_state::IsSet,
     S::DisplayName: trend_view_state::IsSet,
+    S::Topic: trend_view_state::IsSet,
+    S::StartedAt: trend_view_state::IsSet,
+    S::Actors: trend_view_state::IsSet,
+    S::PostCount: trend_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TrendView<'a> {
@@ -3338,147 +3480,5 @@ where
             topic: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendViewStatus<'a> {
-    Hot,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> TrendViewStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Hot => "hot",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for TrendViewStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for TrendViewStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendViewStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for TrendViewStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for TrendViewStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for TrendViewStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for TrendViewStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for TrendViewStatus<'_> {
-    type Output = TrendViewStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TrendViewStatus::Hot => TrendViewStatus::Hot,
-            TrendViewStatus::Other(v) => TrendViewStatus::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendView<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "trendView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendingTopic<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendingTopic<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.defs"
-    }
-    fn def_name() -> &'static str {
-        "trendingTopic"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

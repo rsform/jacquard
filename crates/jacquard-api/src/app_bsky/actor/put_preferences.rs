@@ -21,6 +21,36 @@ pub struct PutPreferences<'a> {
     pub preferences: crate::app_bsky::actor::Preferences<'a>,
 }
 
+/// Response type for
+///app.bsky.actor.putPreferences
+pub struct PutPreferencesResponse;
+impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
+    const NSID: &'static str = "app.bsky.actor.putPreferences";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
+    const NSID: &'static str = "app.bsky.actor.putPreferences";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutPreferencesResponse;
+}
+
+/// Endpoint type for
+///app.bsky.actor.putPreferences
+pub struct PutPreferencesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.putPreferences";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutPreferences<'de>;
+    type Response = PutPreferencesResponse;
+}
+
 pub mod put_preferences_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.actor.putPreferences
-pub struct PutPreferencesResponse;
-impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
-    const NSID: &'static str = "app.bsky.actor.putPreferences";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
-    const NSID: &'static str = "app.bsky.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutPreferencesResponse;
-}
-
-/// Endpoint type for
-///app.bsky.actor.putPreferences
-pub struct PutPreferencesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.actor.putPreferences";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutPreferences<'de>;
-    type Response = PutPreferencesResponse;
 }

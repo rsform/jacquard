@@ -26,6 +26,52 @@ pub struct SearchActors<'a> {
     pub q: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::fm_teal::alpha::actor::MiniProfileView<'a>>,
+    ///Cursor for pagination
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///fm.teal.alpha.actor.searchActors
+pub struct SearchActorsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
+    const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchActorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
+    const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchActorsResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.actor.searchActors
+pub struct SearchActorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.actor.searchActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActors<'de>;
+    type Response = SearchActorsResponse;
+}
+
 pub mod search_actors_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -148,50 +194,4 @@ where
             q: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::fm_teal::alpha::actor::MiniProfileView<'a>>,
-    ///Cursor for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///fm.teal.alpha.actor.searchActors
-pub struct SearchActorsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
-    const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
-    const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchActorsResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.actor.searchActors
-pub struct SearchActorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.actor.searchActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActors<'de>;
-    type Response = SearchActorsResponse;
 }

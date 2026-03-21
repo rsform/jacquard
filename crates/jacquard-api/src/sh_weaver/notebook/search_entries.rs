@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,6 +31,55 @@ pub struct SearchEntries<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchEntriesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.searchEntries
+pub struct SearchEntriesResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchEntriesResponse {
+    const NSID: &'static str = "sh.weaver.notebook.searchEntries";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchEntriesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchEntries<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.searchEntries";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchEntriesResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.searchEntries
+pub struct SearchEntriesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchEntriesRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.searchEntries";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchEntries<'de>;
+    type Response = SearchEntriesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_entries_state {
@@ -201,49 +246,4 @@ where
             tags: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchEntriesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.searchEntries
-pub struct SearchEntriesResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchEntriesResponse {
-    const NSID: &'static str = "sh.weaver.notebook.searchEntries";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchEntriesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchEntries<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.searchEntries";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchEntriesResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.searchEntries
-pub struct SearchEntriesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchEntriesRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.searchEntries";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchEntries<'de>;
-    type Response = SearchEntriesResponse;
 }

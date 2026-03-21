@@ -22,6 +22,23 @@ pub struct Table<'a> {
     pub content: Vec<crate::blog_pckt::block::table_row::TableRow<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Table<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.table"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_table()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod table_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -174,22 +191,5 @@ fn lexicon_doc_blog_pckt_block_table() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Table<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.table"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_table()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

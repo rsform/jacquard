@@ -22,6 +22,50 @@ pub struct GetFollowingUser<'a> {
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFollowingUserOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub follow: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+}
+
+/// Response type for
+///place.stream.graph.getFollowingUser
+pub struct GetFollowingUserResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFollowingUserResponse {
+    const NSID: &'static str = "place.stream.graph.getFollowingUser";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFollowingUserOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowingUser<'a> {
+    const NSID: &'static str = "place.stream.graph.getFollowingUser";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFollowingUserResponse;
+}
+
+/// Endpoint type for
+///place.stream.graph.getFollowingUser
+pub struct GetFollowingUserRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {
+    const PATH: &'static str = "/xrpc/place.stream.graph.getFollowingUser";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFollowingUser<'de>;
+    type Response = GetFollowingUserResponse;
+}
+
 pub mod get_following_user_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -32,37 +76,37 @@ pub mod get_following_user_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
         type SubjectDid;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
         type SubjectDid = Unset;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type UserDid = Set<members::user_did>;
-        type SubjectDid = S::SubjectDid;
+        type UserDid = Unset;
     }
     ///State transition - sets the `subject_did` field to Set
     pub struct SetSubjectDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjectDid<S> {}
     impl<S: State> State for SetSubjectDid<S> {
-        type UserDid = S::UserDid;
         type SubjectDid = Set<members::subject_did>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type SubjectDid = S::SubjectDid;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `subject_did` field
         pub struct subject_did(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -135,8 +179,8 @@ where
 impl<'a, S> GetFollowingUserBuilder<'a, S>
 where
     S: get_following_user_state::State,
-    S::UserDid: get_following_user_state::IsSet,
     S::SubjectDid: get_following_user_state::IsSet,
+    S::UserDid: get_following_user_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetFollowingUser<'a> {
@@ -145,48 +189,4 @@ where
             user_did: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFollowingUserOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub follow: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-}
-
-/// Response type for
-///place.stream.graph.getFollowingUser
-pub struct GetFollowingUserResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFollowingUserResponse {
-    const NSID: &'static str = "place.stream.graph.getFollowingUser";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFollowingUserOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowingUser<'a> {
-    const NSID: &'static str = "place.stream.graph.getFollowingUser";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFollowingUserResponse;
-}
-
-/// Endpoint type for
-///place.stream.graph.getFollowingUser
-pub struct GetFollowingUserRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {
-    const PATH: &'static str = "/xrpc/place.stream.graph.getFollowingUser";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFollowingUser<'de>;
-    type Response = GetFollowingUserResponse;
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,91 @@ pub struct GetList<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub items: Vec<crate::sh_weaver::graph::ListItemView<'a>>,
+    #[serde(borrow)]
+    pub list: crate::sh_weaver::graph::ListView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetListError<'a> {
+    #[serde(rename = "ListNotFound")]
+    ListNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetListError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ListNotFound(msg) => {
+                write!(f, "ListNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.graph.getList
+pub struct GetListResponse;
+impl jacquard_common::xrpc::XrpcResp for GetListResponse {
+    const NSID: &'static str = "sh.weaver.graph.getList";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetListOutput<'de>;
+    type Err<'de> = GetListError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetList<'a> {
+    const NSID: &'static str = "sh.weaver.graph.getList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.graph.getList
+pub struct GetListRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.graph.getList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetList<'de>;
+    type Response = GetListResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_list_state {
@@ -153,85 +234,4 @@ where
             list: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub items: Vec<crate::sh_weaver::graph::ListItemView<'a>>,
-    #[serde(borrow)]
-    pub list: crate::sh_weaver::graph::ListView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetListError<'a> {
-    #[serde(rename = "ListNotFound")]
-    ListNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetListError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::ListNotFound(msg) => {
-                write!(f, "ListNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.graph.getList
-pub struct GetListResponse;
-impl jacquard_common::xrpc::XrpcResp for GetListResponse {
-    const NSID: &'static str = "sh.weaver.graph.getList";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListOutput<'de>;
-    type Err<'de> = GetListError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetList<'a> {
-    const NSID: &'static str = "sh.weaver.graph.getList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetListResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.graph.getList
-pub struct GetListRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetListRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.graph.getList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetList<'de>;
-    type Response = GetListResponse;
 }

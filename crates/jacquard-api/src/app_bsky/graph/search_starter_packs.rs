@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,55 @@ pub struct SearchStarterPacks<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchStarterPacksOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
+}
+
+/// Response type for
+///app.bsky.graph.searchStarterPacks
+pub struct SearchStarterPacksResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksResponse {
+    const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchStarterPacksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacks<'a> {
+    const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchStarterPacksResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.searchStarterPacks
+pub struct SearchStarterPacksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.searchStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchStarterPacks<'de>;
+    type Response = SearchStarterPacksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_starter_packs_state {
@@ -153,49 +198,4 @@ where
             q: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchStarterPacksOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
-}
-
-/// Response type for
-///app.bsky.graph.searchStarterPacks
-pub struct SearchStarterPacksResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksResponse {
-    const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacks<'a> {
-    const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchStarterPacksResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.searchStarterPacks
-pub struct SearchStarterPacksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.searchStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchStarterPacks<'de>;
-    type Response = SearchStarterPacksResponse;
 }

@@ -26,6 +26,90 @@ pub struct ResolveSchema<'a> {
     pub version: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveSchemaOutput<'a> {
+    ///CID of the resolved schema record
+    #[serde(borrow)]
+    pub cid: jacquard_common::CowStr<'a>,
+    ///The full schema record
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    ///AT-URI of the resolved schema record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveSchemaError<'a> {
+    /// No schema found with the given NSID
+    #[serde(rename = "SchemaNotFound")]
+    SchemaNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveSchemaError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SchemaNotFound(msg) => {
+                write!(f, "SchemaNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///science.alt.dataset.resolveSchema
+pub struct ResolveSchemaResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveSchemaResponse {
+    const NSID: &'static str = "science.alt.dataset.resolveSchema";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveSchemaOutput<'de>;
+    type Err<'de> = ResolveSchemaError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveSchema<'a> {
+    const NSID: &'static str = "science.alt.dataset.resolveSchema";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveSchemaResponse;
+}
+
+/// Endpoint type for
+///science.alt.dataset.resolveSchema
+pub struct ResolveSchemaRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveSchemaRequest {
+    const PATH: &'static str = "/xrpc/science.alt.dataset.resolveSchema";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveSchema<'de>;
+    type Response = ResolveSchemaResponse;
+}
+
 pub mod resolve_schema_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,37 +120,37 @@ pub mod resolve_schema_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SchemaId;
         type Handle;
+        type SchemaId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SchemaId = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `schema_id` field to Set
-    pub struct SetSchemaId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaId<S> {}
-    impl<S: State> State for SetSchemaId<S> {
-        type SchemaId = Set<members::schema_id>;
-        type Handle = S::Handle;
+        type SchemaId = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type SchemaId = S::SchemaId;
         type Handle = Set<members::handle>;
+        type SchemaId = S::SchemaId;
+    }
+    ///State transition - sets the `schema_id` field to Set
+    pub struct SetSchemaId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaId<S> {}
+    impl<S: State> State for SetSchemaId<S> {
+        type Handle = S::Handle;
+        type SchemaId = Set<members::schema_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schema_id` field
-        pub struct schema_id(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `schema_id` field
+        pub struct schema_id(());
     }
 }
 
@@ -156,8 +240,8 @@ impl<'a, S: resolve_schema_state::State> ResolveSchemaBuilder<'a, S> {
 impl<'a, S> ResolveSchemaBuilder<'a, S>
 where
     S: resolve_schema_state::State,
-    S::SchemaId: resolve_schema_state::IsSet,
     S::Handle: resolve_schema_state::IsSet,
+    S::SchemaId: resolve_schema_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveSchema<'a> {
@@ -167,88 +251,4 @@ where
             version: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveSchemaOutput<'a> {
-    ///CID of the resolved schema record
-    #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
-    ///The full schema record
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    ///AT-URI of the resolved schema record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveSchemaError<'a> {
-    /// No schema found with the given NSID
-    #[serde(rename = "SchemaNotFound")]
-    SchemaNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveSchemaError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::SchemaNotFound(msg) => {
-                write!(f, "SchemaNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///science.alt.dataset.resolveSchema
-pub struct ResolveSchemaResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveSchemaResponse {
-    const NSID: &'static str = "science.alt.dataset.resolveSchema";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveSchemaOutput<'de>;
-    type Err<'de> = ResolveSchemaError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveSchema<'a> {
-    const NSID: &'static str = "science.alt.dataset.resolveSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveSchemaResponse;
-}
-
-/// Endpoint type for
-///science.alt.dataset.resolveSchema
-pub struct ResolveSchemaRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveSchemaRequest {
-    const PATH: &'static str = "/xrpc/science.alt.dataset.resolveSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveSchema<'de>;
-    type Response = ResolveSchemaResponse;
 }

@@ -24,146 +24,6 @@ pub struct GetPartUploadUrl<'a> {
     pub upload_id: jacquard_common::CowStr<'a>,
 }
 
-pub mod get_part_upload_url_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type PartNumber;
-        type UploadId;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type PartNumber = Unset;
-        type UploadId = Unset;
-    }
-    ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type PartNumber = Set<members::part_number>;
-        type UploadId = S::UploadId;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type PartNumber = S::PartNumber;
-        type UploadId = Set<members::upload_id>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `part_number` field
-        pub struct part_number(());
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct GetPartUploadUrlBuilder<'a, S: get_part_upload_url_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> GetPartUploadUrl<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
-        GetPartUploadUrlBuilder::new()
-    }
-}
-
-impl<'a> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
-where
-    S: get_part_upload_url_state::State,
-    S::PartNumber: get_part_upload_url_state::IsUnset,
-{
-    /// Set the `partNumber` field (required)
-    pub fn part_number(
-        mut self,
-        value: impl Into<i64>,
-    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetPartNumber<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
-where
-    S: get_part_upload_url_state::State,
-    S::UploadId: get_part_upload_url_state::IsUnset,
-{
-    /// Set the `uploadId` field (required)
-    pub fn upload_id(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetUploadId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
-where
-    S: get_part_upload_url_state::State,
-    S::PartNumber: get_part_upload_url_state::IsSet,
-    S::UploadId: get_part_upload_url_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> GetPartUploadUrl<'a> {
-        GetPartUploadUrl {
-            part_number: self.__unsafe_private_named.0.unwrap(),
-            upload_id: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> GetPartUploadUrl<'a> {
-        GetPartUploadUrl {
-            part_number: self.__unsafe_private_named.0.unwrap(),
-            upload_id: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -188,12 +48,6 @@ pub struct GetPartUploadUrlOutput<'a> {
     ///URL to PUT the part data to
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
-}
-
-fn _default_get_part_upload_url_output_method() -> std::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("PUT"))
 }
 
 #[jacquard_derive::open_union]
@@ -267,4 +121,150 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     );
     type Request<'de> = GetPartUploadUrl<'de>;
     type Response = GetPartUploadUrlResponse;
+}
+
+pub mod get_part_upload_url_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type UploadId;
+        type PartNumber;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type UploadId = Unset;
+        type PartNumber = Unset;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUploadId<S> {}
+    impl<S: State> State for SetUploadId<S> {
+        type UploadId = Set<members::upload_id>;
+        type PartNumber = S::PartNumber;
+    }
+    ///State transition - sets the `part_number` field to Set
+    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
+    impl<S: State> State for SetPartNumber<S> {
+        type UploadId = S::UploadId;
+        type PartNumber = Set<members::part_number>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
+        ///Marker type for the `part_number` field
+        pub struct part_number(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetPartUploadUrlBuilder<'a, S: get_part_upload_url_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetPartUploadUrl<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
+        GetPartUploadUrlBuilder::new()
+    }
+}
+
+impl<'a> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetPartUploadUrlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+where
+    S: get_part_upload_url_state::State,
+    S::PartNumber: get_part_upload_url_state::IsUnset,
+{
+    /// Set the `partNumber` field (required)
+    pub fn part_number(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetPartNumber<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetPartUploadUrlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+where
+    S: get_part_upload_url_state::State,
+    S::UploadId: get_part_upload_url_state::IsUnset,
+{
+    /// Set the `uploadId` field (required)
+    pub fn upload_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetUploadId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetPartUploadUrlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+where
+    S: get_part_upload_url_state::State,
+    S::UploadId: get_part_upload_url_state::IsSet,
+    S::PartNumber: get_part_upload_url_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetPartUploadUrl<'a> {
+        GetPartUploadUrl {
+            part_number: self.__unsafe_private_named.0.unwrap(),
+            upload_id: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> GetPartUploadUrl<'a> {
+        GetPartUploadUrl {
+            part_number: self.__unsafe_private_named.0.unwrap(),
+            upload_id: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn _default_get_part_upload_url_output_method() -> std::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
+    Some(jacquard_common::CowStr::from("PUT"))
 }

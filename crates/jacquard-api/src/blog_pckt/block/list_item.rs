@@ -22,6 +22,44 @@ pub struct ListItem<'a> {
     pub content: Vec<ListItemContentItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemContentItem<'a> {
+    #[serde(rename = "blog.pckt.block.text")]
+    Text(Box<crate::blog_pckt::block::text::Text<'a>>),
+    #[serde(rename = "blog.pckt.block.bulletList")]
+    BulletList(Box<crate::blog_pckt::block::bullet_list::BulletList<'a>>),
+    #[serde(rename = "blog.pckt.block.orderedList")]
+    OrderedList(Box<crate::blog_pckt::block::ordered_list::OrderedList<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.listItem"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_listItem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,27 +163,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemContentItem<'a> {
-    #[serde(rename = "blog.pckt.block.text")]
-    Text(Box<crate::blog_pckt::block::text::Text<'a>>),
-    #[serde(rename = "blog.pckt.block.bulletList")]
-    BulletList(Box<crate::blog_pckt::block::bullet_list::BulletList<'a>>),
-    #[serde(rename = "blog.pckt.block.orderedList")]
-    OrderedList(Box<crate::blog_pckt::block::ordered_list::OrderedList<'a>>),
-}
-
 fn lexicon_doc_blog_pckt_block_listItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -198,22 +215,5 @@ fn lexicon_doc_blog_pckt_block_listItem() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.listItem"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_listItem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

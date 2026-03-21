@@ -32,6 +32,555 @@ pub struct Create<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateResult<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub validation_status: std::option::Option<CreateResultValidationStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateResultValidationStatus<'a> {
+    Valid,
+    Unknown,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CreateResultValidationStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CreateResultValidationStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CreateResultValidationStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CreateResultValidationStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CreateResultValidationStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CreateResultValidationStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CreateResultValidationStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CreateResultValidationStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateResultValidationStatus<'_> {
+    type Output = CreateResultValidationStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
+            CreateResultValidationStatus::Unknown => {
+                CreateResultValidationStatus::Unknown
+            }
+            CreateResultValidationStatus::Other(v) => {
+                CreateResultValidationStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Operation which deletes an existing record.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Delete<'a> {
+    #[serde(borrow)]
+    pub collection: jacquard_common::types::string::Nsid<'a>,
+    #[serde(borrow)]
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteResult<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ApplyWrites<'a> {
+    ///The handle or DID of the repo (aka, current account).
+    #[serde(borrow)]
+    pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
+    ///If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ///Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub validate: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub writes: Vec<ApplyWritesWritesItem<'a>>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ApplyWritesWritesItem<'a> {
+    #[serde(rename = "com.atproto.repo.applyWrites#create")]
+    Create(Box<crate::com_atproto::repo::apply_writes::Create<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#update")]
+    Update(Box<crate::com_atproto::repo::apply_writes::Update<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#delete")]
+    Delete(Box<crate::com_atproto::repo::apply_writes::Delete<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ApplyWritesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub results: std::option::Option<Vec<ApplyWritesOutputResultsItem<'a>>>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ApplyWritesOutputResultsItem<'a> {
+    #[serde(rename = "com.atproto.repo.applyWrites#createResult")]
+    CreateResult(Box<crate::com_atproto::repo::apply_writes::CreateResult<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#updateResult")]
+    UpdateResult(Box<crate::com_atproto::repo::apply_writes::UpdateResult<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#deleteResult")]
+    DeleteResult(Box<crate::com_atproto::repo::apply_writes::DeleteResult<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ApplyWritesError<'a> {
+    /// Indicates that the 'swapCommit' parameter did not match current commit.
+    #[serde(rename = "InvalidSwap")]
+    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ApplyWritesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidSwap(msg) => {
+                write!(f, "InvalidSwap")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Operation which updates an existing record.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Update<'a> {
+    #[serde(borrow)]
+    pub collection: jacquard_common::types::string::Nsid<'a>,
+    #[serde(borrow)]
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateResult<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub validation_status: std::option::Option<UpdateResultValidationStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateResultValidationStatus<'a> {
+    Valid,
+    Unknown,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateResultValidationStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateResultValidationStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateResultValidationStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateResultValidationStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateResultValidationStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateResultValidationStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateResultValidationStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateResultValidationStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateResultValidationStatus<'_> {
+    type Output = UpdateResultValidationStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
+            UpdateResultValidationStatus::Unknown => {
+                UpdateResultValidationStatus::Unknown
+            }
+            UpdateResultValidationStatus::Other(v) => {
+                UpdateResultValidationStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "create"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.rkey {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rkey",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "createResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Delete<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "delete"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeleteResult<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "deleteResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///com.atproto.repo.applyWrites
+pub struct ApplyWritesResponse;
+impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
+    const NSID: &'static str = "com.atproto.repo.applyWrites";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ApplyWritesOutput<'de>;
+    type Err<'de> = ApplyWritesError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ApplyWrites<'a> {
+    const NSID: &'static str = "com.atproto.repo.applyWrites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ApplyWritesResponse;
+}
+
+/// Endpoint type for
+///com.atproto.repo.applyWrites
+pub struct ApplyWritesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.applyWrites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ApplyWrites<'de>;
+    type Response = ApplyWritesResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "update"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UpdateResult<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "updateResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_repo_applyWrites()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod create_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,37 +591,37 @@ pub mod create_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Collection;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Collection = S::Collection;
+        type Value = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Value = S::Value;
         type Collection = Set<members::collection>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Collection = S::Collection;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -179,8 +728,8 @@ where
 impl<'a, S> CreateBuilder<'a, S>
 where
     S: create_state::State,
-    S::Value: create_state::IsSet,
     S::Collection: create_state::IsSet,
+    S::Value: create_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Create<'a> {
@@ -690,56 +1239,6 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "create"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.rkey {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rkey",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateResult<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub validation_status: std::option::Option<CreateResultValidationStatus<'a>>,
-}
-
 pub mod create_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -902,136 +1401,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateResultValidationStatus<'a> {
-    Valid,
-    Unknown,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CreateResultValidationStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Valid => "valid",
-            Self::Unknown => "unknown",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CreateResultValidationStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CreateResultValidationStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateResultValidationStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CreateResultValidationStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CreateResultValidationStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CreateResultValidationStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CreateResultValidationStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CreateResultValidationStatus<'_> {
-    type Output = CreateResultValidationStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
-            CreateResultValidationStatus::Unknown => {
-                CreateResultValidationStatus::Unknown
-            }
-            CreateResultValidationStatus::Other(v) => {
-                CreateResultValidationStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "createResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Operation which deletes an existing record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Delete<'a> {
-    #[serde(borrow)]
-    pub collection: jacquard_common::types::string::Nsid<'a>,
-    #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-}
-
 pub mod delete_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1178,79 +1547,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Delete<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "delete"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteResult<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeleteResult<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "deleteResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyWrites<'a> {
-    ///The handle or DID of the repo (aka, current account).
-    #[serde(borrow)]
-    pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
-    ///If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub writes: Vec<ApplyWritesWritesItem<'a>>,
 }
 
 pub mod apply_writes_state {
@@ -1429,155 +1725,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesWritesItem<'a> {
-    #[serde(rename = "com.atproto.repo.applyWrites#create")]
-    Create(Box<crate::com_atproto::repo::apply_writes::Create<'a>>),
-    #[serde(rename = "com.atproto.repo.applyWrites#update")]
-    Update(Box<crate::com_atproto::repo::apply_writes::Update<'a>>),
-    #[serde(rename = "com.atproto.repo.applyWrites#delete")]
-    Delete(Box<crate::com_atproto::repo::apply_writes::Delete<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyWritesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub results: std::option::Option<Vec<ApplyWritesOutputResultsItem<'a>>>,
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesOutputResultsItem<'a> {
-    #[serde(rename = "com.atproto.repo.applyWrites#createResult")]
-    CreateResult(Box<crate::com_atproto::repo::apply_writes::CreateResult<'a>>),
-    #[serde(rename = "com.atproto.repo.applyWrites#updateResult")]
-    UpdateResult(Box<crate::com_atproto::repo::apply_writes::UpdateResult<'a>>),
-    #[serde(rename = "com.atproto.repo.applyWrites#deleteResult")]
-    DeleteResult(Box<crate::com_atproto::repo::apply_writes::DeleteResult<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesError<'a> {
-    /// Indicates that the 'swapCommit' parameter did not match current commit.
-    #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ApplyWritesError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidSwap(msg) => {
-                write!(f, "InvalidSwap")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.repo.applyWrites
-pub struct ApplyWritesResponse;
-impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
-    const NSID: &'static str = "com.atproto.repo.applyWrites";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ApplyWritesOutput<'de>;
-    type Err<'de> = ApplyWritesError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ApplyWrites<'a> {
-    const NSID: &'static str = "com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ApplyWritesResponse;
-}
-
-/// Endpoint type for
-///com.atproto.repo.applyWrites
-pub struct ApplyWritesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = ApplyWrites<'de>;
-    type Response = ApplyWritesResponse;
-}
-
-/// Operation which updates an existing record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Update<'a> {
-    #[serde(borrow)]
-    pub collection: jacquard_common::types::string::Nsid<'a>,
-    #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod update_state {
@@ -1765,44 +1912,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "update"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateResult<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub validation_status: std::option::Option<UpdateResultValidationStatus<'a>>,
-}
-
 pub mod update_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1962,114 +2071,5 @@ where
             validation_status: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateResultValidationStatus<'a> {
-    Valid,
-    Unknown,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> UpdateResultValidationStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Valid => "valid",
-            Self::Unknown => "unknown",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for UpdateResultValidationStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for UpdateResultValidationStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UpdateResultValidationStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for UpdateResultValidationStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for UpdateResultValidationStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for UpdateResultValidationStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for UpdateResultValidationStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateResultValidationStatus<'_> {
-    type Output = UpdateResultValidationStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
-            UpdateResultValidationStatus::Unknown => {
-                UpdateResultValidationStatus::Unknown
-            }
-            UpdateResultValidationStatus::Other(v) => {
-                UpdateResultValidationStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UpdateResult<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.repo.applyWrites"
-    }
-    fn def_name() -> &'static str {
-        "updateResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_repo_applyWrites()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

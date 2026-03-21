@@ -40,6 +40,105 @@ pub struct BrandingAsset<'a> {
     pub width: std::option::Option<i64>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBranding<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBrandingOutput<'a> {
+    ///List of available branding assets
+    #[serde(borrow)]
+    pub assets: Vec<crate::place_stream::branding::get_branding::BrandingAsset<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetBrandingError<'a> {}
+impl core::fmt::Display for GetBrandingError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BrandingAsset<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.branding.getBranding"
+    }
+    fn def_name() -> &'static str {
+        "brandingAsset"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_branding_getBranding()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///place.stream.branding.getBranding
+pub struct GetBrandingResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBrandingResponse {
+    const NSID: &'static str = "place.stream.branding.getBranding";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetBrandingOutput<'de>;
+    type Err<'de> = GetBrandingError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBranding<'a> {
+    const NSID: &'static str = "place.stream.branding.getBranding";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBrandingResponse;
+}
+
+/// Endpoint type for
+///place.stream.branding.getBranding
+pub struct GetBrandingRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBrandingRequest {
+    const PATH: &'static str = "/xrpc/place.stream.branding.getBranding";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBranding<'de>;
+    type Response = GetBrandingResponse;
+}
+
 fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -225,39 +324,6 @@ fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BrandingAsset<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.branding.getBranding"
-    }
-    fn def_name() -> &'static str {
-        "brandingAsset"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_branding_getBranding()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBranding<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
-}
-
 pub mod get_branding_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -333,70 +399,4 @@ where
             broadcaster: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBrandingOutput<'a> {
-    ///List of available branding assets
-    #[serde(borrow)]
-    pub assets: Vec<crate::place_stream::branding::get_branding::BrandingAsset<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBrandingError<'a> {}
-impl core::fmt::Display for GetBrandingError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.branding.getBranding
-pub struct GetBrandingResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBrandingResponse {
-    const NSID: &'static str = "place.stream.branding.getBranding";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBrandingOutput<'de>;
-    type Err<'de> = GetBrandingError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBranding<'a> {
-    const NSID: &'static str = "place.stream.branding.getBranding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBrandingResponse;
-}
-
-/// Endpoint type for
-///place.stream.branding.getBranding
-pub struct GetBrandingRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBrandingRequest {
-    const PATH: &'static str = "/xrpc/place.stream.branding.getBranding";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBranding<'de>;
-    type Response = GetBrandingResponse;
 }

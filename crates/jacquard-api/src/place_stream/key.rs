@@ -29,6 +29,110 @@ pub struct Key<'a> {
     pub signing_key: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct KeyGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Key<'a>,
+}
+
+impl<'a> Key<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, KeyRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct KeyRecord;
+impl jacquard_common::xrpc::XrpcResp for KeyRecord {
+    const NSID: &'static str = "place.stream.key";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = KeyGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<KeyGetRecordOutput<'_>> for Key<'_> {
+    fn from(output: KeyGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Key<'_> {
+    const NSID: &'static str = "place.stream.key";
+    type Record = KeyRecord;
+}
+
+impl jacquard_common::types::collection::Collection for KeyRecord {
+    const NSID: &'static str = "place.stream.key";
+    type Record = KeyRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.key"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_key()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.signing_key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 57usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "signing_key",
+                    ),
+                    max: 57usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.signing_key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 57usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "signing_key",
+                    ),
+                    min: 57usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod key_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,37 +143,37 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SigningKey;
         type CreatedAt;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SigningKey = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
-    impl<S: State> State for SetSigningKey<S> {
-        type SigningKey = Set<members::signing_key>;
-        type CreatedAt = S::CreatedAt;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SigningKey = S::SigningKey;
         type CreatedAt = Set<members::created_at>;
+        type SigningKey = S::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
+    impl<S: State> State for SetSigningKey<S> {
+        type CreatedAt = S::CreatedAt;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
@@ -162,8 +266,8 @@ where
 impl<'a, S> KeyBuilder<'a, S>
 where
     S: key_state::State,
-    S::SigningKey: key_state::IsSet,
     S::CreatedAt: key_state::IsSet,
+    S::SigningKey: key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Key<'a> {
@@ -188,110 +292,6 @@ where
             signing_key: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Key<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, KeyRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct KeyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Key<'a>,
-}
-
-impl From<KeyGetRecordOutput<'_>> for Key<'_> {
-    fn from(output: KeyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Key<'_> {
-    const NSID: &'static str = "place.stream.key";
-    type Record = KeyRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct KeyRecord;
-impl jacquard_common::xrpc::XrpcResp for KeyRecord {
-    const NSID: &'static str = "place.stream.key";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = KeyGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for KeyRecord {
-    const NSID: &'static str = "place.stream.key";
-    type Record = KeyRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.key"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_key()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.signing_key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 57usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signing_key",
-                    ),
-                    max: 57usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.signing_key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 57usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signing_key",
-                    ),
-                    min: 57usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

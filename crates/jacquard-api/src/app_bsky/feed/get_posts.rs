@@ -20,6 +20,48 @@ pub struct GetPosts<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostsOutput<'a> {
+    #[serde(borrow)]
+    pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
+}
+
+/// Response type for
+///app.bsky.feed.getPosts
+pub struct GetPostsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPostsResponse {
+    const NSID: &'static str = "app.bsky.feed.getPosts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPostsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPosts<'a> {
+    const NSID: &'static str = "app.bsky.feed.getPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPostsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.getPosts
+pub struct GetPostsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPosts<'de>;
+    type Response = GetPostsResponse;
+}
+
 pub mod get_posts_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPostsOutput<'a> {
-    #[serde(borrow)]
-    pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
-}
-
-/// Response type for
-///app.bsky.feed.getPosts
-pub struct GetPostsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPostsResponse {
-    const NSID: &'static str = "app.bsky.feed.getPosts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPosts<'a> {
-    const NSID: &'static str = "app.bsky.feed.getPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPostsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.getPosts
-pub struct GetPostsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.getPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPosts<'de>;
-    type Response = GetPostsResponse;
 }

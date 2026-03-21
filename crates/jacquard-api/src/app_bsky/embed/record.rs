@@ -21,6 +21,271 @@ pub struct Record<'a> {
     pub record: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct View<'a> {
+    #[serde(borrow)]
+    pub record: ViewUnionRecord<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewUnionRecord<'a> {
+    #[serde(rename = "app.bsky.embed.record#viewRecord")]
+    ViewRecord(Box<crate::app_bsky::embed::record::ViewRecord<'a>>),
+    #[serde(rename = "app.bsky.embed.record#viewNotFound")]
+    ViewNotFound(Box<crate::app_bsky::embed::record::ViewNotFound<'a>>),
+    #[serde(rename = "app.bsky.embed.record#viewBlocked")]
+    ViewBlocked(Box<crate::app_bsky::embed::record::ViewBlocked<'a>>),
+    #[serde(rename = "app.bsky.embed.record#viewDetached")]
+    ViewDetached(Box<crate::app_bsky::embed::record::ViewDetached<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#generatorView")]
+    GeneratorView(Box<crate::app_bsky::feed::GeneratorView<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#listView")]
+    ListView(Box<crate::app_bsky::graph::ListView<'a>>),
+    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
+    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#starterPackViewBasic")]
+    StarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewBlocked<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+    pub blocked: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewDetached<'a> {
+    pub detached: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewNotFound<'a> {
+    pub not_found: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewRecord<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embeds: std::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub quote_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reply_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub repost_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    ///The record data itself.
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewRecordEmbedsItem<'a> {
+    #[serde(rename = "app.bsky.embed.images#view")]
+    ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
+    #[serde(rename = "app.bsky.embed.video#view")]
+    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
+    #[serde(rename = "app.bsky.embed.external#view")]
+    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+    #[serde(rename = "app.bsky.embed.record#view")]
+    View(Box<crate::app_bsky::embed::record::View<'a>>),
+    #[serde(rename = "app.bsky.embed.recordWithMedia#view")]
+    RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "view"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewBlocked<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "viewBlocked"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewDetached<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "viewDetached"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "viewNotFound"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.record"
+    }
+    fn def_name() -> &'static str {
+        "viewRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_embed_record()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -544,39 +809,6 @@ fn lexicon_doc_app_bsky_embed_record() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    #[serde(borrow)]
-    pub record: ViewUnionRecord<'a>,
-}
-
 pub mod view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -680,73 +912,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewUnionRecord<'a> {
-    #[serde(rename = "app.bsky.embed.record#viewRecord")]
-    ViewRecord(Box<crate::app_bsky::embed::record::ViewRecord<'a>>),
-    #[serde(rename = "app.bsky.embed.record#viewNotFound")]
-    ViewNotFound(Box<crate::app_bsky::embed::record::ViewNotFound<'a>>),
-    #[serde(rename = "app.bsky.embed.record#viewBlocked")]
-    ViewBlocked(Box<crate::app_bsky::embed::record::ViewBlocked<'a>>),
-    #[serde(rename = "app.bsky.embed.record#viewDetached")]
-    ViewDetached(Box<crate::app_bsky::embed::record::ViewDetached<'a>>),
-    #[serde(rename = "app.bsky.feed.defs#generatorView")]
-    GeneratorView(Box<crate::app_bsky::feed::GeneratorView<'a>>),
-    #[serde(rename = "app.bsky.graph.defs#listView")]
-    ListView(Box<crate::app_bsky::graph::ListView<'a>>),
-    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
-    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
-    #[serde(rename = "app.bsky.graph.defs#starterPackViewBasic")]
-    StarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "view"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewBlocked<'a> {
-    #[serde(borrow)]
-    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
-    pub blocked: bool,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod view_blocked_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -757,51 +922,51 @@ pub mod view_blocked_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocked;
         type Author;
         type Uri;
+        type Blocked;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocked = Unset;
         type Author = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `blocked` field to Set
-    pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocked<S> {}
-    impl<S: State> State for SetBlocked<S> {
-        type Blocked = Set<members::blocked>;
-        type Author = S::Author;
-        type Uri = S::Uri;
+        type Blocked = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Blocked = S::Blocked;
         type Author = Set<members::author>;
         type Uri = S::Uri;
+        type Blocked = S::Blocked;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Blocked = S::Blocked;
         type Author = S::Author;
         type Uri = Set<members::uri>;
+        type Blocked = S::Blocked;
+    }
+    ///State transition - sets the `blocked` field to Set
+    pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocked<S> {}
+    impl<S: State> State for SetBlocked<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Blocked = Set<members::blocked>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocked` field
-        pub struct blocked(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `blocked` field
+        pub struct blocked(());
     }
 }
 
@@ -894,9 +1059,9 @@ where
 impl<'a, S> ViewBlockedBuilder<'a, S>
 where
     S: view_blocked_state::State,
-    S::Blocked: view_blocked_state::IsSet,
     S::Author: view_blocked_state::IsSet,
     S::Uri: view_blocked_state::IsSet,
+    S::Blocked: view_blocked_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewBlocked<'a> {
@@ -922,40 +1087,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewBlocked<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "viewBlocked"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewDetached<'a> {
-    pub detached: bool,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod view_detached_state {
@@ -1098,40 +1229,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewDetached<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "viewDetached"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewNotFound<'a> {
-    pub not_found: bool,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod view_not_found_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1142,37 +1239,37 @@ pub mod view_not_found_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type NotFound;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type NotFound = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type NotFound = S::NotFound;
+        type Uri = Unset;
     }
     ///State transition - sets the `not_found` field to Set
     pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotFound<S> {}
     impl<S: State> State for SetNotFound<S> {
-        type Uri = S::Uri;
         type NotFound = Set<members::not_found>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type NotFound = S::NotFound;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `not_found` field
         pub struct not_found(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -1245,8 +1342,8 @@ where
 impl<'a, S> ViewNotFoundBuilder<'a, S>
 where
     S: view_not_found_state::State,
-    S::Uri: view_not_found_state::IsSet,
     S::NotFound: view_not_found_state::IsSet,
+    S::Uri: view_not_found_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewNotFound<'a> {
@@ -1272,61 +1369,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "viewNotFound"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewRecord<'a> {
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub embeds: std::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The record data itself.
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
 pub mod view_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1337,85 +1379,85 @@ pub mod view_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
+        type Uri;
+        type Author;
         type IndexedAt;
         type Value;
-        type Uri;
-        type Cid;
-        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
+        type Uri = Unset;
+        type Author = Unset;
         type IndexedAt = Unset;
         type Value = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
-        type Author = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Value = S::Value;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type IndexedAt = S::IndexedAt;
-        type Value = Set<members::value>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
         type Value = S::Value;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
         type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Value = S::Value;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = Set<members::author>;
         type IndexedAt = S::IndexedAt;
         type Value = S::Value;
-        type Uri = S::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
         type Cid = S::Cid;
-        type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type IndexedAt = Set<members::indexed_at>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
     }
 }
 
@@ -1653,11 +1695,11 @@ where
 impl<'a, S> ViewRecordBuilder<'a, S>
 where
     S: view_record_state::State,
+    S::Cid: view_record_state::IsSet,
+    S::Uri: view_record_state::IsSet,
+    S::Author: view_record_state::IsSet,
     S::IndexedAt: view_record_state::IsSet,
     S::Value: view_record_state::IsSet,
-    S::Uri: view_record_state::IsSet,
-    S::Cid: view_record_state::IsSet,
-    S::Author: view_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewRecord<'a> {
@@ -1698,47 +1740,5 @@ where
             value: self.__unsafe_private_named.10.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordEmbedsItem<'a> {
-    #[serde(rename = "app.bsky.embed.images#view")]
-    ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
-    #[serde(rename = "app.bsky.embed.video#view")]
-    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
-    #[serde(rename = "app.bsky.embed.external#view")]
-    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
-    #[serde(rename = "app.bsky.embed.record#view")]
-    View(Box<crate::app_bsky::embed::record::View<'a>>),
-    #[serde(rename = "app.bsky.embed.recordWithMedia#view")]
-    RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.embed.record"
-    }
-    fn def_name() -> &'static str {
-        "viewRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_embed_record()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

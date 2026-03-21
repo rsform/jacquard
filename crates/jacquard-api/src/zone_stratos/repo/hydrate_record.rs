@@ -23,6 +23,97 @@ pub struct HydrateRecord<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HydrateRecordOutput<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum HydrateRecordError<'a> {
+    /// The requested record does not exist
+    #[serde(rename = "RecordNotFound")]
+    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Access to the record is blocked due to boundary restrictions
+    #[serde(rename = "RecordBlocked")]
+    RecordBlocked(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for HydrateRecordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RecordNotFound(msg) => {
+                write!(f, "RecordNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RecordBlocked(msg) => {
+                write!(f, "RecordBlocked")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///zone.stratos.repo.hydrateRecord
+pub struct HydrateRecordResponse;
+impl jacquard_common::xrpc::XrpcResp for HydrateRecordResponse {
+    const NSID: &'static str = "zone.stratos.repo.hydrateRecord";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = HydrateRecordOutput<'de>;
+    type Err<'de> = HydrateRecordError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for HydrateRecord<'a> {
+    const NSID: &'static str = "zone.stratos.repo.hydrateRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = HydrateRecordResponse;
+}
+
+/// Endpoint type for
+///zone.stratos.repo.hydrateRecord
+pub struct HydrateRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
+    const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = HydrateRecord<'de>;
+    type Response = HydrateRecordResponse;
+}
+
 pub mod hydrate_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -133,95 +224,4 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HydrateRecordOutput<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum HydrateRecordError<'a> {
-    /// The requested record does not exist
-    #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Access to the record is blocked due to boundary restrictions
-    #[serde(rename = "RecordBlocked")]
-    RecordBlocked(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for HydrateRecordError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RecordNotFound(msg) => {
-                write!(f, "RecordNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RecordBlocked(msg) => {
-                write!(f, "RecordBlocked")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///zone.stratos.repo.hydrateRecord
-pub struct HydrateRecordResponse;
-impl jacquard_common::xrpc::XrpcResp for HydrateRecordResponse {
-    const NSID: &'static str = "zone.stratos.repo.hydrateRecord";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = HydrateRecordOutput<'de>;
-    type Err<'de> = HydrateRecordError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for HydrateRecord<'a> {
-    const NSID: &'static str = "zone.stratos.repo.hydrateRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = HydrateRecordResponse;
-}
-
-/// Endpoint type for
-///zone.stratos.repo.hydrateRecord
-pub struct HydrateRecordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
-    const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = HydrateRecord<'de>;
-    type Response = HydrateRecordResponse;
 }

@@ -28,6 +28,141 @@ pub struct ProfileTab<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileTabTab<'a> {
+    PostsAndAuthorThreads,
+    PostsAndReplies,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileTabTab<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::PostsAndAuthorThreads => "posts_and_author_threads",
+            Self::PostsAndReplies => "posts_and_replies",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileTabTab<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "posts_and_author_threads" => Self::PostsAndAuthorThreads,
+            "posts_and_replies" => Self::PostsAndReplies,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileTabTab<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "posts_and_author_threads" => Self::PostsAndAuthorThreads,
+            "posts_and_replies" => Self::PostsAndReplies,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileTabTab<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileTabTab<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileTabTab<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileTabTab<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileTabTab<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
+    type Output = ProfileTabTab<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileTabTab::PostsAndAuthorThreads => ProfileTabTab::PostsAndAuthorThreads,
+            ProfileTabTab::PostsAndReplies => ProfileTabTab::PostsAndReplies,
+            ProfileTabTab::Other(v) => ProfileTabTab::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileTabOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+/// Response type for
+///mov.danabra.ProfileTab
+pub struct ProfileTabResponse;
+impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
+    const NSID: &'static str = "mov.danabra.ProfileTab";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProfileTabOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
+    const NSID: &'static str = "mov.danabra.ProfileTab";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ProfileTabResponse;
+}
+
+/// Endpoint type for
+///mov.danabra.ProfileTab
+pub struct ProfileTabRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
+    const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ProfileTab<'de>;
+    type Response = ProfileTabResponse;
+}
+
 fn _default_profile_tab_limit() -> std::option::Option<i64> {
     Some(10i64)
 }
@@ -167,139 +302,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileTabTab<'a> {
-    PostsAndAuthorThreads,
-    PostsAndReplies,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileTabTab<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::PostsAndAuthorThreads => "posts_and_author_threads",
-            Self::PostsAndReplies => "posts_and_replies",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileTabTab<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "posts_and_author_threads" => Self::PostsAndAuthorThreads,
-            "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileTabTab<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "posts_and_author_threads" => Self::PostsAndAuthorThreads,
-            "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileTabTab<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileTabTab<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ProfileTabTab<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ProfileTabTab<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileTabTab<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
-    type Output = ProfileTabTab<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileTabTab::PostsAndAuthorThreads => ProfileTabTab::PostsAndAuthorThreads,
-            ProfileTabTab::PostsAndReplies => ProfileTabTab::PostsAndReplies,
-            ProfileTabTab::Other(v) => ProfileTabTab::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileTabOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-/// Response type for
-///mov.danabra.ProfileTab
-pub struct ProfileTabResponse;
-impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
-    const NSID: &'static str = "mov.danabra.ProfileTab";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileTabOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
-    const NSID: &'static str = "mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ProfileTabResponse;
-}
-
-/// Endpoint type for
-///mov.danabra.ProfileTab
-pub struct ProfileTabRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
-    const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = ProfileTab<'de>;
-    type Response = ProfileTabResponse;
 }

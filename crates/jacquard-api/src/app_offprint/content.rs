@@ -22,6 +22,62 @@ pub struct Content<'a> {
     pub items: Vec<ContentItemsItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ContentItemsItem<'a> {
+    #[serde(rename = "app.offprint.block.text")]
+    Text(Box<crate::app_offprint::block::text::Text<'a>>),
+    #[serde(rename = "app.offprint.block.heading")]
+    Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
+    #[serde(rename = "app.offprint.block.blockquote")]
+    Blockquote(Box<crate::app_offprint::block::blockquote::Blockquote<'a>>),
+    #[serde(rename = "app.offprint.block.callout")]
+    Callout(Box<crate::app_offprint::block::callout::Callout<'a>>),
+    #[serde(rename = "app.offprint.block.bulletList")]
+    BulletList(Box<crate::app_offprint::block::bullet_list::BulletList<'a>>),
+    #[serde(rename = "app.offprint.block.orderedList")]
+    OrderedList(Box<crate::app_offprint::block::ordered_list::OrderedList<'a>>),
+    #[serde(rename = "app.offprint.block.taskList")]
+    TaskList(Box<crate::app_offprint::block::task_list::TaskList<'a>>),
+    #[serde(rename = "app.offprint.block.codeBlock")]
+    CodeBlock(Box<crate::app_offprint::block::code_block::CodeBlock<'a>>),
+    #[serde(rename = "app.offprint.block.image")]
+    Image(Box<crate::app_offprint::block::image::Image<'a>>),
+    #[serde(rename = "app.offprint.block.imageGrid")]
+    ImageGrid(Box<crate::app_offprint::block::image_grid::ImageGrid<'a>>),
+    #[serde(rename = "app.offprint.block.imageCarousel")]
+    ImageCarousel(Box<crate::app_offprint::block::image_carousel::ImageCarousel<'a>>),
+    #[serde(rename = "app.offprint.block.imageDiff")]
+    ImageDiff(Box<crate::app_offprint::block::image_diff::ImageDiff<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.content"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_content()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod content_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,45 +181,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContentItemsItem<'a> {
-    #[serde(rename = "app.offprint.block.text")]
-    Text(Box<crate::app_offprint::block::text::Text<'a>>),
-    #[serde(rename = "app.offprint.block.heading")]
-    Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
-    #[serde(rename = "app.offprint.block.blockquote")]
-    Blockquote(Box<crate::app_offprint::block::blockquote::Blockquote<'a>>),
-    #[serde(rename = "app.offprint.block.callout")]
-    Callout(Box<crate::app_offprint::block::callout::Callout<'a>>),
-    #[serde(rename = "app.offprint.block.bulletList")]
-    BulletList(Box<crate::app_offprint::block::bullet_list::BulletList<'a>>),
-    #[serde(rename = "app.offprint.block.orderedList")]
-    OrderedList(Box<crate::app_offprint::block::ordered_list::OrderedList<'a>>),
-    #[serde(rename = "app.offprint.block.taskList")]
-    TaskList(Box<crate::app_offprint::block::task_list::TaskList<'a>>),
-    #[serde(rename = "app.offprint.block.codeBlock")]
-    CodeBlock(Box<crate::app_offprint::block::code_block::CodeBlock<'a>>),
-    #[serde(rename = "app.offprint.block.image")]
-    Image(Box<crate::app_offprint::block::image::Image<'a>>),
-    #[serde(rename = "app.offprint.block.imageGrid")]
-    ImageGrid(Box<crate::app_offprint::block::image_grid::ImageGrid<'a>>),
-    #[serde(rename = "app.offprint.block.imageCarousel")]
-    ImageCarousel(Box<crate::app_offprint::block::image_carousel::ImageCarousel<'a>>),
-    #[serde(rename = "app.offprint.block.imageDiff")]
-    ImageDiff(Box<crate::app_offprint::block::image_diff::ImageDiff<'a>>),
-}
-
 fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -226,22 +243,5 @@ fn lexicon_doc_app_offprint_content() -> ::jacquard_lexicon::lexicon::LexiconDoc
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.content"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_content()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

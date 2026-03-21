@@ -20,6 +20,84 @@ pub struct GetPage<'a> {
     pub page: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPageOutput<'a> {
+    #[serde(borrow)]
+    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    #[serde(borrow)]
+    pub page: crate::sh_weaver::notebook::PageView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetPageError<'a> {
+    #[serde(rename = "PageNotFound")]
+    PageNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetPageError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::PageNotFound(msg) => {
+                write!(f, "PageNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.getPage
+pub struct GetPageResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getPage";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPageOutput<'de>;
+    type Err<'de> = GetPageError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getPage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPageResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getPage
+pub struct GetPageRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPage<'de>;
+    type Response = GetPageResponse;
+}
+
 pub mod get_page_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,82 +187,4 @@ where
             page: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPageOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
-    #[serde(borrow)]
-    pub page: crate::sh_weaver::notebook::PageView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPageError<'a> {
-    #[serde(rename = "PageNotFound")]
-    PageNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetPageError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::PageNotFound(msg) => {
-                write!(f, "PageNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.getPage
-pub struct GetPageResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getPage";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPageOutput<'de>;
-    type Err<'de> = GetPageError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPageResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getPage
-pub struct GetPageRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPage<'de>;
-    type Response = GetPageResponse;
 }

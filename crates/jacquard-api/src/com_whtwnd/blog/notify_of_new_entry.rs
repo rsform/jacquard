@@ -21,6 +21,72 @@ pub struct NotifyOfNewEntry<'a> {
     pub entry_uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotifyOfNewEntryOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum NotifyOfNewEntryError<'a> {}
+impl core::fmt::Display for NotifyOfNewEntryError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.whtwnd.blog.notifyOfNewEntry
+pub struct NotifyOfNewEntryResponse;
+impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
+    const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = NotifyOfNewEntryOutput<'de>;
+    type Err<'de> = NotifyOfNewEntryError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
+    const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = NotifyOfNewEntryResponse;
+}
+
+/// Endpoint type for
+///com.whtwnd.blog.notifyOfNewEntry
+pub struct NotifyOfNewEntryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.notifyOfNewEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = NotifyOfNewEntry<'de>;
+    type Response = NotifyOfNewEntryResponse;
+}
+
 pub mod notify_of_new_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,70 +190,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotifyOfNewEntryOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum NotifyOfNewEntryError<'a> {}
-impl core::fmt::Display for NotifyOfNewEntryError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.whtwnd.blog.notifyOfNewEntry
-pub struct NotifyOfNewEntryResponse;
-impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
-    const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = NotifyOfNewEntryOutput<'de>;
-    type Err<'de> = NotifyOfNewEntryError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
-    const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = NotifyOfNewEntryResponse;
-}
-
-/// Endpoint type for
-///com.whtwnd.blog.notifyOfNewEntry
-pub struct NotifyOfNewEntryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
-    const PATH: &'static str = "/xrpc/com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = NotifyOfNewEntry<'de>;
-    type Response = NotifyOfNewEntryResponse;
 }

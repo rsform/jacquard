@@ -36,6 +36,98 @@ pub struct AddRule<'a> {
     pub url: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AddRuleOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::tools_ozone::safelink::Event<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum AddRuleError<'a> {
+    /// The provided URL is invalid
+    #[serde(rename = "InvalidUrl")]
+    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// A rule for this URL/domain already exists
+    #[serde(rename = "RuleAlreadyExists")]
+    RuleAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for AddRuleError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidUrl(msg) => {
+                write!(f, "InvalidUrl")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RuleAlreadyExists(msg) => {
+                write!(f, "RuleAlreadyExists")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.safelink.addRule
+pub struct AddRuleResponse;
+impl jacquard_common::xrpc::XrpcResp for AddRuleResponse {
+    const NSID: &'static str = "tools.ozone.safelink.addRule";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AddRuleOutput<'de>;
+    type Err<'de> = AddRuleError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddRule<'a> {
+    const NSID: &'static str = "tools.ozone.safelink.addRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddRuleResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.safelink.addRule
+pub struct AddRuleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddRuleRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.addRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddRule<'de>;
+    type Response = AddRuleResponse;
+}
+
 pub mod add_rule_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -48,8 +140,8 @@ pub mod add_rule_state {
     pub trait State: sealed::Sealed {
         type Reason;
         type Url;
-        type Action;
         type Pattern;
+        type Action;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -57,8 +149,8 @@ pub mod add_rule_state {
     impl State for Empty {
         type Reason = Unset;
         type Url = Unset;
-        type Action = Unset;
         type Pattern = Unset;
+        type Action = Unset;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
@@ -66,8 +158,8 @@ pub mod add_rule_state {
     impl<S: State> State for SetReason<S> {
         type Reason = Set<members::reason>;
         type Url = S::Url;
-        type Action = S::Action;
         type Pattern = S::Pattern;
+        type Action = S::Action;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -75,17 +167,8 @@ pub mod add_rule_state {
     impl<S: State> State for SetUrl<S> {
         type Reason = S::Reason;
         type Url = Set<members::url>;
+        type Pattern = S::Pattern;
         type Action = S::Action;
-        type Pattern = S::Pattern;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Reason = S::Reason;
-        type Url = S::Url;
-        type Action = Set<members::action>;
-        type Pattern = S::Pattern;
     }
     ///State transition - sets the `pattern` field to Set
     pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
@@ -93,8 +176,17 @@ pub mod add_rule_state {
     impl<S: State> State for SetPattern<S> {
         type Reason = S::Reason;
         type Url = S::Url;
-        type Action = S::Action;
         type Pattern = Set<members::pattern>;
+        type Action = S::Action;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Reason = S::Reason;
+        type Url = S::Url;
+        type Pattern = S::Pattern;
+        type Action = Set<members::action>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -103,10 +195,10 @@ pub mod add_rule_state {
         pub struct reason(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `pattern` field
         pub struct pattern(());
+        ///Marker type for the `action` field
+        pub struct action(());
     }
 }
 
@@ -258,8 +350,8 @@ where
     S: add_rule_state::State,
     S::Reason: add_rule_state::IsSet,
     S::Url: add_rule_state::IsSet,
-    S::Action: add_rule_state::IsSet,
     S::Pattern: add_rule_state::IsSet,
+    S::Action: add_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddRule<'a> {
@@ -291,96 +383,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AddRuleOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::tools_ozone::safelink::Event<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum AddRuleError<'a> {
-    /// The provided URL is invalid
-    #[serde(rename = "InvalidUrl")]
-    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// A rule for this URL/domain already exists
-    #[serde(rename = "RuleAlreadyExists")]
-    RuleAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for AddRuleError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidUrl(msg) => {
-                write!(f, "InvalidUrl")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RuleAlreadyExists(msg) => {
-                write!(f, "RuleAlreadyExists")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.safelink.addRule
-pub struct AddRuleResponse;
-impl jacquard_common::xrpc::XrpcResp for AddRuleResponse {
-    const NSID: &'static str = "tools.ozone.safelink.addRule";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AddRuleOutput<'de>;
-    type Err<'de> = AddRuleError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for AddRule<'a> {
-    const NSID: &'static str = "tools.ozone.safelink.addRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = AddRuleResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.safelink.addRule
-pub struct AddRuleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AddRuleRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.safelink.addRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = AddRule<'de>;
-    type Response = AddRuleResponse;
 }

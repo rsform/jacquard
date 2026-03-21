@@ -21,6 +21,23 @@ pub struct Poll<'a> {
     pub poll_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.poll"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_poll()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod poll_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -166,22 +183,5 @@ fn lexicon_doc_pub_leaflet_blocks_poll() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.blocks.poll"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_blocks_poll()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

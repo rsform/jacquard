@@ -25,6 +25,48 @@ pub struct GetActorFeed<'a> {
     pub limit: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorFeedOutput<'a> {
+    #[serde(borrow)]
+    pub plays: Vec<crate::fm_teal::alpha::feed::PlayView<'a>>,
+}
+
+/// Response type for
+///fm.teal.alpha.feed.getActorFeed
+pub struct GetActorFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorFeedResponse {
+    const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorFeedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorFeed<'a> {
+    const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorFeedResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.feed.getActorFeed
+pub struct GetActorFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getActorFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorFeed<'de>;
+    type Response = GetActorFeedResponse;
+}
+
 pub mod get_actor_feed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -147,46 +189,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorFeedOutput<'a> {
-    #[serde(borrow)]
-    pub plays: Vec<crate::fm_teal::alpha::feed::PlayView<'a>>,
-}
-
-/// Response type for
-///fm.teal.alpha.feed.getActorFeed
-pub struct GetActorFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorFeedResponse {
-    const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorFeed<'a> {
-    const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorFeedResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.feed.getActorFeed
-pub struct GetActorFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getActorFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorFeed<'de>;
-    type Response = GetActorFeedResponse;
 }

@@ -32,6 +32,97 @@ pub struct ArticleLink<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ArticleLinkGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ArticleLink<'a>,
+}
+
+impl<'a> ArticleLink<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ArticleLinkRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ArticleLinkRecord;
+impl jacquard_common::xrpc::XrpcResp for ArticleLinkRecord {
+    const NSID: &'static str = "app.juttu.articleLink";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ArticleLinkGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ArticleLinkGetRecordOutput<'_>> for ArticleLink<'_> {
+    fn from(output: ArticleLinkGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for ArticleLink<'_> {
+    const NSID: &'static str = "app.juttu.articleLink";
+    type Record = ArticleLinkRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ArticleLinkRecord {
+    const NSID: &'static str = "app.juttu.articleLink";
+    type Record = ArticleLinkRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
+    fn nsid() -> &'static str {
+        "app.juttu.articleLink"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_juttu_articleLink()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.article_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "article_id",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod article_link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,50 +134,50 @@ pub mod article_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ArticleId;
-        type CreatedAt;
         type CommentsThread;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ArticleId = Unset;
-        type CreatedAt = Unset;
         type CommentsThread = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `article_id` field to Set
     pub struct SetArticleId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArticleId<S> {}
     impl<S: State> State for SetArticleId<S> {
         type ArticleId = Set<members::article_id>;
+        type CommentsThread = S::CommentsThread;
         type CreatedAt = S::CreatedAt;
-        type CommentsThread = S::CommentsThread;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ArticleId = S::ArticleId;
-        type CreatedAt = Set<members::created_at>;
-        type CommentsThread = S::CommentsThread;
     }
     ///State transition - sets the `comments_thread` field to Set
     pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
     impl<S: State> State for SetCommentsThread<S> {
         type ArticleId = S::ArticleId;
-        type CreatedAt = S::CreatedAt;
         type CommentsThread = Set<members::comments_thread>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ArticleId = S::ArticleId;
+        type CommentsThread = S::CommentsThread;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `article_id` field
         pub struct article_id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `comments_thread` field
         pub struct comments_thread(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -200,8 +291,8 @@ impl<'a, S> ArticleLinkBuilder<'a, S>
 where
     S: article_link_state::State,
     S::ArticleId: article_link_state::IsSet,
-    S::CreatedAt: article_link_state::IsSet,
     S::CommentsThread: article_link_state::IsSet,
+    S::CreatedAt: article_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ArticleLink<'a> {
@@ -228,97 +319,6 @@ where
             created_at: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ArticleLink<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ArticleLinkRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ArticleLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ArticleLink<'a>,
-}
-
-impl From<ArticleLinkGetRecordOutput<'_>> for ArticleLink<'_> {
-    fn from(output: ArticleLinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for ArticleLink<'_> {
-    const NSID: &'static str = "app.juttu.articleLink";
-    type Record = ArticleLinkRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ArticleLinkRecord;
-impl jacquard_common::xrpc::XrpcResp for ArticleLinkRecord {
-    const NSID: &'static str = "app.juttu.articleLink";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ArticleLinkGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ArticleLinkRecord {
-    const NSID: &'static str = "app.juttu.articleLink";
-    type Record = ArticleLinkRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
-    fn nsid() -> &'static str {
-        "app.juttu.articleLink"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_juttu_articleLink()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.article_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "article_id",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

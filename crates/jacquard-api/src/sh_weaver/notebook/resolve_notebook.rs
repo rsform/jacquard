@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_entry_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -31,6 +27,91 @@ pub struct ResolveNotebook<'a> {
     pub entry_limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveNotebookOutput<'a> {
+    #[serde(borrow)]
+    pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveNotebookError<'a> {
+    #[serde(rename = "NotebookNotFound")]
+    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveNotebookError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotebookNotFound(msg) => {
+                write!(f, "NotebookNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.resolveNotebook
+pub struct ResolveNotebookResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveNotebookResponse {
+    const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveNotebookOutput<'de>;
+    type Err<'de> = ResolveNotebookError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveNotebook<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveNotebookResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.resolveNotebook
+pub struct ResolveNotebookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveNotebook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveNotebook<'de>;
+    type Response = ResolveNotebookResponse;
+}
+
+fn _default_entry_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod resolve_notebook_state {
@@ -192,85 +273,4 @@ where
             name: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveNotebookOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveNotebookError<'a> {
-    #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveNotebookError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotebookNotFound(msg) => {
-                write!(f, "NotebookNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.resolveNotebook
-pub struct ResolveNotebookResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveNotebookResponse {
-    const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveNotebookOutput<'de>;
-    type Err<'de> = ResolveNotebookError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveNotebook<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveNotebookResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.resolveNotebook
-pub struct ResolveNotebookRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveNotebook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveNotebook<'de>;
-    type Response = ResolveNotebookResponse;
 }

@@ -20,6 +20,90 @@ pub struct GetEntryNotebooks<'a> {
     pub entry: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetEntryNotebooksOutput<'a> {
+    #[serde(borrow)]
+    pub notebooks: Vec<crate::sh_weaver::notebook::get_entry_notebooks::NotebookRef<'a>>,
+}
+
+/// Reference to a notebook containing this entry.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotebookRef<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub owner: std::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getEntryNotebooks
+pub struct GetEntryNotebooksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetEntryNotebooksResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetEntryNotebooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryNotebooks<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetEntryNotebooksResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getEntryNotebooks
+pub struct GetEntryNotebooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEntryNotebooksRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryNotebooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEntryNotebooks<'de>;
+    type Response = GetEntryNotebooksResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.getEntryNotebooks"
+    }
+    fn def_name() -> &'static str {
+        "notebookRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_getEntryNotebooks()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod get_entry_notebooks_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,73 +193,6 @@ where
             entry: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetEntryNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<crate::sh_weaver::notebook::get_entry_notebooks::NotebookRef<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getEntryNotebooks
-pub struct GetEntryNotebooksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetEntryNotebooksResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryNotebooks<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetEntryNotebooksResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getEntryNotebooks
-pub struct GetEntryNotebooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetEntryNotebooksRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryNotebooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryNotebooks<'de>;
-    type Response = GetEntryNotebooksResponse;
-}
-
-/// Reference to a notebook containing this entry.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotebookRef<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub owner: std::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod notebook_ref_state {
@@ -505,22 +522,5 @@ fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> ::jacquard_lexicon::lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.getEntryNotebooks"
-    }
-    fn def_name() -> &'static str {
-        "notebookRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_getEntryNotebooks()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

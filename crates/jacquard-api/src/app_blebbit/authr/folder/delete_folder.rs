@@ -21,6 +21,48 @@ pub struct DeleteFolderParams<'a> {
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct DeleteFolder;
+/// Response type for
+///app.blebbit.authr.folder.deleteFolder
+pub struct DeleteFolderResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteFolderResponse {
+    const NSID: &'static str = "app.blebbit.authr.folder.deleteFolder";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for DeleteFolder {
+    const NSID: &'static str = "app.blebbit.authr.folder.deleteFolder";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteFolderResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.folder.deleteFolder
+pub struct DeleteFolderRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.deleteFolder";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteFolder;
+    type Response = DeleteFolderResponse;
+}
+
 pub mod delete_folder_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -88,46 +130,4 @@ where
             id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct DeleteFolder;
-/// Response type for
-///app.blebbit.authr.folder.deleteFolder
-pub struct DeleteFolderResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteFolderResponse {
-    const NSID: &'static str = "app.blebbit.authr.folder.deleteFolder";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for DeleteFolder {
-    const NSID: &'static str = "app.blebbit.authr.folder.deleteFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteFolderResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.folder.deleteFolder
-pub struct DeleteFolderRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.deleteFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteFolder;
-    type Response = DeleteFolderResponse;
 }

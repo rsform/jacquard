@@ -30,6 +30,115 @@ pub struct ListingRecord<'a> {
     pub value: std::option::Option<crate::place_atwork::listing::Listing<'a>>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchListings<'a> {
+    #[serde(borrow)]
+    pub query: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchListingsOutput<'a> {
+    #[serde(borrow)]
+    pub listings: Vec<crate::place_atwork::search_listings::ListingRecord<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchListingsError<'a> {
+    /// Failed to search listings
+    #[serde(rename = "SearchFailed")]
+    SearchFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SearchListingsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::SearchFailed(msg) => {
+                write!(f, "SearchFailed")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
+    fn nsid() -> &'static str {
+        "place.atwork.searchListings"
+    }
+    fn def_name() -> &'static str {
+        "listingRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_atwork_searchListings()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///place.atwork.searchListings
+pub struct SearchListingsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchListingsResponse {
+    const NSID: &'static str = "place.atwork.searchListings";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchListingsOutput<'de>;
+    type Err<'de> = SearchListingsError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchListings<'a> {
+    const NSID: &'static str = "place.atwork.searchListings";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchListingsResponse;
+}
+
+/// Endpoint type for
+///place.atwork.searchListings
+pub struct SearchListingsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchListingsRequest {
+    const PATH: &'static str = "/xrpc/place.atwork.searchListings";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchListings<'de>;
+    type Response = SearchListingsResponse;
+}
+
 pub mod listing_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -330,38 +439,6 @@ fn lexicon_doc_place_atwork_searchListings() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
-    fn nsid() -> &'static str {
-        "place.atwork.searchListings"
-    }
-    fn def_name() -> &'static str {
-        "listingRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_atwork_searchListings()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchListings<'a> {
-    #[serde(borrow)]
-    pub query: jacquard_common::CowStr<'a>,
-}
-
 pub mod search_listings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -449,81 +526,4 @@ where
             query: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchListingsOutput<'a> {
-    #[serde(borrow)]
-    pub listings: Vec<crate::place_atwork::search_listings::ListingRecord<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchListingsError<'a> {
-    /// Failed to search listings
-    #[serde(rename = "SearchFailed")]
-    SearchFailed(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SearchListingsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::SearchFailed(msg) => {
-                write!(f, "SearchFailed")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.atwork.searchListings
-pub struct SearchListingsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchListingsResponse {
-    const NSID: &'static str = "place.atwork.searchListings";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchListingsOutput<'de>;
-    type Err<'de> = SearchListingsError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchListings<'a> {
-    const NSID: &'static str = "place.atwork.searchListings";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchListingsResponse;
-}
-
-/// Endpoint type for
-///place.atwork.searchListings
-pub struct SearchListingsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchListingsRequest {
-    const PATH: &'static str = "/xrpc/place.atwork.searchListings";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchListings<'de>;
-    type Response = SearchListingsResponse;
 }

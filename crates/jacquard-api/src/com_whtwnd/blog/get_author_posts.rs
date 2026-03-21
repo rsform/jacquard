@@ -20,6 +20,48 @@ pub struct GetAuthorPosts<'a> {
     pub author: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAuthorPostsOutput<'a> {
+    #[serde(borrow)]
+    pub post: Vec<crate::com_whtwnd::blog::BlogEntry<'a>>,
+}
+
+/// Response type for
+///com.whtwnd.blog.getAuthorPosts
+pub struct GetAuthorPostsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetAuthorPostsResponse {
+    const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetAuthorPostsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorPosts<'a> {
+    const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAuthorPostsResponse;
+}
+
+/// Endpoint type for
+///com.whtwnd.blog.getAuthorPosts
+pub struct GetAuthorPostsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getAuthorPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAuthorPosts<'de>;
+    type Response = GetAuthorPostsResponse;
+}
+
 pub mod get_author_posts_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             author: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAuthorPostsOutput<'a> {
-    #[serde(borrow)]
-    pub post: Vec<crate::com_whtwnd::blog::BlogEntry<'a>>,
-}
-
-/// Response type for
-///com.whtwnd.blog.getAuthorPosts
-pub struct GetAuthorPostsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetAuthorPostsResponse {
-    const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAuthorPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorPosts<'a> {
-    const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetAuthorPostsResponse;
-}
-
-/// Endpoint type for
-///com.whtwnd.blog.getAuthorPosts
-pub struct GetAuthorPostsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
-    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getAuthorPosts";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAuthorPosts<'de>;
-    type Response = GetAuthorPostsResponse;
 }

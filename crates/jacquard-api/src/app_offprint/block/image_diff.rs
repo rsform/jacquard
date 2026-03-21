@@ -38,6 +38,73 @@ pub struct ImageDiff<'a> {
     pub width: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageDiff<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.imageDiff"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_imageDiff()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() > 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    max: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    min: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.labels {
+            #[allow(unused_comparisons)]
+            if value.len() > 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "labels",
+                    ),
+                    max: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.labels {
+            #[allow(unused_comparisons)]
+            if value.len() < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "labels",
+                    ),
+                    min: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod image_diff_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -361,72 +428,5 @@ fn lexicon_doc_app_offprint_block_imageDiff() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageDiff<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.imageDiff"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_imageDiff()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() > 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    max: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    min: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.labels {
-            #[allow(unused_comparisons)]
-            if value.len() > 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "labels",
-                    ),
-                    max: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.labels {
-            #[allow(unused_comparisons)]
-            if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "labels",
-                    ),
-                    min: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

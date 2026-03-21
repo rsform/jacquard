@@ -26,6 +26,125 @@ pub struct Author<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+/// A hydrated oekaki post returned from the PinkSea app view.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HydratedOekaki<'a> {
+    ///Alt text description of the image, for accessibility.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The AT protocol link.
+    #[serde(borrow)]
+    pub at: jacquard_common::types::string::UriValue<'a>,
+    #[serde(borrow)]
+    pub author: crate::com_shinolabs::pinksea::app_view_defs::Author<'a>,
+    ///The oekaki CID.
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///The creation time.
+    pub creation_time: jacquard_common::types::string::Datetime,
+    ///The image link.
+    #[serde(borrow)]
+    pub image: jacquard_common::types::string::UriValue<'a>,
+    ///Is this oekaki NSFW?
+    pub nsfw: bool,
+    ///An array of tags this image had.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// A tombstone for a missing oekaki.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OekakiTombstone<'a> {
+    ///The AT uri of the former oekaki.
+    #[serde(borrow)]
+    pub former_at: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
+    fn nsid() -> &'static str {
+        "com.shinolabs.pinksea.appViewDefs"
+    }
+    fn def_name() -> &'static str {
+        "author"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
+    fn nsid() -> &'static str {
+        "com.shinolabs.pinksea.appViewDefs"
+    }
+    fn def_name() -> &'static str {
+        "hydratedOekaki"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OekakiTombstone<'a> {
+    fn nsid() -> &'static str {
+        "com.shinolabs.pinksea.appViewDefs"
+    }
+    fn def_name() -> &'static str {
+        "oekakiTombstone"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod author_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,37 +155,37 @@ pub mod author_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -139,8 +258,8 @@ where
 impl<'a, S> AuthorBuilder<'a, S>
 where
     S: author_state::State,
-    S::Handle: author_state::IsSet,
     S::Did: author_state::IsSet,
+    S::Handle: author_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Author<'a> {
@@ -471,61 +590,6 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
-    fn nsid() -> &'static str {
-        "com.shinolabs.pinksea.appViewDefs"
-    }
-    fn def_name() -> &'static str {
-        "author"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A hydrated oekaki post returned from the PinkSea app view.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HydratedOekaki<'a> {
-    ///Alt text description of the image, for accessibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The AT protocol link.
-    #[serde(borrow)]
-    pub at: jacquard_common::types::string::UriValue<'a>,
-    #[serde(borrow)]
-    pub author: crate::com_shinolabs::pinksea::app_view_defs::Author<'a>,
-    ///The oekaki CID.
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///The creation time.
-    pub creation_time: jacquard_common::types::string::Datetime,
-    ///The image link.
-    #[serde(borrow)]
-    pub image: jacquard_common::types::string::UriValue<'a>,
-    ///Is this oekaki NSFW?
-    pub nsfw: bool,
-    ///An array of tags this image had.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
 pub mod hydrated_oekaki_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -537,10 +601,10 @@ pub mod hydrated_oekaki_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Image;
-        type Cid;
         type CreationTime;
-        type Author;
         type Nsfw;
+        type Cid;
+        type Author;
         type At;
     }
     /// Empty state - all required fields are unset
@@ -548,10 +612,10 @@ pub mod hydrated_oekaki_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Image = Unset;
-        type Cid = Unset;
         type CreationTime = Unset;
-        type Author = Unset;
         type Nsfw = Unset;
+        type Cid = Unset;
+        type Author = Unset;
         type At = Unset;
     }
     ///State transition - sets the `image` field to Set
@@ -559,21 +623,10 @@ pub mod hydrated_oekaki_state {
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
         type Image = Set<members::image>;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
         type Cid = S::Cid;
-        type CreationTime = S::CreationTime;
         type Author = S::Author;
-        type Nsfw = S::Nsfw;
-        type At = S::At;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Image = S::Image;
-        type Cid = Set<members::cid>;
-        type CreationTime = S::CreationTime;
-        type Author = S::Author;
-        type Nsfw = S::Nsfw;
         type At = S::At;
     }
     ///State transition - sets the `creation_time` field to Set
@@ -581,21 +634,10 @@ pub mod hydrated_oekaki_state {
     impl<S: State> sealed::Sealed for SetCreationTime<S> {}
     impl<S: State> State for SetCreationTime<S> {
         type Image = S::Image;
-        type Cid = S::Cid;
         type CreationTime = Set<members::creation_time>;
-        type Author = S::Author;
         type Nsfw = S::Nsfw;
-        type At = S::At;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Image = S::Image;
         type Cid = S::Cid;
-        type CreationTime = S::CreationTime;
-        type Author = Set<members::author>;
-        type Nsfw = S::Nsfw;
+        type Author = S::Author;
         type At = S::At;
     }
     ///State transition - sets the `nsfw` field to Set
@@ -603,10 +645,32 @@ pub mod hydrated_oekaki_state {
     impl<S: State> sealed::Sealed for SetNsfw<S> {}
     impl<S: State> State for SetNsfw<S> {
         type Image = S::Image;
-        type Cid = S::Cid;
         type CreationTime = S::CreationTime;
-        type Author = S::Author;
         type Nsfw = Set<members::nsfw>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type At = S::At;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Image = S::Image;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type At = S::At;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Image = S::Image;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
         type At = S::At;
     }
     ///State transition - sets the `at` field to Set
@@ -614,10 +678,10 @@ pub mod hydrated_oekaki_state {
     impl<S: State> sealed::Sealed for SetAt<S> {}
     impl<S: State> State for SetAt<S> {
         type Image = S::Image;
-        type Cid = S::Cid;
         type CreationTime = S::CreationTime;
-        type Author = S::Author;
         type Nsfw = S::Nsfw;
+        type Cid = S::Cid;
+        type Author = S::Author;
         type At = Set<members::at>;
     }
     /// Marker types for field names
@@ -625,14 +689,14 @@ pub mod hydrated_oekaki_state {
     pub mod members {
         ///Marker type for the `image` field
         pub struct image(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `creation_time` field
         pub struct creation_time(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `at` field
         pub struct at(());
     }
@@ -822,10 +886,10 @@ impl<'a, S> HydratedOekakiBuilder<'a, S>
 where
     S: hydrated_oekaki_state::State,
     S::Image: hydrated_oekaki_state::IsSet,
-    S::Cid: hydrated_oekaki_state::IsSet,
     S::CreationTime: hydrated_oekaki_state::IsSet,
-    S::Author: hydrated_oekaki_state::IsSet,
     S::Nsfw: hydrated_oekaki_state::IsSet,
+    S::Cid: hydrated_oekaki_state::IsSet,
+    S::Author: hydrated_oekaki_state::IsSet,
     S::At: hydrated_oekaki_state::IsSet,
 {
     /// Build the final struct
@@ -862,53 +926,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
-    fn nsid() -> &'static str {
-        "com.shinolabs.pinksea.appViewDefs"
-    }
-    fn def_name() -> &'static str {
-        "hydratedOekaki"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A tombstone for a missing oekaki.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OekakiTombstone<'a> {
-    ///The AT uri of the former oekaki.
-    #[serde(borrow)]
-    pub former_at: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod oekaki_tombstone_state {
@@ -1013,22 +1030,5 @@ where
             former_at: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OekakiTombstone<'a> {
-    fn nsid() -> &'static str {
-        "com.shinolabs.pinksea.appViewDefs"
-    }
-    fn def_name() -> &'static str {
-        "oekakiTombstone"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_shinolabs_pinksea_appViewDefs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

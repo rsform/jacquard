@@ -20,6 +20,48 @@ pub struct GetConvo<'a> {
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetConvoOutput<'a> {
+    #[serde(borrow)]
+    pub convo: crate::chat_bsky::convo::ConvoView<'a>,
+}
+
+/// Response type for
+///chat.bsky.convo.getConvo
+pub struct GetConvoResponse;
+impl jacquard_common::xrpc::XrpcResp for GetConvoResponse {
+    const NSID: &'static str = "chat.bsky.convo.getConvo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetConvoOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvo<'a> {
+    const NSID: &'static str = "chat.bsky.convo.getConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetConvoResponse;
+}
+
+/// Endpoint type for
+///chat.bsky.convo.getConvo
+pub struct GetConvoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetConvo<'de>;
+    type Response = GetConvoResponse;
+}
+
 pub mod get_convo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,46 +149,4 @@ where
             convo_id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetConvoOutput<'a> {
-    #[serde(borrow)]
-    pub convo: crate::chat_bsky::convo::ConvoView<'a>,
-}
-
-/// Response type for
-///chat.bsky.convo.getConvo
-pub struct GetConvoResponse;
-impl jacquard_common::xrpc::XrpcResp for GetConvoResponse {
-    const NSID: &'static str = "chat.bsky.convo.getConvo";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConvoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvo<'a> {
-    const NSID: &'static str = "chat.bsky.convo.getConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetConvoResponse;
-}
-
-/// Endpoint type for
-///chat.bsky.convo.getConvo
-pub struct GetConvoRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {
-    const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetConvo<'de>;
-    type Response = GetConvoResponse;
 }

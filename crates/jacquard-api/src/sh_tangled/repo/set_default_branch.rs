@@ -23,6 +23,36 @@ pub struct SetDefaultBranch<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.setDefaultBranch
+pub struct SetDefaultBranchResponse;
+impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
+    const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<'a> {
+    const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SetDefaultBranchResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.setDefaultBranch
+pub struct SetDefaultBranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.setDefaultBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SetDefaultBranch<'de>;
+    type Response = SetDefaultBranchResponse;
+}
+
 pub mod set_default_branch_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,37 +63,37 @@ pub mod set_default_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DefaultBranch;
         type Repo;
+        type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DefaultBranch = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `default_branch` field to Set
-    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
-    impl<S: State> State for SetDefaultBranch<S> {
-        type DefaultBranch = Set<members::default_branch>;
-        type Repo = S::Repo;
+        type DefaultBranch = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type DefaultBranch = S::DefaultBranch;
         type Repo = Set<members::repo>;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `default_branch` field to Set
+    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
+    impl<S: State> State for SetDefaultBranch<S> {
+        type Repo = S::Repo;
+        type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `default_branch` field
-        pub struct default_branch(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
     }
 }
 
@@ -136,8 +166,8 @@ where
 impl<'a, S> SetDefaultBranchBuilder<'a, S>
 where
     S: set_default_branch_state::State,
-    S::DefaultBranch: set_default_branch_state::IsSet,
     S::Repo: set_default_branch_state::IsSet,
+    S::DefaultBranch: set_default_branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetDefaultBranch<'a> {
@@ -161,34 +191,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.setDefaultBranch
-pub struct SetDefaultBranchResponse;
-impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
-    const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<'a> {
-    const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SetDefaultBranchResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.setDefaultBranch
-pub struct SetDefaultBranchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.setDefaultBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SetDefaultBranch<'de>;
-    type Response = SetDefaultBranchResponse;
 }

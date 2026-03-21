@@ -21,6 +21,23 @@ pub mod follow;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Defs<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Defs<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_io_kich_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -48,22 +65,5 @@ fn lexicon_doc_io_kich_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Defs<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

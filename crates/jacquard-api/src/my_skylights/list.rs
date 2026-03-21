@@ -118,6 +118,23 @@ impl jacquard_common::IntoStatic for ListSortBy<'_> {
     }
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+    fn nsid() -> &'static str {
+        "my.skylights.list"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_my_skylights_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_my_skylights_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -215,22 +232,5 @@ fn lexicon_doc_my_skylights_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
-    fn nsid() -> &'static str {
-        "my.skylights.list"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_my_skylights_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

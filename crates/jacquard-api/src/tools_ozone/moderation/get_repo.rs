@@ -20,6 +20,83 @@ pub struct GetRepo<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRepoOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::tools_ozone::moderation::RepoViewDetail<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRepoError<'a> {
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRepoError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.moderation.getRepo
+pub struct GetRepoResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getRepo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRepoOutput<'de>;
+    type Err<'de> = GetRepoError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.getRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRepoResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.getRepo
+pub struct GetRepoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRepo<'de>;
+    type Response = GetRepoResponse;
+}
+
 pub mod get_repo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,81 +186,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRepoOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::tools_ozone::moderation::RepoViewDetail<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRepoError<'a> {
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRepoError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.moderation.getRepo
-pub struct GetRepoResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
-    const NSID: &'static str = "tools.ozone.moderation.getRepo";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRepoOutput<'de>;
-    type Err<'de> = GetRepoError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.getRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRepoResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.getRepo
-pub struct GetRepoRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRepo<'de>;
-    type Response = GetRepoResponse;
 }

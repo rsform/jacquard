@@ -44,290 +44,6 @@ pub struct PutRecord<'a> {
     pub validate: std::option::Option<bool>,
 }
 
-pub mod put_record_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Collection;
-        type Rkey;
-        type Repo;
-        type Record;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Collection = Unset;
-        type Rkey = Unset;
-        type Repo = Unset;
-        type Record = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
-        type Repo = S::Repo;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Collection = S::Collection;
-        type Rkey = Set<members::rkey>;
-        type Repo = S::Repo;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
-        type Repo = Set<members::repo>;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
-        type Repo = S::Repo;
-        type Record = Set<members::record>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `record` field
-        pub struct record(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct PutRecordBuilder<'a, S: put_record_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> PutRecord<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PutRecordBuilder<'a, put_record_state::Empty> {
-        PutRecordBuilder::new()
-    }
-}
-
-impl<'a> PutRecordBuilder<'a, put_record_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        PutRecordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PutRecordBuilder<'a, S>
-where
-    S: put_record_state::State,
-    S::Collection: put_record_state::IsUnset,
-{
-    /// Set the `collection` field (required)
-    pub fn collection(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
-    ) -> PutRecordBuilder<'a, put_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        PutRecordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PutRecordBuilder<'a, S>
-where
-    S: put_record_state::State,
-    S::Record: put_record_state::IsUnset,
-{
-    /// Set the `record` field (required)
-    pub fn record(
-        mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
-    ) -> PutRecordBuilder<'a, put_record_state::SetRecord<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        PutRecordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PutRecordBuilder<'a, S>
-where
-    S: put_record_state::State,
-    S::Repo: put_record_state::IsUnset,
-{
-    /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> PutRecordBuilder<'a, put_record_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        PutRecordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PutRecordBuilder<'a, S>
-where
-    S: put_record_state::State,
-    S::Rkey: put_record_state::IsUnset,
-{
-    /// Set the `rkey` field (required)
-    pub fn rkey(
-        mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-    ) -> PutRecordBuilder<'a, put_record_state::SetRkey<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        PutRecordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
-    /// Set the `swapCommit` field (optional)
-    pub fn swap_commit(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `swapCommit` field to an Option value (optional)
-    pub fn maybe_swap_commit(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
-    /// Set the `swapRecord` field (optional)
-    pub fn swap_record(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `swapRecord` field to an Option value (optional)
-    pub fn maybe_swap_record(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
-    /// Set the `validate` field (optional)
-    pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `validate` field to an Option value (optional)
-    pub fn maybe_validate(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S> PutRecordBuilder<'a, S>
-where
-    S: put_record_state::State,
-    S::Collection: put_record_state::IsSet,
-    S::Rkey: put_record_state::IsSet,
-    S::Repo: put_record_state::IsSet,
-    S::Record: put_record_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> PutRecord<'a> {
-        PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            rkey: self.__unsafe_private_named.3.unwrap(),
-            swap_commit: self.__unsafe_private_named.4,
-            swap_record: self.__unsafe_private_named.5,
-            validate: self.__unsafe_private_named.6,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> PutRecord<'a> {
-        PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            rkey: self.__unsafe_private_named.3.unwrap(),
-            swap_commit: self.__unsafe_private_named.4,
-            swap_record: self.__unsafe_private_named.5,
-            validate: self.__unsafe_private_named.6,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -508,4 +224,288 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutRecordRequest {
     );
     type Request<'de> = PutRecord<'de>;
     type Response = PutRecordResponse;
+}
+
+pub mod put_record_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Record;
+        type Collection;
+        type Repo;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Record = Unset;
+        type Collection = Unset;
+        type Repo = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
+        type Collection = S::Collection;
+        type Repo = S::Repo;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Record = S::Record;
+        type Collection = Set<members::collection>;
+        type Repo = S::Repo;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Record = S::Record;
+        type Collection = S::Collection;
+        type Repo = Set<members::repo>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Record = S::Record;
+        type Collection = S::Collection;
+        type Repo = S::Repo;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PutRecordBuilder<'a, S: put_record_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PutRecord<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PutRecordBuilder<'a, put_record_state::Empty> {
+        PutRecordBuilder::new()
+    }
+}
+
+impl<'a> PutRecordBuilder<'a, put_record_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PutRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutRecordBuilder<'a, S>
+where
+    S: put_record_state::State,
+    S::Collection: put_record_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> PutRecordBuilder<'a, put_record_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PutRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutRecordBuilder<'a, S>
+where
+    S: put_record_state::State,
+    S::Record: put_record_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> PutRecordBuilder<'a, put_record_state::SetRecord<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PutRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutRecordBuilder<'a, S>
+where
+    S: put_record_state::State,
+    S::Repo: put_record_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> PutRecordBuilder<'a, put_record_state::SetRepo<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PutRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutRecordBuilder<'a, S>
+where
+    S: put_record_state::State,
+    S::Rkey: put_record_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ) -> PutRecordBuilder<'a, put_record_state::SetRkey<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        PutRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
+    /// Set the `swapCommit` field (optional)
+    pub fn swap_commit(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `swapCommit` field to an Option value (optional)
+    pub fn maybe_swap_commit(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
+    /// Set the `swapRecord` field (optional)
+    pub fn swap_record(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `swapRecord` field to an Option value (optional)
+    pub fn maybe_swap_record(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
+    /// Set the `validate` field (optional)
+    pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `validate` field to an Option value (optional)
+    pub fn maybe_validate(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> PutRecordBuilder<'a, S>
+where
+    S: put_record_state::State,
+    S::Record: put_record_state::IsSet,
+    S::Collection: put_record_state::IsSet,
+    S::Repo: put_record_state::IsSet,
+    S::Rkey: put_record_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PutRecord<'a> {
+        PutRecord {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            repo: self.__unsafe_private_named.2.unwrap(),
+            rkey: self.__unsafe_private_named.3.unwrap(),
+            swap_commit: self.__unsafe_private_named.4,
+            swap_record: self.__unsafe_private_named.5,
+            validate: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PutRecord<'a> {
+        PutRecord {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            repo: self.__unsafe_private_named.2.unwrap(),
+            rkey: self.__unsafe_private_named.3.unwrap(),
+            swap_commit: self.__unsafe_private_named.4,
+            swap_record: self.__unsafe_private_named.5,
+            validate: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }

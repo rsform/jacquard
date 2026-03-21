@@ -20,6 +20,91 @@ pub struct GetRecipe<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRecipeOutput<'a> {
+    #[serde(borrow)]
+    pub recipes: Vec<crate::blue_recipes::feed::RecipeView<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRecipeError<'a> {
+    #[serde(rename = "NotFound")]
+    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidUri")]
+    InvalidUri(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRecipeError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotFound(msg) => {
+                write!(f, "NotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidUri(msg) => {
+                write!(f, "InvalidUri")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///blue.recipes.feed.getRecipe
+pub struct GetRecipeResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRecipeResponse {
+    const NSID: &'static str = "blue.recipes.feed.getRecipe";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetRecipeOutput<'de>;
+    type Err<'de> = GetRecipeError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecipe<'a> {
+    const NSID: &'static str = "blue.recipes.feed.getRecipe";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecipeResponse;
+}
+
+/// Endpoint type for
+///blue.recipes.feed.getRecipe
+pub struct GetRecipeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecipeRequest {
+    const PATH: &'static str = "/xrpc/blue.recipes.feed.getRecipe";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecipe<'de>;
+    type Response = GetRecipeResponse;
+}
+
 pub mod get_recipe_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,89 +194,4 @@ where
             uris: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRecipeOutput<'a> {
-    #[serde(borrow)]
-    pub recipes: Vec<crate::blue_recipes::feed::RecipeView<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecipeError<'a> {
-    #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidUri")]
-    InvalidUri(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRecipeError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotFound(msg) => {
-                write!(f, "NotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidUri(msg) => {
-                write!(f, "InvalidUri")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///blue.recipes.feed.getRecipe
-pub struct GetRecipeResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRecipeResponse {
-    const NSID: &'static str = "blue.recipes.feed.getRecipe";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecipeOutput<'de>;
-    type Err<'de> = GetRecipeError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecipe<'a> {
-    const NSID: &'static str = "blue.recipes.feed.getRecipe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRecipeResponse;
-}
-
-/// Endpoint type for
-///blue.recipes.feed.getRecipe
-pub struct GetRecipeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRecipeRequest {
-    const PATH: &'static str = "/xrpc/blue.recipes.feed.getRecipe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecipe<'de>;
-    type Response = GetRecipeResponse;
 }

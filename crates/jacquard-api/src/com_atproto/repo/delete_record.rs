@@ -38,6 +38,88 @@ pub struct DeleteRecord<'a> {
     pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteRecordError<'a> {
+    #[serde(rename = "InvalidSwap")]
+    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteRecordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidSwap(msg) => {
+                write!(f, "InvalidSwap")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.repo.deleteRecord
+pub struct DeleteRecordResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteRecordResponse {
+    const NSID: &'static str = "com.atproto.repo.deleteRecord";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeleteRecordOutput<'de>;
+    type Err<'de> = DeleteRecordError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecord<'a> {
+    const NSID: &'static str = "com.atproto.repo.deleteRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteRecordResponse;
+}
+
+/// Endpoint type for
+///com.atproto.repo.deleteRecord
+pub struct DeleteRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.deleteRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteRecord<'de>;
+    type Response = DeleteRecordResponse;
+}
+
 pub mod delete_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -48,51 +130,51 @@ pub mod delete_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rkey;
         type Repo;
         type Collection;
-        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rkey = Unset;
         type Repo = Unset;
         type Collection = Unset;
-        type Rkey = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Repo = S::Repo;
-        type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
+        type Rkey = Set<members::rkey>;
         type Repo = S::Repo;
         type Collection = S::Collection;
-        type Rkey = Set<members::rkey>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rkey = S::Rkey;
+        type Repo = Set<members::repo>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Rkey = S::Rkey;
+        type Repo = S::Repo;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
     }
 }
 
@@ -233,9 +315,9 @@ impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
 impl<'a, S> DeleteRecordBuilder<'a, S>
 where
     S: delete_record_state::State,
+    S::Rkey: delete_record_state::IsSet,
     S::Repo: delete_record_state::IsSet,
     S::Collection: delete_record_state::IsSet,
-    S::Rkey: delete_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteRecord<'a> {
@@ -265,86 +347,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteRecordError<'a> {
-    #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteRecordError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidSwap(msg) => {
-                write!(f, "InvalidSwap")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.repo.deleteRecord
-pub struct DeleteRecordResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteRecordResponse {
-    const NSID: &'static str = "com.atproto.repo.deleteRecord";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteRecordOutput<'de>;
-    type Err<'de> = DeleteRecordError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecord<'a> {
-    const NSID: &'static str = "com.atproto.repo.deleteRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteRecordResponse;
-}
-
-/// Endpoint type for
-///com.atproto.repo.deleteRecord
-pub struct DeleteRecordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.repo.deleteRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteRecord<'de>;
-    type Response = DeleteRecordResponse;
 }

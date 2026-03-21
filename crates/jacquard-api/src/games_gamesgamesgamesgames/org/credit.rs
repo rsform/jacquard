@@ -33,6 +33,96 @@ pub struct Credit<'a> {
     pub roles: Vec<crate::games_gamesgamesgamesgames::CompanyRole<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreditGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Credit<'a>,
+}
+
+impl<'a> Credit<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CreditRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CreditRecord;
+impl jacquard_common::xrpc::XrpcResp for CreditRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreditGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CreditGetRecordOutput<'_>> for Credit<'_> {
+    fn from(output: CreditGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Credit<'_> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
+    type Record = CreditRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CreditRecord {
+    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
+    type Record = CreditRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.org.credit"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_org_credit()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod credit_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,51 +133,51 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Roles;
-        type Org;
         type Game;
+        type Org;
+        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Roles = Unset;
-        type Org = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoles<S> {}
-    impl<S: State> State for SetRoles<S> {
-        type Roles = Set<members::roles>;
-        type Org = S::Org;
-        type Game = S::Game;
-    }
-    ///State transition - sets the `org` field to Set
-    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrg<S> {}
-    impl<S: State> State for SetOrg<S> {
-        type Roles = S::Roles;
-        type Org = Set<members::org>;
-        type Game = S::Game;
+        type Org = Unset;
+        type Roles = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Roles = S::Roles;
-        type Org = S::Org;
         type Game = Set<members::game>;
+        type Org = S::Org;
+        type Roles = S::Roles;
+    }
+    ///State transition - sets the `org` field to Set
+    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrg<S> {}
+    impl<S: State> State for SetOrg<S> {
+        type Game = S::Game;
+        type Org = Set<members::org>;
+        type Roles = S::Roles;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoles<S> {}
+    impl<S: State> State for SetRoles<S> {
+        type Game = S::Game;
+        type Org = S::Org;
+        type Roles = Set<members::roles>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `roles` field
-        pub struct roles(());
-        ///Marker type for the `org` field
-        pub struct org(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `org` field
+        pub struct org(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
     }
 }
 
@@ -220,9 +310,9 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Roles: credit_state::IsSet,
-    S::Org: credit_state::IsSet,
     S::Game: credit_state::IsSet,
+    S::Org: credit_state::IsSet,
+    S::Roles: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -251,96 +341,6 @@ where
             roles: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Credit<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CreditRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreditGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Credit<'a>,
-}
-
-impl From<CreditGetRecordOutput<'_>> for Credit<'_> {
-    fn from(output: CreditGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Credit<'_> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
-    type Record = CreditRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CreditRecord;
-impl jacquard_common::xrpc::XrpcResp for CreditRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreditGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CreditRecord {
-    const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
-    type Record = CreditRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.org.credit"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_org_credit()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

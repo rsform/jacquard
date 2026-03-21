@@ -31,6 +31,103 @@ pub struct Actor<'a> {
     pub slice_uri: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActors<'a> {
+    ///Pagination cursor from previous response
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Maximum number of actors to return Defaults to `50`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_get_actors_limit")]
+    pub limit: std::option::Option<i64>,
+    ///AT-URI of the slice to query
+    #[serde(borrow)]
+    pub slice: jacquard_common::CowStr<'a>,
+    ///Flexible filtering conditions for querying actors
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorsOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::network_slices::slice::get_actors::Actor<'a>>,
+    ///Pagination cursor for next page
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Actor<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.getActors"
+    }
+    fn def_name() -> &'static str {
+        "actor"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_slice_getActors()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///network.slices.slice.getActors
+pub struct GetActorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
+    const NSID: &'static str = "network.slices.slice.getActors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActors<'a> {
+    const NSID: &'static str = "network.slices.slice.getActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GetActorsResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.getActors
+pub struct GetActorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetActors<'de>;
+    type Response = GetActorsResponse;
+}
+
 pub mod actor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -41,51 +138,51 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type IndexedAt;
         type SliceUri;
+        type IndexedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type IndexedAt = Unset;
         type SliceUri = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type IndexedAt = S::IndexedAt;
-        type SliceUri = S::SliceUri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Did = S::Did;
-        type IndexedAt = Set<members::indexed_at>;
-        type SliceUri = S::SliceUri;
+        type IndexedAt = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `slice_uri` field to Set
     pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSliceUri<S> {}
     impl<S: State> State for SetSliceUri<S> {
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
         type SliceUri = Set<members::slice_uri>;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type SliceUri = S::SliceUri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type SliceUri = S::SliceUri;
+        type IndexedAt = S::IndexedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `slice_uri` field
         pub struct slice_uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -198,9 +295,9 @@ where
 impl<'a, S> ActorBuilder<'a, S>
 where
     S: actor_state::State,
-    S::Did: actor_state::IsSet,
-    S::IndexedAt: actor_state::IsSet,
     S::SliceUri: actor_state::IsSet,
+    S::IndexedAt: actor_state::IsSet,
+    S::Did: actor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Actor<'a> {
@@ -448,103 +545,6 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Actor<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.slice.getActors"
-    }
-    fn def_name() -> &'static str {
-        "actor"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_slice_getActors()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActors<'a> {
-    ///Pagination cursor from previous response
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of actors to return Defaults to `50`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_get_actors_limit")]
-    pub limit: std::option::Option<i64>,
-    ///AT-URI of the slice to query
-    #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
-    ///Flexible filtering conditions for querying actors
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
-}
-
 fn _default_get_actors_limit() -> std::option::Option<i64> {
     Some(50i64)
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorsOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::network_slices::slice::get_actors::Actor<'a>>,
-    ///Pagination cursor for next page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///network.slices.slice.getActors
-pub struct GetActorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
-    const NSID: &'static str = "network.slices.slice.getActors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActors<'a> {
-    const NSID: &'static str = "network.slices.slice.getActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = GetActorsResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.getActors
-pub struct GetActorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.getActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = GetActors<'de>;
-    type Response = GetActorsResponse;
 }

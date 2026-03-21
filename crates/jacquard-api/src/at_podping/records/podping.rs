@@ -42,6 +42,84 @@ pub struct Podping<'a> {
     pub version: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PodpingGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Podping<'a>,
+}
+
+impl<'a> Podping<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PodpingRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PodpingRecord;
+impl jacquard_common::xrpc::XrpcResp for PodpingRecord {
+    const NSID: &'static str = "at.podping.records.podping";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PodpingGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PodpingGetRecordOutput<'_>> for Podping<'_> {
+    fn from(output: PodpingGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Podping<'_> {
+    const NSID: &'static str = "at.podping.records.podping";
+    type Record = PodpingRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PodpingRecord {
+    const NSID: &'static str = "at.podping.records.podping";
+    type Record = PodpingRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podping<'a> {
+    fn nsid() -> &'static str {
+        "at.podping.records.podping"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_podping_records_podping()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod podping_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -52,85 +130,85 @@ pub mod podping_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Reason;
         type Iris;
-        type Version;
         type Medium;
         type Timestamp;
-        type Reason;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Reason = Unset;
         type Iris = Unset;
-        type Version = Unset;
         type Medium = Unset;
         type Timestamp = Unset;
-        type Reason = Unset;
-    }
-    ///State transition - sets the `iris` field to Set
-    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIris<S> {}
-    impl<S: State> State for SetIris<S> {
-        type Iris = Set<members::iris>;
-        type Version = S::Version;
-        type Medium = S::Medium;
-        type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Iris = S::Iris;
-        type Version = Set<members::version>;
-        type Medium = S::Medium;
-        type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedium<S> {}
-    impl<S: State> State for SetMedium<S> {
-        type Iris = S::Iris;
-        type Version = S::Version;
-        type Medium = Set<members::medium>;
-        type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Iris = S::Iris;
-        type Version = S::Version;
-        type Medium = S::Medium;
-        type Timestamp = Set<members::timestamp>;
-        type Reason = S::Reason;
+        type Version = Unset;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
+        type Reason = Set<members::reason>;
         type Iris = S::Iris;
-        type Version = S::Version;
         type Medium = S::Medium;
         type Timestamp = S::Timestamp;
-        type Reason = Set<members::reason>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `iris` field to Set
+    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIris<S> {}
+    impl<S: State> State for SetIris<S> {
+        type Reason = S::Reason;
+        type Iris = Set<members::iris>;
+        type Medium = S::Medium;
+        type Timestamp = S::Timestamp;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedium<S> {}
+    impl<S: State> State for SetMedium<S> {
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Medium = Set<members::medium>;
+        type Timestamp = S::Timestamp;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Medium = S::Medium;
+        type Timestamp = Set<members::timestamp>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Medium = S::Medium;
+        type Timestamp = S::Timestamp;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `iris` field
         pub struct iris(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `medium` field
         pub struct medium(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -300,11 +378,11 @@ where
 impl<'a, S> PodpingBuilder<'a, S>
 where
     S: podping_state::State,
+    S::Reason: podping_state::IsSet,
     S::Iris: podping_state::IsSet,
-    S::Version: podping_state::IsSet,
     S::Medium: podping_state::IsSet,
     S::Timestamp: podping_state::IsSet,
-    S::Reason: podping_state::IsSet,
+    S::Version: podping_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podping<'a> {
@@ -337,84 +415,6 @@ where
             version: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Podping<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PodpingRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PodpingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Podping<'a>,
-}
-
-impl From<PodpingGetRecordOutput<'_>> for Podping<'_> {
-    fn from(output: PodpingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Podping<'_> {
-    const NSID: &'static str = "at.podping.records.podping";
-    type Record = PodpingRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PodpingRecord;
-impl jacquard_common::xrpc::XrpcResp for PodpingRecord {
-    const NSID: &'static str = "at.podping.records.podping";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PodpingGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PodpingRecord {
-    const NSID: &'static str = "at.podping.records.podping";
-    type Record = PodpingRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podping<'a> {
-    fn nsid() -> &'static str {
-        "at.podping.records.podping"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_podping_records_podping()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

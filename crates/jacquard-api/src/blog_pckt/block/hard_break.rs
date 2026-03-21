@@ -18,6 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HardBreak<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HardBreak<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.hardBreak"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_hardBreak()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_block_hardBreak() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -43,22 +60,5 @@ fn lexicon_doc_blog_pckt_block_hardBreak() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HardBreak<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.hardBreak"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_hardBreak()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -40,6 +40,56 @@ pub struct ListScheduledActions<'a> {
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListScheduledActionsOutput<'a> {
+    #[serde(borrow)]
+    pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
+    ///Cursor for next page of results
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///tools.ozone.moderation.listScheduledActions
+pub struct ListScheduledActionsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
+    const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListScheduledActionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
+    const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ListScheduledActionsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.moderation.listScheduledActions
+pub struct ListScheduledActionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.listScheduledActions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ListScheduledActions<'de>;
+    type Response = ListScheduledActionsResponse;
+}
+
 fn _default_list_scheduled_actions_limit() -> std::option::Option<i64> {
     Some(50i64)
 }
@@ -251,54 +301,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListScheduledActionsOutput<'a> {
-    #[serde(borrow)]
-    pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
-    ///Cursor for next page of results
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///tools.ozone.moderation.listScheduledActions
-pub struct ListScheduledActionsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
-    const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListScheduledActionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
-    const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ListScheduledActionsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.moderation.listScheduledActions
-pub struct ListScheduledActionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.moderation.listScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = ListScheduledActions<'de>;
-    type Response = ListScheduledActionsResponse;
 }

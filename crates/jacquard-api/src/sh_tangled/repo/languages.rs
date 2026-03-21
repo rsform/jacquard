@@ -37,6 +37,149 @@ pub struct Language<'a> {
     pub size: i64,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Languages<'a> {
+    ///Defaults to `"HEAD"`.
+    #[serde(default = "_default_ref")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LanguagesOutput<'a> {
+    #[serde(borrow)]
+    pub languages: Vec<crate::sh_tangled::repo::languages::Language<'a>>,
+    ///The git reference used
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+    ///Total number of files analyzed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_files: std::option::Option<i64>,
+    ///Total size of all analyzed files in bytes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_size: std::option::Option<i64>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LanguagesError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Git reference not found
+    #[serde(rename = "RefNotFound")]
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for LanguagesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RefNotFound(msg) => {
+                write!(f, "RefNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Language<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.repo.languages"
+    }
+    fn def_name() -> &'static str {
+        "language"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_repo_languages()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.languages
+pub struct LanguagesResponse;
+impl jacquard_common::xrpc::XrpcResp for LanguagesResponse {
+    const NSID: &'static str = "sh.tangled.repo.languages";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LanguagesOutput<'de>;
+    type Err<'de> = LanguagesError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Languages<'a> {
+    const NSID: &'static str = "sh.tangled.repo.languages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = LanguagesResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.languages
+pub struct LanguagesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.languages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Languages<'de>;
+    type Response = LanguagesResponse;
+}
+
 pub mod language_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -47,51 +190,51 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Percentage;
         type Name;
         type Size;
-        type Percentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Percentage = Unset;
         type Name = Unset;
         type Size = Unset;
-        type Percentage = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Size = S::Size;
-        type Percentage = S::Percentage;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
-        type Size = Set<members::size>;
-        type Percentage = S::Percentage;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPercentage<S> {}
     impl<S: State> State for SetPercentage<S> {
+        type Percentage = Set<members::percentage>;
         type Name = S::Name;
         type Size = S::Size;
-        type Percentage = Set<members::percentage>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Percentage = S::Percentage;
+        type Name = Set<members::name>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Percentage = S::Percentage;
+        type Name = S::Name;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `percentage` field
+        pub struct percentage(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
-        ///Marker type for the `percentage` field
-        pub struct percentage(());
     }
 }
 
@@ -235,9 +378,9 @@ where
 impl<'a, S> LanguageBuilder<'a, S>
 where
     S: language_state::State,
+    S::Percentage: language_state::IsSet,
     S::Name: language_state::IsSet,
     S::Size: language_state::IsSet,
-    S::Percentage: language_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Language<'a> {
@@ -477,45 +620,8 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Language<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.repo.languages"
-    }
-    fn def_name() -> &'static str {
-        "language"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_repo_languages()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_ref() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("HEAD"))
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Languages<'a> {
-    ///Defaults to `"HEAD"`.
-    #[serde(default = "_default_ref")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
 }
 
 pub mod languages_state {
@@ -625,110 +731,4 @@ where
             repo: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LanguagesOutput<'a> {
-    #[serde(borrow)]
-    pub languages: Vec<crate::sh_tangled::repo::languages::Language<'a>>,
-    ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-    ///Total number of files analyzed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_files: std::option::Option<i64>,
-    ///Total size of all analyzed files in bytes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_size: std::option::Option<i64>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum LanguagesError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Git reference not found
-    #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for LanguagesError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RefNotFound(msg) => {
-                write!(f, "RefNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.languages
-pub struct LanguagesResponse;
-impl jacquard_common::xrpc::XrpcResp for LanguagesResponse {
-    const NSID: &'static str = "sh.tangled.repo.languages";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LanguagesOutput<'de>;
-    type Err<'de> = LanguagesError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Languages<'a> {
-    const NSID: &'static str = "sh.tangled.repo.languages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = LanguagesResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.languages
-pub struct LanguagesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.languages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Languages<'de>;
-    type Response = LanguagesResponse;
 }

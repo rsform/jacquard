@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_detailed() -> std::option::Option<bool> {
-    Some(false)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,71 @@ pub struct GetServices<'a> {
     pub detailed: std::option::Option<bool>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetServicesOutput<'a> {
+    #[serde(borrow)]
+    pub views: Vec<GetServicesOutputViewsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetServicesOutputViewsItem<'a> {
+    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
+    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    #[serde(rename = "app.bsky.labeler.defs#labelerViewDetailed")]
+    LabelerViewDetailed(Box<crate::app_bsky::labeler::LabelerViewDetailed<'a>>),
+}
+
+/// Response type for
+///app.bsky.labeler.getServices
+pub struct GetServicesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
+    const NSID: &'static str = "app.bsky.labeler.getServices";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetServicesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
+    const NSID: &'static str = "app.bsky.labeler.getServices";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetServicesResponse;
+}
+
+/// Endpoint type for
+///app.bsky.labeler.getServices
+pub struct GetServicesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetServices<'de>;
+    type Response = GetServicesResponse;
+}
+
+fn _default_detailed() -> std::option::Option<bool> {
+    Some(false)
 }
 
 pub mod get_services_state {
@@ -132,65 +193,4 @@ where
             dids: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetServicesOutput<'a> {
-    #[serde(borrow)]
-    pub views: Vec<GetServicesOutputViewsItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetServicesOutputViewsItem<'a> {
-    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
-    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
-    #[serde(rename = "app.bsky.labeler.defs#labelerViewDetailed")]
-    LabelerViewDetailed(Box<crate::app_bsky::labeler::LabelerViewDetailed<'a>>),
-}
-
-/// Response type for
-///app.bsky.labeler.getServices
-pub struct GetServicesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
-    const NSID: &'static str = "app.bsky.labeler.getServices";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetServicesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
-    const NSID: &'static str = "app.bsky.labeler.getServices";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetServicesResponse;
-}
-
-/// Endpoint type for
-///app.bsky.labeler.getServices
-pub struct GetServicesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetServices<'de>;
-    type Response = GetServicesResponse;
 }

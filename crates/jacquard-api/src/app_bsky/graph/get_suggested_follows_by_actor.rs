@@ -20,6 +20,59 @@ pub struct GetSuggestedFollowsByActor<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestedFollowsByActorOutput<'a> {
+    ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
+    pub is_fallback: std::option::Option<bool>,
+    ///DEPRECATED: use recIdStr instead.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rec_id: std::option::Option<i64>,
+    ///Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+}
+
+/// Response type for
+///app.bsky.graph.getSuggestedFollowsByActor
+pub struct GetSuggestedFollowsByActorResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestedFollowsByActorResponse {
+    const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestedFollowsByActorOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFollowsByActor<'a> {
+    const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestedFollowsByActorResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getSuggestedFollowsByActor
+pub struct GetSuggestedFollowsByActorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getSuggestedFollowsByActor";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedFollowsByActor<'de>;
+    type Response = GetSuggestedFollowsByActorResponse;
+}
+
 pub mod get_suggested_follows_by_actor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,61 +175,8 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestedFollowsByActorOutput<'a> {
-    ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
-    pub is_fallback: std::option::Option<bool>,
-    ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rec_id: std::option::Option<i64>,
-    ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-}
-
 fn _default_get_suggested_follows_by_actor_output_is_fallback() -> std::option::Option<
     bool,
 > {
     Some(false)
-}
-
-/// Response type for
-///app.bsky.graph.getSuggestedFollowsByActor
-pub struct GetSuggestedFollowsByActorResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestedFollowsByActorResponse {
-    const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedFollowsByActorOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFollowsByActor<'a> {
-    const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestedFollowsByActorResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getSuggestedFollowsByActor
-pub struct GetSuggestedFollowsByActorRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getSuggestedFollowsByActor";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedFollowsByActor<'de>;
-    type Response = GetSuggestedFollowsByActorResponse;
 }

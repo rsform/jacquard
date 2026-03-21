@@ -39,6 +39,307 @@ pub struct Declaration<'a> {
     pub version: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeclarationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Declaration<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageMe<'a> {
+    ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
+    #[serde(borrow)]
+    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
+    ///The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
+    #[serde(borrow)]
+    pub show_button_to: MessageMeShowButtonTo<'a>,
+}
+
+/// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MessageMeShowButtonTo<'a> {
+    None,
+    UsersIFollow,
+    Everyone,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MessageMeShowButtonTo<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::UsersIFollow => "usersIFollow",
+            Self::Everyone => "everyone",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MessageMeShowButtonTo<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "usersIFollow" => Self::UsersIFollow,
+            "everyone" => Self::Everyone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MessageMeShowButtonTo<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "usersIFollow" => Self::UsersIFollow,
+            "everyone" => Self::Everyone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MessageMeShowButtonTo<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MessageMeShowButtonTo<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MessageMeShowButtonTo<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MessageMeShowButtonTo<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MessageMeShowButtonTo<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
+    type Output = MessageMeShowButtonTo<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
+            MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
+            MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
+            MessageMeShowButtonTo::Other(v) => {
+                MessageMeShowButtonTo::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> Declaration<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DeclarationRecord;
+impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
+    const NSID: &'static str = "com.germnetwork.declaration";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeclarationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
+    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Declaration<'_> {
+    const NSID: &'static str = "com.germnetwork.declaration";
+    type Record = DeclarationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DeclarationRecord {
+    const NSID: &'static str = "com.germnetwork.declaration";
+    type Record = DeclarationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
+    fn nsid() -> &'static str {
+        "com.germnetwork.declaration"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_germnetwork_declaration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.continuity_proofs {
+            #[allow(unused_comparisons)]
+            if value.len() > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "continuity_proofs",
+                    ),
+                    max: 1000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.version;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 14usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
+                    max: 14usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.version;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "version",
+                    ),
+                    min: 5usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
+    fn nsid() -> &'static str {
+        "com.germnetwork.declaration"
+    }
+    fn def_name() -> &'static str {
+        "messageMe"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_germnetwork_declaration()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.message_me_url;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2047usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message_me_url",
+                    ),
+                    max: 2047usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.message_me_url;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message_me_url",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.show_button_to;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "show_button_to",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.show_button_to;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "show_button_to",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod declaration_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -245,122 +546,6 @@ where
     }
 }
 
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclarationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Declaration<'a>,
-}
-
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
-    const NSID: &'static str = "com.germnetwork.declaration";
-    type Record = DeclarationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DeclarationRecord;
-impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
-    const NSID: &'static str = "com.germnetwork.declaration";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DeclarationRecord {
-    const NSID: &'static str = "com.germnetwork.declaration";
-    type Record = DeclarationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
-    fn nsid() -> &'static str {
-        "com.germnetwork.declaration"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_germnetwork_declaration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.continuity_proofs {
-            #[allow(unused_comparisons)]
-            if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "continuity_proofs",
-                    ),
-                    max: 1000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.version;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 14usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
-                    max: 14usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.version;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
-                    min: 5usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -533,26 +718,6 @@ fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageMe<'a> {
-    ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
-    #[serde(borrow)]
-    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
-    ///The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
-    #[serde(borrow)]
-    pub show_button_to: MessageMeShowButtonTo<'a>,
-}
-
 pub mod message_me_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -563,37 +728,37 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowButtonTo;
         type MessageMeUrl;
+        type ShowButtonTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowButtonTo = Unset;
         type MessageMeUrl = Unset;
-    }
-    ///State transition - sets the `show_button_to` field to Set
-    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
-    impl<S: State> State for SetShowButtonTo<S> {
-        type ShowButtonTo = Set<members::show_button_to>;
-        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Unset;
     }
     ///State transition - sets the `message_me_url` field to Set
     pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
     impl<S: State> State for SetMessageMeUrl<S> {
-        type ShowButtonTo = S::ShowButtonTo;
         type MessageMeUrl = Set<members::message_me_url>;
+        type ShowButtonTo = S::ShowButtonTo;
+    }
+    ///State transition - sets the `show_button_to` field to Set
+    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
+    impl<S: State> State for SetShowButtonTo<S> {
+        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Set<members::show_button_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_button_to` field
-        pub struct show_button_to(());
         ///Marker type for the `message_me_url` field
         pub struct message_me_url(());
+        ///Marker type for the `show_button_to` field
+        pub struct show_button_to(());
     }
 }
 
@@ -666,8 +831,8 @@ where
 impl<'a, S> MessageMeBuilder<'a, S>
 where
     S: message_me_state::State,
-    S::ShowButtonTo: message_me_state::IsSet,
     S::MessageMeUrl: message_me_state::IsSet,
+    S::ShowButtonTo: message_me_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageMe<'a> {
@@ -690,170 +855,5 @@ where
             show_button_to: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-/// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MessageMeShowButtonTo<'a> {
-    None,
-    UsersIFollow,
-    Everyone,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MessageMeShowButtonTo<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::UsersIFollow => "usersIFollow",
-            Self::Everyone => "everyone",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MessageMeShowButtonTo<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "usersIFollow" => Self::UsersIFollow,
-            "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MessageMeShowButtonTo<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "usersIFollow" => Self::UsersIFollow,
-            "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MessageMeShowButtonTo<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MessageMeShowButtonTo<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MessageMeShowButtonTo<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MessageMeShowButtonTo<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MessageMeShowButtonTo<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
-    type Output = MessageMeShowButtonTo<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
-            MessageMeShowButtonTo::UsersIFollow => MessageMeShowButtonTo::UsersIFollow,
-            MessageMeShowButtonTo::Everyone => MessageMeShowButtonTo::Everyone,
-            MessageMeShowButtonTo::Other(v) => {
-                MessageMeShowButtonTo::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
-    fn nsid() -> &'static str {
-        "com.germnetwork.declaration"
-    }
-    fn def_name() -> &'static str {
-        "messageMe"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_germnetwork_declaration()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.message_me_url;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2047usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message_me_url",
-                    ),
-                    max: 2047usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.message_me_url;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message_me_url",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.show_button_to;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "show_button_to",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.show_button_to;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "show_button_to",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

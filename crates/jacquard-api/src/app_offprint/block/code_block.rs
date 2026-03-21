@@ -31,6 +31,23 @@ pub struct CodeBlock<'a> {
     pub show_line_numbers: std::option::Option<bool>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.codeBlock"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_codeBlock()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_code_block_show_line_numbers() -> std::option::Option<bool> {
     Some(false)
 }
@@ -114,22 +131,5 @@ fn lexicon_doc_app_offprint_block_codeBlock() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.codeBlock"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_codeBlock()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -27,6 +27,23 @@ pub struct Basic<'a> {
     pub foreground: crate::site_standard::theme::color::Rgb<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Basic<'a> {
+    fn nsid() -> &'static str {
+        "site.standard.theme.basic"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_site_standard_theme_basic()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod basic_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,8 +56,8 @@ pub mod basic_state {
     pub trait State: sealed::Sealed {
         type AccentForeground;
         type Accent;
-        type Background;
         type Foreground;
+        type Background;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -48,8 +65,8 @@ pub mod basic_state {
     impl State for Empty {
         type AccentForeground = Unset;
         type Accent = Unset;
-        type Background = Unset;
         type Foreground = Unset;
+        type Background = Unset;
     }
     ///State transition - sets the `accent_foreground` field to Set
     pub struct SetAccentForeground<S: State = Empty>(PhantomData<fn() -> S>);
@@ -57,8 +74,8 @@ pub mod basic_state {
     impl<S: State> State for SetAccentForeground<S> {
         type AccentForeground = Set<members::accent_foreground>;
         type Accent = S::Accent;
-        type Background = S::Background;
         type Foreground = S::Foreground;
+        type Background = S::Background;
     }
     ///State transition - sets the `accent` field to Set
     pub struct SetAccent<S: State = Empty>(PhantomData<fn() -> S>);
@@ -66,17 +83,8 @@ pub mod basic_state {
     impl<S: State> State for SetAccent<S> {
         type AccentForeground = S::AccentForeground;
         type Accent = Set<members::accent>;
+        type Foreground = S::Foreground;
         type Background = S::Background;
-        type Foreground = S::Foreground;
-    }
-    ///State transition - sets the `background` field to Set
-    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBackground<S> {}
-    impl<S: State> State for SetBackground<S> {
-        type AccentForeground = S::AccentForeground;
-        type Accent = S::Accent;
-        type Background = Set<members::background>;
-        type Foreground = S::Foreground;
     }
     ///State transition - sets the `foreground` field to Set
     pub struct SetForeground<S: State = Empty>(PhantomData<fn() -> S>);
@@ -84,8 +92,17 @@ pub mod basic_state {
     impl<S: State> State for SetForeground<S> {
         type AccentForeground = S::AccentForeground;
         type Accent = S::Accent;
-        type Background = S::Background;
         type Foreground = Set<members::foreground>;
+        type Background = S::Background;
+    }
+    ///State transition - sets the `background` field to Set
+    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBackground<S> {}
+    impl<S: State> State for SetBackground<S> {
+        type AccentForeground = S::AccentForeground;
+        type Accent = S::Accent;
+        type Foreground = S::Foreground;
+        type Background = Set<members::background>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -94,10 +111,10 @@ pub mod basic_state {
         pub struct accent_foreground(());
         ///Marker type for the `accent` field
         pub struct accent(());
-        ///Marker type for the `background` field
-        pub struct background(());
         ///Marker type for the `foreground` field
         pub struct foreground(());
+        ///Marker type for the `background` field
+        pub struct background(());
     }
 }
 
@@ -212,8 +229,8 @@ where
     S: basic_state::State,
     S::AccentForeground: basic_state::IsSet,
     S::Accent: basic_state::IsSet,
-    S::Background: basic_state::IsSet,
     S::Foreground: basic_state::IsSet,
+    S::Background: basic_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Basic<'a> {
@@ -323,22 +340,5 @@ fn lexicon_doc_site_standard_theme_basic() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Basic<'a> {
-    fn nsid() -> &'static str {
-        "site.standard.theme.basic"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_site_standard_theme_basic()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

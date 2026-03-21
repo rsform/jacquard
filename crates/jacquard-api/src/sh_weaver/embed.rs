@@ -28,6 +28,57 @@ pub struct PercentSize<'a> {
     pub width: i64,
 }
 
+/// Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PixelSize<'a> {
+    pub height: i64,
+    pub width: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PercentSize<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.defs"
+    }
+    fn def_name() -> &'static str {
+        "percentSize"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PixelSize<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.defs"
+    }
+    fn def_name() -> &'static str {
+        "pixelSize"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod percent_size_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -276,40 +327,6 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PercentSize<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.embed.defs"
-    }
-    fn def_name() -> &'static str {
-        "percentSize"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_embed_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PixelSize<'a> {
-    pub height: i64,
-    pub width: i64,
-}
-
 pub mod pixel_size_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -444,22 +461,5 @@ where
             width: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PixelSize<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.embed.defs"
-    }
-    fn def_name() -> &'static str {
-        "pixelSize"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_embed_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

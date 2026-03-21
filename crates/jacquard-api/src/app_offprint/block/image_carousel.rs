@@ -34,6 +34,49 @@ pub struct ImageCarousel<'a> {
     pub interval: std::option::Option<i64>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.imageCarousel"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_imageCarousel()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() > 6usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    max: 6usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    min: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_image_carousel_autoplay() -> std::option::Option<bool> {
     Some(false)
 }
@@ -291,48 +334,5 @@ fn lexicon_doc_app_offprint_block_imageCarousel() -> ::jacquard_lexicon::lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.imageCarousel"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_imageCarousel()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() > 6usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    max: 6usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    min: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

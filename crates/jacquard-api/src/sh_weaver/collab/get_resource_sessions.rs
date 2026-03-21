@@ -20,6 +20,48 @@ pub struct GetResourceSessions<'a> {
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetResourceSessionsOutput<'a> {
+    #[serde(borrow)]
+    pub sessions: Vec<crate::sh_weaver::collab::SessionView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.collab.getResourceSessions
+pub struct GetResourceSessionsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetResourceSessionsResponse {
+    const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetResourceSessionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceSessions<'a> {
+    const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetResourceSessionsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.collab.getResourceSessions
+pub struct GetResourceSessionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetResourceSessionsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceSessions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetResourceSessions<'de>;
+    type Response = GetResourceSessionsResponse;
+}
+
 pub mod get_resource_sessions_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             resource: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetResourceSessionsOutput<'a> {
-    #[serde(borrow)]
-    pub sessions: Vec<crate::sh_weaver::collab::SessionView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.collab.getResourceSessions
-pub struct GetResourceSessionsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetResourceSessionsResponse {
-    const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceSessionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceSessions<'a> {
-    const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetResourceSessionsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.collab.getResourceSessions
-pub struct GetResourceSessionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetResourceSessionsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceSessions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceSessions<'de>;
-    type Response = GetResourceSessionsResponse;
 }

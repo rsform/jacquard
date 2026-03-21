@@ -20,6 +20,49 @@ pub struct GetLaunchToken<'a> {
     pub aud: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLaunchTokenOutput<'a> {
+    #[serde(borrow)]
+    pub token: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.server.getLaunchToken
+pub struct GetLaunchTokenResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLaunchTokenResponse {
+    const NSID: &'static str = "app.ocho.server.getLaunchToken";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLaunchTokenOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchToken<'a> {
+    const NSID: &'static str = "app.ocho.server.getLaunchToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLaunchTokenResponse;
+}
+
+/// Endpoint type for
+///app.ocho.server.getLaunchToken
+pub struct GetLaunchTokenRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchTokenRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.server.getLaunchToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLaunchToken<'de>;
+    type Response = GetLaunchTokenResponse;
+}
+
 pub mod get_launch_token_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             aud: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLaunchTokenOutput<'a> {
-    #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.server.getLaunchToken
-pub struct GetLaunchTokenResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLaunchTokenResponse {
-    const NSID: &'static str = "app.ocho.server.getLaunchToken";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLaunchTokenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchToken<'a> {
-    const NSID: &'static str = "app.ocho.server.getLaunchToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLaunchTokenResponse;
-}
-
-/// Endpoint type for
-///app.ocho.server.getLaunchToken
-pub struct GetLaunchTokenRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchTokenRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.server.getLaunchToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLaunchToken<'de>;
-    type Response = GetLaunchTokenResponse;
 }

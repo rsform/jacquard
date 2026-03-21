@@ -35,6 +35,215 @@ pub struct CreatePost<'a> {
     pub threadgate_rules: std::option::Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreatePostThreadgateRulesItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreatePostOutput<'a> {
+    ///Chronosky schedule ID (parent post ID for threads)
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///Number of posts created (1 for single post, N for thread)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub post_count: std::option::Option<i64>,
+    pub scheduled_at: jacquard_common::types::string::Datetime,
+}
+
+/// Individual post input for thread scheduling.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadPostInput<'a> {
+    ///Post creation timestamp (optional)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Embedded content (images, external links, records).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embed: std::option::Option<ThreadPostInputEmbed<'a>>,
+    ///Rich text facets (mentions, links, tags)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ///Self-applied content labels for content warnings (AT Protocol standard).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ///Language codes (ISO 639-1)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    ///Post text content
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThreadPostInputEmbed<'a> {
+    #[serde(rename = "app.bsky.embed.images")]
+    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
+    #[serde(rename = "app.bsky.embed.external")]
+    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
+    #[serde(rename = "app.bsky.embed.record")]
+    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
+    #[serde(rename = "app.bsky.embed.video")]
+    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
+    #[serde(rename = "app.bsky.embed.recordWithMedia")]
+    RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
+}
+
+/// Response type for
+///app.chronosky.schedule.createPost
+pub struct CreatePostResponse;
+impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
+    const NSID: &'static str = "app.chronosky.schedule.createPost";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreatePostOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePost<'a> {
+    const NSID: &'static str = "app.chronosky.schedule.createPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreatePostResponse;
+}
+
+/// Endpoint type for
+///app.chronosky.schedule.createPost
+pub struct CreatePostRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
+    const PATH: &'static str = "/xrpc/app.chronosky.schedule.createPost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreatePost<'de>;
+    type Response = CreatePostResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.schedule.createPost"
+    }
+    fn def_name() -> &'static str {
+        "threadPostInput"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_schedule_createPost()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.facets {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "facets",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.langs {
+            #[allow(unused_comparisons)]
+            if value.len() > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "langs",
+                    ),
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod create_post_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -237,142 +446,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreatePostThreadgateRulesItem<'a> {
-    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreatePostOutput<'a> {
-    ///Chronosky schedule ID (parent post ID for threads)
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///Number of posts created (1 for single post, N for thread)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_count: std::option::Option<i64>,
-    pub scheduled_at: jacquard_common::types::string::Datetime,
-}
-
-/// Response type for
-///app.chronosky.schedule.createPost
-pub struct CreatePostResponse;
-impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
-    const NSID: &'static str = "app.chronosky.schedule.createPost";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreatePostOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePost<'a> {
-    const NSID: &'static str = "app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreatePostResponse;
-}
-
-/// Endpoint type for
-///app.chronosky.schedule.createPost
-pub struct CreatePostRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
-    const PATH: &'static str = "/xrpc/app.chronosky.schedule.createPost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreatePost<'de>;
-    type Response = CreatePostResponse;
-}
-
-/// Individual post input for thread scheduling.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadPostInput<'a> {
-    ///Post creation timestamp (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Embedded content (images, external links, records).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub embed: std::option::Option<ThreadPostInputEmbed<'a>>,
-    ///Rich text facets (mentions, links, tags)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Self-applied content labels for content warnings (AT Protocol standard).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Language codes (ISO 639-1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
-    ///Post text content
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadPostInputEmbed<'a> {
-    #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
-    #[serde(rename = "app.bsky.embed.external")]
-    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
-    #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
-    #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
-    #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
 }
 
 fn lexicon_doc_app_chronosky_schedule_createPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -661,78 +734,5 @@ fn lexicon_doc_app_chronosky_schedule_createPost() -> ::jacquard_lexicon::lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.schedule.createPost"
-    }
-    fn def_name() -> &'static str {
-        "threadPostInput"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_schedule_createPost()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.facets {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "facets",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.langs {
-            #[allow(unused_comparisons)]
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "langs",
-                    ),
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

@@ -43,6 +43,84 @@ pub struct Lastfm<'a> {
     pub track_name: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LastfmGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Lastfm<'a>,
+}
+
+impl<'a> Lastfm<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LastfmRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LastfmRecord;
+impl jacquard_common::xrpc::XrpcResp for LastfmRecord {
+    const NSID: &'static str = "me.linkna.lastfm";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LastfmGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LastfmGetRecordOutput<'_>> for Lastfm<'_> {
+    fn from(output: LastfmGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Lastfm<'_> {
+    const NSID: &'static str = "me.linkna.lastfm";
+    type Record = LastfmRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LastfmRecord {
+    const NSID: &'static str = "me.linkna.lastfm";
+    type Record = LastfmRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lastfm<'a> {
+    fn nsid() -> &'static str {
+        "me.linkna.lastfm"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_me_linkna_lastfm()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod lastfm_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -53,51 +131,51 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type TrackName;
         type ArtistNames;
+        type TrackName;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type TrackName = Unset;
         type ArtistNames = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TrackName = S::TrackName;
-        type ArtistNames = S::ArtistNames;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrackName<S> {}
-    impl<S: State> State for SetTrackName<S> {
-        type CreatedAt = S::CreatedAt;
-        type TrackName = Set<members::track_name>;
-        type ArtistNames = S::ArtistNames;
+        type TrackName = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `artist_names` field to Set
     pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtistNames<S> {}
     impl<S: State> State for SetArtistNames<S> {
-        type CreatedAt = S::CreatedAt;
-        type TrackName = S::TrackName;
         type ArtistNames = Set<members::artist_names>;
+        type TrackName = S::TrackName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrackName<S> {}
+    impl<S: State> State for SetTrackName<S> {
+        type ArtistNames = S::ArtistNames;
+        type TrackName = Set<members::track_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ArtistNames = S::ArtistNames;
+        type TrackName = S::TrackName;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `track_name` field
-        pub struct track_name(());
         ///Marker type for the `artist_names` field
         pub struct artist_names(());
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -270,9 +348,9 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
-    S::CreatedAt: lastfm_state::IsSet,
-    S::TrackName: lastfm_state::IsSet,
     S::ArtistNames: lastfm_state::IsSet,
+    S::TrackName: lastfm_state::IsSet,
+    S::CreatedAt: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {
@@ -305,84 +383,6 @@ where
             track_name: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Lastfm<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LastfmRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LastfmGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Lastfm<'a>,
-}
-
-impl From<LastfmGetRecordOutput<'_>> for Lastfm<'_> {
-    fn from(output: LastfmGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Lastfm<'_> {
-    const NSID: &'static str = "me.linkna.lastfm";
-    type Record = LastfmRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LastfmRecord;
-impl jacquard_common::xrpc::XrpcResp for LastfmRecord {
-    const NSID: &'static str = "me.linkna.lastfm";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LastfmGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LastfmRecord {
-    const NSID: &'static str = "me.linkna.lastfm";
-    type Record = LastfmRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lastfm<'a> {
-    fn nsid() -> &'static str {
-        "me.linkna.lastfm"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_me_linkna_lastfm()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

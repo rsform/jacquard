@@ -31,6 +31,196 @@ pub struct Artist<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// A release (album, EP, single) containing recordings of songs or musical works
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Release<'a> {
+    #[serde(borrow)]
+    pub artists: Vec<crate::ch_indiemusi::alpha::release::Artist<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artwork_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///GTIN (Global Trade Item Number) with which the release is registered, e.g. EAN or UPC
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gtin: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///List of recordings (ch.indiemusi.alpha.recording) included in this release
+    #[serde(borrow)]
+    pub recordings: Vec<crate::ch_indiemusi::alpha::recording::Recording<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub release_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReleaseGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Release<'a>,
+}
+
+impl<'a> Release<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ReleaseRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.release"
+    }
+    fn def_name() -> &'static str {
+        "artist"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_release()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ReleaseRecord;
+impl jacquard_common::xrpc::XrpcResp for ReleaseRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.release";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ReleaseGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ReleaseGetRecordOutput<'_>> for Release<'_> {
+    fn from(output: ReleaseGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Release<'_> {
+    const NSID: &'static str = "ch.indiemusi.alpha.release";
+    type Record = ReleaseRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ReleaseRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.release";
+    type Record = ReleaseRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.release"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_release()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.artists;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "artists",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.gtin {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 14usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "gtin",
+                    ),
+                    max: 14usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.recordings;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "recordings",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -240,67 +430,6 @@ fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::Lexi
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.release"
-    }
-    fn def_name() -> &'static str {
-        "artist"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_release()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A release (album, EP, single) containing recordings of songs or musical works
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Release<'a> {
-    #[serde(borrow)]
-    pub artists: Vec<crate::ch_indiemusi::alpha::release::Artist<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub artwork_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///GTIN (Global Trade Item Number) with which the release is registered, e.g. EAN or UPC
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///List of recordings (ch.indiemusi.alpha.recording) included in this release
-    #[serde(borrow)]
-    pub recordings: Vec<crate::ch_indiemusi::alpha::recording::Recording<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub release_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
 }
 
 pub mod release_state {
@@ -542,134 +671,5 @@ where
             title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Release<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReleaseRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReleaseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Release<'a>,
-}
-
-impl From<ReleaseGetRecordOutput<'_>> for Release<'_> {
-    fn from(output: ReleaseGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Release<'_> {
-    const NSID: &'static str = "ch.indiemusi.alpha.release";
-    type Record = ReleaseRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ReleaseRecord;
-impl jacquard_common::xrpc::XrpcResp for ReleaseRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.release";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReleaseGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ReleaseRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.release";
-    type Record = ReleaseRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.release"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_release()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.artists;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artists",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.gtin {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 14usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gtin",
-                    ),
-                    max: 14usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.recordings;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "recordings",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

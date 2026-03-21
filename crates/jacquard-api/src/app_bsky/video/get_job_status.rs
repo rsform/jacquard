@@ -20,6 +20,48 @@ pub struct GetJobStatus<'a> {
     pub job_id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetJobStatusOutput<'a> {
+    #[serde(borrow)]
+    pub job_status: crate::app_bsky::video::JobStatus<'a>,
+}
+
+/// Response type for
+///app.bsky.video.getJobStatus
+pub struct GetJobStatusResponse;
+impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
+    const NSID: &'static str = "app.bsky.video.getJobStatus";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetJobStatusOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
+    const NSID: &'static str = "app.bsky.video.getJobStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetJobStatusResponse;
+}
+
+/// Endpoint type for
+///app.bsky.video.getJobStatus
+pub struct GetJobStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.video.getJobStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJobStatus<'de>;
+    type Response = GetJobStatusResponse;
+}
+
 pub mod get_job_status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,46 +149,4 @@ where
             job_id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetJobStatusOutput<'a> {
-    #[serde(borrow)]
-    pub job_status: crate::app_bsky::video::JobStatus<'a>,
-}
-
-/// Response type for
-///app.bsky.video.getJobStatus
-pub struct GetJobStatusResponse;
-impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
-    const NSID: &'static str = "app.bsky.video.getJobStatus";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJobStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
-    const NSID: &'static str = "app.bsky.video.getJobStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetJobStatusResponse;
-}
-
-/// Endpoint type for
-///app.bsky.video.getJobStatus
-pub struct GetJobStatusRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.video.getJobStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetJobStatus<'de>;
-    type Response = GetJobStatusResponse;
 }

@@ -287,6 +287,23 @@ pub struct Split<'a> {
     pub order: i64,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Split<'a> {
+    fn nsid() -> &'static str {
+        "social.pace.feed.defs"
+    }
+    fn def_name() -> &'static str {
+        "split"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_pace_feed_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod split_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -297,51 +314,51 @@ pub mod split_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Duration;
         type Order;
         type Distance;
-        type Duration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Duration = Unset;
         type Order = Unset;
         type Distance = Unset;
-        type Duration = Unset;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Order = Set<members::order>;
-        type Distance = S::Distance;
-        type Duration = S::Duration;
-    }
-    ///State transition - sets the `distance` field to Set
-    pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDistance<S> {}
-    impl<S: State> State for SetDistance<S> {
-        type Order = S::Order;
-        type Distance = Set<members::distance>;
-        type Duration = S::Duration;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
+        type Duration = Set<members::duration>;
         type Order = S::Order;
         type Distance = S::Distance;
-        type Duration = Set<members::duration>;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Duration = S::Duration;
+        type Order = Set<members::order>;
+        type Distance = S::Distance;
+    }
+    ///State transition - sets the `distance` field to Set
+    pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDistance<S> {}
+    impl<S: State> State for SetDistance<S> {
+        type Duration = S::Duration;
+        type Order = S::Order;
+        type Distance = Set<members::distance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `order` field
         pub struct order(());
         ///Marker type for the `distance` field
         pub struct distance(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
     }
 }
 
@@ -434,9 +451,9 @@ where
 impl<'a, S> SplitBuilder<'a, S>
 where
     S: split_state::State,
+    S::Duration: split_state::IsSet,
     S::Order: split_state::IsSet,
     S::Distance: split_state::IsSet,
-    S::Duration: split_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Split<'a> {
@@ -565,22 +582,5 @@ fn lexicon_doc_social_pace_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Split<'a> {
-    fn nsid() -> &'static str {
-        "social.pace.feed.defs"
-    }
-    fn def_name() -> &'static str {
-        "split"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_pace_feed_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

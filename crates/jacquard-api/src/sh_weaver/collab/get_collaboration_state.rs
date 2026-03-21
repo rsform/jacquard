@@ -20,6 +20,49 @@ pub struct GetCollaborationState<'a> {
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetCollaborationStateOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::sh_weaver::collab::CollaborationStateView<'a>,
+}
+
+/// Response type for
+///sh.weaver.collab.getCollaborationState
+pub struct GetCollaborationStateResponse;
+impl jacquard_common::xrpc::XrpcResp for GetCollaborationStateResponse {
+    const NSID: &'static str = "sh.weaver.collab.getCollaborationState";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetCollaborationStateOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollaborationState<'a> {
+    const NSID: &'static str = "sh.weaver.collab.getCollaborationState";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetCollaborationStateResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.collab.getCollaborationState
+pub struct GetCollaborationStateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetCollaborationStateRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.collab.getCollaborationState";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetCollaborationState<'de>;
+    type Response = GetCollaborationStateResponse;
+}
+
 pub mod get_collaboration_state_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -115,47 +158,4 @@ where
             resource: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetCollaborationStateOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::sh_weaver::collab::CollaborationStateView<'a>,
-}
-
-/// Response type for
-///sh.weaver.collab.getCollaborationState
-pub struct GetCollaborationStateResponse;
-impl jacquard_common::xrpc::XrpcResp for GetCollaborationStateResponse {
-    const NSID: &'static str = "sh.weaver.collab.getCollaborationState";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCollaborationStateOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollaborationState<'a> {
-    const NSID: &'static str = "sh.weaver.collab.getCollaborationState";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetCollaborationStateResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.collab.getCollaborationState
-pub struct GetCollaborationStateRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetCollaborationStateRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.collab.getCollaborationState";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCollaborationState<'de>;
-    type Response = GetCollaborationStateResponse;
 }

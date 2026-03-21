@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,89 @@ pub struct GetGameFeed<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetGameFeedOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetGameFeedError<'a> {
+    #[serde(rename = "UnknownFeed")]
+    UnknownFeed(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetGameFeedError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::UnknownFeed(msg) => {
+                write!(f, "UnknownFeed")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.feed.getGameFeed
+pub struct GetGameFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetGameFeedResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getGameFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetGameFeedOutput<'de>;
+    type Err<'de> = GetGameFeedError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetGameFeed<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getGameFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetGameFeedResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.feed.getGameFeed
+pub struct GetGameFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetGameFeedRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getGameFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetGameFeed<'de>;
+    type Response = GetGameFeedResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_game_feed_state {
@@ -153,83 +232,4 @@ where
             limit: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetGameFeedOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetGameFeedError<'a> {
-    #[serde(rename = "UnknownFeed")]
-    UnknownFeed(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetGameFeedError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::UnknownFeed(msg) => {
-                write!(f, "UnknownFeed")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.feed.getGameFeed
-pub struct GetGameFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetGameFeedResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getGameFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGameFeedOutput<'de>;
-    type Err<'de> = GetGameFeedError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGameFeed<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getGameFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetGameFeedResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.feed.getGameFeed
-pub struct GetGameFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetGameFeedRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getGameFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGameFeed<'de>;
-    type Response = GetGameFeedResponse;
 }

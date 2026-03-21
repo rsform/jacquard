@@ -26,6 +26,295 @@ pub struct AccountCreated<'a> {
     pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EmailConfirmed<'a> {
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EmailUpdated<'a> {
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Event<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub details: EventDetails<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EventDetails<'a> {
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#accountCreated")]
+    AccountCreated(
+        Box<crate::tools_ozone::hosting::get_account_history::AccountCreated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailUpdated")]
+    EmailUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::EmailUpdated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailConfirmed")]
+    EmailConfirmed(
+        Box<crate::tools_ozone::hosting::get_account_history::EmailConfirmed<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#passwordUpdated")]
+    PasswordUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::PasswordUpdated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#handleUpdated")]
+    HandleUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::HandleUpdated<'a>>,
+    ),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HandleUpdated<'a> {
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountHistory<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub events: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///Defaults to `50`. Min: 1. Max: 100.
+    #[serde(default = "_default_limit")]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountHistoryOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub events: Vec<crate::tools_ozone::hosting::get_account_history::Event<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PasswordUpdated<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCreated<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "accountCreated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailConfirmed<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "emailConfirmed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "emailUpdated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "event"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "handleUpdated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///tools.ozone.hosting.getAccountHistory
+pub struct GetAccountHistoryResponse;
+impl jacquard_common::xrpc::XrpcResp for GetAccountHistoryResponse {
+    const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetAccountHistoryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountHistory<'a> {
+    const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountHistoryResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.hosting.getAccountHistory
+pub struct GetAccountHistoryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.hosting.getAccountHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountHistory<'de>;
+    type Response = GetAccountHistoryResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PasswordUpdated<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "passwordUpdated"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_hosting_getAccountHistory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -376,110 +665,6 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCreated<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "accountCreated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EmailConfirmed<'a> {
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailConfirmed<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "emailConfirmed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EmailUpdated<'a> {
-    #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "emailUpdated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Event<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub created_by: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub details: EventDetails<'a>,
-}
-
 pub mod event_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -490,51 +675,51 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Details;
         type CreatedAt;
         type CreatedBy;
-        type Details;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Details = Unset;
         type CreatedAt = Unset;
         type CreatedBy = Unset;
-        type Details = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type CreatedBy = S::CreatedBy;
-        type Details = S::Details;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = Set<members::created_by>;
-        type Details = S::Details;
     }
     ///State transition - sets the `details` field to Set
     pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDetails<S> {}
     impl<S: State> State for SetDetails<S> {
+        type Details = Set<members::details>;
         type CreatedAt = S::CreatedAt;
         type CreatedBy = S::CreatedBy;
-        type Details = Set<members::details>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Details = S::Details;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Details = S::Details;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `details` field
+        pub struct details(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `details` field
-        pub struct details(());
     }
 }
 
@@ -627,9 +812,9 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::Details: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
     S::CreatedBy: event_state::IsSet,
-    S::Details: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -655,74 +840,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum EventDetails<'a> {
-    #[serde(rename = "tools.ozone.hosting.getAccountHistory#accountCreated")]
-    AccountCreated(
-        Box<crate::tools_ozone::hosting::get_account_history::AccountCreated<'a>>,
-    ),
-    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailUpdated")]
-    EmailUpdated(
-        Box<crate::tools_ozone::hosting::get_account_history::EmailUpdated<'a>>,
-    ),
-    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailConfirmed")]
-    EmailConfirmed(
-        Box<crate::tools_ozone::hosting::get_account_history::EmailConfirmed<'a>>,
-    ),
-    #[serde(rename = "tools.ozone.hosting.getAccountHistory#passwordUpdated")]
-    PasswordUpdated(
-        Box<crate::tools_ozone::hosting::get_account_history::PasswordUpdated<'a>>,
-    ),
-    #[serde(rename = "tools.ozone.hosting.getAccountHistory#handleUpdated")]
-    HandleUpdated(
-        Box<crate::tools_ozone::hosting::get_account_history::HandleUpdated<'a>>,
-    ),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "event"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HandleUpdated<'a> {
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
 pub mod handle_updated_state {
@@ -830,50 +947,8 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "handleUpdated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
 fn _default_limit() -> std::option::Option<i64> {
     Some(50i64)
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAccountHistory<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub events: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
-    #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
 }
 
 pub mod get_account_history_state {
@@ -1018,80 +1093,5 @@ where
             events: self.__unsafe_private_named.2,
             limit: self.__unsafe_private_named.3,
         }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAccountHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub events: Vec<crate::tools_ozone::hosting::get_account_history::Event<'a>>,
-}
-
-/// Response type for
-///tools.ozone.hosting.getAccountHistory
-pub struct GetAccountHistoryResponse;
-impl jacquard_common::xrpc::XrpcResp for GetAccountHistoryResponse {
-    const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountHistoryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountHistory<'a> {
-    const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetAccountHistoryResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.hosting.getAccountHistory
-pub struct GetAccountHistoryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.hosting.getAccountHistory";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAccountHistory<'de>;
-    type Response = GetAccountHistoryResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PasswordUpdated<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PasswordUpdated<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.hosting.getAccountHistory"
-    }
-    fn def_name() -> &'static str {
-        "passwordUpdated"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_hosting_getAccountHistory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

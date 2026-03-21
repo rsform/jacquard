@@ -24,6 +24,42 @@ pub struct Facet<'a> {
     pub index: crate::app_bsky::richtext::facet::ByteSlice<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FacetFeaturesItem<'a> {
+    #[serde(rename = "app.bsky.richtext.facet#mention")]
+    FacetMention(Box<crate::app_bsky::richtext::facet::Mention<'a>>),
+    #[serde(rename = "app.bsky.richtext.facet#link")]
+    FacetLink(Box<crate::app_bsky::richtext::facet::Link<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod facet_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -164,25 +200,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum FacetFeaturesItem<'a> {
-    #[serde(rename = "app.bsky.richtext.facet#mention")]
-    FacetMention(Box<crate::app_bsky::richtext::facet::Mention<'a>>),
-    #[serde(rename = "app.bsky.richtext.facet#link")]
-    FacetLink(Box<crate::app_bsky::richtext::facet::Link<'a>>),
-}
-
 fn lexicon_doc_place_stream_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -246,22 +263,5 @@ fn lexicon_doc_place_stream_richtext_facet() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.richtext.facet"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_richtext_facet()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -21,6 +21,36 @@ pub struct SubmitPlcOperation<'a> {
     pub operation: jacquard_common::types::value::Data<'a>,
 }
 
+/// Response type for
+///com.atproto.identity.submitPlcOperation
+pub struct SubmitPlcOperationResponse;
+impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
+    const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<'a> {
+    const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SubmitPlcOperationResponse;
+}
+
+/// Endpoint type for
+///com.atproto.identity.submitPlcOperation
+pub struct SubmitPlcOperationRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.submitPlcOperation";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SubmitPlcOperation<'de>;
+    type Response = SubmitPlcOperationResponse;
+}
+
 pub mod submit_plc_operation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///com.atproto.identity.submitPlcOperation
-pub struct SubmitPlcOperationResponse;
-impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
-    const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<'a> {
-    const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SubmitPlcOperationResponse;
-}
-
-/// Endpoint type for
-///com.atproto.identity.submitPlcOperation
-pub struct SubmitPlcOperationRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.identity.submitPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SubmitPlcOperation<'de>;
-    type Response = SubmitPlcOperationResponse;
 }

@@ -34,6 +34,222 @@ pub struct Thought<'a> {
     pub trigger: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThoughtKind<'a> {
+    Insight,
+    Question,
+    Plan,
+    Reflection,
+    Error,
+    Response,
+    ToolCall,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThoughtKind<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Insight => "insight",
+            Self::Question => "question",
+            Self::Plan => "plan",
+            Self::Reflection => "reflection",
+            Self::Error => "error",
+            Self::Response => "response",
+            Self::ToolCall => "tool_call",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThoughtKind<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "insight" => Self::Insight,
+            "question" => Self::Question,
+            "plan" => Self::Plan,
+            "reflection" => Self::Reflection,
+            "error" => Self::Error,
+            "response" => Self::Response,
+            "tool_call" => Self::ToolCall,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThoughtKind<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "insight" => Self::Insight,
+            "question" => Self::Question,
+            "plan" => Self::Plan,
+            "reflection" => Self::Reflection,
+            "error" => Self::Error,
+            "response" => Self::Response,
+            "tool_call" => Self::ToolCall,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThoughtKind<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThoughtKind<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThoughtKind<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThoughtKind<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThoughtKind<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThoughtKind<'_> {
+    type Output = ThoughtKind<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThoughtKind::Insight => ThoughtKind::Insight,
+            ThoughtKind::Question => ThoughtKind::Question,
+            ThoughtKind::Plan => ThoughtKind::Plan,
+            ThoughtKind::Reflection => ThoughtKind::Reflection,
+            ThoughtKind::Error => ThoughtKind::Error,
+            ThoughtKind::Response => ThoughtKind::Response,
+            ThoughtKind::ToolCall => ThoughtKind::ToolCall,
+            ThoughtKind::Other(v) => ThoughtKind::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThoughtGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Thought<'a>,
+}
+
+impl<'a> Thought<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ThoughtRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ThoughtRecord;
+impl jacquard_common::xrpc::XrpcResp for ThoughtRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.thought";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ThoughtGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ThoughtGetRecordOutput<'_>> for Thought<'_> {
+    fn from(output: ThoughtGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Thought<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.thought";
+    type Record = ThoughtRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ThoughtRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.thought";
+    type Record = ThoughtRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.thought"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_thought()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.content;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
+                    max: 50000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod thought_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -44,51 +260,51 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Kind;
         type Content;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Kind = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `kind` field to Set
-    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKind<S> {}
-    impl<S: State> State for SetKind<S> {
-        type Kind = Set<members::kind>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Kind = S::Kind;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Kind = S::Kind;
         type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKind<S> {}
+    impl<S: State> State for SetKind<S> {
+        type CreatedAt = S::CreatedAt;
+        type Kind = Set<members::kind>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Kind = S::Kind;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `kind` field
         pub struct kind(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -232,9 +448,9 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 impl<'a, S> ThoughtBuilder<'a, S>
 where
     S: thought_state::State,
+    S::CreatedAt: thought_state::IsSet,
     S::Kind: thought_state::IsSet,
     S::Content: thought_state::IsSet,
-    S::CreatedAt: thought_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
@@ -265,222 +481,6 @@ where
             trigger: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Thought<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ThoughtRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThoughtKind<'a> {
-    Insight,
-    Question,
-    Plan,
-    Reflection,
-    Error,
-    Response,
-    ToolCall,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ThoughtKind<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Insight => "insight",
-            Self::Question => "question",
-            Self::Plan => "plan",
-            Self::Reflection => "reflection",
-            Self::Error => "error",
-            Self::Response => "response",
-            Self::ToolCall => "tool_call",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ThoughtKind<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "insight" => Self::Insight,
-            "question" => Self::Question,
-            "plan" => Self::Plan,
-            "reflection" => Self::Reflection,
-            "error" => Self::Error,
-            "response" => Self::Response,
-            "tool_call" => Self::ToolCall,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ThoughtKind<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "insight" => Self::Insight,
-            "question" => Self::Question,
-            "plan" => Self::Plan,
-            "reflection" => Self::Reflection,
-            "error" => Self::Error,
-            "response" => Self::Response,
-            "tool_call" => Self::ToolCall,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThoughtKind<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ThoughtKind<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ThoughtKind<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ThoughtKind<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ThoughtKind<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ThoughtKind<'_> {
-    type Output = ThoughtKind<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThoughtKind::Insight => ThoughtKind::Insight,
-            ThoughtKind::Question => ThoughtKind::Question,
-            ThoughtKind::Plan => ThoughtKind::Plan,
-            ThoughtKind::Reflection => ThoughtKind::Reflection,
-            ThoughtKind::Error => ThoughtKind::Error,
-            ThoughtKind::Response => ThoughtKind::Response,
-            ThoughtKind::ToolCall => ThoughtKind::ToolCall,
-            ThoughtKind::Other(v) => ThoughtKind::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThoughtGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Thought<'a>,
-}
-
-impl From<ThoughtGetRecordOutput<'_>> for Thought<'_> {
-    fn from(output: ThoughtGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Thought<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.thought";
-    type Record = ThoughtRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ThoughtRecord;
-impl jacquard_common::xrpc::XrpcResp for ThoughtRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.thought";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThoughtGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ThoughtRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.thought";
-    type Record = ThoughtRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thought<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.thought"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_thought()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.content;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
-                    max: 50000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

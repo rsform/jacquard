@@ -23,6 +23,90 @@ pub struct AccountCodes<'a> {
     pub codes: Vec<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateInviteCodes<'a> {
+    ///Defaults to `1`.
+    #[serde(default = "_default_create_invite_codes_code_count")]
+    pub code_count: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub for_accounts: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub use_count: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateInviteCodesOutput<'a> {
+    #[serde(borrow)]
+    pub codes: Vec<crate::com_atproto::server::create_invite_codes::AccountCodes<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.server.createInviteCodes"
+    }
+    fn def_name() -> &'static str {
+        "accountCodes"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_server_createInviteCodes()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///com.atproto.server.createInviteCodes
+pub struct CreateInviteCodesResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
+    const NSID: &'static str = "com.atproto.server.createInviteCodes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateInviteCodesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<'a> {
+    const NSID: &'static str = "com.atproto.server.createInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateInviteCodesResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.createInviteCodes
+pub struct CreateInviteCodesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateInviteCodes<'de>;
+    type Response = CreateInviteCodesResponse;
+}
+
 pub mod account_codes_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -319,44 +403,6 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.server.createInviteCodes"
-    }
-    fn def_name() -> &'static str {
-        "accountCodes"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_server_createInviteCodes()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateInviteCodes<'a> {
-    ///Defaults to `1`.
-    #[serde(default = "_default_create_invite_codes_code_count")]
-    pub code_count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub for_accounts: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    pub use_count: i64,
-}
-
 fn _default_create_invite_codes_code_count() -> i64 {
     1i64
 }
@@ -371,37 +417,37 @@ pub mod create_invite_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CodeCount;
         type UseCount;
+        type CodeCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CodeCount = Unset;
         type UseCount = Unset;
-    }
-    ///State transition - sets the `code_count` field to Set
-    pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodeCount<S> {}
-    impl<S: State> State for SetCodeCount<S> {
-        type CodeCount = Set<members::code_count>;
-        type UseCount = S::UseCount;
+        type CodeCount = Unset;
     }
     ///State transition - sets the `use_count` field to Set
     pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUseCount<S> {}
     impl<S: State> State for SetUseCount<S> {
-        type CodeCount = S::CodeCount;
         type UseCount = Set<members::use_count>;
+        type CodeCount = S::CodeCount;
+    }
+    ///State transition - sets the `code_count` field to Set
+    pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodeCount<S> {}
+    impl<S: State> State for SetCodeCount<S> {
+        type UseCount = S::UseCount;
+        type CodeCount = Set<members::code_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code_count` field
-        pub struct code_count(());
         ///Marker type for the `use_count` field
         pub struct use_count(());
+        ///Marker type for the `code_count` field
+        pub struct code_count(());
     }
 }
 
@@ -494,8 +540,8 @@ where
 impl<'a, S> CreateInviteCodesBuilder<'a, S>
 where
     S: create_invite_codes_state::State,
-    S::CodeCount: create_invite_codes_state::IsSet,
     S::UseCount: create_invite_codes_state::IsSet,
+    S::CodeCount: create_invite_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {
@@ -521,50 +567,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateInviteCodesOutput<'a> {
-    #[serde(borrow)]
-    pub codes: Vec<crate::com_atproto::server::create_invite_codes::AccountCodes<'a>>,
-}
-
-/// Response type for
-///com.atproto.server.createInviteCodes
-pub struct CreateInviteCodesResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
-    const NSID: &'static str = "com.atproto.server.createInviteCodes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<'a> {
-    const NSID: &'static str = "com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateInviteCodesResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.createInviteCodes
-pub struct CreateInviteCodesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateInviteCodes<'de>;
-    type Response = CreateInviteCodesResponse;
 }

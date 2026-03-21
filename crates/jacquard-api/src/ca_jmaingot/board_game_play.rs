@@ -27,6 +27,84 @@ pub struct BoardGamePlay<'a> {
     pub played_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BoardGamePlayGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: BoardGamePlay<'a>,
+}
+
+impl<'a> BoardGamePlay<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BoardGamePlayRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BoardGamePlayRecord;
+impl jacquard_common::xrpc::XrpcResp for BoardGamePlayRecord {
+    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BoardGamePlayGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BoardGamePlayGetRecordOutput<'_>> for BoardGamePlay<'_> {
+    fn from(output: BoardGamePlayGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for BoardGamePlay<'_> {
+    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
+    type Record = BoardGamePlayRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BoardGamePlayRecord {
+    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
+    type Record = BoardGamePlayRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
+    fn nsid() -> &'static str {
+        "ca.jmaingot.boardGamePlay"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ca_jmaingot_boardGamePlay()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod board_game_play_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,51 +115,51 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BggId;
-        type Name;
         type PlayedAt;
+        type Name;
+        type BggId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BggId = Unset;
-        type Name = Unset;
         type PlayedAt = Unset;
-    }
-    ///State transition - sets the `bgg_id` field to Set
-    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBggId<S> {}
-    impl<S: State> State for SetBggId<S> {
-        type BggId = Set<members::bgg_id>;
-        type Name = S::Name;
-        type PlayedAt = S::PlayedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type BggId = S::BggId;
-        type Name = Set<members::name>;
-        type PlayedAt = S::PlayedAt;
+        type Name = Unset;
+        type BggId = Unset;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
-        type BggId = S::BggId;
-        type Name = S::Name;
         type PlayedAt = Set<members::played_at>;
+        type Name = S::Name;
+        type BggId = S::BggId;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type PlayedAt = S::PlayedAt;
+        type Name = Set<members::name>;
+        type BggId = S::BggId;
+    }
+    ///State transition - sets the `bgg_id` field to Set
+    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBggId<S> {}
+    impl<S: State> State for SetBggId<S> {
+        type PlayedAt = S::PlayedAt;
+        type Name = S::Name;
+        type BggId = Set<members::bgg_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bgg_id` field
-        pub struct bgg_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `bgg_id` field
+        pub struct bgg_id(());
     }
 }
 
@@ -174,9 +252,9 @@ where
 impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
-    S::BggId: board_game_play_state::IsSet,
-    S::Name: board_game_play_state::IsSet,
     S::PlayedAt: board_game_play_state::IsSet,
+    S::Name: board_game_play_state::IsSet,
+    S::BggId: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {
@@ -201,84 +279,6 @@ where
             played_at: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> BoardGamePlay<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BoardGamePlayRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardGamePlayGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: BoardGamePlay<'a>,
-}
-
-impl From<BoardGamePlayGetRecordOutput<'_>> for BoardGamePlay<'_> {
-    fn from(output: BoardGamePlayGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for BoardGamePlay<'_> {
-    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
-    type Record = BoardGamePlayRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BoardGamePlayRecord;
-impl jacquard_common::xrpc::XrpcResp for BoardGamePlayRecord {
-    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BoardGamePlayGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BoardGamePlayRecord {
-    const NSID: &'static str = "ca.jmaingot.boardGamePlay";
-    type Record = BoardGamePlayRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
-    fn nsid() -> &'static str {
-        "ca.jmaingot.boardGamePlay"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ca_jmaingot_boardGamePlay()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -28,6 +24,56 @@ pub struct GetSegments<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSegmentsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub segments: std::option::Option<
+        Vec<crate::place_stream::segment::SegmentView<'a>>,
+    >,
+}
+
+/// Response type for
+///place.stream.live.getSegments
+pub struct GetSegmentsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSegmentsResponse {
+    const NSID: &'static str = "place.stream.live.getSegments";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSegmentsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSegments<'a> {
+    const NSID: &'static str = "place.stream.live.getSegments";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSegmentsResponse;
+}
+
+/// Endpoint type for
+///place.stream.live.getSegments
+pub struct GetSegmentsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSegmentsRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.getSegments";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSegments<'de>;
+    type Response = GetSegmentsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_segments_state {
@@ -155,50 +201,4 @@ where
             user_did: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSegmentsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub segments: std::option::Option<
-        Vec<crate::place_stream::segment::SegmentView<'a>>,
-    >,
-}
-
-/// Response type for
-///place.stream.live.getSegments
-pub struct GetSegmentsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSegmentsResponse {
-    const NSID: &'static str = "place.stream.live.getSegments";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSegmentsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSegments<'a> {
-    const NSID: &'static str = "place.stream.live.getSegments";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSegmentsResponse;
-}
-
-/// Endpoint type for
-///place.stream.live.getSegments
-pub struct GetSegmentsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSegmentsRequest {
-    const PATH: &'static str = "/xrpc/place.stream.live.getSegments";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSegments<'de>;
-    type Response = GetSegmentsResponse;
 }

@@ -27,6 +27,84 @@ pub struct Accomplishment<'a> {
     pub r#type: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AccomplishmentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Accomplishment<'a>,
+}
+
+impl<'a> Accomplishment<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AccomplishmentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccomplishmentRecord;
+impl jacquard_common::xrpc::XrpcResp for AccomplishmentRecord {
+    const NSID: &'static str = "io.kich.accomplishment";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AccomplishmentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AccomplishmentGetRecordOutput<'_>> for Accomplishment<'_> {
+    fn from(output: AccomplishmentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Accomplishment<'_> {
+    const NSID: &'static str = "io.kich.accomplishment";
+    type Record = AccomplishmentRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AccomplishmentRecord {
+    const NSID: &'static str = "io.kich.accomplishment";
+    type Record = AccomplishmentRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Accomplishment<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.accomplishment"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_accomplishment()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod accomplishment_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -186,84 +264,6 @@ where
             r#type: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Accomplishment<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AccomplishmentRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AccomplishmentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Accomplishment<'a>,
-}
-
-impl From<AccomplishmentGetRecordOutput<'_>> for Accomplishment<'_> {
-    fn from(output: AccomplishmentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Accomplishment<'_> {
-    const NSID: &'static str = "io.kich.accomplishment";
-    type Record = AccomplishmentRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AccomplishmentRecord;
-impl jacquard_common::xrpc::XrpcResp for AccomplishmentRecord {
-    const NSID: &'static str = "io.kich.accomplishment";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AccomplishmentGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AccomplishmentRecord {
-    const NSID: &'static str = "io.kich.accomplishment";
-    type Record = AccomplishmentRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Accomplishment<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.accomplishment"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_accomplishment()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

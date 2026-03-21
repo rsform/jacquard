@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -33,6 +29,55 @@ pub struct ListConvos<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListConvosOutput<'a> {
+    #[serde(borrow)]
+    pub convos: Vec<crate::chat_bsky::convo::ConvoView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///chat.bsky.convo.listConvos
+pub struct ListConvosResponse;
+impl jacquard_common::xrpc::XrpcResp for ListConvosResponse {
+    const NSID: &'static str = "chat.bsky.convo.listConvos";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListConvosOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListConvos<'a> {
+    const NSID: &'static str = "chat.bsky.convo.listConvos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListConvosResponse;
+}
+
+/// Endpoint type for
+///chat.bsky.convo.listConvos
+pub struct ListConvosRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.listConvos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListConvos<'de>;
+    type Response = ListConvosResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_convos_state {
@@ -161,49 +206,4 @@ where
             status: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListConvosOutput<'a> {
-    #[serde(borrow)]
-    pub convos: Vec<crate::chat_bsky::convo::ConvoView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///chat.bsky.convo.listConvos
-pub struct ListConvosResponse;
-impl jacquard_common::xrpc::XrpcResp for ListConvosResponse {
-    const NSID: &'static str = "chat.bsky.convo.listConvos";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListConvosOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListConvos<'a> {
-    const NSID: &'static str = "chat.bsky.convo.listConvos";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListConvosResponse;
-}
-
-/// Endpoint type for
-///chat.bsky.convo.listConvos
-pub struct ListConvosRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
-    const PATH: &'static str = "/xrpc/chat.bsky.convo.listConvos";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListConvos<'de>;
-    type Response = ListConvosResponse;
 }

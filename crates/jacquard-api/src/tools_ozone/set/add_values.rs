@@ -25,6 +25,36 @@ pub struct AddValues<'a> {
     pub values: Vec<jacquard_common::CowStr<'a>>,
 }
 
+/// Response type for
+///tools.ozone.set.addValues
+pub struct AddValuesResponse;
+impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
+    const NSID: &'static str = "tools.ozone.set.addValues";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
+    const NSID: &'static str = "tools.ozone.set.addValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddValuesResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.set.addValues
+pub struct AddValuesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.addValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddValues<'de>;
+    type Response = AddValuesResponse;
+}
+
 pub mod add_values_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -163,34 +193,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///tools.ozone.set.addValues
-pub struct AddValuesResponse;
-impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
-    const NSID: &'static str = "tools.ozone.set.addValues";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
-    const NSID: &'static str = "tools.ozone.set.addValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = AddValuesResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.set.addValues
-pub struct AddValuesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.set.addValues";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = AddValues<'de>;
-    type Response = AddValuesResponse;
 }

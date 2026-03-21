@@ -20,6 +20,49 @@ pub struct GetArtist<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetArtistOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::artist::ArtistViewDetailed<'a>,
+}
+
+/// Response type for
+///app.rocksky.artist.getArtist
+pub struct GetArtistResponse;
+impl jacquard_common::xrpc::XrpcResp for GetArtistResponse {
+    const NSID: &'static str = "app.rocksky.artist.getArtist";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetArtistOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtist<'a> {
+    const NSID: &'static str = "app.rocksky.artist.getArtist";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetArtistResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.artist.getArtist
+pub struct GetArtistRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetArtistRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtist";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetArtist<'de>;
+    type Response = GetArtistResponse;
+}
+
 pub mod get_artist_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetArtistOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::artist::ArtistViewDetailed<'a>,
-}
-
-/// Response type for
-///app.rocksky.artist.getArtist
-pub struct GetArtistResponse;
-impl jacquard_common::xrpc::XrpcResp for GetArtistResponse {
-    const NSID: &'static str = "app.rocksky.artist.getArtist";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetArtistOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtist<'a> {
-    const NSID: &'static str = "app.rocksky.artist.getArtist";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetArtistResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.artist.getArtist
-pub struct GetArtistRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetArtistRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtist";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetArtist<'de>;
-    type Response = GetArtistResponse;
 }

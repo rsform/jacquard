@@ -34,6 +34,104 @@ pub struct Configure<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ConfigureOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ConfigureError<'a> {
+    /// The specified event does not exist.
+    #[serde(rename = "EventNotFound")]
+    EventNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The authenticated user does not own this event.
+    #[serde(rename = "NotAuthorized")]
+    NotAuthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The provided redirect URL is invalid or not allowed.
+    #[serde(rename = "InvalidRedirectUrl")]
+    InvalidRedirectUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ConfigureError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::EventNotFound(msg) => {
+                write!(f, "EventNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::NotAuthorized(msg) => {
+                write!(f, "NotAuthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRedirectUrl(msg) => {
+                write!(f, "InvalidRedirectUrl")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///events.smokesignal.event.configure
+pub struct ConfigureResponse;
+impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
+    const NSID: &'static str = "events.smokesignal.event.configure";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ConfigureOutput<'de>;
+    type Err<'de> = ConfigureError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
+    const NSID: &'static str = "events.smokesignal.event.configure";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ConfigureResponse;
+}
+
+/// Endpoint type for
+///events.smokesignal.event.configure
+pub struct ConfigureRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
+    const PATH: &'static str = "/xrpc/events.smokesignal.event.configure";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Configure<'de>;
+    type Response = ConfigureResponse;
+}
+
 pub mod configure_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -191,102 +289,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfigureOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ConfigureError<'a> {
-    /// The specified event does not exist.
-    #[serde(rename = "EventNotFound")]
-    EventNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The authenticated user does not own this event.
-    #[serde(rename = "NotAuthorized")]
-    NotAuthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The provided redirect URL is invalid or not allowed.
-    #[serde(rename = "InvalidRedirectUrl")]
-    InvalidRedirectUrl(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ConfigureError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::EventNotFound(msg) => {
-                write!(f, "EventNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::NotAuthorized(msg) => {
-                write!(f, "NotAuthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRedirectUrl(msg) => {
-                write!(f, "InvalidRedirectUrl")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///events.smokesignal.event.configure
-pub struct ConfigureResponse;
-impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
-    const NSID: &'static str = "events.smokesignal.event.configure";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ConfigureOutput<'de>;
-    type Err<'de> = ConfigureError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
-    const NSID: &'static str = "events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ConfigureResponse;
-}
-
-/// Endpoint type for
-///events.smokesignal.event.configure
-pub struct ConfigureRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
-    const PATH: &'static str = "/xrpc/events.smokesignal.event.configure";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Configure<'de>;
-    type Response = ConfigureResponse;
 }

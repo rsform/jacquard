@@ -20,6 +20,49 @@ pub struct GetTemporaryLink<'a> {
     pub path: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTemporaryLinkOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::dropbox::TemporaryLinkView<'a>,
+}
+
+/// Response type for
+///app.rocksky.dropbox.getTemporaryLink
+pub struct GetTemporaryLinkResponse;
+impl jacquard_common::xrpc::XrpcResp for GetTemporaryLinkResponse {
+    const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetTemporaryLinkOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTemporaryLink<'a> {
+    const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTemporaryLinkResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.dropbox.getTemporaryLink
+pub struct GetTemporaryLinkRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTemporaryLinkRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getTemporaryLink";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTemporaryLink<'de>;
+    type Response = GetTemporaryLinkResponse;
+}
+
 pub mod get_temporary_link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,47 +150,4 @@ where
             path: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetTemporaryLinkOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::dropbox::TemporaryLinkView<'a>,
-}
-
-/// Response type for
-///app.rocksky.dropbox.getTemporaryLink
-pub struct GetTemporaryLinkResponse;
-impl jacquard_common::xrpc::XrpcResp for GetTemporaryLinkResponse {
-    const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTemporaryLinkOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTemporaryLink<'a> {
-    const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetTemporaryLinkResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.dropbox.getTemporaryLink
-pub struct GetTemporaryLinkRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetTemporaryLinkRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getTemporaryLink";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTemporaryLink<'de>;
-    type Response = GetTemporaryLinkResponse;
 }

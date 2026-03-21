@@ -25,6 +25,88 @@ pub struct PlaceSheeps<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlaceSheepsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub success: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SheepPlacement<'a> {
+    pub horizontal: bool,
+    pub start: i64,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///games.firehose.barklesheep.placeSheeps
+pub struct PlaceSheepsResponse;
+impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
+    const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PlaceSheepsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<'a> {
+    const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PlaceSheepsResponse;
+}
+
+/// Endpoint type for
+///games.firehose.barklesheep.placeSheeps
+pub struct PlaceSheepsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
+    const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PlaceSheeps<'de>;
+    type Response = PlaceSheepsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SheepPlacement<'a> {
+    fn nsid() -> &'static str {
+        "games.firehose.barklesheep.placeSheeps"
+    }
+    fn def_name() -> &'static str {
+        "sheepPlacement"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_firehose_barklesheep_placeSheeps()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod place_sheeps_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -167,71 +249,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaceSheepsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub success: std::option::Option<bool>,
-}
-
-/// Response type for
-///games.firehose.barklesheep.placeSheeps
-pub struct PlaceSheepsResponse;
-impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
-    const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PlaceSheepsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<'a> {
-    const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PlaceSheepsResponse;
-}
-
-/// Endpoint type for
-///games.firehose.barklesheep.placeSheeps
-pub struct PlaceSheepsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
-    const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PlaceSheeps<'de>;
-    type Response = PlaceSheepsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SheepPlacement<'a> {
-    pub horizontal: bool,
-    pub start: i64,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
 }
 
 pub mod sheep_placement_state {
@@ -549,22 +566,5 @@ fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> ::jacquard_lexicon::l
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SheepPlacement<'a> {
-    fn nsid() -> &'static str {
-        "games.firehose.barklesheep.placeSheeps"
-    }
-    fn def_name() -> &'static str {
-        "sheepPlacement"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_firehose_barklesheep_placeSheeps()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

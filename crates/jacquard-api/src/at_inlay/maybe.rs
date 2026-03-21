@@ -24,6 +24,53 @@ pub struct Maybe<'a> {
     pub fallback: std::option::Option<crate::at_inlay::Element<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MaybeOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///at.inlay.Maybe
+pub struct MaybeResponse;
+impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
+    const NSID: &'static str = "at.inlay.Maybe";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MaybeOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Maybe<'a> {
+    const NSID: &'static str = "at.inlay.Maybe";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = MaybeResponse;
+}
+
+/// Endpoint type for
+///at.inlay.Maybe
+pub struct MaybeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MaybeRequest {
+    const PATH: &'static str = "/xrpc/at.inlay.Maybe";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Maybe<'de>;
+    type Response = MaybeResponse;
+}
+
 pub mod maybe_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -149,51 +196,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MaybeOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///at.inlay.Maybe
-pub struct MaybeResponse;
-impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
-    const NSID: &'static str = "at.inlay.Maybe";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MaybeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Maybe<'a> {
-    const NSID: &'static str = "at.inlay.Maybe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = MaybeResponse;
-}
-
-/// Endpoint type for
-///at.inlay.Maybe
-pub struct MaybeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for MaybeRequest {
-    const PATH: &'static str = "/xrpc/at.inlay.Maybe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Maybe<'de>;
-    type Response = MaybeResponse;
 }

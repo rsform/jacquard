@@ -40,6 +40,143 @@ pub struct UpdateCollection<'a> {
     pub visibility: std::option::Option<UpdateCollectionVisibility<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateCollectionVisibility<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateCollectionVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateCollectionVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateCollectionVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateCollectionVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateCollectionVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateCollectionVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateCollectionVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateCollectionVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateCollectionVisibility<'_> {
+    type Output = UpdateCollectionVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateCollectionVisibility::Public => UpdateCollectionVisibility::Public,
+            UpdateCollectionVisibility::Private => UpdateCollectionVisibility::Private,
+            UpdateCollectionVisibility::Other(v) => {
+                UpdateCollectionVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateCollectionOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::social_showcase::CollectionView<'a>,
+}
+
+/// Response type for
+///social.showcase.collection.updateCollection
+pub struct UpdateCollectionResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateCollectionResponse {
+    const NSID: &'static str = "social.showcase.collection.updateCollection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateCollectionOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCollection<'a> {
+    const NSID: &'static str = "social.showcase.collection.updateCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateCollectionResponse;
+}
+
+/// Endpoint type for
+///social.showcase.collection.updateCollection
+pub struct UpdateCollectionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateCollectionRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.collection.updateCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateCollection<'de>;
+    type Response = UpdateCollectionResponse;
+}
+
 pub mod update_collection_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -272,141 +409,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateCollectionVisibility<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> UpdateCollectionVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for UpdateCollectionVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for UpdateCollectionVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UpdateCollectionVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for UpdateCollectionVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for UpdateCollectionVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for UpdateCollectionVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for UpdateCollectionVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateCollectionVisibility<'_> {
-    type Output = UpdateCollectionVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateCollectionVisibility::Public => UpdateCollectionVisibility::Public,
-            UpdateCollectionVisibility::Private => UpdateCollectionVisibility::Private,
-            UpdateCollectionVisibility::Other(v) => {
-                UpdateCollectionVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateCollectionOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::social_showcase::CollectionView<'a>,
-}
-
-/// Response type for
-///social.showcase.collection.updateCollection
-pub struct UpdateCollectionResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateCollectionResponse {
-    const NSID: &'static str = "social.showcase.collection.updateCollection";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateCollectionOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCollection<'a> {
-    const NSID: &'static str = "social.showcase.collection.updateCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateCollectionResponse;
-}
-
-/// Endpoint type for
-///social.showcase.collection.updateCollection
-pub struct UpdateCollectionRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateCollectionRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.collection.updateCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateCollection<'de>;
-    type Response = UpdateCollectionResponse;
 }

@@ -22,6 +22,42 @@ pub struct Blockquote<'a> {
     pub content: Vec<BlockquoteContentItem<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum BlockquoteContentItem<'a> {
+    #[serde(rename = "app.offprint.block.text")]
+    Text(Box<crate::app_offprint::block::text::Text<'a>>),
+    #[serde(rename = "app.offprint.block.heading")]
+    Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
+    fn nsid() -> &'static str {
+        "app.offprint.block.blockquote"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_offprint_block_blockquote()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod blockquote_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,25 +161,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlockquoteContentItem<'a> {
-    #[serde(rename = "app.offprint.block.text")]
-    Text(Box<crate::app_offprint::block::text::Text<'a>>),
-    #[serde(rename = "app.offprint.block.heading")]
-    Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
-}
-
 fn lexicon_doc_app_offprint_block_blockquote() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -195,22 +212,5 @@ fn lexicon_doc_app_offprint_block_blockquote() -> ::jacquard_lexicon::lexicon::L
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
-    fn nsid() -> &'static str {
-        "app.offprint.block.blockquote"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_offprint_block_blockquote()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

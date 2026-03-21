@@ -22,6 +22,50 @@ pub struct DeleteCollection<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteCollectionOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+/// Response type for
+///social.showcase.collection.deleteCollection
+pub struct DeleteCollectionResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteCollectionResponse {
+    const NSID: &'static str = "social.showcase.collection.deleteCollection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeleteCollectionOutput;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteCollection<'a> {
+    const NSID: &'static str = "social.showcase.collection.deleteCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteCollectionResponse;
+}
+
+/// Endpoint type for
+///social.showcase.collection.deleteCollection
+pub struct DeleteCollectionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteCollectionRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.collection.deleteCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteCollection<'de>;
+    type Response = DeleteCollectionResponse;
+}
+
 pub mod delete_collection_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,48 +169,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteCollectionOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-/// Response type for
-///social.showcase.collection.deleteCollection
-pub struct DeleteCollectionResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteCollectionResponse {
-    const NSID: &'static str = "social.showcase.collection.deleteCollection";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteCollectionOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteCollection<'a> {
-    const NSID: &'static str = "social.showcase.collection.deleteCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteCollectionResponse;
-}
-
-/// Endpoint type for
-///social.showcase.collection.deleteCollection
-pub struct DeleteCollectionRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteCollectionRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.collection.deleteCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteCollection<'de>;
-    type Response = DeleteCollectionResponse;
 }

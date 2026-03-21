@@ -32,6 +32,92 @@ pub struct GetSparklines<'a> {
     pub slices: Vec<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSparklinesOutput<'a> {
+    ///Array of slice sparkline data entries
+    #[serde(borrow)]
+    pub sparklines: Vec<
+        crate::network_slices::slice::get_sparklines::SparklineEntry<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SparklineEntry<'a> {
+    ///Array of sparkline data points
+    #[serde(borrow)]
+    pub points: Vec<crate::network_slices::slice::SparklinePoint<'a>>,
+    ///AT-URI of the slice
+    #[serde(borrow)]
+    pub slice_uri: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///network.slices.slice.getSparklines
+pub struct GetSparklinesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSparklinesResponse {
+    const NSID: &'static str = "network.slices.slice.getSparklines";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSparklinesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSparklines<'a> {
+    const NSID: &'static str = "network.slices.slice.getSparklines";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GetSparklinesResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.getSparklines
+pub struct GetSparklinesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSparklines";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetSparklines<'de>;
+    type Response = GetSparklinesResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.getSparklines"
+    }
+    fn def_name() -> &'static str {
+        "sparklineEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_slice_getSparklines()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_get_sparklines_duration() -> std::option::Option<
     jacquard_common::CowStr<'static>,
 > {
@@ -197,75 +283,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSparklinesOutput<'a> {
-    ///Array of slice sparkline data entries
-    #[serde(borrow)]
-    pub sparklines: Vec<
-        crate::network_slices::slice::get_sparklines::SparklineEntry<'a>,
-    >,
-}
-
-/// Response type for
-///network.slices.slice.getSparklines
-pub struct GetSparklinesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSparklinesResponse {
-    const NSID: &'static str = "network.slices.slice.getSparklines";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSparklinesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSparklines<'a> {
-    const NSID: &'static str = "network.slices.slice.getSparklines";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = GetSparklinesResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.getSparklines
-pub struct GetSparklinesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.getSparklines";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = GetSparklines<'de>;
-    type Response = GetSparklinesResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SparklineEntry<'a> {
-    ///Array of sparkline data points
-    #[serde(borrow)]
-    pub points: Vec<crate::network_slices::slice::SparklinePoint<'a>>,
-    ///AT-URI of the slice
-    #[serde(borrow)]
-    pub slice_uri: jacquard_common::CowStr<'a>,
 }
 
 pub mod sparkline_entry_state {
@@ -576,22 +593,5 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.slice.getSparklines"
-    }
-    fn def_name() -> &'static str {
-        "sparklineEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_slice_getSparklines()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

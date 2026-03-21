@@ -120,6 +120,137 @@ impl jacquard_common::IntoStatic for LinkItemService<'_> {
     }
 }
 
+/// Record containing links to external service profiles.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Link<'a> {
+    ///Client-declared timestamp when this record was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Array of external service links.
+    #[serde(borrow)]
+    pub links: Vec<crate::ai_syui::at::link::LinkItem<'a>>,
+    ///Client-declared timestamp when this record was last updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Link<'a>,
+}
+
+impl<'a> Link<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LinkRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkItem<'a> {
+    fn nsid() -> &'static str {
+        "ai.syui.at.link"
+    }
+    fn def_name() -> &'static str {
+        "linkItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ai_syui_at_link()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.username;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "username",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LinkRecord;
+impl jacquard_common::xrpc::XrpcResp for LinkRecord {
+    const NSID: &'static str = "ai.syui.at.link";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LinkGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LinkGetRecordOutput<'_>> for Link<'_> {
+    fn from(output: LinkGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Link<'_> {
+    const NSID: &'static str = "ai.syui.at.link";
+    type Record = LinkRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LinkRecord {
+    const NSID: &'static str = "ai.syui.at.link";
+    type Record = LinkRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+    fn nsid() -> &'static str {
+        "ai.syui.at.link"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ai_syui_at_link()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_ai_syui_at_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -281,59 +412,6 @@ fn lexicon_doc_ai_syui_at_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkItem<'a> {
-    fn nsid() -> &'static str {
-        "ai.syui.at.link"
-    }
-    fn def_name() -> &'static str {
-        "linkItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ai_syui_at_link()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.username;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "username",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Record containing links to external service profiles.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
-    ///Client-declared timestamp when this record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Array of external service links.
-    #[serde(borrow)]
-    pub links: Vec<crate::ai_syui::at::link::LinkItem<'a>>,
-    ///Client-declared timestamp when this record was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -493,83 +571,5 @@ where
             updated_at: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Link<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LinkRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Link<'a>,
-}
-
-impl From<LinkGetRecordOutput<'_>> for Link<'_> {
-    fn from(output: LinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Link<'_> {
-    const NSID: &'static str = "ai.syui.at.link";
-    type Record = LinkRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LinkRecord;
-impl jacquard_common::xrpc::XrpcResp for LinkRecord {
-    const NSID: &'static str = "ai.syui.at.link";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LinkRecord {
-    const NSID: &'static str = "ai.syui.at.link";
-    type Record = LinkRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
-    fn nsid() -> &'static str {
-        "ai.syui.at.link"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ai_syui_at_link()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

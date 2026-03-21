@@ -32,6 +32,340 @@ pub struct ImageRef<'a> {
     pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
+/// Images embed that supports CID references for existing images.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ImagesEmbed<'a> {
+    #[serde(borrow)]
+    pub images: Vec<crate::app_chronosky::schedule::update_post::ImageRef<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdatePost<'a> {
+    ///Whether to disable quote posts
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disable_quote_posts: std::option::Option<bool>,
+    ///Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embed: std::option::Option<UpdatePostEmbed<'a>>,
+    ///Rich text facets (links, mentions, tags).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ///Post ID to update.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///Self-applied content labels for content warnings (AT Protocol standard).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ///Language codes (ISO 639-1).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    ///New scheduled publication datetime (ISO 8601).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub scheduled_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///New post text content.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Thread gate rules to control who can reply
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threadgate_rules: std::option::Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdatePostEmbed<'a> {
+    #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
+    ImagesEmbed(Box<crate::app_chronosky::schedule::update_post::ImagesEmbed<'a>>),
+    #[serde(rename = "app.bsky.embed.images")]
+    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
+    #[serde(rename = "app.bsky.embed.external")]
+    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
+    #[serde(rename = "app.bsky.embed.record")]
+    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
+    #[serde(rename = "app.bsky.embed.video")]
+    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
+    #[serde(rename = "app.bsky.embed.recordWithMedia")]
+    RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdatePostThreadgateRulesItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdatePostOutput<'a> {
+    #[serde(borrow)]
+    pub post: crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdatePostError<'a> {
+    #[serde(rename = "PostNotFound")]
+    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "PostNotPending")]
+    PostNotPending(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "NoFieldsProvided")]
+    NoFieldsProvided(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for UpdatePostError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::PostNotFound(msg) => {
+                write!(f, "PostNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::PostNotPending(msg) => {
+                write!(f, "PostNotPending")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::NoFieldsProvided(msg) => {
+                write!(f, "NoFieldsProvided")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.schedule.updatePost"
+    }
+    fn def_name() -> &'static str {
+        "imageRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_schedule_updatePost()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.alt;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.cid {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cid",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp",
+                    "image/gif",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "image",
+                        ),
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string(), "image/gif".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
+    fn nsid() -> &'static str {
+        "app.chronosky.schedule.updatePost"
+    }
+    fn def_name() -> &'static str {
+        "imagesEmbed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_chronosky_schedule_updatePost()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.images;
+            #[allow(unused_comparisons)]
+            if value.len() > 4usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
+                    max: 4usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Response type for
+///app.chronosky.schedule.updatePost
+pub struct UpdatePostResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdatePostResponse {
+    const NSID: &'static str = "app.chronosky.schedule.updatePost";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdatePostOutput<'de>;
+    type Err<'de> = UpdatePostError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePost<'a> {
+    const NSID: &'static str = "app.chronosky.schedule.updatePost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdatePostResponse;
+}
+
+/// Endpoint type for
+///app.chronosky.schedule.updatePost
+pub struct UpdatePostRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
+    const PATH: &'static str = "/xrpc/app.chronosky.schedule.updatePost";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdatePost<'de>;
+    type Response = UpdatePostResponse;
+}
+
 fn lexicon_doc_app_chronosky_schedule_updatePost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -363,115 +697,6 @@ fn lexicon_doc_app_chronosky_schedule_updatePost() -> ::jacquard_lexicon::lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.schedule.updatePost"
-    }
-    fn def_name() -> &'static str {
-        "imageRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_schedule_updatePost()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.alt;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.cid {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cid",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.image {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.image {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/jpeg",
-                    "image/png",
-                    "image/webp",
-                    "image/gif",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
-                        accepted: vec![
-                            "image/jpeg".to_string(), "image/png".to_string(),
-                            "image/webp".to_string(), "image/gif".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Images embed that supports CID references for existing images.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ImagesEmbed<'a> {
-    #[serde(borrow)]
-    pub images: Vec<crate::app_chronosky::schedule::update_post::ImageRef<'a>>,
-}
-
 pub mod images_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -577,229 +802,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
-    fn nsid() -> &'static str {
-        "app.chronosky.schedule.updatePost"
-    }
-    fn def_name() -> &'static str {
-        "imagesEmbed"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_chronosky_schedule_updatePost()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.images;
-            #[allow(unused_comparisons)]
-            if value.len() > 4usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
-                    max: 4usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdatePost<'a> {
-    ///Whether to disable quote posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_quote_posts: std::option::Option<bool>,
-    ///Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub embed: std::option::Option<UpdatePostEmbed<'a>>,
-    ///Rich text facets (links, mentions, tags).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Post ID to update.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///Self-applied content labels for content warnings (AT Protocol standard).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Language codes (ISO 639-1).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
-    ///New scheduled publication datetime (ISO 8601).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scheduled_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///New post text content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Thread gate rules to control who can reply
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate_rules: std::option::Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostEmbed<'a> {
-    #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
-    ImagesEmbed(Box<crate::app_chronosky::schedule::update_post::ImagesEmbed<'a>>),
-    #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
-    #[serde(rename = "app.bsky.embed.external")]
-    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
-    #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
-    #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
-    #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostThreadgateRulesItem<'a> {
-    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdatePostOutput<'a> {
-    #[serde(borrow)]
-    pub post: crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostError<'a> {
-    #[serde(rename = "PostNotFound")]
-    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "PostNotPending")]
-    PostNotPending(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "NoFieldsProvided")]
-    NoFieldsProvided(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for UpdatePostError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::PostNotFound(msg) => {
-                write!(f, "PostNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::PostNotPending(msg) => {
-                write!(f, "PostNotPending")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::NoFieldsProvided(msg) => {
-                write!(f, "NoFieldsProvided")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.chronosky.schedule.updatePost
-pub struct UpdatePostResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdatePostResponse {
-    const NSID: &'static str = "app.chronosky.schedule.updatePost";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdatePostOutput<'de>;
-    type Err<'de> = UpdatePostError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePost<'a> {
-    const NSID: &'static str = "app.chronosky.schedule.updatePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdatePostResponse;
-}
-
-/// Endpoint type for
-///app.chronosky.schedule.updatePost
-pub struct UpdatePostRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
-    const PATH: &'static str = "/xrpc/app.chronosky.schedule.updatePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdatePost<'de>;
-    type Response = UpdatePostResponse;
 }

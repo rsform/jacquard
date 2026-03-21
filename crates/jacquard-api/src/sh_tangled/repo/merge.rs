@@ -47,6 +47,36 @@ pub struct Merge<'a> {
     pub patch: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.merge
+pub struct MergeResponse;
+impl jacquard_common::xrpc::XrpcResp for MergeResponse {
+    const NSID: &'static str = "sh.tangled.repo.merge";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
+    const NSID: &'static str = "sh.tangled.repo.merge";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = MergeResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.merge
+pub struct MergeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Merge<'de>;
+    type Response = MergeResponse;
+}
+
 pub mod merge_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -57,8 +87,8 @@ pub mod merge_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
         type Patch;
+        type Branch;
         type Did;
         type Name;
     }
@@ -66,26 +96,26 @@ pub mod merge_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
         type Patch = Unset;
+        type Branch = Unset;
         type Did = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Patch = S::Patch;
-        type Did = S::Did;
-        type Name = S::Name;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
-        type Branch = S::Branch;
         type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+        type Did = S::Did;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Patch = S::Patch;
+        type Branch = Set<members::branch>;
         type Did = S::Did;
         type Name = S::Name;
     }
@@ -93,8 +123,8 @@ pub mod merge_state {
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
         type Patch = S::Patch;
+        type Branch = S::Branch;
         type Did = Set<members::did>;
         type Name = S::Name;
     }
@@ -102,18 +132,18 @@ pub mod merge_state {
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Branch = S::Branch;
         type Patch = S::Patch;
+        type Branch = S::Branch;
         type Did = S::Did;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `name` field
@@ -310,8 +340,8 @@ where
 impl<'a, S> MergeBuilder<'a, S>
 where
     S: merge_state::State,
-    S::Branch: merge_state::IsSet,
     S::Patch: merge_state::IsSet,
+    S::Branch: merge_state::IsSet,
     S::Did: merge_state::IsSet,
     S::Name: merge_state::IsSet,
 {
@@ -349,34 +379,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.merge
-pub struct MergeResponse;
-impl jacquard_common::xrpc::XrpcResp for MergeResponse {
-    const NSID: &'static str = "sh.tangled.repo.merge";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
-    const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = MergeResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.merge
-pub struct MergeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Merge<'de>;
-    type Response = MergeResponse;
 }

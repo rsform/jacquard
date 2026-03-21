@@ -44,6 +44,399 @@ pub struct Room<'a> {
     pub topic: jacquard_common::CowStr<'a>,
 }
 
+/// Room purpose categorization.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RoomPurpose<'a> {
+    Discussion,
+    Event,
+    Community,
+    Support,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RoomPurpose<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Discussion => "discussion",
+            Self::Event => "event",
+            Self::Community => "community",
+            Self::Support => "support",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RoomPurpose<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "discussion" => Self::Discussion,
+            "event" => Self::Event,
+            "community" => Self::Community,
+            "support" => Self::Support,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RoomPurpose<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "discussion" => Self::Discussion,
+            "event" => Self::Event,
+            "community" => Self::Community,
+            "support" => Self::Support,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RoomPurpose<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RoomPurpose<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RoomPurpose<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RoomPurpose<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RoomPurpose<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RoomPurpose<'_> {
+    type Output = RoomPurpose<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RoomPurpose::Discussion => RoomPurpose::Discussion,
+            RoomPurpose::Event => RoomPurpose::Event,
+            RoomPurpose::Community => RoomPurpose::Community,
+            RoomPurpose::Support => RoomPurpose::Support,
+            RoomPurpose::Other(v) => RoomPurpose::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RoomGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Room<'a>,
+}
+
+/// Configurable room settings.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RoomSettings<'a> {
+    ///When true, only users on the room allowlist can send messages. Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_room_settings_allowlist_enabled")]
+    pub allowlist_enabled: std::option::Option<bool>,
+    ///Minimum atproto account age in days to participate. Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_room_settings_min_account_age_days")]
+    pub min_account_age_days: std::option::Option<i64>,
+    ///Minimum seconds between messages per user. 0 = disabled. Defaults to `0`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_room_settings_slow_mode_seconds")]
+    pub slow_mode_seconds: std::option::Option<i64>,
+    ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub visibility: std::option::Option<RoomSettingsVisibility<'a>>,
+}
+
+/// Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RoomSettingsVisibility<'a> {
+    Public,
+    Unlisted,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RoomSettingsVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RoomSettingsVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RoomSettingsVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RoomSettingsVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RoomSettingsVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RoomSettingsVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RoomSettingsVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RoomSettingsVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RoomSettingsVisibility<'_> {
+    type Output = RoomSettingsVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RoomSettingsVisibility::Public => RoomSettingsVisibility::Public,
+            RoomSettingsVisibility::Unlisted => RoomSettingsVisibility::Unlisted,
+            RoomSettingsVisibility::Private => RoomSettingsVisibility::Private,
+            RoomSettingsVisibility::Other(v) => {
+                RoomSettingsVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> Room<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RoomRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RoomRecord;
+impl jacquard_common::xrpc::XrpcResp for RoomRecord {
+    const NSID: &'static str = "app.protoimsg.chat.room";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RoomGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RoomGetRecordOutput<'_>> for Room<'_> {
+    fn from(output: RoomGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Room<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.room";
+    type Record = RoomRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RoomRecord {
+    const NSID: &'static str = "app.protoimsg.chat.room";
+    type Record = RoomRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.room"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_room()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.category {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "category",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.topic;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "topic",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.room"
+    }
+    fn def_name() -> &'static str {
+        "roomSettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_room()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.min_account_age_days {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "min_account_age_days",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.slow_mode_seconds {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slow_mode_seconds",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod room_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -54,67 +447,67 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
+        type Topic;
         type Purpose;
         type CreatedAt;
-        type Topic;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
+        type Topic = Unset;
         type Purpose = Unset;
         type CreatedAt = Unset;
-        type Topic = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Name = S::Name;
-        type Purpose = Set<members::purpose>;
-        type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type CreatedAt = Set<members::created_at>;
-        type Topic = S::Topic;
+        type Name = Unset;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type Name = S::Name;
+        type Topic = Set<members::topic>;
         type Purpose = S::Purpose;
         type CreatedAt = S::CreatedAt;
-        type Topic = Set<members::topic>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPurpose<S> {}
+    impl<S: State> State for SetPurpose<S> {
+        type Topic = S::Topic;
+        type Purpose = Set<members::purpose>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -284,10 +677,10 @@ where
 impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
-    S::Name: room_state::IsSet,
+    S::Topic: room_state::IsSet,
     S::Purpose: room_state::IsSet,
     S::CreatedAt: room_state::IsSet,
-    S::Topic: room_state::IsSet,
+    S::Name: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
@@ -320,233 +713,6 @@ where
             topic: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Room<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RoomRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Room purpose categorization.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RoomPurpose<'a> {
-    Discussion,
-    Event,
-    Community,
-    Support,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RoomPurpose<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Discussion => "discussion",
-            Self::Event => "event",
-            Self::Community => "community",
-            Self::Support => "support",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RoomPurpose<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "discussion" => Self::Discussion,
-            "event" => Self::Event,
-            "community" => Self::Community,
-            "support" => Self::Support,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RoomPurpose<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "discussion" => Self::Discussion,
-            "event" => Self::Event,
-            "community" => Self::Community,
-            "support" => Self::Support,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RoomPurpose<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RoomPurpose<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RoomPurpose<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RoomPurpose<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RoomPurpose<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RoomPurpose<'_> {
-    type Output = RoomPurpose<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RoomPurpose::Discussion => RoomPurpose::Discussion,
-            RoomPurpose::Event => RoomPurpose::Event,
-            RoomPurpose::Community => RoomPurpose::Community,
-            RoomPurpose::Support => RoomPurpose::Support,
-            RoomPurpose::Other(v) => RoomPurpose::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RoomGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Room<'a>,
-}
-
-impl From<RoomGetRecordOutput<'_>> for Room<'_> {
-    fn from(output: RoomGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Room<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.room";
-    type Record = RoomRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RoomRecord;
-impl jacquard_common::xrpc::XrpcResp for RoomRecord {
-    const NSID: &'static str = "app.protoimsg.chat.room";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RoomGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RoomRecord {
-    const NSID: &'static str = "app.protoimsg.chat.room";
-    type Record = RoomRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.room"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_room()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.category {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.topic;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "topic",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -806,37 +972,6 @@ fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-/// Configurable room settings.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RoomSettings<'a> {
-    ///When true, only users on the room allowlist can send messages. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_room_settings_allowlist_enabled")]
-    pub allowlist_enabled: std::option::Option<bool>,
-    ///Minimum atproto account age in days to participate. Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_room_settings_min_account_age_days")]
-    pub min_account_age_days: std::option::Option<i64>,
-    ///Minimum seconds between messages per user. 0 = disabled. Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_room_settings_slow_mode_seconds")]
-    pub slow_mode_seconds: std::option::Option<i64>,
-    ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: std::option::Option<RoomSettingsVisibility<'a>>,
-}
-
 fn _default_room_settings_allowlist_enabled() -> std::option::Option<bool> {
     Some(false)
 }
@@ -858,140 +993,5 @@ impl Default for RoomSettings<'_> {
             visibility: None,
             extra_data: Default::default(),
         }
-    }
-}
-
-/// Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RoomSettingsVisibility<'a> {
-    Public,
-    Unlisted,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> RoomSettingsVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Unlisted => "unlisted",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for RoomSettingsVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for RoomSettingsVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RoomSettingsVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for RoomSettingsVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for RoomSettingsVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for RoomSettingsVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for RoomSettingsVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for RoomSettingsVisibility<'_> {
-    type Output = RoomSettingsVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RoomSettingsVisibility::Public => RoomSettingsVisibility::Public,
-            RoomSettingsVisibility::Unlisted => RoomSettingsVisibility::Unlisted,
-            RoomSettingsVisibility::Private => RoomSettingsVisibility::Private,
-            RoomSettingsVisibility::Other(v) => {
-                RoomSettingsVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.room"
-    }
-    fn def_name() -> &'static str {
-        "roomSettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_room()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.min_account_age_days {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "min_account_age_days",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.slow_mode_seconds {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slow_mode_seconds",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

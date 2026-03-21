@@ -20,6 +20,52 @@ pub struct GetResourceParticipants<'a> {
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetResourceParticipantsOutput<'a> {
+    #[serde(borrow)]
+    pub owner: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub participants: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub viewer_can_edit: std::option::Option<bool>,
+}
+
+/// Response type for
+///sh.weaver.collab.getResourceParticipants
+pub struct GetResourceParticipantsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetResourceParticipantsResponse {
+    const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetResourceParticipantsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceParticipants<'a> {
+    const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetResourceParticipantsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.collab.getResourceParticipants
+pub struct GetResourceParticipantsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetResourceParticipantsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceParticipants";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetResourceParticipants<'de>;
+    type Response = GetResourceParticipantsResponse;
+}
+
 pub mod get_resource_participants_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -118,50 +164,4 @@ where
             resource: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetResourceParticipantsOutput<'a> {
-    #[serde(borrow)]
-    pub owner: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub participants: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub viewer_can_edit: std::option::Option<bool>,
-}
-
-/// Response type for
-///sh.weaver.collab.getResourceParticipants
-pub struct GetResourceParticipantsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetResourceParticipantsResponse {
-    const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceParticipantsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceParticipants<'a> {
-    const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetResourceParticipantsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.collab.getResourceParticipants
-pub struct GetResourceParticipantsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetResourceParticipantsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceParticipants";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceParticipants<'de>;
-    type Response = GetResourceParticipantsResponse;
 }

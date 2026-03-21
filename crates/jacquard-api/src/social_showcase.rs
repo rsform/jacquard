@@ -34,187 +34,6 @@ pub struct ActivitySettings<'a> {
     pub share_new_items: bool,
 }
 
-fn _default_activity_settings_retention_days() -> i64 {
-    90i64
-}
-
-pub mod activity_settings_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type ShareNewItems;
-        type RetentionDays;
-        type ShareActivity;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type ShareNewItems = Unset;
-        type RetentionDays = Unset;
-        type ShareActivity = Unset;
-    }
-    ///State transition - sets the `share_new_items` field to Set
-    pub struct SetShareNewItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareNewItems<S> {}
-    impl<S: State> State for SetShareNewItems<S> {
-        type ShareNewItems = Set<members::share_new_items>;
-        type RetentionDays = S::RetentionDays;
-        type ShareActivity = S::ShareActivity;
-    }
-    ///State transition - sets the `retention_days` field to Set
-    pub struct SetRetentionDays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetentionDays<S> {}
-    impl<S: State> State for SetRetentionDays<S> {
-        type ShareNewItems = S::ShareNewItems;
-        type RetentionDays = Set<members::retention_days>;
-        type ShareActivity = S::ShareActivity;
-    }
-    ///State transition - sets the `share_activity` field to Set
-    pub struct SetShareActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareActivity<S> {}
-    impl<S: State> State for SetShareActivity<S> {
-        type ShareNewItems = S::ShareNewItems;
-        type RetentionDays = S::RetentionDays;
-        type ShareActivity = Set<members::share_activity>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `share_new_items` field
-        pub struct share_new_items(());
-        ///Marker type for the `retention_days` field
-        pub struct retention_days(());
-        ///Marker type for the `share_activity` field
-        pub struct share_activity(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct ActivitySettingsBuilder<'a, S: activity_settings_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<ActivitySettingsShareActivity<'a>>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> ActivitySettings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
-        ActivitySettingsBuilder::new()
-    }
-}
-
-impl<'a> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ActivitySettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivitySettingsBuilder<'a, S>
-where
-    S: activity_settings_state::State,
-    S::RetentionDays: activity_settings_state::IsUnset,
-{
-    /// Set the `retentionDays` field (required)
-    pub fn retention_days(
-        mut self,
-        value: impl Into<i64>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetRetentionDays<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ActivitySettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivitySettingsBuilder<'a, S>
-where
-    S: activity_settings_state::State,
-    S::ShareActivity: activity_settings_state::IsUnset,
-{
-    /// Set the `shareActivity` field (required)
-    pub fn share_activity(
-        mut self,
-        value: impl Into<ActivitySettingsShareActivity<'a>>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareActivity<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        ActivitySettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivitySettingsBuilder<'a, S>
-where
-    S: activity_settings_state::State,
-    S::ShareNewItems: activity_settings_state::IsUnset,
-{
-    /// Set the `shareNewItems` field (required)
-    pub fn share_new_items(
-        mut self,
-        value: impl Into<bool>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareNewItems<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        ActivitySettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> ActivitySettingsBuilder<'a, S>
-where
-    S: activity_settings_state::State,
-    S::ShareNewItems: activity_settings_state::IsSet,
-    S::RetentionDays: activity_settings_state::IsSet,
-    S::ShareActivity: activity_settings_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> ActivitySettings<'a> {
-        ActivitySettings {
-            retention_days: self.__unsafe_private_named.0.unwrap(),
-            share_activity: self.__unsafe_private_named.1.unwrap(),
-            share_new_items: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> ActivitySettings<'a> {
-        ActivitySettings {
-            retention_days: self.__unsafe_private_named.0.unwrap(),
-            share_activity: self.__unsafe_private_named.1.unwrap(),
-            share_new_items: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 /// Who sees your activity feed
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActivitySettingsShareActivity<'a> {
@@ -309,6 +128,1575 @@ impl jacquard_common::IntoStatic for ActivitySettingsShareActivity<'_> {
             ActivitySettingsShareActivity::Other(v) => {
                 ActivitySettingsShareActivity::Other(v.into_static())
             }
+        }
+    }
+}
+
+/// Image aspect ratio
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AspectRatio<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub width: std::option::Option<i64>,
+}
+
+/// Reference to an item in a collection
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionItem<'a> {
+    pub added_at: jacquard_common::types::string::Datetime,
+    ///For custom sorting
+    pub order: i64,
+    ///AT-URI reference to item (always shows latest version)
+    #[serde(borrow)]
+    pub uri: jacquard_common::CowStr<'a>,
+}
+
+/// View of a collection with items
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionView<'a> {
+    #[serde(borrow)]
+    pub author: crate::social_showcase::ProfileView<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub item_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub items: std::option::Option<Vec<crate::social_showcase::ItemView<'a>>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub tags: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub visibility: jacquard_common::CowStr<'a>,
+}
+
+/// Display preferences
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplaySettings<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub grid_layout: std::option::Option<DisplaySettingsGridLayout<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub theme: std::option::Option<DisplaySettingsTheme<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DisplaySettingsGridLayout<'a> {
+    Compact,
+    Spacious,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DisplaySettingsGridLayout<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Compact => "compact",
+            Self::Spacious => "spacious",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DisplaySettingsGridLayout<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "compact" => Self::Compact,
+            "spacious" => Self::Spacious,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DisplaySettingsGridLayout<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "compact" => Self::Compact,
+            "spacious" => Self::Spacious,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DisplaySettingsGridLayout<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DisplaySettingsGridLayout<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DisplaySettingsGridLayout<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DisplaySettingsGridLayout<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DisplaySettingsGridLayout<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DisplaySettingsGridLayout<'_> {
+    type Output = DisplaySettingsGridLayout<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DisplaySettingsGridLayout::Compact => DisplaySettingsGridLayout::Compact,
+            DisplaySettingsGridLayout::Spacious => DisplaySettingsGridLayout::Spacious,
+            DisplaySettingsGridLayout::Other(v) => {
+                DisplaySettingsGridLayout::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DisplaySettingsTheme<'a> {
+    Light,
+    Dark,
+    Auto,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DisplaySettingsTheme<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Light => "light",
+            Self::Dark => "dark",
+            Self::Auto => "auto",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DisplaySettingsTheme<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "light" => Self::Light,
+            "dark" => Self::Dark,
+            "auto" => Self::Auto,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DisplaySettingsTheme<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "light" => Self::Light,
+            "dark" => Self::Dark,
+            "auto" => Self::Auto,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DisplaySettingsTheme<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DisplaySettingsTheme<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DisplaySettingsTheme<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DisplaySettingsTheme<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DisplaySettingsTheme<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DisplaySettingsTheme<'_> {
+    type Output = DisplaySettingsTheme<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DisplaySettingsTheme::Light => DisplaySettingsTheme::Light,
+            DisplaySettingsTheme::Dark => DisplaySettingsTheme::Dark,
+            DisplaySettingsTheme::Auto => DisplaySettingsTheme::Auto,
+            DisplaySettingsTheme::Other(v) => {
+                DisplaySettingsTheme::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Image embedded in an item
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ItemImage<'a> {
+    ///Alt text for accessibility
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub aspect_ratio: std::option::Option<crate::social_showcase::AspectRatio<'a>>,
+    #[serde(borrow)]
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+/// View of an item with metadata
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ItemView<'a> {
+    #[serde(borrow)]
+    pub author: crate::social_showcase::ProfileView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub external_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(borrow)]
+    pub images: Vec<crate::social_showcase::ItemImage<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reaction_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub tags: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub visibility: jacquard_common::CowStr<'a>,
+}
+
+/// Notification preferences
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotificationSettings<'a> {
+    pub comments: bool,
+    pub follows: bool,
+    pub reactions: bool,
+}
+
+/// Privacy preferences
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PrivacySettings<'a> {
+    ///Let others comment
+    pub allow_comments: bool,
+    ///Let others react to your items
+    pub allow_reactions: bool,
+    ///Appear in search results
+    pub indexable: bool,
+}
+
+/// View of a user profile
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// Subject of a reaction
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionSubject<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// View of a reaction to content
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionView<'a> {
+    #[serde(borrow)]
+    pub actor: crate::social_showcase::ProfileView<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub subject: crate::social_showcase::ReactionSubject<'a>,
+    ///Emoji shortcode
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// A reference to an item featured in a user's showcase (hydrated at read time)
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ShowcaseItem<'a> {
+    pub added_at: jacquard_common::types::string::Datetime,
+    ///Display order (0 = first)
+    pub order: i64,
+    ///AT-URI reference to the item (e.g., at://did:plc:.../social.showcase.library.item/abc123)
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Visibility preferences
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VisibilitySettings<'a> {
+    #[serde(borrow)]
+    pub default_collection_visibility: VisibilitySettingsDefaultCollectionVisibility<'a>,
+    #[serde(borrow)]
+    pub default_item_visibility: VisibilitySettingsDefaultItemVisibility<'a>,
+    #[serde(borrow)]
+    pub profile_visibility: VisibilitySettingsProfileVisibility<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsDefaultCollectionVisibility<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsDefaultCollectionVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de>
+for VisibilitySettingsDefaultCollectionVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsDefaultCollectionVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsDefaultCollectionVisibility<'_> {
+    type Output = VisibilitySettingsDefaultCollectionVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsDefaultCollectionVisibility::Public => {
+                VisibilitySettingsDefaultCollectionVisibility::Public
+            }
+            VisibilitySettingsDefaultCollectionVisibility::Private => {
+                VisibilitySettingsDefaultCollectionVisibility::Private
+            }
+            VisibilitySettingsDefaultCollectionVisibility::Other(v) => {
+                VisibilitySettingsDefaultCollectionVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsDefaultItemVisibility<'a> {
+    Public,
+    Unlisted,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsDefaultItemVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsDefaultItemVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsDefaultItemVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsDefaultItemVisibility<'_> {
+    type Output = VisibilitySettingsDefaultItemVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsDefaultItemVisibility::Public => {
+                VisibilitySettingsDefaultItemVisibility::Public
+            }
+            VisibilitySettingsDefaultItemVisibility::Unlisted => {
+                VisibilitySettingsDefaultItemVisibility::Unlisted
+            }
+            VisibilitySettingsDefaultItemVisibility::Private => {
+                VisibilitySettingsDefaultItemVisibility::Private
+            }
+            VisibilitySettingsDefaultItemVisibility::Other(v) => {
+                VisibilitySettingsDefaultItemVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsProfileVisibility<'a> {
+    Public,
+    Unlisted,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsProfileVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsProfileVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsProfileVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsProfileVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsProfileVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsProfileVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsProfileVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsProfileVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsProfileVisibility<'_> {
+    type Output = VisibilitySettingsProfileVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsProfileVisibility::Public => {
+                VisibilitySettingsProfileVisibility::Public
+            }
+            VisibilitySettingsProfileVisibility::Unlisted => {
+                VisibilitySettingsProfileVisibility::Unlisted
+            }
+            VisibilitySettingsProfileVisibility::Private => {
+                VisibilitySettingsProfileVisibility::Private
+            }
+            VisibilitySettingsProfileVisibility::Other(v) => {
+                VisibilitySettingsProfileVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySettings<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "activitySettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.share_activity;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "share_activity",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.height {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.width {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "width",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "collectionItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.uri;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 8192usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uri",
+                    ),
+                    max: 8192usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "collectionView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.visibility;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "visibility",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplaySettings<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "displaySettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.grid_layout {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "grid_layout",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.theme {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "theme",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemImage<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "itemImage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.alt {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let size = value.blob().size;
+                if size > 5000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 5000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemView<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "itemView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.category {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "category",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.external_link {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "external_link",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.visibility;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "visibility",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "notificationSettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrivacySettings<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "privacySettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.did;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "did",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.handle;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 253usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "handle",
+                    ),
+                    max: 253usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionSubject<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "reactionSubject"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "reactionView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShowcaseItem<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "showcaseItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.defs"
+    }
+    fn def_name() -> &'static str {
+        "visibilitySettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.default_collection_visibility;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "default_collection_visibility",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.default_item_visibility;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "default_item_visibility",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.profile_visibility;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "profile_visibility",
+                    ),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+fn _default_activity_settings_retention_days() -> i64 {
+    90i64
+}
+
+pub mod activity_settings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ShareActivity;
+        type RetentionDays;
+        type ShareNewItems;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ShareActivity = Unset;
+        type RetentionDays = Unset;
+        type ShareNewItems = Unset;
+    }
+    ///State transition - sets the `share_activity` field to Set
+    pub struct SetShareActivity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShareActivity<S> {}
+    impl<S: State> State for SetShareActivity<S> {
+        type ShareActivity = Set<members::share_activity>;
+        type RetentionDays = S::RetentionDays;
+        type ShareNewItems = S::ShareNewItems;
+    }
+    ///State transition - sets the `retention_days` field to Set
+    pub struct SetRetentionDays<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRetentionDays<S> {}
+    impl<S: State> State for SetRetentionDays<S> {
+        type ShareActivity = S::ShareActivity;
+        type RetentionDays = Set<members::retention_days>;
+        type ShareNewItems = S::ShareNewItems;
+    }
+    ///State transition - sets the `share_new_items` field to Set
+    pub struct SetShareNewItems<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShareNewItems<S> {}
+    impl<S: State> State for SetShareNewItems<S> {
+        type ShareActivity = S::ShareActivity;
+        type RetentionDays = S::RetentionDays;
+        type ShareNewItems = Set<members::share_new_items>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `share_activity` field
+        pub struct share_activity(());
+        ///Marker type for the `retention_days` field
+        pub struct retention_days(());
+        ///Marker type for the `share_new_items` field
+        pub struct share_new_items(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActivitySettingsBuilder<'a, S: activity_settings_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<ActivitySettingsShareActivity<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ActivitySettings<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
+        ActivitySettingsBuilder::new()
+    }
+}
+
+impl<'a> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActivitySettingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySettingsBuilder<'a, S>
+where
+    S: activity_settings_state::State,
+    S::RetentionDays: activity_settings_state::IsUnset,
+{
+    /// Set the `retentionDays` field (required)
+    pub fn retention_days(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetRetentionDays<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ActivitySettingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySettingsBuilder<'a, S>
+where
+    S: activity_settings_state::State,
+    S::ShareActivity: activity_settings_state::IsUnset,
+{
+    /// Set the `shareActivity` field (required)
+    pub fn share_activity(
+        mut self,
+        value: impl Into<ActivitySettingsShareActivity<'a>>,
+    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareActivity<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ActivitySettingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySettingsBuilder<'a, S>
+where
+    S: activity_settings_state::State,
+    S::ShareNewItems: activity_settings_state::IsUnset,
+{
+    /// Set the `shareNewItems` field (required)
+    pub fn share_new_items(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareNewItems<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ActivitySettingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySettingsBuilder<'a, S>
+where
+    S: activity_settings_state::State,
+    S::ShareActivity: activity_settings_state::IsSet,
+    S::RetentionDays: activity_settings_state::IsSet,
+    S::ShareNewItems: activity_settings_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ActivitySettings<'a> {
+        ActivitySettings {
+            retention_days: self.__unsafe_private_named.0.unwrap(),
+            share_activity: self.__unsafe_private_named.1.unwrap(),
+            share_new_items: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ActivitySettings<'a> {
+        ActivitySettings {
+            retention_days: self.__unsafe_private_named.0.unwrap(),
+            share_activity: self.__unsafe_private_named.1.unwrap(),
+            share_new_items: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
         }
     }
 }
@@ -1656,116 +3044,6 @@ fn lexicon_doc_social_showcase_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySettings<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "activitySettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.share_activity;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "share_activity",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Image aspect ratio
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AspectRatio<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "aspectRatio"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.height {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.width {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Reference to an item in a collection
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionItem<'a> {
-    pub added_at: jacquard_common::types::string::Datetime,
-    ///For custom sorting
-    pub order: i64,
-    ///AT-URI reference to item (always shows latest version)
-    #[serde(borrow)]
-    pub uri: jacquard_common::CowStr<'a>,
-}
-
 pub mod collection_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1776,49 +3054,49 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Order;
         type Uri;
+        type Order;
         type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Order = Unset;
         type Uri = Unset;
+        type Order = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Order = Set<members::order>;
-        type Uri = S::Uri;
-        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Order = S::Order;
         type Uri = Set<members::uri>;
+        type Order = S::Order;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Uri = S::Uri;
+        type Order = Set<members::order>;
         type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Order = S::Order;
         type Uri = S::Uri;
+        type Order = S::Order;
         type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `order` field
-        pub struct order(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `order` field
+        pub struct order(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
     }
@@ -1913,8 +3191,8 @@ where
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Order: collection_item_state::IsSet,
     S::Uri: collection_item_state::IsSet,
+    S::Order: collection_item_state::IsSet,
     S::AddedAt: collection_item_state::IsSet,
 {
     /// Build the final struct
@@ -1943,79 +3221,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "collectionItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.uri;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 8192usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uri",
-                    ),
-                    max: 8192usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// View of a collection with items
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionView<'a> {
-    #[serde(borrow)]
-    pub author: crate::social_showcase::ProfileView<'a>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub items: std::option::Option<Vec<crate::social_showcase::ItemView<'a>>>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub tags: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub visibility: jacquard_common::CowStr<'a>,
-}
-
 pub mod collection_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2026,151 +3231,151 @@ pub mod collection_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
-        type Type;
         type Name;
-        type Uri;
-        type Cid;
-        type CreatedAt;
         type Tags;
+        type Cid;
+        type Type;
         type Visibility;
+        type Uri;
+        type CreatedAt;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
-        type Type = Unset;
         type Name = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
-        type CreatedAt = Unset;
         type Tags = Unset;
+        type Cid = Unset;
+        type Type = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type Type = S::Type;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Author = S::Author;
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
+        type Uri = Unset;
+        type CreatedAt = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Author = S::Author;
-        type Type = S::Type;
         type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Tags = S::Tags;
         type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Author = S::Author;
         type Type = S::Type;
-        type Name = S::Name;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
         type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Author = S::Author;
-        type Type = S::Type;
-        type Name = S::Name;
         type Uri = S::Uri;
-        type Cid = Set<members::cid>;
         type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Author = S::Author;
-        type Type = S::Type;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = Set<members::created_at>;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type Author = S::Author;
-        type Type = S::Type;
         type Name = S::Name;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
         type Tags = Set<members::tags>;
+        type Cid = S::Cid;
+        type Type = S::Type;
         type Visibility = S::Visibility;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Name = S::Name;
+        type Tags = S::Tags;
+        type Cid = Set<members::cid>;
+        type Type = S::Type;
+        type Visibility = S::Visibility;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Name = S::Name;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+        type Type = Set<members::r#type>;
+        type Visibility = S::Visibility;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Author = S::Author;
-        type Type = S::Type;
         type Name = S::Name;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
+        type Cid = S::Cid;
+        type Type = S::Type;
         type Visibility = Set<members::visibility>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+        type Type = S::Type;
+        type Visibility = S::Visibility;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+        type Type = S::Type;
+        type Visibility = S::Visibility;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Name = S::Name;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+        type Type = S::Type;
+        type Visibility = S::Visibility;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -2471,14 +3676,14 @@ where
 impl<'a, S> CollectionViewBuilder<'a, S>
 where
     S: collection_view_state::State,
-    S::Author: collection_view_state::IsSet,
-    S::Type: collection_view_state::IsSet,
     S::Name: collection_view_state::IsSet,
-    S::Uri: collection_view_state::IsSet,
-    S::Cid: collection_view_state::IsSet,
-    S::CreatedAt: collection_view_state::IsSet,
     S::Tags: collection_view_state::IsSet,
+    S::Cid: collection_view_state::IsSet,
+    S::Type: collection_view_state::IsSet,
     S::Visibility: collection_view_state::IsSet,
+    S::Uri: collection_view_state::IsSet,
+    S::CreatedAt: collection_view_state::IsSet,
+    S::Author: collection_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionView<'a> {
@@ -2524,346 +3729,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "collectionView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.visibility;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "visibility",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Display preferences
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DisplaySettings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub grid_layout: std::option::Option<DisplaySettingsGridLayout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub theme: std::option::Option<DisplaySettingsTheme<'a>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DisplaySettingsGridLayout<'a> {
-    Compact,
-    Spacious,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> DisplaySettingsGridLayout<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Compact => "compact",
-            Self::Spacious => "spacious",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for DisplaySettingsGridLayout<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "compact" => Self::Compact,
-            "spacious" => Self::Spacious,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for DisplaySettingsGridLayout<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "compact" => Self::Compact,
-            "spacious" => Self::Spacious,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DisplaySettingsGridLayout<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for DisplaySettingsGridLayout<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for DisplaySettingsGridLayout<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for DisplaySettingsGridLayout<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for DisplaySettingsGridLayout<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for DisplaySettingsGridLayout<'_> {
-    type Output = DisplaySettingsGridLayout<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DisplaySettingsGridLayout::Compact => DisplaySettingsGridLayout::Compact,
-            DisplaySettingsGridLayout::Spacious => DisplaySettingsGridLayout::Spacious,
-            DisplaySettingsGridLayout::Other(v) => {
-                DisplaySettingsGridLayout::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DisplaySettingsTheme<'a> {
-    Light,
-    Dark,
-    Auto,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> DisplaySettingsTheme<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Light => "light",
-            Self::Dark => "dark",
-            Self::Auto => "auto",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for DisplaySettingsTheme<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "light" => Self::Light,
-            "dark" => Self::Dark,
-            "auto" => Self::Auto,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for DisplaySettingsTheme<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "dark" => Self::Dark,
-            "auto" => Self::Auto,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DisplaySettingsTheme<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for DisplaySettingsTheme<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for DisplaySettingsTheme<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for DisplaySettingsTheme<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for DisplaySettingsTheme<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for DisplaySettingsTheme<'_> {
-    type Output = DisplaySettingsTheme<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DisplaySettingsTheme::Light => DisplaySettingsTheme::Light,
-            DisplaySettingsTheme::Dark => DisplaySettingsTheme::Dark,
-            DisplaySettingsTheme::Auto => DisplaySettingsTheme::Auto,
-            DisplaySettingsTheme::Other(v) => {
-                DisplaySettingsTheme::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplaySettings<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "displaySettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.grid_layout {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "grid_layout",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.theme {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "theme",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Image embedded in an item
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemImage<'a> {
-    ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::social_showcase::AspectRatio<'a>>,
-    #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 pub mod item_image_state {
@@ -3009,128 +3874,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemImage<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "itemImage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.alt {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let size = value.blob().size;
-                if size > 5000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 5000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// View of an item with metadata
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemView<'a> {
-    #[serde(borrow)]
-    pub author: crate::social_showcase::ProfileView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub external_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(borrow)]
-    pub images: Vec<crate::social_showcase::ItemImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reaction_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub tags: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub visibility: jacquard_common::CowStr<'a>,
-}
-
 pub mod item_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3141,151 +3884,151 @@ pub mod item_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Visibility;
         type Tags;
+        type CreatedAt;
+        type Visibility;
+        type Images;
         type Author;
         type Uri;
-        type Images;
+        type Cid;
         type Title;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Visibility = Unset;
         type Tags = Unset;
+        type CreatedAt = Unset;
+        type Visibility = Unset;
+        type Images = Unset;
         type Author = Unset;
         type Uri = Unset;
-        type Images = Unset;
+        type Cid = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Visibility = S::Visibility;
-        type Tags = S::Tags;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Cid = S::Cid;
-        type Visibility = Set<members::visibility>;
-        type Tags = S::Tags;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type Cid = S::Cid;
-        type Visibility = S::Visibility;
         type Tags = Set<members::tags>;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
         type Author = S::Author;
         type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
         type Cid = S::Cid;
-        type Visibility = S::Visibility;
-        type Tags = S::Tags;
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type Images = S::Images;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Visibility = S::Visibility;
-        type Tags = S::Tags;
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type Images = S::Images;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Cid = S::Cid;
-        type Visibility = S::Visibility;
-        type Tags = S::Tags;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Images = Set<members::images>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Cid = S::Cid;
-        type Visibility = S::Visibility;
-        type Tags = S::Tags;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type Visibility = S::Visibility;
         type Tags = S::Tags;
+        type CreatedAt = Set<members::created_at>;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
         type Author = S::Author;
         type Uri = S::Uri;
-        type Images = S::Images;
+        type Cid = S::Cid;
         type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = Set<members::visibility>;
+        type Images = S::Images;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = Set<members::images>;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `images` field
+        pub struct images(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `images` field
-        pub struct images(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -3604,14 +4347,14 @@ where
 impl<'a, S> ItemViewBuilder<'a, S>
 where
     S: item_view_state::State,
-    S::Cid: item_view_state::IsSet,
-    S::Visibility: item_view_state::IsSet,
     S::Tags: item_view_state::IsSet,
+    S::CreatedAt: item_view_state::IsSet,
+    S::Visibility: item_view_state::IsSet,
+    S::Images: item_view_state::IsSet,
     S::Author: item_view_state::IsSet,
     S::Uri: item_view_state::IsSet,
-    S::Images: item_view_state::IsSet,
+    S::Cid: item_view_state::IsSet,
     S::Title: item_view_state::IsSet,
-    S::CreatedAt: item_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ItemView<'a> {
@@ -3659,103 +4402,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemView<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "itemView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.category {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.external_link {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "external_link",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 300usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.visibility;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "visibility",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Notification preferences
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotificationSettings<'a> {
-    pub comments: bool,
-    pub follows: bool,
-    pub reactions: bool,
 }
 
 pub mod notification_settings_state {
@@ -3935,44 +4581,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "notificationSettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Privacy preferences
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PrivacySettings<'a> {
-    ///Let others comment
-    pub allow_comments: bool,
-    ///Let others react to your items
-    pub allow_reactions: bool,
-    ///Appear in search results
-    pub indexable: bool,
-}
-
 pub mod privacy_settings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4150,129 +4758,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrivacySettings<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "privacySettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// View of a user profile
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.did;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "did",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.handle;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 253usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "handle",
-                    ),
-                    max: 253usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Subject of a reaction
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionSubject<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod reaction_subject_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4283,37 +4768,37 @@ pub mod reaction_subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -4386,8 +4871,8 @@ where
 impl<'a, S> ReactionSubjectBuilder<'a, S>
 where
     S: reaction_subject_state::State,
-    S::Cid: reaction_subject_state::IsSet,
     S::Uri: reaction_subject_state::IsSet,
+    S::Cid: reaction_subject_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionSubject<'a> {
@@ -4413,48 +4898,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionSubject<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "reactionSubject"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// View of a reaction to content
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionView<'a> {
-    #[serde(borrow)]
-    pub actor: crate::social_showcase::ProfileView<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub subject: crate::social_showcase::ReactionSubject<'a>,
-    ///Emoji shortcode
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod reaction_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4466,84 +4909,84 @@ pub mod reaction_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Type;
-        type Actor;
-        type Subject;
         type CreatedAt;
+        type Actor;
+        type Type;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Type = Unset;
-        type Actor = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
+        type Actor = Unset;
+        type Type = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
-        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
         type Actor = S::Actor;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
-        type Type = Set<members::r#type>;
-        type Actor = S::Actor;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Uri = S::Uri;
         type Type = S::Type;
-        type Actor = Set<members::actor>;
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Actor = S::Actor;
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Uri = S::Uri;
-        type Type = S::Type;
-        type Actor = S::Actor;
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Actor = S::Actor;
+        type Type = S::Type;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Actor = Set<members::actor>;
+        type Type = S::Type;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
+        type Type = Set<members::r#type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
+        type Type = S::Type;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `actor` field
-        pub struct actor(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -4677,10 +5120,10 @@ impl<'a, S> ReactionViewBuilder<'a, S>
 where
     S: reaction_view_state::State,
     S::Uri: reaction_view_state::IsSet,
-    S::Type: reaction_view_state::IsSet,
-    S::Actor: reaction_view_state::IsSet,
-    S::Subject: reaction_view_state::IsSet,
     S::CreatedAt: reaction_view_state::IsSet,
+    S::Actor: reaction_view_state::IsSet,
+    S::Type: reaction_view_state::IsSet,
+    S::Subject: reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionView<'a> {
@@ -4710,57 +5153,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "reactionView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A reference to an item featured in a user's showcase (hydrated at read time)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ShowcaseItem<'a> {
-    pub added_at: jacquard_common::types::string::Datetime,
-    ///Display order (0 = first)
-    pub order: i64,
-    ///AT-URI reference to the item (e.g., at://did:plc:.../social.showcase.library.item/abc123)
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod showcase_item_state {
@@ -4937,397 +5329,5 @@ where
             uri: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShowcaseItem<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "showcaseItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Visibility preferences
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VisibilitySettings<'a> {
-    #[serde(borrow)]
-    pub default_collection_visibility: VisibilitySettingsDefaultCollectionVisibility<'a>,
-    #[serde(borrow)]
-    pub default_item_visibility: VisibilitySettingsDefaultItemVisibility<'a>,
-    #[serde(borrow)]
-    pub profile_visibility: VisibilitySettingsProfileVisibility<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDefaultCollectionVisibility<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsDefaultCollectionVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de>
-for VisibilitySettingsDefaultCollectionVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsDefaultCollectionVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsDefaultCollectionVisibility<'_> {
-    type Output = VisibilitySettingsDefaultCollectionVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsDefaultCollectionVisibility::Public => {
-                VisibilitySettingsDefaultCollectionVisibility::Public
-            }
-            VisibilitySettingsDefaultCollectionVisibility::Private => {
-                VisibilitySettingsDefaultCollectionVisibility::Private
-            }
-            VisibilitySettingsDefaultCollectionVisibility::Other(v) => {
-                VisibilitySettingsDefaultCollectionVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDefaultItemVisibility<'a> {
-    Public,
-    Unlisted,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsDefaultItemVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Unlisted => "unlisted",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsDefaultItemVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsDefaultItemVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsDefaultItemVisibility<'_> {
-    type Output = VisibilitySettingsDefaultItemVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsDefaultItemVisibility::Public => {
-                VisibilitySettingsDefaultItemVisibility::Public
-            }
-            VisibilitySettingsDefaultItemVisibility::Unlisted => {
-                VisibilitySettingsDefaultItemVisibility::Unlisted
-            }
-            VisibilitySettingsDefaultItemVisibility::Private => {
-                VisibilitySettingsDefaultItemVisibility::Private
-            }
-            VisibilitySettingsDefaultItemVisibility::Other(v) => {
-                VisibilitySettingsDefaultItemVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsProfileVisibility<'a> {
-    Public,
-    Unlisted,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsProfileVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Unlisted => "unlisted",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsProfileVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsProfileVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsProfileVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsProfileVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsProfileVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsProfileVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsProfileVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsProfileVisibility<'_> {
-    type Output = VisibilitySettingsProfileVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsProfileVisibility::Public => {
-                VisibilitySettingsProfileVisibility::Public
-            }
-            VisibilitySettingsProfileVisibility::Unlisted => {
-                VisibilitySettingsProfileVisibility::Unlisted
-            }
-            VisibilitySettingsProfileVisibility::Private => {
-                VisibilitySettingsProfileVisibility::Private
-            }
-            VisibilitySettingsProfileVisibility::Other(v) => {
-                VisibilitySettingsProfileVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.defs"
-    }
-    fn def_name() -> &'static str {
-        "visibilitySettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.default_collection_visibility;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "default_collection_visibility",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.default_item_visibility;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "default_item_visibility",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.profile_visibility;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "profile_visibility",
-                    ),
-                    max: 10usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

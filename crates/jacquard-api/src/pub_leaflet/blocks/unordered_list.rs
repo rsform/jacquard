@@ -33,6 +33,77 @@ pub struct ListItem<'a> {
     >,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemContent<'a> {
+    #[serde(rename = "pub.leaflet.blocks.text")]
+    Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.header")]
+    Header(Box<crate::pub_leaflet::blocks::header::Header<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.image")]
+    Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UnorderedList<'a> {
+    #[serde(borrow)]
+    pub children: Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.unorderedList"
+    }
+    fn def_name() -> &'static str {
+        "listItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_unorderedList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnorderedList<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.unorderedList"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_unorderedList()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod list_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -188,27 +259,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemContent<'a> {
-    #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<crate::pub_leaflet::blocks::header::Header<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
-}
-
 fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -315,39 +365,6 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.blocks.unorderedList"
-    }
-    fn def_name() -> &'static str {
-        "listItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_blocks_unorderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UnorderedList<'a> {
-    #[serde(borrow)]
-    pub children: Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
-}
-
 pub mod unordered_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -452,22 +469,5 @@ where
             children: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnorderedList<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.blocks.unorderedList"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_blocks_unorderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

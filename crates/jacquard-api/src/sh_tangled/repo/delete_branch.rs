@@ -23,6 +23,36 @@ pub struct DeleteBranch<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.deleteBranch
+pub struct DeleteBranchResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
+    const NSID: &'static str = "sh.tangled.repo.deleteBranch";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
+    const NSID: &'static str = "sh.tangled.repo.deleteBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteBranchResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.deleteBranch
+pub struct DeleteBranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteBranch<'de>;
+    type Response = DeleteBranchResponse;
+}
+
 pub mod delete_branch_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,34 +191,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.deleteBranch
-pub struct DeleteBranchResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
-    const NSID: &'static str = "sh.tangled.repo.deleteBranch";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
-    const NSID: &'static str = "sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteBranchResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.deleteBranch
-pub struct DeleteBranchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteBranch<'de>;
-    type Response = DeleteBranchResponse;
 }

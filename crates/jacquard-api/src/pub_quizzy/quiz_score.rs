@@ -26,6 +26,159 @@ pub struct QuizScore<'a> {
     pub results: Vec<crate::pub_quizzy::quiz_score::TeamResult<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuizScoreGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: QuizScore<'a>,
+}
+
+/// A team's final result
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TeamResult<'a> {
+    ///Reference to the team's detailed score record
+    #[serde(borrow)]
+    pub team_score: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///Team's total score
+    pub total_score: i64,
+}
+
+impl<'a> QuizScore<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, QuizScoreRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct QuizScoreRecord;
+impl jacquard_common::xrpc::XrpcResp for QuizScoreRecord {
+    const NSID: &'static str = "pub.quizzy.quizScore";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QuizScoreGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<QuizScoreGetRecordOutput<'_>> for QuizScore<'_> {
+    fn from(output: QuizScoreGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for QuizScore<'_> {
+    const NSID: &'static str = "pub.quizzy.quizScore";
+    type Record = QuizScoreRecord;
+}
+
+impl jacquard_common::types::collection::Collection for QuizScoreRecord {
+    const NSID: &'static str = "pub.quizzy.quizScore";
+    type Record = QuizScoreRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizScore<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quizScore"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quizScore()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.results;
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "results",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.results;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "results",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamResult<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quizScore"
+    }
+    fn def_name() -> &'static str {
+        "teamResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quizScore()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.total_score;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_score",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod quiz_score_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -166,110 +319,6 @@ where
     }
 }
 
-impl<'a> QuizScore<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, QuizScoreRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: QuizScore<'a>,
-}
-
-impl From<QuizScoreGetRecordOutput<'_>> for QuizScore<'_> {
-    fn from(output: QuizScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for QuizScore<'_> {
-    const NSID: &'static str = "pub.quizzy.quizScore";
-    type Record = QuizScoreRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct QuizScoreRecord;
-impl jacquard_common::xrpc::XrpcResp for QuizScoreRecord {
-    const NSID: &'static str = "pub.quizzy.quizScore";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizScoreGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for QuizScoreRecord {
-    const NSID: &'static str = "pub.quizzy.quizScore";
-    type Record = QuizScoreRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizScore<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quizScore"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quizScore()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.results;
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.results;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 fn lexicon_doc_pub_quizzy_quizScore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -382,26 +431,6 @@ fn lexicon_doc_pub_quizzy_quizScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
             map
         },
     }
-}
-
-/// A team's final result
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TeamResult<'a> {
-    ///Reference to the team's detailed score record
-    #[serde(borrow)]
-    pub team_score: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///Team's total score
-    pub total_score: i64,
 }
 
 pub mod team_result_state {
@@ -541,34 +570,5 @@ where
             total_score: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamResult<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quizScore"
-    }
-    fn def_name() -> &'static str {
-        "teamResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quizScore()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.total_score;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_score",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

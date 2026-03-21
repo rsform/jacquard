@@ -48,6 +48,123 @@ pub struct Tool<'a> {
     pub version: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ToolGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Tool<'a>,
+}
+
+impl<'a> Tool<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ToolRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ToolRecord;
+impl jacquard_common::xrpc::XrpcResp for ToolRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.tool";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ToolGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ToolGetRecordOutput<'_>> for Tool<'_> {
+    fn from(output: ToolGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Tool<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.tool";
+    type Record = ToolRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ToolRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.tool";
+    type Record = ToolRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.tool"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_tool()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.code;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "code",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1024usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1024usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod tool_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -58,85 +175,85 @@ pub mod tool_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type InputSchema;
         type Description;
-        type CreatedAt;
+        type InputSchema;
         type Name;
         type Code;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type InputSchema = Unset;
         type Description = Unset;
-        type CreatedAt = Unset;
+        type InputSchema = Unset;
         type Name = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `input_schema` field to Set
-    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
-    impl<S: State> State for SetInputSchema<S> {
-        type InputSchema = Set<members::input_schema>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Code = S::Code;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type InputSchema = S::InputSchema;
         type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type InputSchema = S::InputSchema;
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Code = S::Code;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `input_schema` field to Set
+    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
+    impl<S: State> State for SetInputSchema<S> {
+        type Description = S::Description;
+        type InputSchema = Set<members::input_schema>;
+        type Name = S::Name;
+        type Code = S::Code;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type InputSchema = S::InputSchema;
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type InputSchema = S::InputSchema;
         type Name = Set<members::name>;
         type Code = S::Code;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type InputSchema = S::InputSchema;
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type InputSchema = S::InputSchema;
         type Name = S::Name;
         type Code = Set<members::code>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Description = S::Description;
+        type InputSchema = S::InputSchema;
+        type Name = S::Name;
+        type Code = S::Code;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `input_schema` field
-        pub struct input_schema(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `input_schema` field
+        pub struct input_schema(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -404,11 +521,11 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
-    S::InputSchema: tool_state::IsSet,
     S::Description: tool_state::IsSet,
-    S::CreatedAt: tool_state::IsSet,
+    S::InputSchema: tool_state::IsSet,
     S::Name: tool_state::IsSet,
     S::Code: tool_state::IsSet,
+    S::CreatedAt: tool_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tool<'a> {
@@ -451,123 +568,6 @@ where
             version: self.__unsafe_private_named.11,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Tool<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ToolRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tool<'a>,
-}
-
-impl From<ToolGetRecordOutput<'_>> for Tool<'_> {
-    fn from(output: ToolGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Tool<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.tool";
-    type Record = ToolRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ToolRecord;
-impl jacquard_common::xrpc::XrpcResp for ToolRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.tool";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ToolGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ToolRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.tool";
-    type Record = ToolRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.tool"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_tool()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.code;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "code",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1024usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1024usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

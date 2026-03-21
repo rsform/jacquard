@@ -26,6 +26,63 @@ pub struct GetStripeIntent<'a> {
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// The intent data
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStripeIntentOutput<'a> {
+    ///The customer ID for the payment intent
+    #[serde(borrow)]
+    pub customer: jacquard_common::CowStr<'a>,
+    ///The customer session ID for the payment intent
+    #[serde(borrow)]
+    pub customer_session: jacquard_common::CowStr<'a>,
+    ///The ephemeral key for the payment intent
+    #[serde(borrow)]
+    pub ephemeral_key: jacquard_common::CowStr<'a>,
+    ///The payment intent ID
+    #[serde(borrow)]
+    pub payment_intent: jacquard_common::CowStr<'a>,
+    ///The publishable key for the payment intent
+    #[serde(borrow)]
+    pub publishable_key: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.payment.getStripeIntent
+pub struct GetStripeIntentResponse;
+impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
+    const NSID: &'static str = "app.ocho.payment.getStripeIntent";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetStripeIntentOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
+    const NSID: &'static str = "app.ocho.payment.getStripeIntent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStripeIntentResponse;
+}
+
+/// Endpoint type for
+///app.ocho.payment.getStripeIntent
+pub struct GetStripeIntentRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStripeIntent<'de>;
+    type Response = GetStripeIntentResponse;
+}
+
 pub mod get_stripe_intent_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,51 +93,51 @@ pub mod get_stripe_intent_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Iss;
         type Amount;
         type Id;
+        type Iss;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Iss = Unset;
         type Amount = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `iss` field to Set
-    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIss<S> {}
-    impl<S: State> State for SetIss<S> {
-        type Iss = Set<members::iss>;
-        type Amount = S::Amount;
-        type Id = S::Id;
+        type Iss = Unset;
     }
     ///State transition - sets the `amount` field to Set
     pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAmount<S> {}
     impl<S: State> State for SetAmount<S> {
-        type Iss = S::Iss;
         type Amount = Set<members::amount>;
         type Id = S::Id;
+        type Iss = S::Iss;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Iss = S::Iss;
         type Amount = S::Amount;
         type Id = Set<members::id>;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIss<S> {}
+    impl<S: State> State for SetIss<S> {
+        type Amount = S::Amount;
+        type Id = S::Id;
+        type Iss = Set<members::iss>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `iss` field
-        pub struct iss(());
         ///Marker type for the `amount` field
         pub struct amount(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `iss` field
+        pub struct iss(());
     }
 }
 
@@ -190,9 +247,9 @@ impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
 impl<'a, S> GetStripeIntentBuilder<'a, S>
 where
     S: get_stripe_intent_state::State,
-    S::Iss: get_stripe_intent_state::IsSet,
     S::Amount: get_stripe_intent_state::IsSet,
     S::Id: get_stripe_intent_state::IsSet,
+    S::Iss: get_stripe_intent_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetStripeIntent<'a> {
@@ -203,61 +260,4 @@ where
             token: self.__unsafe_private_named.3,
         }
     }
-}
-
-/// The intent data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetStripeIntentOutput<'a> {
-    ///The customer ID for the payment intent
-    #[serde(borrow)]
-    pub customer: jacquard_common::CowStr<'a>,
-    ///The customer session ID for the payment intent
-    #[serde(borrow)]
-    pub customer_session: jacquard_common::CowStr<'a>,
-    ///The ephemeral key for the payment intent
-    #[serde(borrow)]
-    pub ephemeral_key: jacquard_common::CowStr<'a>,
-    ///The payment intent ID
-    #[serde(borrow)]
-    pub payment_intent: jacquard_common::CowStr<'a>,
-    ///The publishable key for the payment intent
-    #[serde(borrow)]
-    pub publishable_key: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.payment.getStripeIntent
-pub struct GetStripeIntentResponse;
-impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
-    const NSID: &'static str = "app.ocho.payment.getStripeIntent";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStripeIntentOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
-    const NSID: &'static str = "app.ocho.payment.getStripeIntent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetStripeIntentResponse;
-}
-
-/// Endpoint type for
-///app.ocho.payment.getStripeIntent
-pub struct GetStripeIntentRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStripeIntent<'de>;
-    type Response = GetStripeIntentResponse;
 }

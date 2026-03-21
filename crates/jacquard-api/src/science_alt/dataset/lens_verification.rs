@@ -27,6 +27,209 @@ pub struct CodeHash<'a> {
     pub digest: jacquard_common::CowStr<'a>,
 }
 
+/// Verification record for a lens transformation. The verifier's identity is implicit — the DID of the repo owner who writes this record. Follows the ATProto pattern where verification records live in the verifier's own PDS.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LensVerification<'a> {
+    ///Hash of the code at the referenced commit. Required for signedHash method.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub code_hash: std::option::Option<
+        crate::science_alt::dataset::lens_verification::CodeHash<'a>,
+    >,
+    ///Timestamp when this verification was issued
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Human-readable description of what was verified
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///AT-URI of the lens record being verified
+    #[serde(borrow)]
+    pub lens: jacquard_common::types::string::AtUri<'a>,
+    ///CID of the specific lens record version. Ensures immutability — if the lens is updated, old verifications do not carry over.
+    #[serde(borrow)]
+    pub lens_commit: jacquard_common::CowStr<'a>,
+    ///Link to proof artifact (Coq/Lean proof, test suite, etc.). Used with formalProof or automatedTest methods.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub proof_ref: std::option::Option<
+        crate::science_alt::dataset::lens::CodeReference<'a>,
+    >,
+    ///What kind of verification was performed
+    #[serde(borrow)]
+    pub verification_method: crate::science_alt::dataset::verification_method::VerificationMethod<
+        'a,
+    >,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LensVerificationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: LensVerification<'a>,
+}
+
+impl<'a> LensVerification<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LensVerificationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeHash<'a> {
+    fn nsid() -> &'static str {
+        "science.alt.dataset.lensVerification"
+    }
+    fn def_name() -> &'static str {
+        "codeHash"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_science_alt_dataset_lensVerification()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.algorithm;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "algorithm",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.digest;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LensVerificationRecord;
+impl jacquard_common::xrpc::XrpcResp for LensVerificationRecord {
+    const NSID: &'static str = "science.alt.dataset.lensVerification";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LensVerificationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LensVerificationGetRecordOutput<'_>> for LensVerification<'_> {
+    fn from(output: LensVerificationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for LensVerification<'_> {
+    const NSID: &'static str = "science.alt.dataset.lensVerification";
+    type Record = LensVerificationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LensVerificationRecord {
+    const NSID: &'static str = "science.alt.dataset.lensVerification";
+    type Record = LensVerificationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensVerification<'a> {
+    fn nsid() -> &'static str {
+        "science.alt.dataset.lensVerification"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_science_alt_dataset_lensVerification()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.lens;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lens",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.lens_commit;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "lens_commit",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -255,93 +458,6 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> ::jacquard_lexicon::lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeHash<'a> {
-    fn nsid() -> &'static str {
-        "science.alt.dataset.lensVerification"
-    }
-    fn def_name() -> &'static str {
-        "codeHash"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_science_alt_dataset_lensVerification()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.algorithm;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "algorithm",
-                    ),
-                    max: 20usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.digest;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Verification record for a lens transformation. The verifier's identity is implicit — the DID of the repo owner who writes this record. Follows the ATProto pattern where verification records live in the verifier's own PDS.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LensVerification<'a> {
-    ///Hash of the code at the referenced commit. Required for signedHash method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub code_hash: std::option::Option<
-        crate::science_alt::dataset::lens_verification::CodeHash<'a>,
-    >,
-    ///Timestamp when this verification was issued
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Human-readable description of what was verified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT-URI of the lens record being verified
-    #[serde(borrow)]
-    pub lens: jacquard_common::types::string::AtUri<'a>,
-    ///CID of the specific lens record version. Ensures immutability — if the lens is updated, old verifications do not carry over.
-    #[serde(borrow)]
-    pub lens_commit: jacquard_common::CowStr<'a>,
-    ///Link to proof artifact (Coq/Lean proof, test suite, etc.). Used with formalProof or automatedTest methods.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub proof_ref: std::option::Option<
-        crate::science_alt::dataset::lens::CodeReference<'a>,
-    >,
-    ///What kind of verification was performed
-    #[serde(borrow)]
-    pub verification_method: crate::science_alt::dataset::verification_method::VerificationMethod<
-        'a,
-    >,
-}
-
 pub mod lens_verification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -352,67 +468,67 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type LensCommit;
-        type VerificationMethod;
         type Lens;
+        type CreatedAt;
+        type VerificationMethod;
+        type LensCommit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type LensCommit = Unset;
-        type VerificationMethod = Unset;
         type Lens = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type LensCommit = S::LensCommit;
-        type VerificationMethod = S::VerificationMethod;
-        type Lens = S::Lens;
-    }
-    ///State transition - sets the `lens_commit` field to Set
-    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
-    impl<S: State> State for SetLensCommit<S> {
-        type CreatedAt = S::CreatedAt;
-        type LensCommit = Set<members::lens_commit>;
-        type VerificationMethod = S::VerificationMethod;
-        type Lens = S::Lens;
-    }
-    ///State transition - sets the `verification_method` field to Set
-    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
-    impl<S: State> State for SetVerificationMethod<S> {
-        type CreatedAt = S::CreatedAt;
-        type LensCommit = S::LensCommit;
-        type VerificationMethod = Set<members::verification_method>;
-        type Lens = S::Lens;
+        type CreatedAt = Unset;
+        type VerificationMethod = Unset;
+        type LensCommit = Unset;
     }
     ///State transition - sets the `lens` field to Set
     pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLens<S> {}
     impl<S: State> State for SetLens<S> {
-        type CreatedAt = S::CreatedAt;
-        type LensCommit = S::LensCommit;
-        type VerificationMethod = S::VerificationMethod;
         type Lens = Set<members::lens>;
+        type CreatedAt = S::CreatedAt;
+        type VerificationMethod = S::VerificationMethod;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Lens = S::Lens;
+        type CreatedAt = Set<members::created_at>;
+        type VerificationMethod = S::VerificationMethod;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `verification_method` field to Set
+    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
+    impl<S: State> State for SetVerificationMethod<S> {
+        type Lens = S::Lens;
+        type CreatedAt = S::CreatedAt;
+        type VerificationMethod = Set<members::verification_method>;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens_commit` field to Set
+    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
+    impl<S: State> State for SetLensCommit<S> {
+        type Lens = S::Lens;
+        type CreatedAt = S::CreatedAt;
+        type VerificationMethod = S::VerificationMethod;
+        type LensCommit = Set<members::lens_commit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `lens_commit` field
-        pub struct lens_commit(());
-        ///Marker type for the `verification_method` field
-        pub struct verification_method(());
         ///Marker type for the `lens` field
         pub struct lens(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `verification_method` field
+        pub struct verification_method(());
+        ///Marker type for the `lens_commit` field
+        pub struct lens_commit(());
     }
 }
 
@@ -593,10 +709,10 @@ where
 impl<'a, S> LensVerificationBuilder<'a, S>
 where
     S: lens_verification_state::State,
-    S::CreatedAt: lens_verification_state::IsSet,
-    S::LensCommit: lens_verification_state::IsSet,
-    S::VerificationMethod: lens_verification_state::IsSet,
     S::Lens: lens_verification_state::IsSet,
+    S::CreatedAt: lens_verification_state::IsSet,
+    S::VerificationMethod: lens_verification_state::IsSet,
+    S::LensCommit: lens_verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LensVerification<'a> {
@@ -629,121 +745,5 @@ where
             verification_method: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> LensVerification<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LensVerificationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LensVerificationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: LensVerification<'a>,
-}
-
-impl From<LensVerificationGetRecordOutput<'_>> for LensVerification<'_> {
-    fn from(output: LensVerificationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for LensVerification<'_> {
-    const NSID: &'static str = "science.alt.dataset.lensVerification";
-    type Record = LensVerificationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LensVerificationRecord;
-impl jacquard_common::xrpc::XrpcResp for LensVerificationRecord {
-    const NSID: &'static str = "science.alt.dataset.lensVerification";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LensVerificationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LensVerificationRecord {
-    const NSID: &'static str = "science.alt.dataset.lensVerification";
-    type Record = LensVerificationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensVerification<'a> {
-    fn nsid() -> &'static str {
-        "science.alt.dataset.lensVerification"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_science_alt_dataset_lensVerification()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.lens;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lens",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.lens_commit;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lens_commit",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

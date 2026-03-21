@@ -23,6 +23,23 @@ pub struct Button<'a> {
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.button"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_blocks_button()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod button_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,37 +50,37 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Text;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Text = S::Text;
+        type Url = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Url = S::Url;
         type Text = Set<members::text>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Text = S::Text;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -136,8 +153,8 @@ where
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::Url: button_state::IsSet,
     S::Text: button_state::IsSet,
+    S::Url: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {
@@ -229,22 +246,5 @@ fn lexicon_doc_pub_leaflet_blocks_button() -> ::jacquard_lexicon::lexicon::Lexic
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.blocks.button"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_blocks_button()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

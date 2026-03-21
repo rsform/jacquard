@@ -29,6 +29,414 @@ pub struct Address<'a> {
     pub postal_code: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Coordinates<'a> {
+    pub lat: i64,
+    pub lng: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventComponent<'a> {
+    #[serde(borrow)]
+    pub data: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EventInstance<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub end: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub start: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub venue_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EventStatus<'a> {
+    Planned,
+    Uncertain,
+    Postponed,
+    Cancelled,
+    Suspended,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EventStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Planned => "planned",
+            Self::Uncertain => "uncertain",
+            Self::Postponed => "postponed",
+            Self::Cancelled => "cancelled",
+            Self::Suspended => "suspended",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EventStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "planned" => Self::Planned,
+            "uncertain" => Self::Uncertain,
+            "postponed" => Self::Postponed,
+            "cancelled" => Self::Cancelled,
+            "suspended" => Self::Suspended,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EventStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "planned" => Self::Planned,
+            "uncertain" => Self::Uncertain,
+            "postponed" => Self::Postponed,
+            "cancelled" => Self::Cancelled,
+            "suspended" => Self::Suspended,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for EventStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for EventStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for EventStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EventStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for EventStatus<'_> {
+    type Output = EventStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EventStatus::Planned => EventStatus::Planned,
+            EventStatus::Uncertain => EventStatus::Uncertain,
+            EventStatus::Postponed => EventStatus::Postponed,
+            EventStatus::Cancelled => EventStatus::Cancelled,
+            EventStatus::Suspended => EventStatus::Suspended,
+            EventStatus::Other(v) => EventStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OnlineVenue<'a> {
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PhysicalVenue<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub address: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub coordinates: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UnknownVenue<'a> {
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Event<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub components: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub instances: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub label: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub v: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub venues: std::option::Option<Vec<EventVenuesItem<'a>>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EventVenuesItem<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "Address"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coordinates<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "Coordinates"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventComponent<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "EventComponent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventInstance<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "EventInstance"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OnlineVenue<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "OnlineVenue"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PhysicalVenue<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "PhysicalVenue"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnknownVenue<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "UnknownVenue"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "directory.evnt.event"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_directory_evnt_event()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_directory_evnt_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -605,39 +1013,6 @@ fn lexicon_doc_directory_evnt_event() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "Address"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Coordinates<'a> {
-    pub lat: i64,
-    pub lng: i64,
-}
-
 pub mod coordinates_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -648,37 +1023,37 @@ pub mod coordinates_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lat;
         type Lng;
+        type Lat;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lat = Unset;
         type Lng = Unset;
-    }
-    ///State transition - sets the `lat` field to Set
-    pub struct SetLat<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLat<S> {}
-    impl<S: State> State for SetLat<S> {
-        type Lat = Set<members::lat>;
-        type Lng = S::Lng;
+        type Lat = Unset;
     }
     ///State transition - sets the `lng` field to Set
     pub struct SetLng<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLng<S> {}
     impl<S: State> State for SetLng<S> {
-        type Lat = S::Lat;
         type Lng = Set<members::lng>;
+        type Lat = S::Lat;
+    }
+    ///State transition - sets the `lat` field to Set
+    pub struct SetLat<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLat<S> {}
+    impl<S: State> State for SetLat<S> {
+        type Lng = S::Lng;
+        type Lat = Set<members::lat>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lat` field
-        pub struct lat(());
         ///Marker type for the `lng` field
         pub struct lng(());
+        ///Marker type for the `lat` field
+        pub struct lat(());
     }
 }
 
@@ -748,8 +1123,8 @@ where
 impl<'a, S> CoordinatesBuilder<'a, S>
 where
     S: coordinates_state::State,
-    S::Lat: coordinates_state::IsSet,
     S::Lng: coordinates_state::IsSet,
+    S::Lat: coordinates_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Coordinates<'a> {
@@ -773,41 +1148,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coordinates<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "Coordinates"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventComponent<'a> {
-    #[serde(borrow)]
-    pub data: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
 }
 
 pub mod event_component_state {
@@ -948,187 +1288,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventComponent<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "EventComponent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EventInstance<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub end: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub start: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub venue_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventInstance<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "EventInstance"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventStatus<'a> {
-    Planned,
-    Uncertain,
-    Postponed,
-    Cancelled,
-    Suspended,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> EventStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Planned => "planned",
-            Self::Uncertain => "uncertain",
-            Self::Postponed => "postponed",
-            Self::Cancelled => "cancelled",
-            Self::Suspended => "suspended",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for EventStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "planned" => Self::Planned,
-            "uncertain" => Self::Uncertain,
-            "postponed" => Self::Postponed,
-            "cancelled" => Self::Cancelled,
-            "suspended" => Self::Suspended,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for EventStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "planned" => Self::Planned,
-            "uncertain" => Self::Uncertain,
-            "postponed" => Self::Postponed,
-            "cancelled" => Self::Cancelled,
-            "suspended" => Self::Suspended,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for EventStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for EventStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for EventStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for EventStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for EventStatus<'_> {
-    type Output = EventStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EventStatus::Planned => EventStatus::Planned,
-            EventStatus::Uncertain => EventStatus::Uncertain,
-            EventStatus::Postponed => EventStatus::Postponed,
-            EventStatus::Cancelled => EventStatus::Cancelled,
-            EventStatus::Suspended => EventStatus::Suspended,
-            EventStatus::Other(v) => EventStatus::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OnlineVenue<'a> {
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod online_venue_state {
@@ -1324,49 +1483,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OnlineVenue<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "OnlineVenue"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PhysicalVenue<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub address: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub coordinates: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
 pub mod physical_venue_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1377,51 +1493,51 @@ pub mod physical_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
         type Type;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Id = S::Id;
-        type Type = S::Type;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Id = Set<members::id>;
         type Type = S::Type;
+        type Name = S::Name;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Name = S::Name;
         type Id = S::Id;
         type Type = Set<members::r#type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Type = S::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1554,9 +1670,9 @@ where
 impl<'a, S> PhysicalVenueBuilder<'a, S>
 where
     S: physical_venue_state::State,
-    S::Name: physical_venue_state::IsSet,
     S::Id: physical_venue_state::IsSet,
     S::Type: physical_venue_state::IsSet,
+    S::Name: physical_venue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhysicalVenue<'a> {
@@ -1588,43 +1704,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PhysicalVenue<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "PhysicalVenue"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UnknownVenue<'a> {
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-}
-
 pub mod unknown_venue_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1635,51 +1714,51 @@ pub mod unknown_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Name;
         type Id;
+        type Name;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Type = S::Type;
-        type Name = Set<members::name>;
-        type Id = S::Id;
+        type Name = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Type = S::Type;
-        type Name = S::Name;
         type Id = Set<members::id>;
+        type Name = S::Name;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1772,9 +1851,9 @@ where
 impl<'a, S> UnknownVenueBuilder<'a, S>
 where
     S: unknown_venue_state::State,
-    S::Type: unknown_venue_state::IsSet,
-    S::Name: unknown_venue_state::IsSet,
     S::Id: unknown_venue_state::IsSet,
+    S::Name: unknown_venue_state::IsSet,
+    S::Type: unknown_venue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UnknownVenue<'a> {
@@ -1800,55 +1879,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnknownVenue<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "UnknownVenue"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Event<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub components: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub instances: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub label: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    pub v: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub venues: std::option::Option<Vec<EventVenuesItem<'a>>>,
 }
 
 pub mod event_state {
@@ -2089,35 +2119,5 @@ where
             venues: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum EventVenuesItem<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
-    fn nsid() -> &'static str {
-        "directory.evnt.event"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_directory_evnt_event()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -5,14 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
-fn _default_scope() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("instance"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -42,6 +34,59 @@ pub struct ListOptions<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListOptionsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub options: Vec<crate::tools_ozone::setting::DefsOption<'a>>,
+}
+
+/// Response type for
+///tools.ozone.setting.listOptions
+pub struct ListOptionsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
+    const NSID: &'static str = "tools.ozone.setting.listOptions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListOptionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListOptions<'a> {
+    const NSID: &'static str = "tools.ozone.setting.listOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListOptionsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.setting.listOptions
+pub struct ListOptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.setting.listOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListOptions<'de>;
+    type Response = ListOptionsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
+}
+
+fn _default_scope() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("instance"))
 }
 
 pub mod list_options_state {
@@ -188,49 +233,4 @@ where
             scope: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListOptionsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub options: Vec<crate::tools_ozone::setting::DefsOption<'a>>,
-}
-
-/// Response type for
-///tools.ozone.setting.listOptions
-pub struct ListOptionsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
-    const NSID: &'static str = "tools.ozone.setting.listOptions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListOptions<'a> {
-    const NSID: &'static str = "tools.ozone.setting.listOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListOptionsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.setting.listOptions
-pub struct ListOptionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.setting.listOptions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListOptions<'de>;
-    type Response = ListOptionsResponse;
 }

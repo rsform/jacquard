@@ -31,6 +31,448 @@ pub struct Enum<'a> {
     pub values: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
 }
 
+/// A record describing a game hosting leaderboards via Tsunagite.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Game<'a> {
+    ///The default component for leaderboard sorting.
+    #[serde(borrow)]
+    pub default_component: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub input_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///The obtainable judgments during gameplay.
+    #[serde(borrow)]
+    pub judgments: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
+    ///The logo of the game, for display in UI.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub logo: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub modes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///The human-readable name of the game, for display in UI.
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
+    #[serde(borrow)]
+    pub score_components: Vec<GameScoreComponentsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GameScoreComponentsItem<'a> {
+    #[serde(rename = "dev.tsunagite.game#enum")]
+    Enum(Box<crate::dev_tsunagite::game::Enum<'a>>),
+    #[serde(rename = "dev.tsunagite.game#points")]
+    Points(Box<crate::dev_tsunagite::game::Points<'a>>),
+    #[serde(rename = "dev.tsunagite.game#percentage")]
+    Percentage(Box<crate::dev_tsunagite::game::Percentage<'a>>),
+    #[serde(rename = "dev.tsunagite.game#text")]
+    Text(Box<crate::dev_tsunagite::game::Text<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GameGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Game<'a>,
+}
+
+/// A percentage score with customizable precision.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Percentage<'a> {
+    ///The internal ID of this component, limited to the RecordKey characterset.
+    #[serde(borrow)]
+    pub id: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    ///The maximum allowed percentage for this score. Defaults to `100`.
+    #[serde(default = "_default_percentage_maximum")]
+    pub maximum: i64,
+    ///The human-readable name of this component in UI.
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+    ///The number of decimal places to include in the percentage. Defaults to `2`.
+    #[serde(default = "_default_percentage_precision")]
+    pub precision: i64,
+}
+
+/// An integer point score, with or without a cap.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Points<'a> {
+    ///The internal ID of this component, limited to the RecordKey characterset.
+    #[serde(borrow)]
+    pub id: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    ///The maximum allowed value for this score.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub maximum: std::option::Option<i64>,
+    ///The human-readable name of this component in UI.
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+}
+
+/// A fallback component for displaying arbitrary text.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Text<'a> {
+    ///The internal ID of this component, limited to the RecordKey characterset.
+    #[serde(borrow)]
+    pub id: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
+    ///The human-readable name of this component in UI.
+    #[serde(borrow)]
+    pub name: jacquard_common::types::value::Data<'a>,
+}
+
+impl<'a> Game<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, GameRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.game"
+    }
+    fn def_name() -> &'static str {
+        "enum"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_game()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct GameRecord;
+impl jacquard_common::xrpc::XrpcResp for GameRecord {
+    const NSID: &'static str = "dev.tsunagite.game";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GameGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<GameGetRecordOutput<'_>> for Game<'_> {
+    fn from(output: GameGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Game<'_> {
+    const NSID: &'static str = "dev.tsunagite.game";
+    type Record = GameRecord;
+}
+
+impl jacquard_common::types::collection::Collection for GameRecord {
+    const NSID: &'static str = "dev.tsunagite.game";
+    type Record = GameRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.game"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_game()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.logo {
+            {
+                let size = value.blob().size;
+                if size > 8000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "logo",
+                        ),
+                        max: 8000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.logo {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "logo",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.game"
+    }
+    fn def_name() -> &'static str {
+        "percentage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_game()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.game"
+    }
+    fn def_name() -> &'static str {
+        "points"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_game()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+    fn nsid() -> &'static str {
+        "dev.tsunagite.game"
+    }
+    fn def_name() -> &'static str {
+        "text"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_tsunagite_game()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "id",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod enum_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -683,90 +1125,6 @@ fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.game"
-    }
-    fn def_name() -> &'static str {
-        "enum"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_game()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A record describing a game hosting leaderboards via Tsunagite.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Game<'a> {
-    ///The default component for leaderboard sorting.
-    #[serde(borrow)]
-    pub default_component: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub input_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The obtainable judgments during gameplay.
-    #[serde(borrow)]
-    pub judgments: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
-    ///The logo of the game, for display in UI.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub logo: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub modes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The human-readable name of the game, for display in UI.
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
-    #[serde(borrow)]
-    pub score_components: Vec<GameScoreComponentsItem<'a>>,
-}
-
 pub mod game_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -777,8 +1135,8 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Judgments;
         type DefaultComponent;
+        type Judgments;
         type Name;
         type ScoreComponents;
     }
@@ -786,26 +1144,26 @@ pub mod game_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Judgments = Unset;
         type DefaultComponent = Unset;
+        type Judgments = Unset;
         type Name = Unset;
         type ScoreComponents = Unset;
-    }
-    ///State transition - sets the `judgments` field to Set
-    pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJudgments<S> {}
-    impl<S: State> State for SetJudgments<S> {
-        type Judgments = Set<members::judgments>;
-        type DefaultComponent = S::DefaultComponent;
-        type Name = S::Name;
-        type ScoreComponents = S::ScoreComponents;
     }
     ///State transition - sets the `default_component` field to Set
     pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
     impl<S: State> State for SetDefaultComponent<S> {
-        type Judgments = S::Judgments;
         type DefaultComponent = Set<members::default_component>;
+        type Judgments = S::Judgments;
+        type Name = S::Name;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `judgments` field to Set
+    pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJudgments<S> {}
+    impl<S: State> State for SetJudgments<S> {
+        type DefaultComponent = S::DefaultComponent;
+        type Judgments = Set<members::judgments>;
         type Name = S::Name;
         type ScoreComponents = S::ScoreComponents;
     }
@@ -813,8 +1171,8 @@ pub mod game_state {
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Judgments = S::Judgments;
         type DefaultComponent = S::DefaultComponent;
+        type Judgments = S::Judgments;
         type Name = Set<members::name>;
         type ScoreComponents = S::ScoreComponents;
     }
@@ -822,18 +1180,18 @@ pub mod game_state {
     pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
     impl<S: State> State for SetScoreComponents<S> {
-        type Judgments = S::Judgments;
         type DefaultComponent = S::DefaultComponent;
+        type Judgments = S::Judgments;
         type Name = S::Name;
         type ScoreComponents = Set<members::score_components>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `judgments` field
-        pub struct judgments(());
         ///Marker type for the `default_component` field
         pub struct default_component(());
+        ///Marker type for the `judgments` field
+        pub struct judgments(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `score_components` field
@@ -1018,8 +1376,8 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Judgments: game_state::IsSet,
     S::DefaultComponent: game_state::IsSet,
+    S::Judgments: game_state::IsSet,
     S::Name: game_state::IsSet,
     S::ScoreComponents: game_state::IsSet,
 {
@@ -1057,186 +1415,6 @@ where
     }
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, GameRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GameScoreComponentsItem<'a> {
-    #[serde(rename = "dev.tsunagite.game#enum")]
-    Enum(Box<crate::dev_tsunagite::game::Enum<'a>>),
-    #[serde(rename = "dev.tsunagite.game#points")]
-    Points(Box<crate::dev_tsunagite::game::Points<'a>>),
-    #[serde(rename = "dev.tsunagite.game#percentage")]
-    Percentage(Box<crate::dev_tsunagite::game::Percentage<'a>>),
-    #[serde(rename = "dev.tsunagite.game#text")]
-    Text(Box<crate::dev_tsunagite::game::Text<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
-}
-
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Game<'_> {
-    const NSID: &'static str = "dev.tsunagite.game";
-    type Record = GameRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct GameRecord;
-impl jacquard_common::xrpc::XrpcResp for GameRecord {
-    const NSID: &'static str = "dev.tsunagite.game";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for GameRecord {
-    const NSID: &'static str = "dev.tsunagite.game";
-    type Record = GameRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.game"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_game()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.logo {
-            {
-                let size = value.blob().size;
-                if size > 8000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "logo",
-                        ),
-                        max: 8000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.logo {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &[
-                    "image/png",
-                    "image/jpeg",
-                    "image/jxl",
-                    "image/webp",
-                ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "logo",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/jxl".to_string(), "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A percentage score with customizable precision.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Percentage<'a> {
-    ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    ///The maximum allowed percentage for this score. Defaults to `100`.
-    #[serde(default = "_default_percentage_maximum")]
-    pub maximum: i64,
-    ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    ///The number of decimal places to include in the percentage. Defaults to `2`.
-    #[serde(default = "_default_percentage_precision")]
-    pub precision: i64,
-}
-
 fn _default_percentage_maximum() -> i64 {
     100i64
 }
@@ -1255,67 +1433,67 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Precision;
         type Name;
+        type Precision;
         type Maximum;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Precision = Unset;
         type Name = Unset;
+        type Precision = Unset;
         type Maximum = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Precision = S::Precision;
-        type Name = S::Name;
-        type Maximum = S::Maximum;
-    }
-    ///State transition - sets the `precision` field to Set
-    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrecision<S> {}
-    impl<S: State> State for SetPrecision<S> {
-        type Id = S::Id;
-        type Precision = Set<members::precision>;
-        type Name = S::Name;
-        type Maximum = S::Maximum;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Precision = S::Precision;
         type Name = Set<members::name>;
+        type Precision = S::Precision;
         type Maximum = S::Maximum;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `precision` field to Set
+    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrecision<S> {}
+    impl<S: State> State for SetPrecision<S> {
+        type Name = S::Name;
+        type Precision = Set<members::precision>;
+        type Maximum = S::Maximum;
+        type Id = S::Id;
     }
     ///State transition - sets the `maximum` field to Set
     pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMaximum<S> {}
     impl<S: State> State for SetMaximum<S> {
-        type Id = S::Id;
-        type Precision = S::Precision;
         type Name = S::Name;
+        type Precision = S::Precision;
         type Maximum = Set<members::maximum>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Precision = S::Precision;
+        type Maximum = S::Maximum;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `precision` field
-        pub struct precision(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `precision` field
+        pub struct precision(());
         ///Marker type for the `maximum` field
         pub struct maximum(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1436,10 +1614,10 @@ where
 impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
-    S::Id: percentage_state::IsSet,
-    S::Precision: percentage_state::IsSet,
     S::Name: percentage_state::IsSet,
+    S::Precision: percentage_state::IsSet,
     S::Maximum: percentage_state::IsSet,
+    S::Id: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1467,75 +1645,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.game"
-    }
-    fn def_name() -> &'static str {
-        "percentage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_game()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// An integer point score, with or without a cap.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Points<'a> {
-    ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    ///The maximum allowed value for this score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub maximum: std::option::Option<i64>,
-    ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
 }
 
 pub mod points_state {
@@ -1702,72 +1811,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.game"
-    }
-    fn def_name() -> &'static str {
-        "points"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_game()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A fallback component for displaying arbitrary text.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Text<'a> {
-    ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-}
-
 pub mod text_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1913,48 +1956,5 @@ where
             name: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
-    fn nsid() -> &'static str {
-        "dev.tsunagite.game"
-    }
-    fn def_name() -> &'static str {
-        "text"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_dev_tsunagite_game()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
-                    min: 1usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

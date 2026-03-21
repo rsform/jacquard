@@ -23,6 +23,85 @@ pub struct BatchItem<'a> {
     pub message: crate::chat_bsky::convo::MessageInput<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SendMessageBatch<'a> {
+    #[serde(borrow)]
+    pub items: Vec<crate::chat_bsky::convo::send_message_batch::BatchItem<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SendMessageBatchOutput<'a> {
+    #[serde(borrow)]
+    pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchItem<'a> {
+    fn nsid() -> &'static str {
+        "chat.bsky.convo.sendMessageBatch"
+    }
+    fn def_name() -> &'static str {
+        "batchItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_chat_bsky_convo_sendMessageBatch()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///chat.bsky.convo.sendMessageBatch
+pub struct SendMessageBatchResponse;
+impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
+    const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SendMessageBatchOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<'a> {
+    const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SendMessageBatchResponse;
+}
+
+/// Endpoint type for
+///chat.bsky.convo.sendMessageBatch
+pub struct SendMessageBatchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessageBatch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendMessageBatch<'de>;
+    type Response = SendMessageBatchResponse;
+}
+
 pub mod batch_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -269,39 +348,6 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchItem<'a> {
-    fn nsid() -> &'static str {
-        "chat.bsky.convo.sendMessageBatch"
-    }
-    fn def_name() -> &'static str {
-        "batchItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_chat_bsky_convo_sendMessageBatch()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SendMessageBatch<'a> {
-    #[serde(borrow)]
-    pub items: Vec<crate::chat_bsky::convo::send_message_batch::BatchItem<'a>>,
-}
-
 pub mod send_message_batch_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -407,50 +453,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SendMessageBatchOutput<'a> {
-    #[serde(borrow)]
-    pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
-}
-
-/// Response type for
-///chat.bsky.convo.sendMessageBatch
-pub struct SendMessageBatchResponse;
-impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
-    const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SendMessageBatchOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<'a> {
-    const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SendMessageBatchResponse;
-}
-
-/// Endpoint type for
-///chat.bsky.convo.sendMessageBatch
-pub struct SendMessageBatchRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
-    const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SendMessageBatch<'de>;
-    type Response = SendMessageBatchResponse;
 }

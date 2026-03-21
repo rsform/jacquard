@@ -27,6 +27,97 @@ pub struct UpdateSubjectStatus<'a> {
     pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateSubjectStatusSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
+    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSubjectStatusOutput<'a> {
+    #[serde(borrow)]
+    pub subject: UpdateSubjectStatusOutputSubject<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateSubjectStatusOutputSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
+    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
+}
+
+/// Response type for
+///com.atproto.admin.updateSubjectStatus
+pub struct UpdateSubjectStatusResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
+    const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateSubjectStatusOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<'a> {
+    const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateSubjectStatusResponse;
+}
+
+/// Endpoint type for
+///com.atproto.admin.updateSubjectStatus
+pub struct UpdateSubjectStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateSubjectStatusRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateSubjectStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateSubjectStatus<'de>;
+    type Response = UpdateSubjectStatusResponse;
+}
+
 pub mod update_subject_status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -174,95 +265,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateSubjectStatusSubject<'a> {
-    #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
-    #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-    #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
-    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateSubjectStatusOutput<'a> {
-    #[serde(borrow)]
-    pub subject: UpdateSubjectStatusOutputSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateSubjectStatusOutputSubject<'a> {
-    #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
-    #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-    #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
-    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
-}
-
-/// Response type for
-///com.atproto.admin.updateSubjectStatus
-pub struct UpdateSubjectStatusResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
-    const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateSubjectStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<'a> {
-    const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateSubjectStatusResponse;
-}
-
-/// Endpoint type for
-///com.atproto.admin.updateSubjectStatus
-pub struct UpdateSubjectStatusRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateSubjectStatusRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.admin.updateSubjectStatus";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateSubjectStatus<'de>;
-    type Response = UpdateSubjectStatusResponse;
 }

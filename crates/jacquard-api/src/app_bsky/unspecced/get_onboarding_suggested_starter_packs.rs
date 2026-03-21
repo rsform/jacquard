@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -24,6 +20,52 @@ pub struct GetOnboardingSuggestedStarterPacks {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {
+    #[serde(borrow)]
+    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackView<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
+pub struct GetOnboardingSuggestedStarterPacksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetOnboardingSuggestedStarterPacksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedStarterPacks {
+    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetOnboardingSuggestedStarterPacksResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
+pub struct GetOnboardingSuggestedStarterPacksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetOnboardingSuggestedStarterPacks;
+    type Response = GetOnboardingSuggestedStarterPacksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod get_onboarding_suggested_starter_packs_state {
@@ -99,46 +141,4 @@ where
             limit: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {
-    #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackView<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
-pub struct GetOnboardingSuggestedStarterPacksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetOnboardingSuggestedStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedStarterPacks {
-    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetOnboardingSuggestedStarterPacksResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
-pub struct GetOnboardingSuggestedStarterPacksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetOnboardingSuggestedStarterPacks;
-    type Response = GetOnboardingSuggestedStarterPacksResponse;
 }

@@ -36,6 +36,23 @@ pub struct AuthCallback<'a> {
     pub refresh_jwt: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthCallback<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.auth.defs"
+    }
+    fn def_name() -> &'static str {
+        "authCallback"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_auth_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod auth_callback_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -47,8 +64,8 @@ pub mod auth_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type RefreshJwt;
         type Did;
+        type RefreshJwt;
         type AccessJwt;
     }
     /// Empty state - all required fields are unset
@@ -56,8 +73,8 @@ pub mod auth_callback_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type RefreshJwt = Unset;
         type Did = Unset;
+        type RefreshJwt = Unset;
         type AccessJwt = Unset;
     }
     ///State transition - sets the `handle` field to Set
@@ -65,17 +82,8 @@ pub mod auth_callback_state {
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type Did = S::Did;
         type RefreshJwt = S::RefreshJwt;
-        type Did = S::Did;
-        type AccessJwt = S::AccessJwt;
-    }
-    ///State transition - sets the `refresh_jwt` field to Set
-    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
-    impl<S: State> State for SetRefreshJwt<S> {
-        type Handle = S::Handle;
-        type RefreshJwt = Set<members::refresh_jwt>;
-        type Did = S::Did;
         type AccessJwt = S::AccessJwt;
     }
     ///State transition - sets the `did` field to Set
@@ -83,8 +91,17 @@ pub mod auth_callback_state {
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Handle = S::Handle;
-        type RefreshJwt = S::RefreshJwt;
         type Did = Set<members::did>;
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
+    }
+    ///State transition - sets the `refresh_jwt` field to Set
+    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
+    impl<S: State> State for SetRefreshJwt<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type RefreshJwt = Set<members::refresh_jwt>;
         type AccessJwt = S::AccessJwt;
     }
     ///State transition - sets the `access_jwt` field to Set
@@ -92,8 +109,8 @@ pub mod auth_callback_state {
     impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
     impl<S: State> State for SetAccessJwt<S> {
         type Handle = S::Handle;
-        type RefreshJwt = S::RefreshJwt;
         type Did = S::Did;
+        type RefreshJwt = S::RefreshJwt;
         type AccessJwt = Set<members::access_jwt>;
     }
     /// Marker types for field names
@@ -101,10 +118,10 @@ pub mod auth_callback_state {
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `refresh_jwt` field
-        pub struct refresh_jwt(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `refresh_jwt` field
+        pub struct refresh_jwt(());
         ///Marker type for the `access_jwt` field
         pub struct access_jwt(());
     }
@@ -220,8 +237,8 @@ impl<'a, S> AuthCallbackBuilder<'a, S>
 where
     S: auth_callback_state::State,
     S::Handle: auth_callback_state::IsSet,
-    S::RefreshJwt: auth_callback_state::IsSet,
     S::Did: auth_callback_state::IsSet,
+    S::RefreshJwt: auth_callback_state::IsSet,
     S::AccessJwt: auth_callback_state::IsSet,
 {
     /// Build the final struct
@@ -352,22 +369,5 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthCallback<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.auth.defs"
-    }
-    fn def_name() -> &'static str {
-        "authCallback"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_auth_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

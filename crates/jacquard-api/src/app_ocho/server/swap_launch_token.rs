@@ -20,6 +20,59 @@ pub struct SwapLaunchToken<'a> {
     pub launch_token: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SwapLaunchTokenOutput<'a> {
+    ///The did of the user
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub token: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.server.swapLaunchToken
+pub struct SwapLaunchTokenResponse;
+impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
+    const NSID: &'static str = "app.ocho.server.swapLaunchToken";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SwapLaunchTokenOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<'a> {
+    const NSID: &'static str = "app.ocho.server.swapLaunchToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SwapLaunchTokenResponse;
+}
+
+/// Endpoint type for
+///app.ocho.server.swapLaunchToken
+pub struct SwapLaunchTokenRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.server.swapLaunchToken";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SwapLaunchToken<'de>;
+    type Response = SwapLaunchTokenResponse;
+}
+
 pub mod swap_launch_token_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,57 +160,4 @@ where
             launch_token: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SwapLaunchTokenOutput<'a> {
-    ///The did of the user
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.server.swapLaunchToken
-pub struct SwapLaunchTokenResponse;
-impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
-    const NSID: &'static str = "app.ocho.server.swapLaunchToken";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SwapLaunchTokenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<'a> {
-    const NSID: &'static str = "app.ocho.server.swapLaunchToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SwapLaunchTokenResponse;
-}
-
-/// Endpoint type for
-///app.ocho.server.swapLaunchToken
-pub struct SwapLaunchTokenRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.server.swapLaunchToken";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SwapLaunchToken<'de>;
-    type Response = SwapLaunchTokenResponse;
 }

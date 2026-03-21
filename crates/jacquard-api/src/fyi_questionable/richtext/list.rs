@@ -25,6 +25,42 @@ pub struct List<'a> {
     pub ordered: std::option::Option<bool>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemsItem<'a> {
+    #[serde(rename = "fyi.questionable.richtext.text")]
+    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
+    #[serde(rename = "fyi.questionable.richtext.list")]
+    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+    fn nsid() -> &'static str {
+        "fyi.questionable.richtext.list"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_fyi_questionable_richtext_list()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_list_ordered() -> std::option::Option<bool> {
     Some(false)
 }
@@ -150,25 +186,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemsItem<'a> {
-    #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
-    #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
-}
-
 fn lexicon_doc_fyi_questionable_richtext_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -226,22 +243,5 @@ fn lexicon_doc_fyi_questionable_richtext_list() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
-    fn nsid() -> &'static str {
-        "fyi.questionable.richtext.list"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_fyi_questionable_richtext_list()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

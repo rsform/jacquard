@@ -49,6 +49,411 @@ pub struct CommunityTagCount<'a> {
     pub tag: jacquard_common::CowStr<'a>,
 }
 
+/// A curated collection of notebooks/entries for sharing.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Curatelist;
+impl std::fmt::Display for Curatelist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "curatelist")
+    }
+}
+
+/// An item in a list with hydrated subject.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListItemView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub added_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub subject: ListItemViewSubject<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListItemViewSubject<'a> {
+    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
+    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
+    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
+    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListPurpose<'a> {
+    ShWeaverGraphDefsCuratelist,
+    ShWeaverGraphDefsReadinglist,
+    ShWeaverGraphDefsSerieslist,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ListPurpose<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ShWeaverGraphDefsCuratelist => "sh.weaver.graph.defs#curatelist",
+            Self::ShWeaverGraphDefsReadinglist => "sh.weaver.graph.defs#readinglist",
+            Self::ShWeaverGraphDefsSerieslist => "sh.weaver.graph.defs#serieslist",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ListPurpose<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sh.weaver.graph.defs#curatelist" => Self::ShWeaverGraphDefsCuratelist,
+            "sh.weaver.graph.defs#readinglist" => Self::ShWeaverGraphDefsReadinglist,
+            "sh.weaver.graph.defs#serieslist" => Self::ShWeaverGraphDefsSerieslist,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ListPurpose<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sh.weaver.graph.defs#curatelist" => Self::ShWeaverGraphDefsCuratelist,
+            "sh.weaver.graph.defs#readinglist" => Self::ShWeaverGraphDefsReadinglist,
+            "sh.weaver.graph.defs#serieslist" => Self::ShWeaverGraphDefsSerieslist,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for ListPurpose<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for ListPurpose<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for ListPurpose<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ListPurpose<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for ListPurpose<'_> {
+    type Output = ListPurpose<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListPurpose::ShWeaverGraphDefsCuratelist => {
+                ListPurpose::ShWeaverGraphDefsCuratelist
+            }
+            ListPurpose::ShWeaverGraphDefsReadinglist => {
+                ListPurpose::ShWeaverGraphDefsReadinglist
+            }
+            ListPurpose::ShWeaverGraphDefsSerieslist => {
+                ListPurpose::ShWeaverGraphDefsSerieslist
+            }
+            ListPurpose::Other(v) => ListPurpose::Other(v.into_static()),
+        }
+    }
+}
+
+/// Hydrated view of a list.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub creator: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    pub item_count: i64,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub purpose: crate::sh_weaver::graph::ListPurpose<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_subscribed: std::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
+}
+
+/// A personal reading list.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Readinglist;
+impl std::fmt::Display for Readinglist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "readinglist")
+    }
+}
+
+/// All tags for a resource, grouped by source.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResourceTagsView<'a> {
+    ///Tags from the record itself (author-applied).
+    #[serde(borrow)]
+    pub author_tags: Vec<jacquard_common::CowStr<'a>>,
+    ///Aggregated community-applied tags with counts.
+    #[serde(borrow)]
+    pub community_tags: Vec<crate::sh_weaver::graph::CommunityTagCount<'a>>,
+    #[serde(borrow)]
+    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///Tags the current viewer has applied.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer_applied_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// An ordered series of related works (sequels, spin-offs).
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Serieslist;
+impl std::fmt::Display for Serieslist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "serieslist")
+    }
+}
+
+/// A single tag application with who applied it.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagApplicationView<'a> {
+    #[serde(borrow)]
+    pub applied_by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub tag: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Aggregated view of a tag with usage statistics.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entry_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub notebook_count: std::option::Option<i64>,
+    ///Uses in the last 30 days.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub recent_use_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub tag: jacquard_common::CowStr<'a>,
+    ///Appview-computed trending score.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub trending_score: std::option::Option<i64>,
+    ///Total number of resources tagged with this tag.
+    pub use_count: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityTagCount<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "communityTagCount"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "listItemView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "listView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResourceTagsView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "resourceTagsView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagApplicationView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "tagApplicationView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.graph.defs"
+    }
+    fn def_name() -> &'static str {
+        "tagView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_graph_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod community_tag_count_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -59,37 +464,37 @@ pub mod community_tag_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Count;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Count = S::Count;
+        type Tag = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Tag = S::Tag;
         type Count = Set<members::count>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Count = S::Count;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -162,8 +567,8 @@ where
 impl<'a, S> CommunityTagCountBuilder<'a, S>
 where
     S: community_tag_count_state::State,
-    S::Tag: community_tag_count_state::IsSet,
     S::Count: community_tag_count_state::IsSet,
+    S::Tag: community_tag_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityTagCount<'a> {
@@ -855,62 +1260,6 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityTagCount<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "communityTagCount"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A curated collection of notebooks/entries for sharing.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Curatelist;
-impl std::fmt::Display for Curatelist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "curatelist")
-    }
-}
-
-/// An item in a list with hydrated subject.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListItemView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub added_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub subject: ListItemViewSubject<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod list_item_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -921,37 +1270,37 @@ pub mod list_item_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Uri;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Uri = S::Uri;
+        type Subject = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Subject = S::Subject;
         type Uri = Set<members::uri>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Uri = S::Uri;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -1044,8 +1393,8 @@ where
 impl<'a, S> ListItemViewBuilder<'a, S>
 where
     S: list_item_view_state::State,
-    S::Subject: list_item_view_state::IsSet,
     S::Uri: list_item_view_state::IsSet,
+    S::Subject: list_item_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListItemView<'a> {
@@ -1073,173 +1422,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemViewSubject<'a> {
-    #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
-    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
-    #[serde(rename = "sh.weaver.notebook.defs#entryView")]
-    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "listItemView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ListPurpose<'a> {
-    ShWeaverGraphDefsCuratelist,
-    ShWeaverGraphDefsReadinglist,
-    ShWeaverGraphDefsSerieslist,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ListPurpose<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::ShWeaverGraphDefsCuratelist => "sh.weaver.graph.defs#curatelist",
-            Self::ShWeaverGraphDefsReadinglist => "sh.weaver.graph.defs#readinglist",
-            Self::ShWeaverGraphDefsSerieslist => "sh.weaver.graph.defs#serieslist",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ListPurpose<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "sh.weaver.graph.defs#curatelist" => Self::ShWeaverGraphDefsCuratelist,
-            "sh.weaver.graph.defs#readinglist" => Self::ShWeaverGraphDefsReadinglist,
-            "sh.weaver.graph.defs#serieslist" => Self::ShWeaverGraphDefsSerieslist,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ListPurpose<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sh.weaver.graph.defs#curatelist" => Self::ShWeaverGraphDefsCuratelist,
-            "sh.weaver.graph.defs#readinglist" => Self::ShWeaverGraphDefsReadinglist,
-            "sh.weaver.graph.defs#serieslist" => Self::ShWeaverGraphDefsSerieslist,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ListPurpose<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for ListPurpose<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for ListPurpose<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ListPurpose<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for ListPurpose<'_> {
-    type Output = ListPurpose<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ListPurpose::ShWeaverGraphDefsCuratelist => {
-                ListPurpose::ShWeaverGraphDefsCuratelist
-            }
-            ListPurpose::ShWeaverGraphDefsReadinglist => {
-                ListPurpose::ShWeaverGraphDefsReadinglist
-            }
-            ListPurpose::ShWeaverGraphDefsSerieslist => {
-                ListPurpose::ShWeaverGraphDefsSerieslist
-            }
-            ListPurpose::Other(v) => ListPurpose::Other(v.into_static()),
-        }
-    }
-}
-
-/// Hydrated view of a list.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub creator: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    pub item_count: i64,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub purpose: crate::sh_weaver::graph::ListPurpose<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_subscribed: std::option::Option<
-        jacquard_common::types::string::AtUri<'a>,
-    >,
-}
-
 pub mod list_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1250,127 +1432,127 @@ pub mod list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ItemCount;
-        type Cid;
-        type IndexedAt;
-        type Uri;
         type Name;
+        type ItemCount;
         type Creator;
+        type Cid;
+        type Uri;
         type Purpose;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ItemCount = Unset;
-        type Cid = Unset;
-        type IndexedAt = Unset;
-        type Uri = Unset;
         type Name = Unset;
+        type ItemCount = Unset;
         type Creator = Unset;
+        type Cid = Unset;
+        type Uri = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `item_count` field to Set
-    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemCount<S> {}
-    impl<S: State> State for SetItemCount<S> {
-        type ItemCount = Set<members::item_count>;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = Set<members::cid>;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = S::Cid;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type Purpose = S::Purpose;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type ItemCount = S::ItemCount;
         type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
         type Purpose = S::Purpose;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `item_count` field to Set
+    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemCount<S> {}
+    impl<S: State> State for SetItemCount<S> {
+        type Name = S::Name;
+        type ItemCount = Set<members::item_count>;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Purpose = S::Purpose;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
         type Name = S::Name;
+        type ItemCount = S::ItemCount;
         type Creator = Set<members::creator>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
         type Purpose = S::Purpose;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
+        type Creator = S::Creator;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Purpose = S::Purpose;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type Purpose = S::Purpose;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type ItemCount = S::ItemCount;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
         type Name = S::Name;
+        type ItemCount = S::ItemCount;
         type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
         type Purpose = Set<members::purpose>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Purpose = S::Purpose;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item_count` field
-        pub struct item_count(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `item_count` field
+        pub struct item_count(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -1614,13 +1796,13 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
 impl<'a, S> ListViewBuilder<'a, S>
 where
     S: list_view_state::State,
-    S::ItemCount: list_view_state::IsSet,
-    S::Cid: list_view_state::IsSet,
-    S::IndexedAt: list_view_state::IsSet,
-    S::Uri: list_view_state::IsSet,
     S::Name: list_view_state::IsSet,
+    S::ItemCount: list_view_state::IsSet,
     S::Creator: list_view_state::IsSet,
+    S::Cid: list_view_state::IsSet,
+    S::Uri: list_view_state::IsSet,
     S::Purpose: list_view_state::IsSet,
+    S::IndexedAt: list_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListView<'a> {
@@ -1662,68 +1844,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "listView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A personal reading list.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Readinglist;
-impl std::fmt::Display for Readinglist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "readinglist")
-    }
-}
-
-/// All tags for a resource, grouped by source.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResourceTagsView<'a> {
-    ///Tags from the record itself (author-applied).
-    #[serde(borrow)]
-    pub author_tags: Vec<jacquard_common::CowStr<'a>>,
-    ///Aggregated community-applied tags with counts.
-    #[serde(borrow)]
-    pub community_tags: Vec<crate::sh_weaver::graph::CommunityTagCount<'a>>,
-    #[serde(borrow)]
-    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///Tags the current viewer has applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_applied_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-}
-
 pub mod resource_tags_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1734,51 +1854,51 @@ pub mod resource_tags_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommunityTags;
         type Resource;
         type AuthorTags;
+        type CommunityTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommunityTags = Unset;
         type Resource = Unset;
         type AuthorTags = Unset;
-    }
-    ///State transition - sets the `community_tags` field to Set
-    pub struct SetCommunityTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunityTags<S> {}
-    impl<S: State> State for SetCommunityTags<S> {
-        type CommunityTags = Set<members::community_tags>;
-        type Resource = S::Resource;
-        type AuthorTags = S::AuthorTags;
+        type CommunityTags = Unset;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type CommunityTags = S::CommunityTags;
         type Resource = Set<members::resource>;
         type AuthorTags = S::AuthorTags;
+        type CommunityTags = S::CommunityTags;
     }
     ///State transition - sets the `author_tags` field to Set
     pub struct SetAuthorTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthorTags<S> {}
     impl<S: State> State for SetAuthorTags<S> {
-        type CommunityTags = S::CommunityTags;
         type Resource = S::Resource;
         type AuthorTags = Set<members::author_tags>;
+        type CommunityTags = S::CommunityTags;
+    }
+    ///State transition - sets the `community_tags` field to Set
+    pub struct SetCommunityTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommunityTags<S> {}
+    impl<S: State> State for SetCommunityTags<S> {
+        type Resource = S::Resource;
+        type AuthorTags = S::AuthorTags;
+        type CommunityTags = Set<members::community_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `community_tags` field
-        pub struct community_tags(());
         ///Marker type for the `resource` field
         pub struct resource(());
         ///Marker type for the `author_tags` field
         pub struct author_tags(());
+        ///Marker type for the `community_tags` field
+        pub struct community_tags(());
     }
 }
 
@@ -1891,9 +2011,9 @@ impl<'a, S: resource_tags_view_state::State> ResourceTagsViewBuilder<'a, S> {
 impl<'a, S> ResourceTagsViewBuilder<'a, S>
 where
     S: resource_tags_view_state::State,
-    S::CommunityTags: resource_tags_view_state::IsSet,
     S::Resource: resource_tags_view_state::IsSet,
     S::AuthorTags: resource_tags_view_state::IsSet,
+    S::CommunityTags: resource_tags_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResourceTagsView<'a> {
@@ -1923,63 +2043,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResourceTagsView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "resourceTagsView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An ordered series of related works (sequels, spin-offs).
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Serieslist;
-impl std::fmt::Display for Serieslist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "serieslist")
-    }
-}
-
-/// A single tag application with who applied it.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagApplicationView<'a> {
-    #[serde(borrow)]
-    pub applied_by: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod tag_application_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1990,67 +2053,67 @@ pub mod tag_application_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Tag;
-        type CreatedAt;
+        type Uri;
         type AppliedBy;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Tag = Unset;
-        type CreatedAt = Unset;
+        type Uri = Unset;
         type AppliedBy = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
-        type AppliedBy = S::AppliedBy;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type Uri = S::Uri;
         type Tag = Set<members::tag>;
-        type CreatedAt = S::CreatedAt;
-        type AppliedBy = S::AppliedBy;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Uri = S::Uri;
-        type Tag = S::Tag;
-        type CreatedAt = Set<members::created_at>;
         type AppliedBy = S::AppliedBy;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Tag = S::Tag;
+        type Uri = Set<members::uri>;
+        type AppliedBy = S::AppliedBy;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `applied_by` field to Set
     pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
     impl<S: State> State for SetAppliedBy<S> {
-        type Uri = S::Uri;
         type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
         type AppliedBy = Set<members::applied_by>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Tag = S::Tag;
+        type Uri = S::Uri;
+        type AppliedBy = S::AppliedBy;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `tag` field
         pub struct tag(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `applied_by` field
         pub struct applied_by(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -2163,10 +2226,10 @@ where
 impl<'a, S> TagApplicationViewBuilder<'a, S>
 where
     S: tag_application_view_state::State,
-    S::Uri: tag_application_view_state::IsSet,
     S::Tag: tag_application_view_state::IsSet,
-    S::CreatedAt: tag_application_view_state::IsSet,
+    S::Uri: tag_application_view_state::IsSet,
     S::AppliedBy: tag_application_view_state::IsSet,
+    S::CreatedAt: tag_application_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagApplicationView<'a> {
@@ -2194,52 +2257,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagApplicationView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "tagApplicationView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Aggregated view of a tag with usage statistics.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub notebook_count: std::option::Option<i64>,
-    ///Uses in the last 30 days.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub recent_use_count: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
-    ///Appview-computed trending score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub trending_score: std::option::Option<i64>,
-    ///Total number of resources tagged with this tag.
-    pub use_count: i64,
 }
 
 pub mod tag_view_state {
@@ -2443,22 +2460,5 @@ where
             use_count: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.graph.defs"
-    }
-    fn def_name() -> &'static str {
-        "tagView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_graph_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

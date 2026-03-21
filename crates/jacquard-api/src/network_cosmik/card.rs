@@ -49,6 +49,351 @@ pub struct Card<'a> {
     pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CardContent<'a> {
+    #[serde(rename = "network.cosmik.card#urlContent")]
+    UrlContent(Box<crate::network_cosmik::card::UrlContent<'a>>),
+    #[serde(rename = "network.cosmik.card#noteContent")]
+    NoteContent(Box<crate::network_cosmik::card::NoteContent<'a>>),
+}
+
+/// The type of card
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CardType<'a> {
+    Url,
+    Note,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CardType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Url => "URL",
+            Self::Note => "NOTE",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CardType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "URL" => Self::Url,
+            "NOTE" => Self::Note,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CardType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "URL" => Self::Url,
+            "NOTE" => Self::Note,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CardType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CardType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CardType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CardType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CardType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CardType<'_> {
+    type Output = CardType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CardType::Url => CardType::Url,
+            CardType::Note => CardType::Note,
+            CardType::Other(v) => CardType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CardGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Card<'a>,
+}
+
+/// Content structure for a note card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NoteContent<'a> {
+    ///The note text content
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+
+/// Content structure for a URL card.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UrlContent<'a> {
+    ///Optional metadata about the URL
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub metadata: std::option::Option<crate::network_cosmik::card::UrlMetadata<'a>>,
+    ///The URL being saved
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+/// Metadata about a URL.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UrlMetadata<'a> {
+    ///Author of the content
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub author: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Description of the page
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Digital Object Identifier (DOI) for academic content
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub doi: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URL of a representative image
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///International Standard Book Number (ISBN) for books
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub isbn: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///When the content was published
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub published_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///When the metadata was retrieved
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub retrieved_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Name of the site
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Title of the page
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Type of content (e.g., 'video', 'article')
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Card<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CardRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CardRecord;
+impl jacquard_common::xrpc::XrpcResp for CardRecord {
+    const NSID: &'static str = "network.cosmik.card";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CardGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CardGetRecordOutput<'_>> for Card<'_> {
+    fn from(output: CardGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Card<'_> {
+    const NSID: &'static str = "network.cosmik.card";
+    type Record = CardRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CardRecord {
+    const NSID: &'static str = "network.cosmik.card";
+    type Record = CardRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.card"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_card()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteContent<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.card"
+    }
+    fn def_name() -> &'static str {
+        "noteContent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_card()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlContent<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.card"
+    }
+    fn def_name() -> &'static str {
+        "urlContent"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_card()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlMetadata<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.card"
+    }
+    fn def_name() -> &'static str {
+        "urlMetadata"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_card()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod card_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -296,192 +641,6 @@ where
             url: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Card<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CardRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CardContent<'a> {
-    #[serde(rename = "network.cosmik.card#urlContent")]
-    UrlContent(Box<crate::network_cosmik::card::UrlContent<'a>>),
-    #[serde(rename = "network.cosmik.card#noteContent")]
-    NoteContent(Box<crate::network_cosmik::card::NoteContent<'a>>),
-}
-
-/// The type of card
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CardType<'a> {
-    Url,
-    Note,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CardType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Url => "URL",
-            Self::Note => "NOTE",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CardType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "URL" => Self::Url,
-            "NOTE" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CardType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "URL" => Self::Url,
-            "NOTE" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CardType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CardType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CardType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CardType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CardType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CardType<'_> {
-    type Output = CardType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CardType::Url => CardType::Url,
-            CardType::Note => CardType::Note,
-            CardType::Other(v) => CardType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Card<'a>,
-}
-
-impl From<CardGetRecordOutput<'_>> for Card<'_> {
-    fn from(output: CardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Card<'_> {
-    const NSID: &'static str = "network.cosmik.card";
-    type Record = CardRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CardRecord;
-impl jacquard_common::xrpc::XrpcResp for CardRecord {
-    const NSID: &'static str = "network.cosmik.card";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CardGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CardRecord {
-    const NSID: &'static str = "network.cosmik.card";
-    type Record = CardRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.card"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_card()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -961,77 +1120,6 @@ fn lexicon_doc_network_cosmik_card() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-/// Content structure for a note card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NoteContent<'a> {
-    ///The note text content
-    #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteContent<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.card"
-    }
-    fn def_name() -> &'static str {
-        "noteContent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_card()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Content structure for a URL card.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlContent<'a> {
-    ///Optional metadata about the URL
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: std::option::Option<crate::network_cosmik::card::UrlMetadata<'a>>,
-    ///The URL being saved
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod url_content_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1156,93 +1244,5 @@ where
             url: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlContent<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.card"
-    }
-    fn def_name() -> &'static str {
-        "urlContent"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_card()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Metadata about a URL.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlMetadata<'a> {
-    ///Author of the content
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub author: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Description of the page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Digital Object Identifier (DOI) for academic content
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub doi: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL of a representative image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///International Standard Book Number (ISBN) for books
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub isbn: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the content was published
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///When the metadata was retrieved
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub retrieved_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Name of the site
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Title of the page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Type of content (e.g., 'video', 'article')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlMetadata<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.card"
-    }
-    fn def_name() -> &'static str {
-        "urlMetadata"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_card()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

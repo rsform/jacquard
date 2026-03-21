@@ -31,235 +31,6 @@ pub struct Answer<'a> {
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
-pub mod answer_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Question;
-        type Certainty;
-        type Text;
-        type Timestamp;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Question = Unset;
-        type Certainty = Unset;
-        type Text = Unset;
-        type Timestamp = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type Certainty = S::Certainty;
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `certainty` field to Set
-    pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCertainty<S> {}
-    impl<S: State> State for SetCertainty<S> {
-        type Question = S::Question;
-        type Certainty = Set<members::certainty>;
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Question = S::Question;
-        type Certainty = S::Certainty;
-        type Text = Set<members::text>;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Question = S::Question;
-        type Certainty = S::Certainty;
-        type Text = S::Text;
-        type Timestamp = Set<members::timestamp>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
-        ///Marker type for the `certainty` field
-        pub struct certainty(());
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct AnswerBuilder<'a, S: answer_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<AnswerCertainty<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Answer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AnswerBuilder<'a, answer_state::Empty> {
-        AnswerBuilder::new()
-    }
-}
-
-impl<'a> AnswerBuilder<'a, answer_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        AnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AnswerBuilder<'a, S>
-where
-    S: answer_state::State,
-    S::Certainty: answer_state::IsUnset,
-{
-    /// Set the `certainty` field (required)
-    pub fn certainty(
-        mut self,
-        value: impl Into<AnswerCertainty<'a>>,
-    ) -> AnswerBuilder<'a, answer_state::SetCertainty<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        AnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AnswerBuilder<'a, S>
-where
-    S: answer_state::State,
-    S::Question: answer_state::IsUnset,
-{
-    /// Set the `question` field (required)
-    pub fn question(
-        mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> AnswerBuilder<'a, answer_state::SetQuestion<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        AnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AnswerBuilder<'a, S>
-where
-    S: answer_state::State,
-    S::Text: answer_state::IsUnset,
-{
-    /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> AnswerBuilder<'a, answer_state::SetText<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        AnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AnswerBuilder<'a, S>
-where
-    S: answer_state::State,
-    S::Timestamp: answer_state::IsUnset,
-{
-    /// Set the `timestamp` field (required)
-    pub fn timestamp(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> AnswerBuilder<'a, answer_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        AnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> AnswerBuilder<'a, S>
-where
-    S: answer_state::State,
-    S::Question: answer_state::IsSet,
-    S::Certainty: answer_state::IsSet,
-    S::Text: answer_state::IsSet,
-    S::Timestamp: answer_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Answer<'a> {
-        Answer {
-            certainty: self.__unsafe_private_named.0.unwrap(),
-            question: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
-            timestamp: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Answer<'a> {
-        Answer {
-            certainty: self.__unsafe_private_named.0.unwrap(),
-            question: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
-            timestamp: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Answer<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AnswerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// How certain the person is about this answer
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AnswerCertainty<'a> {
@@ -380,16 +151,17 @@ pub struct AnswerGetRecordOutput<'a> {
     pub value: Answer<'a>,
 }
 
-impl From<AnswerGetRecordOutput<'_>> for Answer<'_> {
-    fn from(output: AnswerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Answer<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AnswerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Answer<'_> {
-    const NSID: &'static str = "pub.quizzy.answer";
-    type Record = AnswerRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -400,6 +172,18 @@ impl jacquard_common::xrpc::XrpcResp for AnswerRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = AnswerGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AnswerGetRecordOutput<'_>> for Answer<'_> {
+    fn from(output: AnswerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Answer<'_> {
+    const NSID: &'static str = "pub.quizzy.answer";
+    type Record = AnswerRecord;
 }
 
 impl jacquard_common::types::collection::Collection for AnswerRecord {
@@ -453,6 +237,222 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Answer<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod answer_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Timestamp;
+        type Certainty;
+        type Question;
+        type Text;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Timestamp = Unset;
+        type Certainty = Unset;
+        type Question = Unset;
+        type Text = Unset;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Timestamp = Set<members::timestamp>;
+        type Certainty = S::Certainty;
+        type Question = S::Question;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `certainty` field to Set
+    pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCertainty<S> {}
+    impl<S: State> State for SetCertainty<S> {
+        type Timestamp = S::Timestamp;
+        type Certainty = Set<members::certainty>;
+        type Question = S::Question;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Timestamp = S::Timestamp;
+        type Certainty = S::Certainty;
+        type Question = Set<members::question>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Timestamp = S::Timestamp;
+        type Certainty = S::Certainty;
+        type Question = S::Question;
+        type Text = Set<members::text>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
+        ///Marker type for the `certainty` field
+        pub struct certainty(());
+        ///Marker type for the `question` field
+        pub struct question(());
+        ///Marker type for the `text` field
+        pub struct text(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AnswerBuilder<'a, S: answer_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<AnswerCertainty<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Answer<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AnswerBuilder<'a, answer_state::Empty> {
+        AnswerBuilder::new()
+    }
+}
+
+impl<'a> AnswerBuilder<'a, answer_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AnswerBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AnswerBuilder<'a, S>
+where
+    S: answer_state::State,
+    S::Certainty: answer_state::IsUnset,
+{
+    /// Set the `certainty` field (required)
+    pub fn certainty(
+        mut self,
+        value: impl Into<AnswerCertainty<'a>>,
+    ) -> AnswerBuilder<'a, answer_state::SetCertainty<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AnswerBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AnswerBuilder<'a, S>
+where
+    S: answer_state::State,
+    S::Question: answer_state::IsUnset,
+{
+    /// Set the `question` field (required)
+    pub fn question(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> AnswerBuilder<'a, answer_state::SetQuestion<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AnswerBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AnswerBuilder<'a, S>
+where
+    S: answer_state::State,
+    S::Text: answer_state::IsUnset,
+{
+    /// Set the `text` field (required)
+    pub fn text(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AnswerBuilder<'a, answer_state::SetText<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AnswerBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AnswerBuilder<'a, S>
+where
+    S: answer_state::State,
+    S::Timestamp: answer_state::IsUnset,
+{
+    /// Set the `timestamp` field (required)
+    pub fn timestamp(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AnswerBuilder<'a, answer_state::SetTimestamp<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AnswerBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AnswerBuilder<'a, S>
+where
+    S: answer_state::State,
+    S::Timestamp: answer_state::IsSet,
+    S::Certainty: answer_state::IsSet,
+    S::Question: answer_state::IsSet,
+    S::Text: answer_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Answer<'a> {
+        Answer {
+            certainty: self.__unsafe_private_named.0.unwrap(),
+            question: self.__unsafe_private_named.1.unwrap(),
+            text: self.__unsafe_private_named.2.unwrap(),
+            timestamp: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Answer<'a> {
+        Answer {
+            certainty: self.__unsafe_private_named.0.unwrap(),
+            question: self.__unsafe_private_named.1.unwrap(),
+            text: self.__unsafe_private_named.2.unwrap(),
+            timestamp: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

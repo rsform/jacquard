@@ -21,6 +21,36 @@ pub struct UnmuteActorList<'a> {
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///app.bsky.graph.unmuteActorList
+pub struct UnmuteActorListResponse;
+impl jacquard_common::xrpc::XrpcResp for UnmuteActorListResponse {
+    const NSID: &'static str = "app.bsky.graph.unmuteActorList";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActorList<'a> {
+    const NSID: &'static str = "app.bsky.graph.unmuteActorList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UnmuteActorListResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.unmuteActorList
+pub struct UnmuteActorListRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorListRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteActorList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UnmuteActorList<'de>;
+    type Response = UnmuteActorListResponse;
+}
+
 pub mod unmute_actor_list_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,34 +154,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///app.bsky.graph.unmuteActorList
-pub struct UnmuteActorListResponse;
-impl jacquard_common::xrpc::XrpcResp for UnmuteActorListResponse {
-    const NSID: &'static str = "app.bsky.graph.unmuteActorList";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActorList<'a> {
-    const NSID: &'static str = "app.bsky.graph.unmuteActorList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UnmuteActorListResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.unmuteActorList
-pub struct UnmuteActorListRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorListRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteActorList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UnmuteActorList<'de>;
-    type Response = UnmuteActorListResponse;
 }

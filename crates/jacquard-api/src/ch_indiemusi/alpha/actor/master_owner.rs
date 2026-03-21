@@ -22,6 +22,97 @@ pub struct MasterOwner<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MasterOwnerGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: MasterOwner<'a>,
+}
+
+impl<'a> MasterOwner<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MasterOwnerRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MasterOwnerRecord;
+impl jacquard_common::xrpc::XrpcResp for MasterOwnerRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MasterOwnerGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MasterOwnerGetRecordOutput<'_>> for MasterOwner<'_> {
+    fn from(output: MasterOwnerGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for MasterOwner<'_> {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
+    type Record = MasterOwnerRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MasterOwnerRecord {
+    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
+    type Record = MasterOwnerRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwner<'a> {
+    fn nsid() -> &'static str {
+        "ch.indiemusi.alpha.actor.masterOwner"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ch_indiemusi_alpha_actor_masterOwner()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod master_owner_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,97 +213,6 @@ where
             name: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> MasterOwner<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MasterOwnerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MasterOwnerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: MasterOwner<'a>,
-}
-
-impl From<MasterOwnerGetRecordOutput<'_>> for MasterOwner<'_> {
-    fn from(output: MasterOwnerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for MasterOwner<'_> {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
-    type Record = MasterOwnerRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MasterOwnerRecord;
-impl jacquard_common::xrpc::XrpcResp for MasterOwnerRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MasterOwnerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MasterOwnerRecord {
-    const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
-    type Record = MasterOwnerRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwner<'a> {
-    fn nsid() -> &'static str {
-        "ch.indiemusi.alpha.actor.masterOwner"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ch_indiemusi_alpha_actor_masterOwner()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

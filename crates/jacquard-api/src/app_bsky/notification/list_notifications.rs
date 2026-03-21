@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -34,6 +30,257 @@ pub struct ListNotifications<'a> {
     pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListNotificationsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub notifications: Vec<
+        crate::app_bsky::notification::list_notifications::Notification<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub priority: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Notification<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileView<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    pub is_read: bool,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ///The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
+    #[serde(borrow)]
+    pub reason: NotificationReason<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NotificationReason<'a> {
+    Like,
+    Repost,
+    Follow,
+    Mention,
+    Reply,
+    Quote,
+    StarterpackJoined,
+    Verified,
+    Unverified,
+    LikeViaRepost,
+    RepostViaRepost,
+    SubscribedPost,
+    ContactMatch,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> NotificationReason<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Like => "like",
+            Self::Repost => "repost",
+            Self::Follow => "follow",
+            Self::Mention => "mention",
+            Self::Reply => "reply",
+            Self::Quote => "quote",
+            Self::StarterpackJoined => "starterpack-joined",
+            Self::Verified => "verified",
+            Self::Unverified => "unverified",
+            Self::LikeViaRepost => "like-via-repost",
+            Self::RepostViaRepost => "repost-via-repost",
+            Self::SubscribedPost => "subscribed-post",
+            Self::ContactMatch => "contact-match",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for NotificationReason<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "like" => Self::Like,
+            "repost" => Self::Repost,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            "reply" => Self::Reply,
+            "quote" => Self::Quote,
+            "starterpack-joined" => Self::StarterpackJoined,
+            "verified" => Self::Verified,
+            "unverified" => Self::Unverified,
+            "like-via-repost" => Self::LikeViaRepost,
+            "repost-via-repost" => Self::RepostViaRepost,
+            "subscribed-post" => Self::SubscribedPost,
+            "contact-match" => Self::ContactMatch,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for NotificationReason<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "like" => Self::Like,
+            "repost" => Self::Repost,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            "reply" => Self::Reply,
+            "quote" => Self::Quote,
+            "starterpack-joined" => Self::StarterpackJoined,
+            "verified" => Self::Verified,
+            "unverified" => Self::Unverified,
+            "like-via-repost" => Self::LikeViaRepost,
+            "repost-via-repost" => Self::RepostViaRepost,
+            "subscribed-post" => Self::SubscribedPost,
+            "contact-match" => Self::ContactMatch,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for NotificationReason<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for NotificationReason<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for NotificationReason<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for NotificationReason<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for NotificationReason<'_> {
+    type Output = NotificationReason<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            NotificationReason::Like => NotificationReason::Like,
+            NotificationReason::Repost => NotificationReason::Repost,
+            NotificationReason::Follow => NotificationReason::Follow,
+            NotificationReason::Mention => NotificationReason::Mention,
+            NotificationReason::Reply => NotificationReason::Reply,
+            NotificationReason::Quote => NotificationReason::Quote,
+            NotificationReason::StarterpackJoined => {
+                NotificationReason::StarterpackJoined
+            }
+            NotificationReason::Verified => NotificationReason::Verified,
+            NotificationReason::Unverified => NotificationReason::Unverified,
+            NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
+            NotificationReason::RepostViaRepost => NotificationReason::RepostViaRepost,
+            NotificationReason::SubscribedPost => NotificationReason::SubscribedPost,
+            NotificationReason::ContactMatch => NotificationReason::ContactMatch,
+            NotificationReason::Other(v) => NotificationReason::Other(v.into_static()),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.notification.listNotifications
+pub struct ListNotificationsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
+    const NSID: &'static str = "app.bsky.notification.listNotifications";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListNotificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
+    const NSID: &'static str = "app.bsky.notification.listNotifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListNotificationsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.notification.listNotifications
+pub struct ListNotificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.listNotifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListNotifications<'de>;
+    type Response = ListNotificationsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.notification.listNotifications"
+    }
+    fn def_name() -> &'static str {
+        "notification"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_listNotifications()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_notifications_state {
@@ -182,90 +429,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListNotificationsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub notifications: Vec<
-        crate::app_bsky::notification::list_notifications::Notification<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub priority: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-/// Response type for
-///app.bsky.notification.listNotifications
-pub struct ListNotificationsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
-    const NSID: &'static str = "app.bsky.notification.listNotifications";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
-    const NSID: &'static str = "app.bsky.notification.listNotifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListNotificationsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.notification.listNotifications
-pub struct ListNotificationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.notification.listNotifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListNotifications<'de>;
-    type Response = ListNotificationsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Notification<'a> {
-    #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileView<'a>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub indexed_at: jacquard_common::types::string::Datetime,
-    pub is_read: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    ///The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
-    #[serde(borrow)]
-    pub reason: NotificationReason<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod notification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -276,127 +439,127 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type Uri;
-        type Author;
         type Cid;
+        type Author;
         type Reason;
-        type IndexedAt;
+        type Record;
         type IsRead;
+        type IndexedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type Uri = Unset;
-        type Author = Unset;
         type Cid = Unset;
+        type Author = Unset;
         type Reason = Unset;
-        type IndexedAt = Unset;
+        type Record = Unset;
         type IsRead = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-        type IndexedAt = S::IndexedAt;
-        type IsRead = S::IsRead;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-        type IndexedAt = S::IndexedAt;
-        type IsRead = S::IsRead;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-        type IndexedAt = S::IndexedAt;
-        type IsRead = S::IsRead;
+        type IndexedAt = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type Cid = Set<members::cid>;
+        type Author = S::Author;
         type Reason = S::Reason;
-        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
         type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type Cid = S::Cid;
+        type Author = S::Author;
         type Reason = Set<members::reason>;
-        type IndexedAt = S::IndexedAt;
-        type IsRead = S::IsRead;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
         type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-        type IndexedAt = Set<members::indexed_at>;
         type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = Set<members::record>;
+        type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `is_read` field to Set
     pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsRead<S> {}
     impl<S: State> State for SetIsRead<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type Cid = S::Cid;
+        type Author = S::Author;
         type Reason = S::Reason;
-        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
         type IsRead = Set<members::is_read>;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `reason` field
         pub struct reason(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -619,13 +782,13 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::Record: notification_state::IsSet,
-    S::Uri: notification_state::IsSet,
-    S::Author: notification_state::IsSet,
     S::Cid: notification_state::IsSet,
+    S::Author: notification_state::IsSet,
     S::Reason: notification_state::IsSet,
-    S::IndexedAt: notification_state::IsSet,
+    S::Record: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
+    S::IndexedAt: notification_state::IsSet,
+    S::Uri: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -661,152 +824,6 @@ where
             record: self.__unsafe_private_named.7.unwrap(),
             uri: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NotificationReason<'a> {
-    Like,
-    Repost,
-    Follow,
-    Mention,
-    Reply,
-    Quote,
-    StarterpackJoined,
-    Verified,
-    Unverified,
-    LikeViaRepost,
-    RepostViaRepost,
-    SubscribedPost,
-    ContactMatch,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> NotificationReason<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Like => "like",
-            Self::Repost => "repost",
-            Self::Follow => "follow",
-            Self::Mention => "mention",
-            Self::Reply => "reply",
-            Self::Quote => "quote",
-            Self::StarterpackJoined => "starterpack-joined",
-            Self::Verified => "verified",
-            Self::Unverified => "unverified",
-            Self::LikeViaRepost => "like-via-repost",
-            Self::RepostViaRepost => "repost-via-repost",
-            Self::SubscribedPost => "subscribed-post",
-            Self::ContactMatch => "contact-match",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for NotificationReason<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "like" => Self::Like,
-            "repost" => Self::Repost,
-            "follow" => Self::Follow,
-            "mention" => Self::Mention,
-            "reply" => Self::Reply,
-            "quote" => Self::Quote,
-            "starterpack-joined" => Self::StarterpackJoined,
-            "verified" => Self::Verified,
-            "unverified" => Self::Unverified,
-            "like-via-repost" => Self::LikeViaRepost,
-            "repost-via-repost" => Self::RepostViaRepost,
-            "subscribed-post" => Self::SubscribedPost,
-            "contact-match" => Self::ContactMatch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for NotificationReason<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "like" => Self::Like,
-            "repost" => Self::Repost,
-            "follow" => Self::Follow,
-            "mention" => Self::Mention,
-            "reply" => Self::Reply,
-            "quote" => Self::Quote,
-            "starterpack-joined" => Self::StarterpackJoined,
-            "verified" => Self::Verified,
-            "unverified" => Self::Unverified,
-            "like-via-repost" => Self::LikeViaRepost,
-            "repost-via-repost" => Self::RepostViaRepost,
-            "subscribed-post" => Self::SubscribedPost,
-            "contact-match" => Self::ContactMatch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for NotificationReason<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for NotificationReason<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for NotificationReason<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for NotificationReason<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for NotificationReason<'_> {
-    type Output = NotificationReason<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            NotificationReason::Like => NotificationReason::Like,
-            NotificationReason::Repost => NotificationReason::Repost,
-            NotificationReason::Follow => NotificationReason::Follow,
-            NotificationReason::Mention => NotificationReason::Mention,
-            NotificationReason::Reply => NotificationReason::Reply,
-            NotificationReason::Quote => NotificationReason::Quote,
-            NotificationReason::StarterpackJoined => {
-                NotificationReason::StarterpackJoined
-            }
-            NotificationReason::Verified => NotificationReason::Verified,
-            NotificationReason::Unverified => NotificationReason::Unverified,
-            NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
-            NotificationReason::RepostViaRepost => NotificationReason::RepostViaRepost,
-            NotificationReason::SubscribedPost => NotificationReason::SubscribedPost,
-            NotificationReason::ContactMatch => NotificationReason::ContactMatch,
-            NotificationReason::Other(v) => NotificationReason::Other(v.into_static()),
         }
     }
 }
@@ -1094,22 +1111,5 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.notification.listNotifications"
-    }
-    fn def_name() -> &'static str {
-        "notification"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_notification_listNotifications()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

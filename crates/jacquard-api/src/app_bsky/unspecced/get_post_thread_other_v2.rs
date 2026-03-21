@@ -20,6 +20,88 @@ pub struct GetPostThreadOtherV2<'a> {
     pub anchor: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostThreadOtherV2Output<'a> {
+    ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
+    #[serde(borrow)]
+    pub thread: Vec<
+        crate::app_bsky::unspecced::get_post_thread_other_v2::ThreadItem<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItem<'a> {
+    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
+    pub depth: i64,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: crate::app_bsky::unspecced::ThreadItemPost<'a>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getPostThreadOtherV2
+pub struct GetPostThreadOtherV2Response;
+impl jacquard_common::xrpc::XrpcResp for GetPostThreadOtherV2Response {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPostThreadOtherV2Output<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadOtherV2<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPostThreadOtherV2Response;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getPostThreadOtherV2
+pub struct GetPostThreadOtherV2Request;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadOtherV2";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPostThreadOtherV2<'de>;
+    type Response = GetPostThreadOtherV2Response;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.getPostThreadOtherV2"
+    }
+    fn def_name() -> &'static str {
+        "threadItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod get_post_thread_other_v2_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -112,71 +194,6 @@ where
             anchor: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPostThreadOtherV2Output<'a> {
-    ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
-    #[serde(borrow)]
-    pub thread: Vec<
-        crate::app_bsky::unspecced::get_post_thread_other_v2::ThreadItem<'a>,
-    >,
-}
-
-/// Response type for
-///app.bsky.unspecced.getPostThreadOtherV2
-pub struct GetPostThreadOtherV2Response;
-impl jacquard_common::xrpc::XrpcResp for GetPostThreadOtherV2Response {
-    const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadOtherV2Output<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadOtherV2<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPostThreadOtherV2Response;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getPostThreadOtherV2
-pub struct GetPostThreadOtherV2Request;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadOtherV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPostThreadOtherV2<'de>;
-    type Response = GetPostThreadOtherV2Response;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItem<'a> {
-    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
-    pub depth: i64,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: crate::app_bsky::unspecced::ThreadItemPost<'a>,
 }
 
 pub mod thread_item_state {
@@ -479,22 +496,5 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.unspecced.getPostThreadOtherV2"
-    }
-    fn def_name() -> &'static str {
-        "threadItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

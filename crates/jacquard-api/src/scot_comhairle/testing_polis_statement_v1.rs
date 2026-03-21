@@ -28,6 +28,135 @@ pub struct TestingPolisStatementV1<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TestingPolisStatementV1GetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: TestingPolisStatementV1<'a>,
+}
+
+/// Reference to a poll record
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PollRef<'a> {
+    ///Content identifier of the poll record
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///AT-URI of the poll record
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> TestingPolisStatementV1<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TestingPolisStatementV1Record>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TestingPolisStatementV1Record;
+impl jacquard_common::xrpc::XrpcResp for TestingPolisStatementV1Record {
+    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TestingPolisStatementV1GetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TestingPolisStatementV1GetRecordOutput<'_>> for TestingPolisStatementV1<'_> {
+    fn from(output: TestingPolisStatementV1GetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for TestingPolisStatementV1<'_> {
+    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
+    type Record = TestingPolisStatementV1Record;
+}
+
+impl jacquard_common::types::collection::Collection for TestingPolisStatementV1Record {
+    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
+    type Record = TestingPolisStatementV1Record;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestingPolisStatementV1<'a> {
+    fn nsid() -> &'static str {
+        "scot.comhairle.testingPolisStatementV1"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_scot_comhairle_testingPolisStatementV1()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.text;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PollRef<'a> {
+    fn nsid() -> &'static str {
+        "scot.comhairle.testingPolisStatementV1"
+    }
+    fn def_name() -> &'static str {
+        "pollRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_scot_comhairle_testingPolisStatementV1()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod testing_polis_statement_v1_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +167,51 @@ pub mod testing_polis_statement_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Text;
         type Poll;
+        type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Text = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
-        type Poll = S::Poll;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = Set<members::text>;
-        type Poll = S::Poll;
+        type Text = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
         type Poll = Set<members::poll>;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Poll = S::Poll;
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Poll = S::Poll;
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -192,9 +321,9 @@ where
 impl<'a, S> TestingPolisStatementV1Builder<'a, S>
 where
     S: testing_polis_statement_v1_state::State,
-    S::CreatedAt: testing_polis_statement_v1_state::IsSet,
-    S::Text: testing_polis_statement_v1_state::IsSet,
     S::Poll: testing_polis_statement_v1_state::IsSet,
+    S::Text: testing_polis_statement_v1_state::IsSet,
+    S::CreatedAt: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisStatementV1<'a> {
@@ -219,97 +348,6 @@ where
             text: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> TestingPolisStatementV1<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TestingPolisStatementV1Record>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TestingPolisStatementV1GetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TestingPolisStatementV1<'a>,
-}
-
-impl From<TestingPolisStatementV1GetRecordOutput<'_>> for TestingPolisStatementV1<'_> {
-    fn from(output: TestingPolisStatementV1GetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for TestingPolisStatementV1<'_> {
-    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
-    type Record = TestingPolisStatementV1Record;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TestingPolisStatementV1Record;
-impl jacquard_common::xrpc::XrpcResp for TestingPolisStatementV1Record {
-    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TestingPolisStatementV1GetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TestingPolisStatementV1Record {
-    const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
-    type Record = TestingPolisStatementV1Record;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestingPolisStatementV1<'a> {
-    fn nsid() -> &'static str {
-        "scot.comhairle.testingPolisStatementV1"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_scot_comhairle_testingPolisStatementV1()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -478,27 +516,6 @@ fn lexicon_doc_scot_comhairle_testingPolisStatementV1() -> ::jacquard_lexicon::l
     }
 }
 
-/// Reference to a poll record
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PollRef<'a> {
-    ///Content identifier of the poll record
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///AT-URI of the poll record
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod poll_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -636,22 +653,5 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PollRef<'a> {
-    fn nsid() -> &'static str {
-        "scot.comhairle.testingPolisStatementV1"
-    }
-    fn def_name() -> &'static str {
-        "pollRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_scot_comhairle_testingPolisStatementV1()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

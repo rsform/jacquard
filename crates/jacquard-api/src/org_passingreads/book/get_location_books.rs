@@ -20,6 +20,52 @@ pub struct GetLocationBooks<'a> {
     pub h3: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLocationBooksOutput<'a> {
+    #[serde(borrow)]
+    pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
+    ///Human-readable name of the requested location
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub location_name: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///org.passingreads.book.getLocationBooks
+pub struct GetLocationBooksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLocationBooksResponse {
+    const NSID: &'static str = "org.passingreads.book.getLocationBooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLocationBooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLocationBooks<'a> {
+    const NSID: &'static str = "org.passingreads.book.getLocationBooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLocationBooksResponse;
+}
+
+/// Endpoint type for
+///org.passingreads.book.getLocationBooks
+pub struct GetLocationBooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
+    const PATH: &'static str = "/xrpc/org.passingreads.book.getLocationBooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLocationBooks<'de>;
+    type Response = GetLocationBooksResponse;
+}
+
 pub mod get_location_books_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,50 +153,4 @@ where
             h3: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLocationBooksOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
-    ///Human-readable name of the requested location
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub location_name: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///org.passingreads.book.getLocationBooks
-pub struct GetLocationBooksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLocationBooksResponse {
-    const NSID: &'static str = "org.passingreads.book.getLocationBooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLocationBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLocationBooks<'a> {
-    const NSID: &'static str = "org.passingreads.book.getLocationBooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLocationBooksResponse;
-}
-
-/// Endpoint type for
-///org.passingreads.book.getLocationBooks
-pub struct GetLocationBooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
-    const PATH: &'static str = "/xrpc/org.passingreads.book.getLocationBooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLocationBooks<'de>;
-    type Response = GetLocationBooksResponse;
 }

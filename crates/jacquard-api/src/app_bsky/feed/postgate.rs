@@ -19,6 +19,156 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableRule<'a> {}
+/// Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Postgate<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///List of AT-URIs embedding this post that the author has detached from.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub detached_embedding_uris: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
+    ///List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embedding_rules: std::option::Option<
+        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
+    >,
+    ///Reference (AT-URI) to the post record.
+    #[serde(borrow)]
+    pub post: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PostgateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Postgate<'a>,
+}
+
+impl<'a> Postgate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PostgateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.postgate"
+    }
+    fn def_name() -> &'static str {
+        "disableRule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_postgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PostgateRecord;
+impl jacquard_common::xrpc::XrpcResp for PostgateRecord {
+    const NSID: &'static str = "app.bsky.feed.postgate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PostgateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
+    fn from(output: PostgateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Postgate<'_> {
+    const NSID: &'static str = "app.bsky.feed.postgate";
+    type Record = PostgateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PostgateRecord {
+    const NSID: &'static str = "app.bsky.feed.postgate";
+    type Record = PostgateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.postgate"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_postgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.detached_embedding_uris {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "detached_embedding_uris",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.embedding_rules {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "embedding_rules",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -168,54 +318,6 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.postgate"
-    }
-    fn def_name() -> &'static str {
-        "disableRule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_postgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Postgate<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///List of AT-URIs embedding this post that the author has detached from.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub detached_embedding_uris: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-    ///List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub embedding_rules: std::option::Option<
-        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
-    >,
-    ///Reference (AT-URI) to the post record.
-    #[serde(borrow)]
-    pub post: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod postgate_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -226,37 +328,37 @@ pub mod postgate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Post;
         type CreatedAt;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Post = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Post = Set<members::post>;
-        type CreatedAt = S::CreatedAt;
+        type Post = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Post = S::Post;
         type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
@@ -369,8 +471,8 @@ where
 impl<'a, S> PostgateBuilder<'a, S>
 where
     S: postgate_state::State,
-    S::Post: postgate_state::IsSet,
     S::CreatedAt: postgate_state::IsSet,
+    S::Post: postgate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Postgate<'a> {
@@ -397,107 +499,5 @@ where
             post: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Postgate<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PostgateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PostgateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Postgate<'a>,
-}
-
-impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
-    fn from(output: PostgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Postgate<'_> {
-    const NSID: &'static str = "app.bsky.feed.postgate";
-    type Record = PostgateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PostgateRecord;
-impl jacquard_common::xrpc::XrpcResp for PostgateRecord {
-    const NSID: &'static str = "app.bsky.feed.postgate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostgateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PostgateRecord {
-    const NSID: &'static str = "app.bsky.feed.postgate";
-    type Record = PostgateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.postgate"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_postgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.detached_embedding_uris {
-            #[allow(unused_comparisons)]
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "detached_embedding_uris",
-                    ),
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.embedding_rules {
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "embedding_rules",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

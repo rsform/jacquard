@@ -37,6 +37,23 @@ pub struct StatsView<'a> {
     pub tracks: std::option::Option<i64>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.stats.defs"
+    }
+    fn def_name() -> &'static str {
+        "statsView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_stats_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -127,22 +144,5 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.stats.defs"
-    }
-    fn def_name() -> &'static str {
-        "statsView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_stats_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

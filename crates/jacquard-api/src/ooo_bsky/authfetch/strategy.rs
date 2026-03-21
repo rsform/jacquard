@@ -37,6 +37,23 @@ Of course, many of these strategies depend on the specifics of `app.bsky.graph.f
     pub name: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strategy<'a> {
+    fn nsid() -> &'static str {
+        "ooo.bsky.authfetch.strategy"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_ooo_bsky_authfetch_strategy()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_ooo_bsky_authfetch_strategy() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -91,22 +108,5 @@ fn lexicon_doc_ooo_bsky_authfetch_strategy() -> ::jacquard_lexicon::lexicon::Lex
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strategy<'a> {
-    fn nsid() -> &'static str {
-        "ooo.bsky.authfetch.strategy"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_ooo_bsky_authfetch_strategy()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

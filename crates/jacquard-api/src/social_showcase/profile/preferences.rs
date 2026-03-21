@@ -36,6 +36,84 @@ pub struct Preferences<'a> {
     pub visibility: crate::social_showcase::VisibilitySettings<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PreferencesGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Preferences<'a>,
+}
+
+impl<'a> Preferences<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PreferencesRecord;
+impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
+    const NSID: &'static str = "social.showcase.profile.preferences";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PreferencesGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
+    fn from(output: PreferencesGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Preferences<'_> {
+    const NSID: &'static str = "social.showcase.profile.preferences";
+    type Record = PreferencesRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PreferencesRecord {
+    const NSID: &'static str = "social.showcase.profile.preferences";
+    type Record = PreferencesRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+    fn nsid() -> &'static str {
+        "social.showcase.profile.preferences"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_showcase_profile_preferences()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_preferences_schema_version() -> std::option::Option<i64> {
     Some(1i64)
 }
@@ -53,8 +131,8 @@ pub mod preferences_state {
         type Privacy;
         type Activity;
         type Visibility;
-        type Notifications;
         type UpdatedAt;
+        type Notifications;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -63,8 +141,8 @@ pub mod preferences_state {
         type Privacy = Unset;
         type Activity = Unset;
         type Visibility = Unset;
-        type Notifications = Unset;
         type UpdatedAt = Unset;
+        type Notifications = Unset;
     }
     ///State transition - sets the `privacy` field to Set
     pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
@@ -73,8 +151,8 @@ pub mod preferences_state {
         type Privacy = Set<members::privacy>;
         type Activity = S::Activity;
         type Visibility = S::Visibility;
-        type Notifications = S::Notifications;
         type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
     }
     ///State transition - sets the `activity` field to Set
     pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
@@ -83,8 +161,8 @@ pub mod preferences_state {
         type Privacy = S::Privacy;
         type Activity = Set<members::activity>;
         type Visibility = S::Visibility;
-        type Notifications = S::Notifications;
         type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
@@ -93,18 +171,8 @@ pub mod preferences_state {
         type Privacy = S::Privacy;
         type Activity = S::Activity;
         type Visibility = Set<members::visibility>;
+        type UpdatedAt = S::UpdatedAt;
         type Notifications = S::Notifications;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `notifications` field to Set
-    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotifications<S> {}
-    impl<S: State> State for SetNotifications<S> {
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
-        type Visibility = S::Visibility;
-        type Notifications = Set<members::notifications>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -113,8 +181,18 @@ pub mod preferences_state {
         type Privacy = S::Privacy;
         type Activity = S::Activity;
         type Visibility = S::Visibility;
-        type Notifications = S::Notifications;
         type UpdatedAt = Set<members::updated_at>;
+        type Notifications = S::Notifications;
+    }
+    ///State transition - sets the `notifications` field to Set
+    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotifications<S> {}
+    impl<S: State> State for SetNotifications<S> {
+        type Privacy = S::Privacy;
+        type Activity = S::Activity;
+        type Visibility = S::Visibility;
+        type UpdatedAt = S::UpdatedAt;
+        type Notifications = Set<members::notifications>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -125,10 +203,10 @@ pub mod preferences_state {
         pub struct activity(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
-        ///Marker type for the `notifications` field
-        pub struct notifications(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `notifications` field
+        pub struct notifications(());
     }
 }
 
@@ -298,8 +376,8 @@ where
     S::Privacy: preferences_state::IsSet,
     S::Activity: preferences_state::IsSet,
     S::Visibility: preferences_state::IsSet,
-    S::Notifications: preferences_state::IsSet,
     S::UpdatedAt: preferences_state::IsSet,
+    S::Notifications: preferences_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preferences<'a> {
@@ -332,84 +410,6 @@ where
             visibility: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Preferences<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PreferencesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Preferences<'a>,
-}
-
-impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
-    fn from(output: PreferencesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Preferences<'_> {
-    const NSID: &'static str = "social.showcase.profile.preferences";
-    type Record = PreferencesRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PreferencesRecord;
-impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
-    const NSID: &'static str = "social.showcase.profile.preferences";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PreferencesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PreferencesRecord {
-    const NSID: &'static str = "social.showcase.profile.preferences";
-    type Record = PreferencesRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
-    fn nsid() -> &'static str {
-        "social.showcase.profile.preferences"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_showcase_profile_preferences()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

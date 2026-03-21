@@ -22,6 +22,84 @@ pub struct Example<'a> {
     pub message2: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExampleGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Example<'a>,
+}
+
+impl<'a> Example<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExampleRecord;
+impl jacquard_common::xrpc::XrpcResp for ExampleRecord {
+    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ExampleGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
+    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Example<'_> {
+    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
+    type Record = ExampleRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ExampleRecord {
+    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
+    type Record = ExampleRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.unconquered-modesto.example"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_unconquered_modesto_example()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod example_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,84 +200,6 @@ where
             message2: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Example<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ExampleRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Example<'a>,
-}
-
-impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
-    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Example<'_> {
-    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
-    type Record = ExampleRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ExampleRecord;
-impl jacquard_common::xrpc::XrpcResp for ExampleRecord {
-    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExampleGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ExampleRecord {
-    const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
-    type Record = ExampleRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.unconquered-modesto.example"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_unconquered_modesto_example()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

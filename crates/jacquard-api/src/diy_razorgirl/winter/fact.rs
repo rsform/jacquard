@@ -41,6 +41,122 @@ pub struct Fact<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FactGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Fact<'a>,
+}
+
+impl<'a> Fact<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, FactRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct FactRecord;
+impl jacquard_common::xrpc::XrpcResp for FactRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.fact";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FactGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<FactGetRecordOutput<'_>> for Fact<'_> {
+    fn from(output: FactGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Fact<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.fact";
+    type Record = FactRecord;
+}
+
+impl jacquard_common::types::collection::Collection for FactRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.fact";
+    type Record = FactRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.fact"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_fact()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.args;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "args",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.predicate;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "predicate",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod fact_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -51,49 +167,49 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Predicate;
         type CreatedAt;
+        type Predicate;
         type Args;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Predicate = Unset;
         type CreatedAt = Unset;
+        type Predicate = Unset;
         type Args = Unset;
-    }
-    ///State transition - sets the `predicate` field to Set
-    pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPredicate<S> {}
-    impl<S: State> State for SetPredicate<S> {
-        type Predicate = Set<members::predicate>;
-        type CreatedAt = S::CreatedAt;
-        type Args = S::Args;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Predicate = S::Predicate;
         type CreatedAt = Set<members::created_at>;
+        type Predicate = S::Predicate;
+        type Args = S::Args;
+    }
+    ///State transition - sets the `predicate` field to Set
+    pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPredicate<S> {}
+    impl<S: State> State for SetPredicate<S> {
+        type CreatedAt = S::CreatedAt;
+        type Predicate = Set<members::predicate>;
         type Args = S::Args;
     }
     ///State transition - sets the `args` field to Set
     pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArgs<S> {}
     impl<S: State> State for SetArgs<S> {
-        type Predicate = S::Predicate;
         type CreatedAt = S::CreatedAt;
+        type Predicate = S::Predicate;
         type Args = Set<members::args>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `predicate` field
-        pub struct predicate(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `predicate` field
+        pub struct predicate(());
         ///Marker type for the `args` field
         pub struct args(());
     }
@@ -285,8 +401,8 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
-    S::Predicate: fact_state::IsSet,
     S::CreatedAt: fact_state::IsSet,
+    S::Predicate: fact_state::IsSet,
     S::Args: fact_state::IsSet,
 {
     /// Build the final struct
@@ -322,122 +438,6 @@ where
             tags: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Fact<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, FactRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FactGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fact<'a>,
-}
-
-impl From<FactGetRecordOutput<'_>> for Fact<'_> {
-    fn from(output: FactGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Fact<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.fact";
-    type Record = FactRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct FactRecord;
-impl jacquard_common::xrpc::XrpcResp for FactRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.fact";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = FactGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for FactRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.fact";
-    type Record = FactRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.fact"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_fact()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.args;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "args",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.predicate;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "predicate",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

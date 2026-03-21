@@ -22,6 +22,96 @@ pub struct GetRepo<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetRepoOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRepoError<'a> {
+    /// The requested repo does not exist or has no commits.
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetRepoError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///zone.stratos.sync.getRepo
+pub struct GetRepoResponse;
+impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
+    const NSID: &'static str = "zone.stratos.sync.getRepo";
+    const ENCODING: &'static str = "application/vnd.ipld.car";
+    type Output<'de> = GetRepoOutput;
+    type Err<'de> = GetRepoError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetRepoOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
+    const NSID: &'static str = "zone.stratos.sync.getRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRepoResponse;
+}
+
+/// Endpoint type for
+///zone.stratos.sync.getRepo
+pub struct GetRepoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {
+    const PATH: &'static str = "/xrpc/zone.stratos.sync.getRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRepo<'de>;
+    type Response = GetRepoResponse;
+}
+
 pub mod get_repo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -132,94 +222,4 @@ where
             since: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetRepoOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRepoError<'a> {
-    /// The requested repo does not exist or has no commits.
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetRepoError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///zone.stratos.sync.getRepo
-pub struct GetRepoResponse;
-impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
-    const NSID: &'static str = "zone.stratos.sync.getRepo";
-    const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRepoOutput;
-    type Err<'de> = GetRepoError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(GetRepoOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
-    const NSID: &'static str = "zone.stratos.sync.getRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetRepoResponse;
-}
-
-/// Endpoint type for
-///zone.stratos.sync.getRepo
-pub struct GetRepoRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {
-    const PATH: &'static str = "/xrpc/zone.stratos.sync.getRepo";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRepo<'de>;
-    type Response = GetRepoResponse;
 }

@@ -32,6 +32,23 @@ pub struct Geo<'a> {
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geo<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.location.geo"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_location_geo()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_community_lexicon_location_geo() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -138,22 +155,5 @@ fn lexicon_doc_community_lexicon_location_geo() -> ::jacquard_lexicon::lexicon::
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geo<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.location.geo"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_location_geo()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

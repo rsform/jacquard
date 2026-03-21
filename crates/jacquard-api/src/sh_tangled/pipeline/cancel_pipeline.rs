@@ -28,6 +28,36 @@ pub struct CancelPipeline<'a> {
     pub workflow: jacquard_common::CowStr<'a>,
 }
 
+/// Response type for
+///sh.tangled.pipeline.cancelPipeline
+pub struct CancelPipelineResponse;
+impl jacquard_common::xrpc::XrpcResp for CancelPipelineResponse {
+    const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CancelPipeline<'a> {
+    const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CancelPipelineResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.pipeline.cancelPipeline
+pub struct CancelPipelineRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CancelPipelineRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.pipeline.cancelPipeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CancelPipeline<'de>;
+    type Response = CancelPipelineResponse;
+}
+
 pub mod cancel_pipeline_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +68,51 @@ pub mod cancel_pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Workflow;
         type Repo;
         type Pipeline;
+        type Workflow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Workflow = Unset;
         type Repo = Unset;
         type Pipeline = Unset;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type Workflow = Set<members::workflow>;
-        type Repo = S::Repo;
-        type Pipeline = S::Pipeline;
+        type Workflow = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Workflow = S::Workflow;
         type Repo = Set<members::repo>;
         type Pipeline = S::Pipeline;
+        type Workflow = S::Workflow;
     }
     ///State transition - sets the `pipeline` field to Set
     pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPipeline<S> {}
     impl<S: State> State for SetPipeline<S> {
-        type Workflow = S::Workflow;
         type Repo = S::Repo;
         type Pipeline = Set<members::pipeline>;
+        type Workflow = S::Workflow;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type Repo = S::Repo;
+        type Pipeline = S::Pipeline;
+        type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `workflow` field
-        pub struct workflow(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
     }
 }
 
@@ -175,9 +205,9 @@ where
 impl<'a, S> CancelPipelineBuilder<'a, S>
 where
     S: cancel_pipeline_state::State,
-    S::Workflow: cancel_pipeline_state::IsSet,
     S::Repo: cancel_pipeline_state::IsSet,
     S::Pipeline: cancel_pipeline_state::IsSet,
+    S::Workflow: cancel_pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancelPipeline<'a> {
@@ -203,34 +233,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.pipeline.cancelPipeline
-pub struct CancelPipelineResponse;
-impl jacquard_common::xrpc::XrpcResp for CancelPipelineResponse {
-    const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CancelPipeline<'a> {
-    const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CancelPipelineResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.pipeline.cancelPipeline
-pub struct CancelPipelineRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CancelPipelineRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.pipeline.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CancelPipeline<'de>;
-    type Response = CancelPipelineResponse;
 }

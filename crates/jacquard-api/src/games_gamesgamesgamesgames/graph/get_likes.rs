@@ -20,6 +20,50 @@ pub struct GetLikes<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetLikesOutput<'a> {
+    ///Total number of likes on this game.
+    pub count: i64,
+    ///Whether the authenticated user has liked this game.
+    pub liked: bool,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.graph.getLikes
+pub struct GetLikesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.graph.getLikes";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetLikesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikes<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.graph.getLikes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetLikesResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.graph.getLikes
+pub struct GetLikesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.getLikes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLikes<'de>;
+    type Response = GetLikesResponse;
+}
+
 pub mod get_likes_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,48 +153,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetLikesOutput<'a> {
-    ///Total number of likes on this game.
-    pub count: i64,
-    ///Whether the authenticated user has liked this game.
-    pub liked: bool,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.graph.getLikes
-pub struct GetLikesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.graph.getLikes";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLikesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikes<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.graph.getLikes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetLikesResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.graph.getLikes
-pub struct GetLikesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.getLikes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLikes<'de>;
-    type Response = GetLikesResponse;
 }

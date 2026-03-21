@@ -67,6 +67,3859 @@ pub struct ActorProfileDetailView<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ActorProfileSummaryView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeRating<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content_descriptors: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(borrow)]
+    pub organization: AgeRatingOrganization<'a>,
+    #[serde(borrow)]
+    pub rating: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AgeRatingOrganization<'a> {
+    Esrb,
+    Pegi,
+    Cero,
+    Usk,
+    Grac,
+    ClassInd,
+    Acb,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AgeRatingOrganization<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Esrb => "esrb",
+            Self::Pegi => "pegi",
+            Self::Cero => "cero",
+            Self::Usk => "usk",
+            Self::Grac => "grac",
+            Self::ClassInd => "classInd",
+            Self::Acb => "acb",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AgeRatingOrganization<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "esrb" => Self::Esrb,
+            "pegi" => Self::Pegi,
+            "cero" => Self::Cero,
+            "usk" => Self::Usk,
+            "grac" => Self::Grac,
+            "classInd" => Self::ClassInd,
+            "acb" => Self::Acb,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AgeRatingOrganization<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "esrb" => Self::Esrb,
+            "pegi" => Self::Pegi,
+            "cero" => Self::Cero,
+            "usk" => Self::Usk,
+            "grac" => Self::Grac,
+            "classInd" => Self::ClassInd,
+            "acb" => Self::Acb,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AgeRatingOrganization<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AgeRatingOrganization<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AgeRatingOrganization<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AgeRatingOrganization<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AgeRatingOrganization<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AgeRatingOrganization<'_> {
+    type Output = AgeRatingOrganization<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AgeRatingOrganization::Esrb => AgeRatingOrganization::Esrb,
+            AgeRatingOrganization::Pegi => AgeRatingOrganization::Pegi,
+            AgeRatingOrganization::Cero => AgeRatingOrganization::Cero,
+            AgeRatingOrganization::Usk => AgeRatingOrganization::Usk,
+            AgeRatingOrganization::Grac => AgeRatingOrganization::Grac,
+            AgeRatingOrganization::ClassInd => AgeRatingOrganization::ClassInd,
+            AgeRatingOrganization::Acb => AgeRatingOrganization::Acb,
+            AgeRatingOrganization::Other(v) => {
+                AgeRatingOrganization::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AlternativeName<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+pub type ApplicationType<'a> = jacquard_common::CowStr<'a>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionSummaryView<'a> {
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<CollectionSummaryViewType<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionSummaryViewType<'a> {
+    Franchise,
+    Series,
+    Curated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CollectionSummaryViewType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Franchise => "franchise",
+            Self::Series => "series",
+            Self::Curated => "curated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CollectionSummaryViewType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "franchise" => Self::Franchise,
+            "series" => Self::Series,
+            "curated" => Self::Curated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CollectionSummaryViewType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "franchise" => Self::Franchise,
+            "series" => Self::Series,
+            "curated" => Self::Curated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CollectionSummaryViewType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CollectionSummaryViewType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CollectionSummaryViewType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CollectionSummaryViewType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CollectionSummaryViewType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CollectionSummaryViewType<'_> {
+    type Output = CollectionSummaryViewType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionSummaryViewType::Franchise => CollectionSummaryViewType::Franchise,
+            CollectionSummaryViewType::Series => CollectionSummaryViewType::Series,
+            CollectionSummaryViewType::Curated => CollectionSummaryViewType::Curated,
+            CollectionSummaryViewType::Other(v) => {
+                CollectionSummaryViewType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CompanyRole<'a> {
+    Developer,
+    Publisher,
+    Porter,
+    Supporter,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CompanyRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Developer => "developer",
+            Self::Publisher => "publisher",
+            Self::Porter => "porter",
+            Self::Supporter => "supporter",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CompanyRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "developer" => Self::Developer,
+            "publisher" => Self::Publisher,
+            "porter" => Self::Porter,
+            "supporter" => Self::Supporter,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CompanyRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "developer" => Self::Developer,
+            "publisher" => Self::Publisher,
+            "porter" => Self::Porter,
+            "supporter" => Self::Supporter,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for CompanyRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for CompanyRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for CompanyRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CompanyRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for CompanyRole<'_> {
+    type Output = CompanyRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CompanyRole::Developer => CompanyRole::Developer,
+            CompanyRole::Publisher => CompanyRole::Publisher,
+            CompanyRole::Porter => CompanyRole::Porter,
+            CompanyRole::Supporter => CompanyRole::Supporter,
+            CompanyRole::Other(v) => CompanyRole::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreditEntry<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub department: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub role: crate::games_gamesgamesgamesgames::IndividualRole<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EngineSummaryView<'a> {
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalIds<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub apple_app_store: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub epic_games: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gog: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub google_play: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub humble_bundle: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub igdb: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub itch_io: std::option::Option<crate::games_gamesgamesgamesgames::ItchIoId<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub nintendo_eshop: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub play_station: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub steam: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub xbox: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalVideo<'a> {
+    #[serde(borrow)]
+    pub platform: ExternalVideoPlatform<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub video_id: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExternalVideoPlatform<'a> {
+    Youtube,
+    Twitch,
+    Vimeo,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ExternalVideoPlatform<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Youtube => "youtube",
+            Self::Twitch => "twitch",
+            Self::Vimeo => "vimeo",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ExternalVideoPlatform<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "youtube" => Self::Youtube,
+            "twitch" => Self::Twitch,
+            "vimeo" => Self::Vimeo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ExternalVideoPlatform<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "youtube" => Self::Youtube,
+            "twitch" => Self::Twitch,
+            "vimeo" => Self::Vimeo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ExternalVideoPlatform<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ExternalVideoPlatform<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ExternalVideoPlatform<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ExternalVideoPlatform<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ExternalVideoPlatform<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ExternalVideoPlatform<'_> {
+    type Output = ExternalVideoPlatform<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExternalVideoPlatform::Youtube => ExternalVideoPlatform::Youtube,
+            ExternalVideoPlatform::Twitch => ExternalVideoPlatform::Twitch,
+            ExternalVideoPlatform::Vimeo => ExternalVideoPlatform::Vimeo,
+            ExternalVideoPlatform::Other(v) => {
+                ExternalVideoPlatform::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GameDetailView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub age_ratings: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub alternative_names: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub application_type: std::option::Option<
+        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collections: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub engines: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub external_ids: std::option::Option<
+        crate::games_gamesgamesgamesgames::ExternalIds<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub language_supports: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub modes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub multiplayer_modes: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
+    >,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub player_perspectives: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub releases: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub storyline: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub time_to_beat: std::option::Option<
+        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
+    >,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub videos: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GameFeedViewItem<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub game: crate::games_gamesgamesgamesgames::GameView<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GameSummaryView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub application_type: std::option::Option<
+        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
+    >,
+    ///Earliest release date as YYYYMMDD integer.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub first_release_date: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GameView<'a> {
+    #[serde(borrow)]
+    pub application_type: crate::games_gamesgamesgamesgames::ApplicationType<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub releases: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::games_gamesgamesgamesgames::ViewerState<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Genre<'a> {
+    Fighting,
+    Music,
+    Platform,
+    PointAndClick,
+    Puzzle,
+    Racing,
+    Rpg,
+    Rts,
+    Shooter,
+    Simulator,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Genre<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Fighting => "fighting",
+            Self::Music => "music",
+            Self::Platform => "platform",
+            Self::PointAndClick => "pointAndClick",
+            Self::Puzzle => "puzzle",
+            Self::Racing => "racing",
+            Self::Rpg => "rpg",
+            Self::Rts => "rts",
+            Self::Shooter => "shooter",
+            Self::Simulator => "simulator",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Genre<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "fighting" => Self::Fighting,
+            "music" => Self::Music,
+            "platform" => Self::Platform,
+            "pointAndClick" => Self::PointAndClick,
+            "puzzle" => Self::Puzzle,
+            "racing" => Self::Racing,
+            "rpg" => Self::Rpg,
+            "rts" => Self::Rts,
+            "shooter" => Self::Shooter,
+            "simulator" => Self::Simulator,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Genre<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "fighting" => Self::Fighting,
+            "music" => Self::Music,
+            "platform" => Self::Platform,
+            "pointAndClick" => Self::PointAndClick,
+            "puzzle" => Self::Puzzle,
+            "racing" => Self::Racing,
+            "rpg" => Self::Rpg,
+            "rts" => Self::Rts,
+            "shooter" => Self::Shooter,
+            "simulator" => Self::Simulator,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Genre<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Genre<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Genre<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Genre<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Genre<'_> {
+    type Output = Genre<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Genre::Fighting => Genre::Fighting,
+            Genre::Music => Genre::Music,
+            Genre::Platform => Genre::Platform,
+            Genre::PointAndClick => Genre::PointAndClick,
+            Genre::Puzzle => Genre::Puzzle,
+            Genre::Racing => Genre::Racing,
+            Genre::Rpg => Genre::Rpg,
+            Genre::Rts => Genre::Rts,
+            Genre::Shooter => Genre::Shooter,
+            Genre::Simulator => Genre::Simulator,
+            Genre::Other(v) => Genre::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum IndividualRole<'a> {
+    Director,
+    Producer,
+    Designer,
+    Programmer,
+    Artist,
+    Animator,
+    Writer,
+    Composer,
+    SoundDesigner,
+    VoiceActor,
+    Qa,
+    Localization,
+    CommunityManager,
+    Marketing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> IndividualRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Director => "director",
+            Self::Producer => "producer",
+            Self::Designer => "designer",
+            Self::Programmer => "programmer",
+            Self::Artist => "artist",
+            Self::Animator => "animator",
+            Self::Writer => "writer",
+            Self::Composer => "composer",
+            Self::SoundDesigner => "soundDesigner",
+            Self::VoiceActor => "voiceActor",
+            Self::Qa => "qa",
+            Self::Localization => "localization",
+            Self::CommunityManager => "communityManager",
+            Self::Marketing => "marketing",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for IndividualRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "director" => Self::Director,
+            "producer" => Self::Producer,
+            "designer" => Self::Designer,
+            "programmer" => Self::Programmer,
+            "artist" => Self::Artist,
+            "animator" => Self::Animator,
+            "writer" => Self::Writer,
+            "composer" => Self::Composer,
+            "soundDesigner" => Self::SoundDesigner,
+            "voiceActor" => Self::VoiceActor,
+            "qa" => Self::Qa,
+            "localization" => Self::Localization,
+            "communityManager" => Self::CommunityManager,
+            "marketing" => Self::Marketing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for IndividualRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "director" => Self::Director,
+            "producer" => Self::Producer,
+            "designer" => Self::Designer,
+            "programmer" => Self::Programmer,
+            "artist" => Self::Artist,
+            "animator" => Self::Animator,
+            "writer" => Self::Writer,
+            "composer" => Self::Composer,
+            "soundDesigner" => Self::SoundDesigner,
+            "voiceActor" => Self::VoiceActor,
+            "qa" => Self::Qa,
+            "localization" => Self::Localization,
+            "communityManager" => Self::CommunityManager,
+            "marketing" => Self::Marketing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for IndividualRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for IndividualRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for IndividualRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for IndividualRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for IndividualRole<'_> {
+    type Output = IndividualRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            IndividualRole::Director => IndividualRole::Director,
+            IndividualRole::Producer => IndividualRole::Producer,
+            IndividualRole::Designer => IndividualRole::Designer,
+            IndividualRole::Programmer => IndividualRole::Programmer,
+            IndividualRole::Artist => IndividualRole::Artist,
+            IndividualRole::Animator => IndividualRole::Animator,
+            IndividualRole::Writer => IndividualRole::Writer,
+            IndividualRole::Composer => IndividualRole::Composer,
+            IndividualRole::SoundDesigner => IndividualRole::SoundDesigner,
+            IndividualRole::VoiceActor => IndividualRole::VoiceActor,
+            IndividualRole::Qa => IndividualRole::Qa,
+            IndividualRole::Localization => IndividualRole::Localization,
+            IndividualRole::CommunityManager => IndividualRole::CommunityManager,
+            IndividualRole::Marketing => IndividualRole::Marketing,
+            IndividualRole::Other(v) => IndividualRole::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ItchIoId<'a> {
+    #[serde(borrow)]
+    pub developer: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub game: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LanguageSupport<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audio: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interface: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub language: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subtitles: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaItem<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub width: std::option::Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Mode<'a> {
+    BattleRoyale,
+    Cooperative,
+    Mmo,
+    Multiplayer,
+    SinglePlayer,
+    SplitScreen,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Mode<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::BattleRoyale => "battleRoyale",
+            Self::Cooperative => "cooperative",
+            Self::Mmo => "mmo",
+            Self::Multiplayer => "multiplayer",
+            Self::SinglePlayer => "singlePlayer",
+            Self::SplitScreen => "splitScreen",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Mode<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "battleRoyale" => Self::BattleRoyale,
+            "cooperative" => Self::Cooperative,
+            "mmo" => Self::Mmo,
+            "multiplayer" => Self::Multiplayer,
+            "singlePlayer" => Self::SinglePlayer,
+            "splitScreen" => Self::SplitScreen,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Mode<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "battleRoyale" => Self::BattleRoyale,
+            "cooperative" => Self::Cooperative,
+            "mmo" => Self::Mmo,
+            "multiplayer" => Self::Multiplayer,
+            "singlePlayer" => Self::SinglePlayer,
+            "splitScreen" => Self::SplitScreen,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Mode<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Mode<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Mode<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Mode<'_> {
+    type Output = Mode<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Mode::BattleRoyale => Mode::BattleRoyale,
+            Mode::Cooperative => Mode::Cooperative,
+            Mode::Mmo => Mode::Mmo,
+            Mode::Multiplayer => Mode::Multiplayer,
+            Mode::SinglePlayer => Mode::SinglePlayer,
+            Mode::SplitScreen => Mode::SplitScreen,
+            Mode::Other(v) => Mode::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MultiplayerMode<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_campaign_coop: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_drop_in: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_lan_coop: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_splitscreen: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_splitscreen_online: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offline_coop_max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offline_max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub online_coop_max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub online_max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OrgProfileDetailView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub country: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founded_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<OrgProfileDetailViewStatus<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub websites: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
+    >,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OrgProfileDetailViewStatus<'a> {
+    Active,
+    Inactive,
+    Merged,
+    Acquired,
+    Defunct,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> OrgProfileDetailViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Inactive => "inactive",
+            Self::Merged => "merged",
+            Self::Acquired => "acquired",
+            Self::Defunct => "defunct",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for OrgProfileDetailViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "active" => Self::Active,
+            "inactive" => Self::Inactive,
+            "merged" => Self::Merged,
+            "acquired" => Self::Acquired,
+            "defunct" => Self::Defunct,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for OrgProfileDetailViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "active" => Self::Active,
+            "inactive" => Self::Inactive,
+            "merged" => Self::Merged,
+            "acquired" => Self::Acquired,
+            "defunct" => Self::Defunct,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for OrgProfileDetailViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for OrgProfileDetailViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for OrgProfileDetailViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for OrgProfileDetailViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for OrgProfileDetailViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for OrgProfileDetailViewStatus<'_> {
+    type Output = OrgProfileDetailViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OrgProfileDetailViewStatus::Active => OrgProfileDetailViewStatus::Active,
+            OrgProfileDetailViewStatus::Inactive => OrgProfileDetailViewStatus::Inactive,
+            OrgProfileDetailViewStatus::Merged => OrgProfileDetailViewStatus::Merged,
+            OrgProfileDetailViewStatus::Acquired => OrgProfileDetailViewStatus::Acquired,
+            OrgProfileDetailViewStatus::Defunct => OrgProfileDetailViewStatus::Defunct,
+            OrgProfileDetailViewStatus::Other(v) => {
+                OrgProfileDetailViewStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OrgProfileSummaryView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlatformCategory<'a> {
+    Console,
+    Portable,
+    Computer,
+    Arcade,
+    OperatingSystem,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PlatformCategory<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Console => "console",
+            Self::Portable => "portable",
+            Self::Computer => "computer",
+            Self::Arcade => "arcade",
+            Self::OperatingSystem => "operatingSystem",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PlatformCategory<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "console" => Self::Console,
+            "portable" => Self::Portable,
+            "computer" => Self::Computer,
+            "arcade" => Self::Arcade,
+            "operatingSystem" => Self::OperatingSystem,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PlatformCategory<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "console" => Self::Console,
+            "portable" => Self::Portable,
+            "computer" => Self::Computer,
+            "arcade" => Self::Arcade,
+            "operatingSystem" => Self::OperatingSystem,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for PlatformCategory<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for PlatformCategory<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for PlatformCategory<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PlatformCategory<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for PlatformCategory<'_> {
+    type Output = PlatformCategory<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PlatformCategory::Console => PlatformCategory::Console,
+            PlatformCategory::Portable => PlatformCategory::Portable,
+            PlatformCategory::Computer => PlatformCategory::Computer,
+            PlatformCategory::Arcade => PlatformCategory::Arcade,
+            PlatformCategory::OperatingSystem => PlatformCategory::OperatingSystem,
+            PlatformCategory::Other(v) => PlatformCategory::Other(v.into_static()),
+        }
+    }
+}
+
+/// Features supported by a game on a specific storefront/platform.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformFeatures<'a> {
+    #[serde(borrow)]
+    pub features: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub platform: PlatformFeaturesPlatform<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlatformFeaturesPlatform<'a> {
+    Steam,
+    Gog,
+    EpicGames,
+    PlayStation,
+    Xbox,
+    NintendoEshop,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PlatformFeaturesPlatform<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Steam => "steam",
+            Self::Gog => "gog",
+            Self::EpicGames => "epicGames",
+            Self::PlayStation => "playStation",
+            Self::Xbox => "xbox",
+            Self::NintendoEshop => "nintendoEshop",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PlatformFeaturesPlatform<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "steam" => Self::Steam,
+            "gog" => Self::Gog,
+            "epicGames" => Self::EpicGames,
+            "playStation" => Self::PlayStation,
+            "xbox" => Self::Xbox,
+            "nintendoEshop" => Self::NintendoEshop,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PlatformFeaturesPlatform<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "steam" => Self::Steam,
+            "gog" => Self::Gog,
+            "epicGames" => Self::EpicGames,
+            "playStation" => Self::PlayStation,
+            "xbox" => Self::Xbox,
+            "nintendoEshop" => Self::NintendoEshop,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for PlatformFeaturesPlatform<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for PlatformFeaturesPlatform<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for PlatformFeaturesPlatform<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PlatformFeaturesPlatform<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for PlatformFeaturesPlatform<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for PlatformFeaturesPlatform<'_> {
+    type Output = PlatformFeaturesPlatform<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PlatformFeaturesPlatform::Steam => PlatformFeaturesPlatform::Steam,
+            PlatformFeaturesPlatform::Gog => PlatformFeaturesPlatform::Gog,
+            PlatformFeaturesPlatform::EpicGames => PlatformFeaturesPlatform::EpicGames,
+            PlatformFeaturesPlatform::PlayStation => {
+                PlatformFeaturesPlatform::PlayStation
+            }
+            PlatformFeaturesPlatform::Xbox => PlatformFeaturesPlatform::Xbox,
+            PlatformFeaturesPlatform::NintendoEshop => {
+                PlatformFeaturesPlatform::NintendoEshop
+            }
+            PlatformFeaturesPlatform::Other(v) => {
+                PlatformFeaturesPlatform::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformSummaryView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub abbreviation: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<
+        crate::games_gamesgamesgamesgames::PlatformCategory<'a>,
+    >,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformVersion<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub connectivity: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cpu: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gpu: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub max_resolution: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlayerPerspective<'a> {
+    Auditory,
+    FirstPerson,
+    Isometric,
+    SideView,
+    Text,
+    ThirdPerson,
+    TopDown,
+    Vr,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PlayerPerspective<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Auditory => "auditory",
+            Self::FirstPerson => "firstPerson",
+            Self::Isometric => "isometric",
+            Self::SideView => "sideView",
+            Self::Text => "text",
+            Self::ThirdPerson => "thirdPerson",
+            Self::TopDown => "topDown",
+            Self::Vr => "vr",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PlayerPerspective<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "auditory" => Self::Auditory,
+            "firstPerson" => Self::FirstPerson,
+            "isometric" => Self::Isometric,
+            "sideView" => Self::SideView,
+            "text" => Self::Text,
+            "thirdPerson" => Self::ThirdPerson,
+            "topDown" => Self::TopDown,
+            "vr" => Self::Vr,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PlayerPerspective<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "auditory" => Self::Auditory,
+            "firstPerson" => Self::FirstPerson,
+            "isometric" => Self::Isometric,
+            "sideView" => Self::SideView,
+            "text" => Self::Text,
+            "thirdPerson" => Self::ThirdPerson,
+            "topDown" => Self::TopDown,
+            "vr" => Self::Vr,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for PlayerPerspective<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for PlayerPerspective<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for PlayerPerspective<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PlayerPerspective<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for PlayerPerspective<'_> {
+    type Output = PlayerPerspective<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PlayerPerspective::Auditory => PlayerPerspective::Auditory,
+            PlayerPerspective::FirstPerson => PlayerPerspective::FirstPerson,
+            PlayerPerspective::Isometric => PlayerPerspective::Isometric,
+            PlayerPerspective::SideView => PlayerPerspective::SideView,
+            PlayerPerspective::Text => PlayerPerspective::Text,
+            PlayerPerspective::ThirdPerson => PlayerPerspective::ThirdPerson,
+            PlayerPerspective::TopDown => PlayerPerspective::TopDown,
+            PlayerPerspective::Vr => PlayerPerspective::Vr,
+            PlayerPerspective::Other(v) => PlayerPerspective::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileSummaryView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub profile_type: ProfileSummaryViewProfileType<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileSummaryViewProfileType<'a> {
+    Actor,
+    Org,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileSummaryViewProfileType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Actor => "actor",
+            Self::Org => "org",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileSummaryViewProfileType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "actor" => Self::Actor,
+            "org" => Self::Org,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileSummaryViewProfileType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "actor" => Self::Actor,
+            "org" => Self::Org,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileSummaryViewProfileType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileSummaryViewProfileType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileSummaryViewProfileType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileSummaryViewProfileType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileSummaryViewProfileType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileSummaryViewProfileType<'_> {
+    type Output = ProfileSummaryViewProfileType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileSummaryViewProfileType::Actor => ProfileSummaryViewProfileType::Actor,
+            ProfileSummaryViewProfileType::Org => ProfileSummaryViewProfileType::Org,
+            ProfileSummaryViewProfileType::Other(v) => {
+                ProfileSummaryViewProfileType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Release<'a> {
+    ///Free-text platform name, used when no platform record exists.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///AT URI of a platform record.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platform_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub release_dates: std::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::ReleaseDate<'a>>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ReleaseDate<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub region: std::option::Option<ReleaseDateRegion<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub released_at: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub released_at_format: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<ReleaseDateStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReleaseDateRegion<'a> {
+    Worldwide,
+    Europe,
+    NorthAmerica,
+    Australia,
+    NewZealand,
+    Japan,
+    China,
+    Asia,
+    Korea,
+    Brazil,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReleaseDateRegion<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Worldwide => "worldwide",
+            Self::Europe => "europe",
+            Self::NorthAmerica => "northAmerica",
+            Self::Australia => "australia",
+            Self::NewZealand => "newZealand",
+            Self::Japan => "japan",
+            Self::China => "china",
+            Self::Asia => "asia",
+            Self::Korea => "korea",
+            Self::Brazil => "brazil",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReleaseDateRegion<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "worldwide" => Self::Worldwide,
+            "europe" => Self::Europe,
+            "northAmerica" => Self::NorthAmerica,
+            "australia" => Self::Australia,
+            "newZealand" => Self::NewZealand,
+            "japan" => Self::Japan,
+            "china" => Self::China,
+            "asia" => Self::Asia,
+            "korea" => Self::Korea,
+            "brazil" => Self::Brazil,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReleaseDateRegion<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "worldwide" => Self::Worldwide,
+            "europe" => Self::Europe,
+            "northAmerica" => Self::NorthAmerica,
+            "australia" => Self::Australia,
+            "newZealand" => Self::NewZealand,
+            "japan" => Self::Japan,
+            "china" => Self::China,
+            "asia" => Self::Asia,
+            "korea" => Self::Korea,
+            "brazil" => Self::Brazil,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ReleaseDateRegion<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ReleaseDateRegion<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ReleaseDateRegion<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateRegion<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ReleaseDateRegion<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ReleaseDateRegion<'_> {
+    type Output = ReleaseDateRegion<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReleaseDateRegion::Worldwide => ReleaseDateRegion::Worldwide,
+            ReleaseDateRegion::Europe => ReleaseDateRegion::Europe,
+            ReleaseDateRegion::NorthAmerica => ReleaseDateRegion::NorthAmerica,
+            ReleaseDateRegion::Australia => ReleaseDateRegion::Australia,
+            ReleaseDateRegion::NewZealand => ReleaseDateRegion::NewZealand,
+            ReleaseDateRegion::Japan => ReleaseDateRegion::Japan,
+            ReleaseDateRegion::China => ReleaseDateRegion::China,
+            ReleaseDateRegion::Asia => ReleaseDateRegion::Asia,
+            ReleaseDateRegion::Korea => ReleaseDateRegion::Korea,
+            ReleaseDateRegion::Brazil => ReleaseDateRegion::Brazil,
+            ReleaseDateRegion::Other(v) => ReleaseDateRegion::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReleaseDateStatus<'a> {
+    AdvancedAccess,
+    Alpha,
+    Beta,
+    Cancelled,
+    DigitalCompatibilityRelease,
+    EarlyAccess,
+    NextGenOptimizationRelease,
+    Offline,
+    Release,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReleaseDateStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AdvancedAccess => "advancedAccess",
+            Self::Alpha => "alpha",
+            Self::Beta => "beta",
+            Self::Cancelled => "cancelled",
+            Self::DigitalCompatibilityRelease => "digitalCompatibilityRelease",
+            Self::EarlyAccess => "earlyAccess",
+            Self::NextGenOptimizationRelease => "nextGenOptimizationRelease",
+            Self::Offline => "offline",
+            Self::Release => "release",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReleaseDateStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "advancedAccess" => Self::AdvancedAccess,
+            "alpha" => Self::Alpha,
+            "beta" => Self::Beta,
+            "cancelled" => Self::Cancelled,
+            "digitalCompatibilityRelease" => Self::DigitalCompatibilityRelease,
+            "earlyAccess" => Self::EarlyAccess,
+            "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
+            "offline" => Self::Offline,
+            "release" => Self::Release,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReleaseDateStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "advancedAccess" => Self::AdvancedAccess,
+            "alpha" => Self::Alpha,
+            "beta" => Self::Beta,
+            "cancelled" => Self::Cancelled,
+            "digitalCompatibilityRelease" => Self::DigitalCompatibilityRelease,
+            "earlyAccess" => Self::EarlyAccess,
+            "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
+            "offline" => Self::Offline,
+            "release" => Self::Release,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ReleaseDateStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ReleaseDateStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ReleaseDateStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ReleaseDateStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ReleaseDateStatus<'_> {
+    type Output = ReleaseDateStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReleaseDateStatus::AdvancedAccess => ReleaseDateStatus::AdvancedAccess,
+            ReleaseDateStatus::Alpha => ReleaseDateStatus::Alpha,
+            ReleaseDateStatus::Beta => ReleaseDateStatus::Beta,
+            ReleaseDateStatus::Cancelled => ReleaseDateStatus::Cancelled,
+            ReleaseDateStatus::DigitalCompatibilityRelease => {
+                ReleaseDateStatus::DigitalCompatibilityRelease
+            }
+            ReleaseDateStatus::EarlyAccess => ReleaseDateStatus::EarlyAccess,
+            ReleaseDateStatus::NextGenOptimizationRelease => {
+                ReleaseDateStatus::NextGenOptimizationRelease
+            }
+            ReleaseDateStatus::Offline => ReleaseDateStatus::Offline,
+            ReleaseDateStatus::Release => ReleaseDateStatus::Release,
+            ReleaseDateStatus::Other(v) => ReleaseDateStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonGameFeedItem<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub game: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// System requirements for a game on a specific platform.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SystemRequirements<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub minimum: std::option::Option<crate::games_gamesgamesgamesgames::SystemSpec<'a>>,
+    #[serde(borrow)]
+    pub platform: SystemRequirementsPlatform<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub recommended: std::option::Option<
+        crate::games_gamesgamesgamesgames::SystemSpec<'a>,
+    >,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SystemRequirementsPlatform<'a> {
+    Windows,
+    Mac,
+    Linux,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SystemRequirementsPlatform<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Windows => "windows",
+            Self::Mac => "mac",
+            Self::Linux => "linux",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SystemRequirementsPlatform<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "windows" => Self::Windows,
+            "mac" => Self::Mac,
+            "linux" => Self::Linux,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SystemRequirementsPlatform<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "windows" => Self::Windows,
+            "mac" => Self::Mac,
+            "linux" => Self::Linux,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SystemRequirementsPlatform<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SystemRequirementsPlatform<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SystemRequirementsPlatform<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SystemRequirementsPlatform<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SystemRequirementsPlatform<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SystemRequirementsPlatform<'_> {
+    type Output = SystemRequirementsPlatform<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SystemRequirementsPlatform::Windows => SystemRequirementsPlatform::Windows,
+            SystemRequirementsPlatform::Mac => SystemRequirementsPlatform::Mac,
+            SystemRequirementsPlatform::Linux => SystemRequirementsPlatform::Linux,
+            SystemRequirementsPlatform::Other(v) => {
+                SystemRequirementsPlatform::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Hardware/software specification for a platform.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SystemSpec<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub additional_notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub directx: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub graphics: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub processor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sound_card: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Theme<'a> {
+    _4x,
+    Action,
+    Business,
+    Comedy,
+    Drama,
+    Educational,
+    Erotic,
+    Fantasy,
+    Historical,
+    Horror,
+    Kids,
+    Mystery,
+    Nonfiction,
+    OpenWorld,
+    Party,
+    Romance,
+    Sandbox,
+    Scifi,
+    Stealth,
+    Survival,
+    Thriller,
+    Warfare,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> Theme<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_4x => "4x",
+            Self::Action => "action",
+            Self::Business => "business",
+            Self::Comedy => "comedy",
+            Self::Drama => "drama",
+            Self::Educational => "educational",
+            Self::Erotic => "erotic",
+            Self::Fantasy => "fantasy",
+            Self::Historical => "historical",
+            Self::Horror => "horror",
+            Self::Kids => "kids",
+            Self::Mystery => "mystery",
+            Self::Nonfiction => "nonfiction",
+            Self::OpenWorld => "openWorld",
+            Self::Party => "party",
+            Self::Romance => "romance",
+            Self::Sandbox => "sandbox",
+            Self::Scifi => "scifi",
+            Self::Stealth => "stealth",
+            Self::Survival => "survival",
+            Self::Thriller => "thriller",
+            Self::Warfare => "warfare",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for Theme<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "4x" => Self::_4x,
+            "action" => Self::Action,
+            "business" => Self::Business,
+            "comedy" => Self::Comedy,
+            "drama" => Self::Drama,
+            "educational" => Self::Educational,
+            "erotic" => Self::Erotic,
+            "fantasy" => Self::Fantasy,
+            "historical" => Self::Historical,
+            "horror" => Self::Horror,
+            "kids" => Self::Kids,
+            "mystery" => Self::Mystery,
+            "nonfiction" => Self::Nonfiction,
+            "openWorld" => Self::OpenWorld,
+            "party" => Self::Party,
+            "romance" => Self::Romance,
+            "sandbox" => Self::Sandbox,
+            "scifi" => Self::Scifi,
+            "stealth" => Self::Stealth,
+            "survival" => Self::Survival,
+            "thriller" => Self::Thriller,
+            "warfare" => Self::Warfare,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for Theme<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "4x" => Self::_4x,
+            "action" => Self::Action,
+            "business" => Self::Business,
+            "comedy" => Self::Comedy,
+            "drama" => Self::Drama,
+            "educational" => Self::Educational,
+            "erotic" => Self::Erotic,
+            "fantasy" => Self::Fantasy,
+            "historical" => Self::Historical,
+            "horror" => Self::Horror,
+            "kids" => Self::Kids,
+            "mystery" => Self::Mystery,
+            "nonfiction" => Self::Nonfiction,
+            "openWorld" => Self::OpenWorld,
+            "party" => Self::Party,
+            "romance" => Self::Romance,
+            "sandbox" => Self::Sandbox,
+            "scifi" => Self::Scifi,
+            "stealth" => Self::Stealth,
+            "survival" => Self::Survival,
+            "thriller" => Self::Thriller,
+            "warfare" => Self::Warfare,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> AsRef<str> for Theme<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for Theme<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> serde::Serialize for Theme<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for Theme<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for Theme<'_> {
+    type Output = Theme<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Theme::_4x => Theme::_4x,
+            Theme::Action => Theme::Action,
+            Theme::Business => Theme::Business,
+            Theme::Comedy => Theme::Comedy,
+            Theme::Drama => Theme::Drama,
+            Theme::Educational => Theme::Educational,
+            Theme::Erotic => Theme::Erotic,
+            Theme::Fantasy => Theme::Fantasy,
+            Theme::Historical => Theme::Historical,
+            Theme::Horror => Theme::Horror,
+            Theme::Kids => Theme::Kids,
+            Theme::Mystery => Theme::Mystery,
+            Theme::Nonfiction => Theme::Nonfiction,
+            Theme::OpenWorld => Theme::OpenWorld,
+            Theme::Party => Theme::Party,
+            Theme::Romance => Theme::Romance,
+            Theme::Sandbox => Theme::Sandbox,
+            Theme::Scifi => Theme::Scifi,
+            Theme::Stealth => Theme::Stealth,
+            Theme::Survival => Theme::Survival,
+            Theme::Thriller => Theme::Thriller,
+            Theme::Warfare => Theme::Warfare,
+            Theme::Other(v) => Theme::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TimeToBeat<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub completely: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hastily: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub normally: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerState<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Website<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<WebsiteType<'a>>,
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WebsiteType<'a> {
+    Official,
+    Wiki,
+    Steam,
+    Gog,
+    EpicGames,
+    ItchIo,
+    Twitter,
+    Instagram,
+    Youtube,
+    Twitch,
+    Discord,
+    Reddit,
+    Facebook,
+    Wikipedia,
+    Bluesky,
+    Xbox,
+    Playstation,
+    Nintendo,
+    Meta,
+    Other,
+    UnknownValue(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WebsiteType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Official => "official",
+            Self::Wiki => "wiki",
+            Self::Steam => "steam",
+            Self::Gog => "gog",
+            Self::EpicGames => "epicGames",
+            Self::ItchIo => "itchIo",
+            Self::Twitter => "twitter",
+            Self::Instagram => "instagram",
+            Self::Youtube => "youtube",
+            Self::Twitch => "twitch",
+            Self::Discord => "discord",
+            Self::Reddit => "reddit",
+            Self::Facebook => "facebook",
+            Self::Wikipedia => "wikipedia",
+            Self::Bluesky => "bluesky",
+            Self::Xbox => "xbox",
+            Self::Playstation => "playstation",
+            Self::Nintendo => "nintendo",
+            Self::Meta => "meta",
+            Self::Other => "other",
+            Self::UnknownValue(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WebsiteType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "official" => Self::Official,
+            "wiki" => Self::Wiki,
+            "steam" => Self::Steam,
+            "gog" => Self::Gog,
+            "epicGames" => Self::EpicGames,
+            "itchIo" => Self::ItchIo,
+            "twitter" => Self::Twitter,
+            "instagram" => Self::Instagram,
+            "youtube" => Self::Youtube,
+            "twitch" => Self::Twitch,
+            "discord" => Self::Discord,
+            "reddit" => Self::Reddit,
+            "facebook" => Self::Facebook,
+            "wikipedia" => Self::Wikipedia,
+            "bluesky" => Self::Bluesky,
+            "xbox" => Self::Xbox,
+            "playstation" => Self::Playstation,
+            "nintendo" => Self::Nintendo,
+            "meta" => Self::Meta,
+            "other" => Self::Other,
+            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WebsiteType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "official" => Self::Official,
+            "wiki" => Self::Wiki,
+            "steam" => Self::Steam,
+            "gog" => Self::Gog,
+            "epicGames" => Self::EpicGames,
+            "itchIo" => Self::ItchIo,
+            "twitter" => Self::Twitter,
+            "instagram" => Self::Instagram,
+            "youtube" => Self::Youtube,
+            "twitch" => Self::Twitch,
+            "discord" => Self::Discord,
+            "reddit" => Self::Reddit,
+            "facebook" => Self::Facebook,
+            "wikipedia" => Self::Wikipedia,
+            "bluesky" => Self::Bluesky,
+            "xbox" => Self::Xbox,
+            "playstation" => Self::Playstation,
+            "nintendo" => Self::Nintendo,
+            "meta" => Self::Meta,
+            "other" => Self::Other,
+            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WebsiteType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WebsiteType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WebsiteType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WebsiteType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WebsiteType<'a> {
+    fn default() -> Self {
+        Self::UnknownValue(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WebsiteType<'_> {
+    type Output = WebsiteType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WebsiteType::Official => WebsiteType::Official,
+            WebsiteType::Wiki => WebsiteType::Wiki,
+            WebsiteType::Steam => WebsiteType::Steam,
+            WebsiteType::Gog => WebsiteType::Gog,
+            WebsiteType::EpicGames => WebsiteType::EpicGames,
+            WebsiteType::ItchIo => WebsiteType::ItchIo,
+            WebsiteType::Twitter => WebsiteType::Twitter,
+            WebsiteType::Instagram => WebsiteType::Instagram,
+            WebsiteType::Youtube => WebsiteType::Youtube,
+            WebsiteType::Twitch => WebsiteType::Twitch,
+            WebsiteType::Discord => WebsiteType::Discord,
+            WebsiteType::Reddit => WebsiteType::Reddit,
+            WebsiteType::Facebook => WebsiteType::Facebook,
+            WebsiteType::Wikipedia => WebsiteType::Wikipedia,
+            WebsiteType::Bluesky => WebsiteType::Bluesky,
+            WebsiteType::Xbox => WebsiteType::Xbox,
+            WebsiteType::Playstation => WebsiteType::Playstation,
+            WebsiteType::Nintendo => WebsiteType::Nintendo,
+            WebsiteType::Meta => WebsiteType::Meta,
+            WebsiteType::Other => WebsiteType::Other,
+            WebsiteType::UnknownValue(v) => WebsiteType::UnknownValue(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileDetailView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "actorProfileDetailView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.pronouns {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pronouns",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "actorProfileSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeRating<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "ageRating"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AlternativeName<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "alternativeName"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "collectionSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreditEntry<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "creditEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.department {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "department",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EngineSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "engineSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalIds<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "externalIds"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalVideo<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "externalVideo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameDetailView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "gameDetailView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameFeedViewItem<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "gameFeedViewItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.feed_context {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_context",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "gameSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "gameView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.like_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "like_count",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItchIoId<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "itchIoId"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LanguageSupport<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "languageSupport"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaItem<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "mediaItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.blob {
+            {
+                let size = value.blob().size;
+                if size > 200000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 200000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.blob {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*", "video/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["image/*".to_string(), "video/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiplayerMode<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "multiplayerMode"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileDetailView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "orgProfileDetailView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 3000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "orgProfileSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformFeatures<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "platformFeatures"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "platformSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformVersion<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "platformVersion"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileSummaryView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "profileSummaryView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.avatar {
+            {
+                let size = value.blob().size;
+                if size > 10000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        max: 10000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.avatar {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "avatar",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "release"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseDate<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "releaseDate"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonGameFeedItem<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "skeletonGameFeedItem"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.feed_context {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_context",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemRequirements<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "systemRequirements"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemSpec<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "systemSpec"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimeToBeat<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "timeToBeat"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "viewerState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Website<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "website"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod actor_profile_detail_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -77,37 +3930,37 @@ pub mod actor_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Uri;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Uri = S::Uri;
+        type Did = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
         type Uri = Set<members::uri>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Uri = S::Uri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -351,8 +4204,8 @@ impl<
 impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
 where
     S: actor_profile_detail_view_state::State,
-    S::Did: actor_profile_detail_view_state::IsSet,
     S::Uri: actor_profile_detail_view_state::IsSet,
+    S::Did: actor_profile_detail_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActorProfileDetailView<'a> {
@@ -3946,127 +7799,6 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileDetailView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "actorProfileDetailView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.pronouns {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pronouns",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ActorProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod actor_profile_summary_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -4077,37 +7809,37 @@ pub mod actor_profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
         type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -4238,8 +7970,8 @@ where
 impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
 where
     S: actor_profile_summary_view_state::State,
-    S::Uri: actor_profile_summary_view_state::IsSet,
     S::Did: actor_profile_summary_view_state::IsSet,
+    S::Uri: actor_profile_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActorProfileSummaryView<'a> {
@@ -4267,298 +7999,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "actorProfileSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AgeRating<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content_descriptors: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(borrow)]
-    pub organization: AgeRatingOrganization<'a>,
-    #[serde(borrow)]
-    pub rating: jacquard_common::CowStr<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AgeRatingOrganization<'a> {
-    Esrb,
-    Pegi,
-    Cero,
-    Usk,
-    Grac,
-    ClassInd,
-    Acb,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> AgeRatingOrganization<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Esrb => "esrb",
-            Self::Pegi => "pegi",
-            Self::Cero => "cero",
-            Self::Usk => "usk",
-            Self::Grac => "grac",
-            Self::ClassInd => "classInd",
-            Self::Acb => "acb",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AgeRatingOrganization<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "esrb" => Self::Esrb,
-            "pegi" => Self::Pegi,
-            "cero" => Self::Cero,
-            "usk" => Self::Usk,
-            "grac" => Self::Grac,
-            "classInd" => Self::ClassInd,
-            "acb" => Self::Acb,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for AgeRatingOrganization<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "esrb" => Self::Esrb,
-            "pegi" => Self::Pegi,
-            "cero" => Self::Cero,
-            "usk" => Self::Usk,
-            "grac" => Self::Grac,
-            "classInd" => Self::ClassInd,
-            "acb" => Self::Acb,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AgeRatingOrganization<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for AgeRatingOrganization<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for AgeRatingOrganization<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for AgeRatingOrganization<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for AgeRatingOrganization<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for AgeRatingOrganization<'_> {
-    type Output = AgeRatingOrganization<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AgeRatingOrganization::Esrb => AgeRatingOrganization::Esrb,
-            AgeRatingOrganization::Pegi => AgeRatingOrganization::Pegi,
-            AgeRatingOrganization::Cero => AgeRatingOrganization::Cero,
-            AgeRatingOrganization::Usk => AgeRatingOrganization::Usk,
-            AgeRatingOrganization::Grac => AgeRatingOrganization::Grac,
-            AgeRatingOrganization::ClassInd => AgeRatingOrganization::ClassInd,
-            AgeRatingOrganization::Acb => AgeRatingOrganization::Acb,
-            AgeRatingOrganization::Other(v) => {
-                AgeRatingOrganization::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeRating<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "ageRating"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AlternativeName<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AlternativeName<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "alternativeName"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-pub type ApplicationType<'a> = jacquard_common::CowStr<'a>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionSummaryView<'a> {
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<CollectionSummaryViewType<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod collection_summary_view_state {
@@ -4742,229 +8182,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionSummaryViewType<'a> {
-    Franchise,
-    Series,
-    Curated,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CollectionSummaryViewType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Franchise => "franchise",
-            Self::Series => "series",
-            Self::Curated => "curated",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CollectionSummaryViewType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CollectionSummaryViewType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CollectionSummaryViewType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CollectionSummaryViewType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CollectionSummaryViewType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CollectionSummaryViewType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CollectionSummaryViewType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CollectionSummaryViewType<'_> {
-    type Output = CollectionSummaryViewType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CollectionSummaryViewType::Franchise => CollectionSummaryViewType::Franchise,
-            CollectionSummaryViewType::Series => CollectionSummaryViewType::Series,
-            CollectionSummaryViewType::Curated => CollectionSummaryViewType::Curated,
-            CollectionSummaryViewType::Other(v) => {
-                CollectionSummaryViewType::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "collectionSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CompanyRole<'a> {
-    Developer,
-    Publisher,
-    Porter,
-    Supporter,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CompanyRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Developer => "developer",
-            Self::Publisher => "publisher",
-            Self::Porter => "porter",
-            Self::Supporter => "supporter",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CompanyRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "developer" => Self::Developer,
-            "publisher" => Self::Publisher,
-            "porter" => Self::Porter,
-            "supporter" => Self::Supporter,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CompanyRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "developer" => Self::Developer,
-            "publisher" => Self::Publisher,
-            "porter" => Self::Porter,
-            "supporter" => Self::Supporter,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for CompanyRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for CompanyRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for CompanyRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CompanyRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for CompanyRole<'_> {
-    type Output = CompanyRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CompanyRole::Developer => CompanyRole::Developer,
-            CompanyRole::Publisher => CompanyRole::Publisher,
-            CompanyRole::Porter => CompanyRole::Porter,
-            CompanyRole::Supporter => CompanyRole::Supporter,
-            CompanyRole::Other(v) => CompanyRole::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreditEntry<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub department: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub role: crate::games_gamesgamesgamesgames::IndividualRole<'a>,
-}
-
 pub mod credit_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5092,56 +8309,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreditEntry<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "creditEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.department {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "department",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EngineSummaryView<'a> {
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod engine_summary_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -5152,37 +8319,37 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -5272,8 +8439,8 @@ where
 impl<'a, S> EngineSummaryViewBuilder<'a, S>
 where
     S: engine_summary_view_state::State,
-    S::Name: engine_summary_view_state::IsSet,
     S::Uri: engine_summary_view_state::IsSet,
+    S::Name: engine_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EngineSummaryView<'a> {
@@ -5299,333 +8466,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EngineSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "engineSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalIds<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub apple_app_store: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub epic_games: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gog: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub google_play: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub humble_bundle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub igdb: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub itch_io: std::option::Option<crate::games_gamesgamesgamesgames::ItchIoId<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub nintendo_eshop: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub play_station: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub steam: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub xbox: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalIds<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "externalIds"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalVideo<'a> {
-    #[serde(borrow)]
-    pub platform: ExternalVideoPlatform<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub video_id: jacquard_common::CowStr<'a>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ExternalVideoPlatform<'a> {
-    Youtube,
-    Twitch,
-    Vimeo,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ExternalVideoPlatform<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Youtube => "youtube",
-            Self::Twitch => "twitch",
-            Self::Vimeo => "vimeo",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ExternalVideoPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "vimeo" => Self::Vimeo,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ExternalVideoPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "vimeo" => Self::Vimeo,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ExternalVideoPlatform<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ExternalVideoPlatform<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ExternalVideoPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ExternalVideoPlatform<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ExternalVideoPlatform<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ExternalVideoPlatform<'_> {
-    type Output = ExternalVideoPlatform<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ExternalVideoPlatform::Youtube => ExternalVideoPlatform::Youtube,
-            ExternalVideoPlatform::Twitch => ExternalVideoPlatform::Twitch,
-            ExternalVideoPlatform::Vimeo => ExternalVideoPlatform::Vimeo,
-            ExternalVideoPlatform::Other(v) => {
-                ExternalVideoPlatform::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalVideo<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "externalVideo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GameDetailView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub age_ratings: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_names: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub application_type: std::option::Option<
-        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub engines: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub external_ids: std::option::Option<
-        crate::games_gamesgamesgamesgames::ExternalIds<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub language_supports: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub modes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub multiplayer_modes: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
-    >,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub player_perspectives: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub releases: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub storyline: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub time_to_beat: std::option::Option<
-        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
-    >,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub videos: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub websites: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
 }
 
 pub mod game_detail_view_state {
@@ -6352,42 +9192,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameDetailView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "gameDetailView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GameFeedViewItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub game: crate::games_gamesgamesgamesgames::GameView<'a>,
-}
-
 pub mod game_feed_view_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -6513,72 +9317,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameFeedViewItem<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "gameFeedViewItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.feed_context {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_context",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GameSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub application_type: std::option::Option<
-        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    >,
-    ///Earliest release date as YYYYMMDD integer.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub first_release_date: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod game_summary_view_state {
@@ -6817,70 +9555,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "gameSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GameView<'a> {
-    #[serde(borrow)]
-    pub application_type: crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub releases: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::games_gamesgamesgamesgames::ViewerState<'a>>,
 }
 
 pub mod game_view_state {
@@ -7236,677 +9910,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "gameView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.like_count {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "like_count",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Genre<'a> {
-    Fighting,
-    Music,
-    Platform,
-    PointAndClick,
-    Puzzle,
-    Racing,
-    Rpg,
-    Rts,
-    Shooter,
-    Simulator,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Genre<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Fighting => "fighting",
-            Self::Music => "music",
-            Self::Platform => "platform",
-            Self::PointAndClick => "pointAndClick",
-            Self::Puzzle => "puzzle",
-            Self::Racing => "racing",
-            Self::Rpg => "rpg",
-            Self::Rts => "rts",
-            Self::Shooter => "shooter",
-            Self::Simulator => "simulator",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Genre<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "fighting" => Self::Fighting,
-            "music" => Self::Music,
-            "platform" => Self::Platform,
-            "pointAndClick" => Self::PointAndClick,
-            "puzzle" => Self::Puzzle,
-            "racing" => Self::Racing,
-            "rpg" => Self::Rpg,
-            "rts" => Self::Rts,
-            "shooter" => Self::Shooter,
-            "simulator" => Self::Simulator,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Genre<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "fighting" => Self::Fighting,
-            "music" => Self::Music,
-            "platform" => Self::Platform,
-            "pointAndClick" => Self::PointAndClick,
-            "puzzle" => Self::Puzzle,
-            "racing" => Self::Racing,
-            "rpg" => Self::Rpg,
-            "rts" => Self::Rts,
-            "shooter" => Self::Shooter,
-            "simulator" => Self::Simulator,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Genre<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Genre<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Genre<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Genre<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Genre<'_> {
-    type Output = Genre<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Genre::Fighting => Genre::Fighting,
-            Genre::Music => Genre::Music,
-            Genre::Platform => Genre::Platform,
-            Genre::PointAndClick => Genre::PointAndClick,
-            Genre::Puzzle => Genre::Puzzle,
-            Genre::Racing => Genre::Racing,
-            Genre::Rpg => Genre::Rpg,
-            Genre::Rts => Genre::Rts,
-            Genre::Shooter => Genre::Shooter,
-            Genre::Simulator => Genre::Simulator,
-            Genre::Other(v) => Genre::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum IndividualRole<'a> {
-    Director,
-    Producer,
-    Designer,
-    Programmer,
-    Artist,
-    Animator,
-    Writer,
-    Composer,
-    SoundDesigner,
-    VoiceActor,
-    Qa,
-    Localization,
-    CommunityManager,
-    Marketing,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> IndividualRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Director => "director",
-            Self::Producer => "producer",
-            Self::Designer => "designer",
-            Self::Programmer => "programmer",
-            Self::Artist => "artist",
-            Self::Animator => "animator",
-            Self::Writer => "writer",
-            Self::Composer => "composer",
-            Self::SoundDesigner => "soundDesigner",
-            Self::VoiceActor => "voiceActor",
-            Self::Qa => "qa",
-            Self::Localization => "localization",
-            Self::CommunityManager => "communityManager",
-            Self::Marketing => "marketing",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for IndividualRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "director" => Self::Director,
-            "producer" => Self::Producer,
-            "designer" => Self::Designer,
-            "programmer" => Self::Programmer,
-            "artist" => Self::Artist,
-            "animator" => Self::Animator,
-            "writer" => Self::Writer,
-            "composer" => Self::Composer,
-            "soundDesigner" => Self::SoundDesigner,
-            "voiceActor" => Self::VoiceActor,
-            "qa" => Self::Qa,
-            "localization" => Self::Localization,
-            "communityManager" => Self::CommunityManager,
-            "marketing" => Self::Marketing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for IndividualRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "director" => Self::Director,
-            "producer" => Self::Producer,
-            "designer" => Self::Designer,
-            "programmer" => Self::Programmer,
-            "artist" => Self::Artist,
-            "animator" => Self::Animator,
-            "writer" => Self::Writer,
-            "composer" => Self::Composer,
-            "soundDesigner" => Self::SoundDesigner,
-            "voiceActor" => Self::VoiceActor,
-            "qa" => Self::Qa,
-            "localization" => Self::Localization,
-            "communityManager" => Self::CommunityManager,
-            "marketing" => Self::Marketing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for IndividualRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for IndividualRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for IndividualRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for IndividualRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for IndividualRole<'_> {
-    type Output = IndividualRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            IndividualRole::Director => IndividualRole::Director,
-            IndividualRole::Producer => IndividualRole::Producer,
-            IndividualRole::Designer => IndividualRole::Designer,
-            IndividualRole::Programmer => IndividualRole::Programmer,
-            IndividualRole::Artist => IndividualRole::Artist,
-            IndividualRole::Animator => IndividualRole::Animator,
-            IndividualRole::Writer => IndividualRole::Writer,
-            IndividualRole::Composer => IndividualRole::Composer,
-            IndividualRole::SoundDesigner => IndividualRole::SoundDesigner,
-            IndividualRole::VoiceActor => IndividualRole::VoiceActor,
-            IndividualRole::Qa => IndividualRole::Qa,
-            IndividualRole::Localization => IndividualRole::Localization,
-            IndividualRole::CommunityManager => IndividualRole::CommunityManager,
-            IndividualRole::Marketing => IndividualRole::Marketing,
-            IndividualRole::Other(v) => IndividualRole::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ItchIoId<'a> {
-    #[serde(borrow)]
-    pub developer: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub game: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItchIoId<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "itchIoId"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LanguageSupport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub audio: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub interface: std::option::Option<bool>,
-    #[serde(borrow)]
-    pub language: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub subtitles: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LanguageSupport<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "languageSupport"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaItem<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "mediaItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.blob {
-            {
-                let size = value.blob().size;
-                if size > 200000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 200000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.blob {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*", "video/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["image/*".to_string(), "video/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<'a> {
-    BattleRoyale,
-    Cooperative,
-    Mmo,
-    Multiplayer,
-    SinglePlayer,
-    SplitScreen,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Mode<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::BattleRoyale => "battleRoyale",
-            Self::Cooperative => "cooperative",
-            Self::Mmo => "mmo",
-            Self::Multiplayer => "multiplayer",
-            Self::SinglePlayer => "singlePlayer",
-            Self::SplitScreen => "splitScreen",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Mode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "battleRoyale" => Self::BattleRoyale,
-            "cooperative" => Self::Cooperative,
-            "mmo" => Self::Mmo,
-            "multiplayer" => Self::Multiplayer,
-            "singlePlayer" => Self::SinglePlayer,
-            "splitScreen" => Self::SplitScreen,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Mode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "battleRoyale" => Self::BattleRoyale,
-            "cooperative" => Self::Cooperative,
-            "mmo" => Self::Mmo,
-            "multiplayer" => Self::Multiplayer,
-            "singlePlayer" => Self::SinglePlayer,
-            "splitScreen" => Self::SplitScreen,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Mode<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Mode<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Mode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Mode<'_> {
-    type Output = Mode<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Mode::BattleRoyale => Mode::BattleRoyale,
-            Mode::Cooperative => Mode::Cooperative,
-            Mode::Mmo => Mode::Mmo,
-            Mode::Multiplayer => Mode::Multiplayer,
-            Mode::SinglePlayer => Mode::SinglePlayer,
-            Mode::SplitScreen => Mode::SplitScreen,
-            Mode::Other(v) => Mode::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiplayerMode<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_campaign_coop: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_drop_in: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_lan_coop: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_splitscreen: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_splitscreen_online: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offline_coop_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offline_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub online_coop_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub online_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiplayerMode<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "multiplayerMode"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OrgProfileDetailView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub country: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub founded_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<OrgProfileDetailViewStatus<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub websites: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
-}
-
 pub mod org_profile_detail_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -7917,37 +9920,37 @@ pub mod org_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
         type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -8254,8 +10257,8 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
 impl<'a, S> OrgProfileDetailViewBuilder<'a, S>
 where
     S: org_profile_detail_view_state::State,
-    S::Uri: org_profile_detail_view_state::IsSet,
     S::Did: org_profile_detail_view_state::IsSet,
+    S::Uri: org_profile_detail_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OrgProfileDetailView<'a> {
@@ -8301,220 +10304,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OrgProfileDetailViewStatus<'a> {
-    Active,
-    Inactive,
-    Merged,
-    Acquired,
-    Defunct,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> OrgProfileDetailViewStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Active => "active",
-            Self::Inactive => "inactive",
-            Self::Merged => "merged",
-            Self::Acquired => "acquired",
-            Self::Defunct => "defunct",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for OrgProfileDetailViewStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "active" => Self::Active,
-            "inactive" => Self::Inactive,
-            "merged" => Self::Merged,
-            "acquired" => Self::Acquired,
-            "defunct" => Self::Defunct,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for OrgProfileDetailViewStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "active" => Self::Active,
-            "inactive" => Self::Inactive,
-            "merged" => Self::Merged,
-            "acquired" => Self::Acquired,
-            "defunct" => Self::Defunct,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for OrgProfileDetailViewStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for OrgProfileDetailViewStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for OrgProfileDetailViewStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for OrgProfileDetailViewStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for OrgProfileDetailViewStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for OrgProfileDetailViewStatus<'_> {
-    type Output = OrgProfileDetailViewStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            OrgProfileDetailViewStatus::Active => OrgProfileDetailViewStatus::Active,
-            OrgProfileDetailViewStatus::Inactive => OrgProfileDetailViewStatus::Inactive,
-            OrgProfileDetailViewStatus::Merged => OrgProfileDetailViewStatus::Merged,
-            OrgProfileDetailViewStatus::Acquired => OrgProfileDetailViewStatus::Acquired,
-            OrgProfileDetailViewStatus::Defunct => OrgProfileDetailViewStatus::Defunct,
-            OrgProfileDetailViewStatus::Other(v) => {
-                OrgProfileDetailViewStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileDetailView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "orgProfileDetailView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 3000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OrgProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod org_profile_summary_view_state {
@@ -8704,195 +10493,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "orgProfileSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformCategory<'a> {
-    Console,
-    Portable,
-    Computer,
-    Arcade,
-    OperatingSystem,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> PlatformCategory<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Console => "console",
-            Self::Portable => "portable",
-            Self::Computer => "computer",
-            Self::Arcade => "arcade",
-            Self::OperatingSystem => "operatingSystem",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for PlatformCategory<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "console" => Self::Console,
-            "portable" => Self::Portable,
-            "computer" => Self::Computer,
-            "arcade" => Self::Arcade,
-            "operatingSystem" => Self::OperatingSystem,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for PlatformCategory<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "console" => Self::Console,
-            "portable" => Self::Portable,
-            "computer" => Self::Computer,
-            "arcade" => Self::Arcade,
-            "operatingSystem" => Self::OperatingSystem,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for PlatformCategory<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for PlatformCategory<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for PlatformCategory<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for PlatformCategory<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for PlatformCategory<'_> {
-    type Output = PlatformCategory<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PlatformCategory::Console => PlatformCategory::Console,
-            PlatformCategory::Portable => PlatformCategory::Portable,
-            PlatformCategory::Computer => PlatformCategory::Computer,
-            PlatformCategory::Arcade => PlatformCategory::Arcade,
-            PlatformCategory::OperatingSystem => PlatformCategory::OperatingSystem,
-            PlatformCategory::Other(v) => PlatformCategory::Other(v.into_static()),
-        }
-    }
-}
-
-/// Features supported by a game on a specific storefront/platform.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformFeatures<'a> {
-    #[serde(borrow)]
-    pub features: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub platform: PlatformFeaturesPlatform<'a>,
-}
-
 pub mod platform_features_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -8903,37 +10503,37 @@ pub mod platform_features_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Platform;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Platform = S::Platform;
+        type Features = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Features = S::Features;
         type Platform = Set<members::platform>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Platform = S::Platform;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
@@ -9006,8 +10606,8 @@ where
 impl<'a, S> PlatformFeaturesBuilder<'a, S>
 where
     S: platform_features_state::State,
-    S::Features: platform_features_state::IsSet,
     S::Platform: platform_features_state::IsSet,
+    S::Features: platform_features_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlatformFeatures<'a> {
@@ -9033,166 +10633,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformFeaturesPlatform<'a> {
-    Steam,
-    Gog,
-    EpicGames,
-    PlayStation,
-    Xbox,
-    NintendoEshop,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> PlatformFeaturesPlatform<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Steam => "steam",
-            Self::Gog => "gog",
-            Self::EpicGames => "epicGames",
-            Self::PlayStation => "playStation",
-            Self::Xbox => "xbox",
-            Self::NintendoEshop => "nintendoEshop",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for PlatformFeaturesPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "playStation" => Self::PlayStation,
-            "xbox" => Self::Xbox,
-            "nintendoEshop" => Self::NintendoEshop,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for PlatformFeaturesPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "playStation" => Self::PlayStation,
-            "xbox" => Self::Xbox,
-            "nintendoEshop" => Self::NintendoEshop,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PlatformFeaturesPlatform<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for PlatformFeaturesPlatform<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for PlatformFeaturesPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for PlatformFeaturesPlatform<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for PlatformFeaturesPlatform<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for PlatformFeaturesPlatform<'_> {
-    type Output = PlatformFeaturesPlatform<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PlatformFeaturesPlatform::Steam => PlatformFeaturesPlatform::Steam,
-            PlatformFeaturesPlatform::Gog => PlatformFeaturesPlatform::Gog,
-            PlatformFeaturesPlatform::EpicGames => PlatformFeaturesPlatform::EpicGames,
-            PlatformFeaturesPlatform::PlayStation => {
-                PlatformFeaturesPlatform::PlayStation
-            }
-            PlatformFeaturesPlatform::Xbox => PlatformFeaturesPlatform::Xbox,
-            PlatformFeaturesPlatform::NintendoEshop => {
-                PlatformFeaturesPlatform::NintendoEshop
-            }
-            PlatformFeaturesPlatform::Other(v) => {
-                PlatformFeaturesPlatform::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformFeatures<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "platformFeatures"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub abbreviation: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<
-        crate::games_gamesgamesgamesgames::PlatformCategory<'a>,
-    >,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod platform_summary_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -9203,37 +10643,37 @@ pub mod platform_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -9363,8 +10803,8 @@ where
 impl<'a, S> PlatformSummaryViewBuilder<'a, S>
 where
     S: platform_summary_view_state::State,
-    S::Name: platform_summary_view_state::IsSet,
     S::Uri: platform_summary_view_state::IsSet,
+    S::Name: platform_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlatformSummaryView<'a> {
@@ -9396,227 +10836,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "platformSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformVersion<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub connectivity: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cpu: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub gpu: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub max_resolution: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformVersion<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "platformVersion"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlayerPerspective<'a> {
-    Auditory,
-    FirstPerson,
-    Isometric,
-    SideView,
-    Text,
-    ThirdPerson,
-    TopDown,
-    Vr,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> PlayerPerspective<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Auditory => "auditory",
-            Self::FirstPerson => "firstPerson",
-            Self::Isometric => "isometric",
-            Self::SideView => "sideView",
-            Self::Text => "text",
-            Self::ThirdPerson => "thirdPerson",
-            Self::TopDown => "topDown",
-            Self::Vr => "vr",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for PlayerPerspective<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "auditory" => Self::Auditory,
-            "firstPerson" => Self::FirstPerson,
-            "isometric" => Self::Isometric,
-            "sideView" => Self::SideView,
-            "text" => Self::Text,
-            "thirdPerson" => Self::ThirdPerson,
-            "topDown" => Self::TopDown,
-            "vr" => Self::Vr,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for PlayerPerspective<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "auditory" => Self::Auditory,
-            "firstPerson" => Self::FirstPerson,
-            "isometric" => Self::Isometric,
-            "sideView" => Self::SideView,
-            "text" => Self::Text,
-            "thirdPerson" => Self::ThirdPerson,
-            "topDown" => Self::TopDown,
-            "vr" => Self::Vr,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for PlayerPerspective<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for PlayerPerspective<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for PlayerPerspective<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for PlayerPerspective<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for PlayerPerspective<'_> {
-    type Output = PlayerPerspective<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PlayerPerspective::Auditory => PlayerPerspective::Auditory,
-            PlayerPerspective::FirstPerson => PlayerPerspective::FirstPerson,
-            PlayerPerspective::Isometric => PlayerPerspective::Isometric,
-            PlayerPerspective::SideView => PlayerPerspective::SideView,
-            PlayerPerspective::Text => PlayerPerspective::Text,
-            PlayerPerspective::ThirdPerson => PlayerPerspective::ThirdPerson,
-            PlayerPerspective::TopDown => PlayerPerspective::TopDown,
-            PlayerPerspective::Vr => PlayerPerspective::Vr,
-            PlayerPerspective::Other(v) => PlayerPerspective::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub profile_type: ProfileSummaryViewProfileType<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod profile_summary_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -9628,50 +10847,50 @@ pub mod profile_summary_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Uri;
         type ProfileType;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Uri = Unset;
         type ProfileType = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Did = Set<members::did>;
+        type ProfileType = S::ProfileType;
         type Uri = S::Uri;
-        type ProfileType = S::ProfileType;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
-        type Uri = Set<members::uri>;
-        type ProfileType = S::ProfileType;
     }
     ///State transition - sets the `profile_type` field to Set
     pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProfileType<S> {}
     impl<S: State> State for SetProfileType<S> {
         type Did = S::Did;
-        type Uri = S::Uri;
         type ProfileType = Set<members::profile_type>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type ProfileType = S::ProfileType;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `profile_type` field
         pub struct profile_type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -9805,8 +11024,8 @@ impl<'a, S> ProfileSummaryViewBuilder<'a, S>
 where
     S: profile_summary_view_state::State,
     S::Did: profile_summary_view_state::IsSet,
-    S::Uri: profile_summary_view_state::IsSet,
     S::ProfileType: profile_summary_view_state::IsSet,
+    S::Uri: profile_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileSummaryView<'a> {
@@ -9836,532 +11055,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileSummaryViewProfileType<'a> {
-    Actor,
-    Org,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ProfileSummaryViewProfileType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Actor => "actor",
-            Self::Org => "org",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ProfileSummaryViewProfileType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "actor" => Self::Actor,
-            "org" => Self::Org,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ProfileSummaryViewProfileType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "actor" => Self::Actor,
-            "org" => Self::Org,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileSummaryViewProfileType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ProfileSummaryViewProfileType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ProfileSummaryViewProfileType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ProfileSummaryViewProfileType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ProfileSummaryViewProfileType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ProfileSummaryViewProfileType<'_> {
-    type Output = ProfileSummaryViewProfileType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileSummaryViewProfileType::Actor => ProfileSummaryViewProfileType::Actor,
-            ProfileSummaryViewProfileType::Org => ProfileSummaryViewProfileType::Org,
-            ProfileSummaryViewProfileType::Other(v) => {
-                ProfileSummaryViewProfileType::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileSummaryView<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "profileSummaryView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.avatar {
-            {
-                let size = value.blob().size;
-                if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        max: 10000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.avatar {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "avatar",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Release<'a> {
-    ///Free-text platform name, used when no platform record exists.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT URI of a platform record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platform_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub release_dates: std::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::ReleaseDate<'a>>,
-    >,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "release"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ReleaseDate<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub region: std::option::Option<ReleaseDateRegion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub released_at: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub released_at_format: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<ReleaseDateStatus<'a>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateRegion<'a> {
-    Worldwide,
-    Europe,
-    NorthAmerica,
-    Australia,
-    NewZealand,
-    Japan,
-    China,
-    Asia,
-    Korea,
-    Brazil,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ReleaseDateRegion<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Worldwide => "worldwide",
-            Self::Europe => "europe",
-            Self::NorthAmerica => "northAmerica",
-            Self::Australia => "australia",
-            Self::NewZealand => "newZealand",
-            Self::Japan => "japan",
-            Self::China => "china",
-            Self::Asia => "asia",
-            Self::Korea => "korea",
-            Self::Brazil => "brazil",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ReleaseDateRegion<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "worldwide" => Self::Worldwide,
-            "europe" => Self::Europe,
-            "northAmerica" => Self::NorthAmerica,
-            "australia" => Self::Australia,
-            "newZealand" => Self::NewZealand,
-            "japan" => Self::Japan,
-            "china" => Self::China,
-            "asia" => Self::Asia,
-            "korea" => Self::Korea,
-            "brazil" => Self::Brazil,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ReleaseDateRegion<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "worldwide" => Self::Worldwide,
-            "europe" => Self::Europe,
-            "northAmerica" => Self::NorthAmerica,
-            "australia" => Self::Australia,
-            "newZealand" => Self::NewZealand,
-            "japan" => Self::Japan,
-            "china" => Self::China,
-            "asia" => Self::Asia,
-            "korea" => Self::Korea,
-            "brazil" => Self::Brazil,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReleaseDateRegion<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ReleaseDateRegion<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ReleaseDateRegion<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateRegion<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ReleaseDateRegion<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ReleaseDateRegion<'_> {
-    type Output = ReleaseDateRegion<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReleaseDateRegion::Worldwide => ReleaseDateRegion::Worldwide,
-            ReleaseDateRegion::Europe => ReleaseDateRegion::Europe,
-            ReleaseDateRegion::NorthAmerica => ReleaseDateRegion::NorthAmerica,
-            ReleaseDateRegion::Australia => ReleaseDateRegion::Australia,
-            ReleaseDateRegion::NewZealand => ReleaseDateRegion::NewZealand,
-            ReleaseDateRegion::Japan => ReleaseDateRegion::Japan,
-            ReleaseDateRegion::China => ReleaseDateRegion::China,
-            ReleaseDateRegion::Asia => ReleaseDateRegion::Asia,
-            ReleaseDateRegion::Korea => ReleaseDateRegion::Korea,
-            ReleaseDateRegion::Brazil => ReleaseDateRegion::Brazil,
-            ReleaseDateRegion::Other(v) => ReleaseDateRegion::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateStatus<'a> {
-    AdvancedAccess,
-    Alpha,
-    Beta,
-    Cancelled,
-    DigitalCompatibilityRelease,
-    EarlyAccess,
-    NextGenOptimizationRelease,
-    Offline,
-    Release,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ReleaseDateStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::AdvancedAccess => "advancedAccess",
-            Self::Alpha => "alpha",
-            Self::Beta => "beta",
-            Self::Cancelled => "cancelled",
-            Self::DigitalCompatibilityRelease => "digitalCompatibilityRelease",
-            Self::EarlyAccess => "earlyAccess",
-            Self::NextGenOptimizationRelease => "nextGenOptimizationRelease",
-            Self::Offline => "offline",
-            Self::Release => "release",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ReleaseDateStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "advancedAccess" => Self::AdvancedAccess,
-            "alpha" => Self::Alpha,
-            "beta" => Self::Beta,
-            "cancelled" => Self::Cancelled,
-            "digitalCompatibilityRelease" => Self::DigitalCompatibilityRelease,
-            "earlyAccess" => Self::EarlyAccess,
-            "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
-            "offline" => Self::Offline,
-            "release" => Self::Release,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ReleaseDateStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "advancedAccess" => Self::AdvancedAccess,
-            "alpha" => Self::Alpha,
-            "beta" => Self::Beta,
-            "cancelled" => Self::Cancelled,
-            "digitalCompatibilityRelease" => Self::DigitalCompatibilityRelease,
-            "earlyAccess" => Self::EarlyAccess,
-            "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
-            "offline" => Self::Offline,
-            "release" => Self::Release,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReleaseDateStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ReleaseDateStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ReleaseDateStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ReleaseDateStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ReleaseDateStatus<'_> {
-    type Output = ReleaseDateStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReleaseDateStatus::AdvancedAccess => ReleaseDateStatus::AdvancedAccess,
-            ReleaseDateStatus::Alpha => ReleaseDateStatus::Alpha,
-            ReleaseDateStatus::Beta => ReleaseDateStatus::Beta,
-            ReleaseDateStatus::Cancelled => ReleaseDateStatus::Cancelled,
-            ReleaseDateStatus::DigitalCompatibilityRelease => {
-                ReleaseDateStatus::DigitalCompatibilityRelease
-            }
-            ReleaseDateStatus::EarlyAccess => ReleaseDateStatus::EarlyAccess,
-            ReleaseDateStatus::NextGenOptimizationRelease => {
-                ReleaseDateStatus::NextGenOptimizationRelease
-            }
-            ReleaseDateStatus::Offline => ReleaseDateStatus::Offline,
-            ReleaseDateStatus::Release => ReleaseDateStatus::Release,
-            ReleaseDateStatus::Other(v) => ReleaseDateStatus::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseDate<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "releaseDate"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonGameFeedItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub game: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod skeleton_game_feed_item_state {
@@ -10494,504 +11187,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonGameFeedItem<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "skeletonGameFeedItem"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.feed_context {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_context",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// System requirements for a game on a specific platform.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SystemRequirements<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub minimum: std::option::Option<crate::games_gamesgamesgamesgames::SystemSpec<'a>>,
-    #[serde(borrow)]
-    pub platform: SystemRequirementsPlatform<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub recommended: std::option::Option<
-        crate::games_gamesgamesgamesgames::SystemSpec<'a>,
-    >,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SystemRequirementsPlatform<'a> {
-    Windows,
-    Mac,
-    Linux,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SystemRequirementsPlatform<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Windows => "windows",
-            Self::Mac => "mac",
-            Self::Linux => "linux",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SystemRequirementsPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "windows" => Self::Windows,
-            "mac" => Self::Mac,
-            "linux" => Self::Linux,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SystemRequirementsPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "windows" => Self::Windows,
-            "mac" => Self::Mac,
-            "linux" => Self::Linux,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SystemRequirementsPlatform<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SystemRequirementsPlatform<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SystemRequirementsPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SystemRequirementsPlatform<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SystemRequirementsPlatform<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SystemRequirementsPlatform<'_> {
-    type Output = SystemRequirementsPlatform<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SystemRequirementsPlatform::Windows => SystemRequirementsPlatform::Windows,
-            SystemRequirementsPlatform::Mac => SystemRequirementsPlatform::Mac,
-            SystemRequirementsPlatform::Linux => SystemRequirementsPlatform::Linux,
-            SystemRequirementsPlatform::Other(v) => {
-                SystemRequirementsPlatform::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemRequirements<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "systemRequirements"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Hardware/software specification for a platform.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SystemSpec<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub additional_notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub directx: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub graphics: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub processor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sound_card: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemSpec<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "systemSpec"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Theme<'a> {
-    _4x,
-    Action,
-    Business,
-    Comedy,
-    Drama,
-    Educational,
-    Erotic,
-    Fantasy,
-    Historical,
-    Horror,
-    Kids,
-    Mystery,
-    Nonfiction,
-    OpenWorld,
-    Party,
-    Romance,
-    Sandbox,
-    Scifi,
-    Stealth,
-    Survival,
-    Thriller,
-    Warfare,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> Theme<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::_4x => "4x",
-            Self::Action => "action",
-            Self::Business => "business",
-            Self::Comedy => "comedy",
-            Self::Drama => "drama",
-            Self::Educational => "educational",
-            Self::Erotic => "erotic",
-            Self::Fantasy => "fantasy",
-            Self::Historical => "historical",
-            Self::Horror => "horror",
-            Self::Kids => "kids",
-            Self::Mystery => "mystery",
-            Self::Nonfiction => "nonfiction",
-            Self::OpenWorld => "openWorld",
-            Self::Party => "party",
-            Self::Romance => "romance",
-            Self::Sandbox => "sandbox",
-            Self::Scifi => "scifi",
-            Self::Stealth => "stealth",
-            Self::Survival => "survival",
-            Self::Thriller => "thriller",
-            Self::Warfare => "warfare",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Theme<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "4x" => Self::_4x,
-            "action" => Self::Action,
-            "business" => Self::Business,
-            "comedy" => Self::Comedy,
-            "drama" => Self::Drama,
-            "educational" => Self::Educational,
-            "erotic" => Self::Erotic,
-            "fantasy" => Self::Fantasy,
-            "historical" => Self::Historical,
-            "horror" => Self::Horror,
-            "kids" => Self::Kids,
-            "mystery" => Self::Mystery,
-            "nonfiction" => Self::Nonfiction,
-            "openWorld" => Self::OpenWorld,
-            "party" => Self::Party,
-            "romance" => Self::Romance,
-            "sandbox" => Self::Sandbox,
-            "scifi" => Self::Scifi,
-            "stealth" => Self::Stealth,
-            "survival" => Self::Survival,
-            "thriller" => Self::Thriller,
-            "warfare" => Self::Warfare,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for Theme<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "4x" => Self::_4x,
-            "action" => Self::Action,
-            "business" => Self::Business,
-            "comedy" => Self::Comedy,
-            "drama" => Self::Drama,
-            "educational" => Self::Educational,
-            "erotic" => Self::Erotic,
-            "fantasy" => Self::Fantasy,
-            "historical" => Self::Historical,
-            "horror" => Self::Horror,
-            "kids" => Self::Kids,
-            "mystery" => Self::Mystery,
-            "nonfiction" => Self::Nonfiction,
-            "openWorld" => Self::OpenWorld,
-            "party" => Self::Party,
-            "romance" => Self::Romance,
-            "sandbox" => Self::Sandbox,
-            "scifi" => Self::Scifi,
-            "stealth" => Self::Stealth,
-            "survival" => Self::Survival,
-            "thriller" => Self::Thriller,
-            "warfare" => Self::Warfare,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Theme<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> core::fmt::Display for Theme<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> serde::Serialize for Theme<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for Theme<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl jacquard_common::IntoStatic for Theme<'_> {
-    type Output = Theme<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            Theme::_4x => Theme::_4x,
-            Theme::Action => Theme::Action,
-            Theme::Business => Theme::Business,
-            Theme::Comedy => Theme::Comedy,
-            Theme::Drama => Theme::Drama,
-            Theme::Educational => Theme::Educational,
-            Theme::Erotic => Theme::Erotic,
-            Theme::Fantasy => Theme::Fantasy,
-            Theme::Historical => Theme::Historical,
-            Theme::Horror => Theme::Horror,
-            Theme::Kids => Theme::Kids,
-            Theme::Mystery => Theme::Mystery,
-            Theme::Nonfiction => Theme::Nonfiction,
-            Theme::OpenWorld => Theme::OpenWorld,
-            Theme::Party => Theme::Party,
-            Theme::Romance => Theme::Romance,
-            Theme::Sandbox => Theme::Sandbox,
-            Theme::Scifi => Theme::Scifi,
-            Theme::Stealth => Theme::Stealth,
-            Theme::Survival => Theme::Survival,
-            Theme::Thriller => Theme::Thriller,
-            Theme::Warfare => Theme::Warfare,
-            Theme::Other(v) => Theme::Other(v.into_static()),
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TimeToBeat<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completely: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hastily: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub normally: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimeToBeat<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "timeToBeat"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerState<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "viewerState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Website<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<WebsiteType<'a>>,
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
-}
-
 pub mod website_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -11110,200 +11305,5 @@ where
             url: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WebsiteType<'a> {
-    Official,
-    Wiki,
-    Steam,
-    Gog,
-    EpicGames,
-    ItchIo,
-    Twitter,
-    Instagram,
-    Youtube,
-    Twitch,
-    Discord,
-    Reddit,
-    Facebook,
-    Wikipedia,
-    Bluesky,
-    Xbox,
-    Playstation,
-    Nintendo,
-    Meta,
-    Other,
-    UnknownValue(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WebsiteType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Official => "official",
-            Self::Wiki => "wiki",
-            Self::Steam => "steam",
-            Self::Gog => "gog",
-            Self::EpicGames => "epicGames",
-            Self::ItchIo => "itchIo",
-            Self::Twitter => "twitter",
-            Self::Instagram => "instagram",
-            Self::Youtube => "youtube",
-            Self::Twitch => "twitch",
-            Self::Discord => "discord",
-            Self::Reddit => "reddit",
-            Self::Facebook => "facebook",
-            Self::Wikipedia => "wikipedia",
-            Self::Bluesky => "bluesky",
-            Self::Xbox => "xbox",
-            Self::Playstation => "playstation",
-            Self::Nintendo => "nintendo",
-            Self::Meta => "meta",
-            Self::Other => "other",
-            Self::UnknownValue(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WebsiteType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "official" => Self::Official,
-            "wiki" => Self::Wiki,
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "itchIo" => Self::ItchIo,
-            "twitter" => Self::Twitter,
-            "instagram" => Self::Instagram,
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "discord" => Self::Discord,
-            "reddit" => Self::Reddit,
-            "facebook" => Self::Facebook,
-            "wikipedia" => Self::Wikipedia,
-            "bluesky" => Self::Bluesky,
-            "xbox" => Self::Xbox,
-            "playstation" => Self::Playstation,
-            "nintendo" => Self::Nintendo,
-            "meta" => Self::Meta,
-            "other" => Self::Other,
-            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WebsiteType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "official" => Self::Official,
-            "wiki" => Self::Wiki,
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "itchIo" => Self::ItchIo,
-            "twitter" => Self::Twitter,
-            "instagram" => Self::Instagram,
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "discord" => Self::Discord,
-            "reddit" => Self::Reddit,
-            "facebook" => Self::Facebook,
-            "wikipedia" => Self::Wikipedia,
-            "bluesky" => Self::Bluesky,
-            "xbox" => Self::Xbox,
-            "playstation" => Self::Playstation,
-            "nintendo" => Self::Nintendo,
-            "meta" => Self::Meta,
-            "other" => Self::Other,
-            _ => Self::UnknownValue(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WebsiteType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WebsiteType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WebsiteType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WebsiteType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WebsiteType<'a> {
-    fn default() -> Self {
-        Self::UnknownValue(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WebsiteType<'_> {
-    type Output = WebsiteType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WebsiteType::Official => WebsiteType::Official,
-            WebsiteType::Wiki => WebsiteType::Wiki,
-            WebsiteType::Steam => WebsiteType::Steam,
-            WebsiteType::Gog => WebsiteType::Gog,
-            WebsiteType::EpicGames => WebsiteType::EpicGames,
-            WebsiteType::ItchIo => WebsiteType::ItchIo,
-            WebsiteType::Twitter => WebsiteType::Twitter,
-            WebsiteType::Instagram => WebsiteType::Instagram,
-            WebsiteType::Youtube => WebsiteType::Youtube,
-            WebsiteType::Twitch => WebsiteType::Twitch,
-            WebsiteType::Discord => WebsiteType::Discord,
-            WebsiteType::Reddit => WebsiteType::Reddit,
-            WebsiteType::Facebook => WebsiteType::Facebook,
-            WebsiteType::Wikipedia => WebsiteType::Wikipedia,
-            WebsiteType::Bluesky => WebsiteType::Bluesky,
-            WebsiteType::Xbox => WebsiteType::Xbox,
-            WebsiteType::Playstation => WebsiteType::Playstation,
-            WebsiteType::Nintendo => WebsiteType::Nintendo,
-            WebsiteType::Meta => WebsiteType::Meta,
-            WebsiteType::Other => WebsiteType::Other,
-            WebsiteType::UnknownValue(v) => WebsiteType::UnknownValue(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Website<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.defs"
-    }
-    fn def_name() -> &'static str {
-        "website"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

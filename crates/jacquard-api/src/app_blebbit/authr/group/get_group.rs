@@ -20,6 +20,61 @@ pub struct GetGroup<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetGroupOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub public: std::option::Option<bool>,
+}
+
+/// Response type for
+///app.blebbit.authr.group.getGroup
+pub struct GetGroupResponse;
+impl jacquard_common::xrpc::XrpcResp for GetGroupResponse {
+    const NSID: &'static str = "app.blebbit.authr.group.getGroup";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetGroupOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroup<'a> {
+    const NSID: &'static str = "app.blebbit.authr.group.getGroup";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetGroupResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.group.getGroup
+pub struct GetGroupRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetGroupRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroup";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetGroup<'de>;
+    type Response = GetGroupResponse;
+}
+
 pub mod get_group_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,59 +162,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetGroupOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: std::option::Option<bool>,
-}
-
-/// Response type for
-///app.blebbit.authr.group.getGroup
-pub struct GetGroupResponse;
-impl jacquard_common::xrpc::XrpcResp for GetGroupResponse {
-    const NSID: &'static str = "app.blebbit.authr.group.getGroup";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGroupOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroup<'a> {
-    const NSID: &'static str = "app.blebbit.authr.group.getGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetGroupResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.group.getGroup
-pub struct GetGroupRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetGroupRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGroup<'de>;
-    type Response = GetGroupResponse;
 }

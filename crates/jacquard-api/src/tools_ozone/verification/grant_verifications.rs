@@ -26,6 +26,135 @@ pub struct GrantError<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GrantVerifications<'a> {
+    ///Array of verification requests to process
+    #[serde(borrow)]
+    pub verifications: Vec<
+        crate::tools_ozone::verification::grant_verifications::VerificationInput<'a>,
+    >,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GrantVerificationsOutput<'a> {
+    #[serde(borrow)]
+    pub failed_verifications: Vec<
+        crate::tools_ozone::verification::grant_verifications::GrantError<'a>,
+    >,
+    #[serde(borrow)]
+    pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationInput<'a> {
+    ///Timestamp for verification record. Defaults to current time when not specified.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Display name of the subject the verification applies to at the moment of verifying.
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    ///Handle of the subject the verification applies to at the moment of verifying.
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    ///The did of the subject being verified
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GrantError<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.verification.grantVerifications"
+    }
+    fn def_name() -> &'static str {
+        "grantError"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_verification_grantVerifications()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///tools.ozone.verification.grantVerifications
+pub struct GrantVerificationsResponse;
+impl jacquard_common::xrpc::XrpcResp for GrantVerificationsResponse {
+    const NSID: &'static str = "tools.ozone.verification.grantVerifications";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GrantVerificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GrantVerifications<'a> {
+    const NSID: &'static str = "tools.ozone.verification.grantVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GrantVerificationsResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.verification.grantVerifications
+pub struct GrantVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.grantVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GrantVerifications<'de>;
+    type Response = GrantVerificationsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationInput<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.verification.grantVerifications"
+    }
+    fn def_name() -> &'static str {
+        "verificationInput"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_verification_grantVerifications()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod grant_error_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,37 +165,37 @@ pub mod grant_error_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Error;
         type Subject;
+        type Error;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Error = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `error` field to Set
-    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetError<S> {}
-    impl<S: State> State for SetError<S> {
-        type Error = Set<members::error>;
-        type Subject = S::Subject;
+        type Error = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Error = S::Error;
         type Subject = Set<members::subject>;
+        type Error = S::Error;
+    }
+    ///State transition - sets the `error` field to Set
+    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetError<S> {}
+    impl<S: State> State for SetError<S> {
+        type Subject = S::Subject;
+        type Error = Set<members::error>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `error` field
-        pub struct error(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `error` field
+        pub struct error(());
     }
 }
 
@@ -139,8 +268,8 @@ where
 impl<'a, S> GrantErrorBuilder<'a, S>
 where
     S: grant_error_state::State,
-    S::Error: grant_error_state::IsSet,
     S::Subject: grant_error_state::IsSet,
+    S::Error: grant_error_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GrantError<'a> {
@@ -411,42 +540,6 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GrantError<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.verification.grantVerifications"
-    }
-    fn def_name() -> &'static str {
-        "grantError"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_verification_grantVerifications()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GrantVerifications<'a> {
-    ///Array of verification requests to process
-    #[serde(borrow)]
-    pub verifications: Vec<
-        crate::tools_ozone::verification::grant_verifications::VerificationInput<'a>,
-    >,
-}
-
 pub mod grant_verifications_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -564,82 +657,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GrantVerificationsOutput<'a> {
-    #[serde(borrow)]
-    pub failed_verifications: Vec<
-        crate::tools_ozone::verification::grant_verifications::GrantError<'a>,
-    >,
-    #[serde(borrow)]
-    pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
-}
-
-/// Response type for
-///tools.ozone.verification.grantVerifications
-pub struct GrantVerificationsResponse;
-impl jacquard_common::xrpc::XrpcResp for GrantVerificationsResponse {
-    const NSID: &'static str = "tools.ozone.verification.grantVerifications";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GrantVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GrantVerifications<'a> {
-    const NSID: &'static str = "tools.ozone.verification.grantVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = GrantVerificationsResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.verification.grantVerifications
-pub struct GrantVerificationsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.verification.grantVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = GrantVerifications<'de>;
-    type Response = GrantVerificationsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationInput<'a> {
-    ///Timestamp for verification record. Defaults to current time when not specified.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Display name of the subject the verification applies to at the moment of verifying.
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    ///Handle of the subject the verification applies to at the moment of verifying.
-    #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    ///The did of the subject being verified
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod verification_input_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -650,51 +667,51 @@ pub mod verification_input_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type Subject;
         type Handle;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type Subject = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type DisplayName = S::DisplayName;
         type Subject = Set<members::subject>;
         type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type DisplayName = S::DisplayName;
         type Subject = S::Subject;
         type Handle = Set<members::handle>;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
@@ -807,9 +824,9 @@ where
 impl<'a, S> VerificationInputBuilder<'a, S>
 where
     S: verification_input_state::State,
-    S::DisplayName: verification_input_state::IsSet,
     S::Subject: verification_input_state::IsSet,
     S::Handle: verification_input_state::IsSet,
+    S::DisplayName: verification_input_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationInput<'a> {
@@ -836,22 +853,5 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationInput<'a> {
-    fn nsid() -> &'static str {
-        "tools.ozone.verification.grantVerifications"
-    }
-    fn def_name() -> &'static str {
-        "verificationInput"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tools_ozone_verification_grantVerifications()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

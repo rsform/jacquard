@@ -30,6 +30,48 @@ pub struct GetBookIdentifiers<'a> {
     pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBookIdentifiersOutput<'a> {
+    #[serde(borrow)]
+    pub book_identifiers: crate::buzz_bookhive::BookIdentifiers<'a>,
+}
+
+/// Response type for
+///buzz.bookhive.getBookIdentifiers
+pub struct GetBookIdentifiersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBookIdentifiersResponse {
+    const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetBookIdentifiersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookIdentifiers<'a> {
+    const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBookIdentifiersResponse;
+}
+
+/// Endpoint type for
+///buzz.bookhive.getBookIdentifiers
+pub struct GetBookIdentifiersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBookIdentifiersRequest {
+    const PATH: &'static str = "/xrpc/buzz.bookhive.getBookIdentifiers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBookIdentifiers<'de>;
+    type Response = GetBookIdentifiersResponse;
+}
+
 pub mod get_book_identifiers_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -159,46 +201,4 @@ where
             isbn13: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBookIdentifiersOutput<'a> {
-    #[serde(borrow)]
-    pub book_identifiers: crate::buzz_bookhive::BookIdentifiers<'a>,
-}
-
-/// Response type for
-///buzz.bookhive.getBookIdentifiers
-pub struct GetBookIdentifiersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBookIdentifiersResponse {
-    const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBookIdentifiersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookIdentifiers<'a> {
-    const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBookIdentifiersResponse;
-}
-
-/// Endpoint type for
-///buzz.bookhive.getBookIdentifiers
-pub struct GetBookIdentifiersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBookIdentifiersRequest {
-    const PATH: &'static str = "/xrpc/buzz.bookhive.getBookIdentifiers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBookIdentifiers<'de>;
-    type Response = GetBookIdentifiersResponse;
 }

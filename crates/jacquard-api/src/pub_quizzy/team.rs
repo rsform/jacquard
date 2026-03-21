@@ -33,203 +33,6 @@ pub struct Team<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-pub mod team_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Members;
-        type Name;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Members = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `members` field to Set
-    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembers<S> {}
-    impl<S: State> State for SetMembers<S> {
-        type Members = Set<members::members>;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Members = S::Members;
-        type Name = Set<members::name>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `members` field
-        pub struct members(());
-        ///Marker type for the `name` field
-        pub struct name(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct TeamBuilder<'a, S: team_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Team<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TeamBuilder<'a, team_state::Empty> {
-        TeamBuilder::new()
-    }
-}
-
-impl<'a> TeamBuilder<'a, team_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        TeamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: team_state::State> TeamBuilder<'a, S> {
-    /// Set the `avatar` field (optional)
-    pub fn avatar(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S: team_state::State> TeamBuilder<'a, S> {
-    /// Set the `avatarAlt` field (optional)
-    pub fn avatar_alt(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `avatarAlt` field to an Option value (optional)
-    pub fn maybe_avatar_alt(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S> TeamBuilder<'a, S>
-where
-    S: team_state::State,
-    S::Members: team_state::IsUnset,
-{
-    /// Set the `members` field (required)
-    pub fn members(
-        mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
-    ) -> TeamBuilder<'a, team_state::SetMembers<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        TeamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TeamBuilder<'a, S>
-where
-    S: team_state::State,
-    S::Name: team_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> TeamBuilder<'a, team_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        TeamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TeamBuilder<'a, S>
-where
-    S: team_state::State,
-    S::Members: team_state::IsSet,
-    S::Name: team_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Team<'a> {
-        Team {
-            avatar: self.__unsafe_private_named.0,
-            avatar_alt: self.__unsafe_private_named.1,
-            members: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Team<'a> {
-        Team {
-            avatar: self.__unsafe_private_named.0,
-            avatar_alt: self.__unsafe_private_named.1,
-            members: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Team<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TeamRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,
@@ -251,16 +54,17 @@ pub struct TeamGetRecordOutput<'a> {
     pub value: Team<'a>,
 }
 
-impl From<TeamGetRecordOutput<'_>> for Team<'_> {
-    fn from(output: TeamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Team<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TeamRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Team<'_> {
-    const NSID: &'static str = "pub.quizzy.team";
-    type Record = TeamRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -271,6 +75,18 @@ impl jacquard_common::xrpc::XrpcResp for TeamRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = TeamGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TeamGetRecordOutput<'_>> for Team<'_> {
+    fn from(output: TeamGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Team<'_> {
+    const NSID: &'static str = "pub.quizzy.team";
+    type Record = TeamRecord;
 }
 
 impl jacquard_common::types::collection::Collection for TeamRecord {
@@ -424,6 +240,190 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Team<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod team_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Members;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Members = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Members = S::Members;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Name = S::Name;
+        type Members = Set<members::members>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `members` field
+        pub struct members(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TeamBuilder<'a, S: team_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Team<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TeamBuilder<'a, team_state::Empty> {
+        TeamBuilder::new()
+    }
+}
+
+impl<'a> TeamBuilder<'a, team_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TeamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: team_state::State> TeamBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: team_state::State> TeamBuilder<'a, S> {
+    /// Set the `avatarAlt` field (optional)
+    pub fn avatar_alt(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `avatarAlt` field to an Option value (optional)
+    pub fn maybe_avatar_alt(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> TeamBuilder<'a, S>
+where
+    S: team_state::State,
+    S::Members: team_state::IsUnset,
+{
+    /// Set the `members` field (required)
+    pub fn members(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> TeamBuilder<'a, team_state::SetMembers<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TeamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TeamBuilder<'a, S>
+where
+    S: team_state::State,
+    S::Name: team_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TeamBuilder<'a, team_state::SetName<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TeamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TeamBuilder<'a, S>
+where
+    S: team_state::State,
+    S::Name: team_state::IsSet,
+    S::Members: team_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Team<'a> {
+        Team {
+            avatar: self.__unsafe_private_named.0,
+            avatar_alt: self.__unsafe_private_named.1,
+            members: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Team<'a> {
+        Team {
+            avatar: self.__unsafe_private_named.0,
+            avatar_alt: self.__unsafe_private_named.1,
+            members: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

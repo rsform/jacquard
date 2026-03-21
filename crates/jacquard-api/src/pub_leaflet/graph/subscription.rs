@@ -22,6 +22,84 @@ pub struct Subscription<'a> {
     pub publication: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscriptionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Subscription<'a>,
+}
+
+impl<'a> Subscription<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SubscriptionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SubscriptionRecord;
+impl jacquard_common::xrpc::XrpcResp for SubscriptionRecord {
+    const NSID: &'static str = "pub.leaflet.graph.subscription";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SubscriptionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
+    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Subscription<'_> {
+    const NSID: &'static str = "pub.leaflet.graph.subscription";
+    type Record = SubscriptionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SubscriptionRecord {
+    const NSID: &'static str = "pub.leaflet.graph.subscription";
+    type Record = SubscriptionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.graph.subscription"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_graph_subscription()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod subscription_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,84 +202,6 @@ where
             publication: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Subscription<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SubscriptionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscriptionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Subscription<'a>,
-}
-
-impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
-    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Subscription<'_> {
-    const NSID: &'static str = "pub.leaflet.graph.subscription";
-    type Record = SubscriptionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SubscriptionRecord;
-impl jacquard_common::xrpc::XrpcResp for SubscriptionRecord {
-    const NSID: &'static str = "pub.leaflet.graph.subscription";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscriptionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SubscriptionRecord {
-    const NSID: &'static str = "pub.leaflet.graph.subscription";
-    type Record = SubscriptionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.graph.subscription"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_graph_subscription()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

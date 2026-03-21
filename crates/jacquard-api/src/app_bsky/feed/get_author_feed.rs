@@ -5,18 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_filter() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("posts_with_replies"))
-}
-
-fn _default_include_pins() -> std::option::Option<bool> {
-    Some(false)
-}
-
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -46,6 +34,106 @@ pub struct GetAuthorFeed<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAuthorFeedOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetAuthorFeedError<'a> {
+    #[serde(rename = "BlockedActor")]
+    BlockedActor(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "BlockedByActor")]
+    BlockedByActor(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetAuthorFeedError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BlockedActor(msg) => {
+                write!(f, "BlockedActor")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::BlockedByActor(msg) => {
+                write!(f, "BlockedByActor")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.feed.getAuthorFeed
+pub struct GetAuthorFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
+    const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetAuthorFeedOutput<'de>;
+    type Err<'de> = GetAuthorFeedError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<'a> {
+    const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAuthorFeedResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.getAuthorFeed
+pub struct GetAuthorFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getAuthorFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAuthorFeed<'de>;
+    type Response = GetAuthorFeedResponse;
+}
+
+fn _default_filter() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("posts_with_replies"))
+}
+
+fn _default_include_pins() -> std::option::Option<bool> {
+    Some(false)
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_author_feed_state {
@@ -203,92 +291,4 @@ where
             limit: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAuthorFeedOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetAuthorFeedError<'a> {
-    #[serde(rename = "BlockedActor")]
-    BlockedActor(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "BlockedByActor")]
-    BlockedByActor(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetAuthorFeedError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BlockedActor(msg) => {
-                write!(f, "BlockedActor")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::BlockedByActor(msg) => {
-                write!(f, "BlockedByActor")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.feed.getAuthorFeed
-pub struct GetAuthorFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
-    const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAuthorFeedOutput<'de>;
-    type Err<'de> = GetAuthorFeedError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<'a> {
-    const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetAuthorFeedResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.getAuthorFeed
-pub struct GetAuthorFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.getAuthorFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAuthorFeed<'de>;
-    type Response = GetAuthorFeedResponse;
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_include_cascaded() -> std::option::Option<bool> {
-    Some(true)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct GetContributors<'a> {
     pub include_cascaded: std::option::Option<bool>,
     #[serde(borrow)]
     pub resource: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetContributorsOutput<'a> {
+    #[serde(borrow)]
+    pub contributors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+}
+
+/// Response type for
+///sh.weaver.edit.getContributors
+pub struct GetContributorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetContributorsResponse {
+    const NSID: &'static str = "sh.weaver.edit.getContributors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetContributorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetContributors<'a> {
+    const NSID: &'static str = "sh.weaver.edit.getContributors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetContributorsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.edit.getContributors
+pub struct GetContributorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.edit.getContributors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetContributors<'de>;
+    type Response = GetContributorsResponse;
+}
+
+fn _default_include_cascaded() -> std::option::Option<bool> {
+    Some(true)
 }
 
 pub mod get_contributors_state {
@@ -132,46 +174,4 @@ where
             resource: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetContributorsOutput<'a> {
-    #[serde(borrow)]
-    pub contributors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-}
-
-/// Response type for
-///sh.weaver.edit.getContributors
-pub struct GetContributorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetContributorsResponse {
-    const NSID: &'static str = "sh.weaver.edit.getContributors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetContributorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetContributors<'a> {
-    const NSID: &'static str = "sh.weaver.edit.getContributors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetContributorsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.edit.getContributors
-pub struct GetContributorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.edit.getContributors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetContributors<'de>;
-    type Response = GetContributorsResponse;
 }

@@ -40,6 +40,23 @@ pub struct SpriteSettings<'a> {
     pub selected_options: jacquard_common::types::value::Data<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpriteSettings<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.defs"
+    }
+    fn def_name() -> &'static str {
+        "spriteSettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod sprite_settings_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -239,22 +256,5 @@ fn lexicon_doc_org_simocracy_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpriteSettings<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.defs"
-    }
-    fn def_name() -> &'static str {
-        "spriteSettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

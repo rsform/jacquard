@@ -20,6 +20,49 @@ pub struct GetFile<'a> {
     pub file_id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFileOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::googledrive::FileView<'a>,
+}
+
+/// Response type for
+///app.rocksky.googledrive.getFile
+pub struct GetFileResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFileResponse {
+    const NSID: &'static str = "app.rocksky.googledrive.getFile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFileOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFile<'a> {
+    const NSID: &'static str = "app.rocksky.googledrive.getFile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFileResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.googledrive.getFile
+pub struct GetFileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFileRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFile<'de>;
+    type Response = GetFileResponse;
+}
+
 pub mod get_file_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,47 +150,4 @@ where
             file_id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFileOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::googledrive::FileView<'a>,
-}
-
-/// Response type for
-///app.rocksky.googledrive.getFile
-pub struct GetFileResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFileResponse {
-    const NSID: &'static str = "app.rocksky.googledrive.getFile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFile<'a> {
-    const NSID: &'static str = "app.rocksky.googledrive.getFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFileResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.googledrive.getFile
-pub struct GetFileRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFileRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFile<'de>;
-    type Response = GetFileResponse;
 }

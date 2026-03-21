@@ -24,6 +24,127 @@ pub struct Compare<'a> {
     pub rev2: jacquard_common::CowStr<'a>,
 }
 
+/// Compare output in application/json
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CompareOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CompareError<'a> {
+    /// Repository not found or access denied
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// One or both revisions not found
+    #[serde(rename = "RevisionNotFound")]
+    RevisionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Invalid request parameters
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// Failed to compare revisions
+    #[serde(rename = "CompareError")]
+    CompareError(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CompareError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RevisionNotFound(msg) => {
+                write!(f, "RevisionNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::CompareError(msg) => {
+                write!(f, "CompareError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.tangled.repo.compare
+pub struct CompareResponse;
+impl jacquard_common::xrpc::XrpcResp for CompareResponse {
+    const NSID: &'static str = "sh.tangled.repo.compare";
+    const ENCODING: &'static str = "*/*";
+    type Output<'de> = CompareOutput;
+    type Err<'de> = CompareError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(CompareOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
+    const NSID: &'static str = "sh.tangled.repo.compare";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CompareResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.compare
+pub struct CompareRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.compare";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Compare<'de>;
+    type Response = CompareResponse;
+}
+
 pub mod compare_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -183,125 +304,4 @@ where
             rev2: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-/// Compare output in application/json
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CompareOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CompareError<'a> {
-    /// Repository not found or access denied
-    #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// One or both revisions not found
-    #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Invalid request parameters
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// Failed to compare revisions
-    #[serde(rename = "CompareError")]
-    CompareError(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CompareError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RepoNotFound(msg) => {
-                write!(f, "RepoNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RevisionNotFound(msg) => {
-                write!(f, "RevisionNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::CompareError(msg) => {
-                write!(f, "CompareError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.tangled.repo.compare
-pub struct CompareResponse;
-impl jacquard_common::xrpc::XrpcResp for CompareResponse {
-    const NSID: &'static str = "sh.tangled.repo.compare";
-    const ENCODING: &'static str = "*/*";
-    type Output<'de> = CompareOutput;
-    type Err<'de> = CompareError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(CompareOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
-    const NSID: &'static str = "sh.tangled.repo.compare";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = CompareResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.compare
-pub struct CompareRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.compare";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Compare<'de>;
-    type Response = CompareResponse;
 }

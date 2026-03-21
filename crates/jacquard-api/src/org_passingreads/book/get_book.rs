@@ -20,6 +20,50 @@ pub struct GetBook<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBookOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub book: std::option::Option<crate::org_passingreads::book::StatefulBook<'a>>,
+}
+
+/// Response type for
+///org.passingreads.book.getBook
+pub struct GetBookResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
+    const NSID: &'static str = "org.passingreads.book.getBook";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetBookOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBook<'a> {
+    const NSID: &'static str = "org.passingreads.book.getBook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBookResponse;
+}
+
+/// Endpoint type for
+///org.passingreads.book.getBook
+pub struct GetBookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
+    const PATH: &'static str = "/xrpc/org.passingreads.book.getBook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBook<'de>;
+    type Response = GetBookResponse;
+}
+
 pub mod get_book_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,48 +151,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBookOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub book: std::option::Option<crate::org_passingreads::book::StatefulBook<'a>>,
-}
-
-/// Response type for
-///org.passingreads.book.getBook
-pub struct GetBookResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
-    const NSID: &'static str = "org.passingreads.book.getBook";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBookOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBook<'a> {
-    const NSID: &'static str = "org.passingreads.book.getBook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBookResponse;
-}
-
-/// Endpoint type for
-///org.passingreads.book.getBook
-pub struct GetBookRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
-    const PATH: &'static str = "/xrpc/org.passingreads.book.getBook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBook<'de>;
-    type Response = GetBookResponse;
 }

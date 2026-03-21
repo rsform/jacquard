@@ -21,6 +21,48 @@ pub struct GetValidBadges<'a> {
     pub streamer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetValidBadgesOutput<'a> {
+    #[serde(borrow)]
+    pub badges: Vec<crate::place_stream::badge::BadgeView<'a>>,
+}
+
+/// Response type for
+///place.stream.badge.getValidBadges
+pub struct GetValidBadgesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetValidBadgesResponse {
+    const NSID: &'static str = "place.stream.badge.getValidBadges";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetValidBadgesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetValidBadges<'a> {
+    const NSID: &'static str = "place.stream.badge.getValidBadges";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetValidBadgesResponse;
+}
+
+/// Endpoint type for
+///place.stream.badge.getValidBadges
+pub struct GetValidBadgesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
+    const PATH: &'static str = "/xrpc/place.stream.badge.getValidBadges";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetValidBadges<'de>;
+    type Response = GetValidBadgesResponse;
+}
+
 pub mod get_valid_badges_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -96,46 +138,4 @@ where
             streamer: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetValidBadgesOutput<'a> {
-    #[serde(borrow)]
-    pub badges: Vec<crate::place_stream::badge::BadgeView<'a>>,
-}
-
-/// Response type for
-///place.stream.badge.getValidBadges
-pub struct GetValidBadgesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetValidBadgesResponse {
-    const NSID: &'static str = "place.stream.badge.getValidBadges";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetValidBadgesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetValidBadges<'a> {
-    const NSID: &'static str = "place.stream.badge.getValidBadges";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetValidBadgesResponse;
-}
-
-/// Endpoint type for
-///place.stream.badge.getValidBadges
-pub struct GetValidBadgesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
-    const PATH: &'static str = "/xrpc/place.stream.badge.getValidBadges";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetValidBadges<'de>;
-    type Response = GetValidBadgesResponse;
 }

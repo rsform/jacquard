@@ -19,6 +19,273 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowerRule<'a> {}
+/// Allow replies from actors you follow.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FollowingRule<'a> {}
+/// Allow replies from actors on a list.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListRule<'a> {
+    #[serde(borrow)]
+    pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Threadgate<'a> {
+    ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///List of hidden reply URIs.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hidden_replies: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
+    ///Reference (AT-URI) to the post record.
+    #[serde(borrow)]
+    pub post: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThreadgateAllowItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    MentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    FollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    FollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadgateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Threadgate<'a>,
+}
+
+/// Allow replies from actors mentioned in your post.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MentionRule<'a> {}
+impl<'a> Threadgate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ThreadgateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "followerRule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_threadgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "followingRule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_threadgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "listRule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_threadgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ThreadgateRecord;
+impl jacquard_common::xrpc::XrpcResp for ThreadgateRecord {
+    const NSID: &'static str = "app.bsky.feed.threadgate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ThreadgateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
+    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Threadgate<'_> {
+    const NSID: &'static str = "app.bsky.feed.threadgate";
+    type Record = ThreadgateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ThreadgateRecord {
+    const NSID: &'static str = "app.bsky.feed.threadgate";
+    type Record = ThreadgateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_threadgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.allow {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "allow",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.hidden_replies {
+            #[allow(unused_comparisons)]
+            if value.len() > 300usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hidden_replies",
+                    ),
+                    max: 300usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "mentionRule"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_feed_threadgate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -245,71 +512,6 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.threadgate"
-    }
-    fn def_name() -> &'static str {
-        "followerRule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_threadgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Allow replies from actors you follow.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowingRule<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.threadgate"
-    }
-    fn def_name() -> &'static str {
-        "followingRule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_threadgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Allow replies from actors on a list.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListRule<'a> {
-    #[serde(borrow)]
-    pub list: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod list_rule_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -413,52 +615,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.threadgate"
-    }
-    fn def_name() -> &'static str {
-        "listRule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_threadgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Threadgate<'a> {
-    ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///List of hidden reply URIs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub hidden_replies: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-    ///Reference (AT-URI) to the post record.
-    #[serde(borrow)]
-    pub post: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod threadgate_state {
@@ -639,161 +795,5 @@ where
             post: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Threadgate<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ThreadgateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadgateAllowItem<'a> {
-    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    MentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    FollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    FollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
-    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadgateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Threadgate<'a>,
-}
-
-impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
-    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Threadgate<'_> {
-    const NSID: &'static str = "app.bsky.feed.threadgate";
-    type Record = ThreadgateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ThreadgateRecord;
-impl jacquard_common::xrpc::XrpcResp for ThreadgateRecord {
-    const NSID: &'static str = "app.bsky.feed.threadgate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThreadgateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ThreadgateRecord {
-    const NSID: &'static str = "app.bsky.feed.threadgate";
-    type Record = ThreadgateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.threadgate"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_threadgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.allow {
-            #[allow(unused_comparisons)]
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "allow",
-                    ),
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.hidden_replies {
-            #[allow(unused_comparisons)]
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hidden_replies",
-                    ),
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Allow replies from actors mentioned in your post.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MentionRule<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.feed.threadgate"
-    }
-    fn def_name() -> &'static str {
-        "mentionRule"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_feed_threadgate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

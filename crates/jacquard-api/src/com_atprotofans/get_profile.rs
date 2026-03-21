@@ -20,6 +20,94 @@ pub struct GetProfile<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetProfileOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetProfileError<'a> {
+    /// Invalid DID format.
+    #[serde(rename = "InvalidRequest")]
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// No profile found for the given DID.
+    #[serde(rename = "ProfileNotFound")]
+    ProfileNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetProfileError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidRequest(msg) => {
+                write!(f, "InvalidRequest")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::ProfileNotFound(msg) => {
+                write!(f, "ProfileNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atprotofans.getProfile
+pub struct GetProfileResponse;
+impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
+    const NSID: &'static str = "com.atprotofans.getProfile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetProfileOutput<'de>;
+    type Err<'de> = GetProfileError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
+    const NSID: &'static str = "com.atprotofans.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetProfileResponse;
+}
+
+/// Endpoint type for
+///com.atprotofans.getProfile
+pub struct GetProfileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
+    const PATH: &'static str = "/xrpc/com.atprotofans.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetProfile<'de>;
+    type Response = GetProfileResponse;
+}
+
 pub mod get_profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,92 +197,4 @@ where
             subject: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetProfileOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetProfileError<'a> {
-    /// Invalid DID format.
-    #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// No profile found for the given DID.
-    #[serde(rename = "ProfileNotFound")]
-    ProfileNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetProfileError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidRequest(msg) => {
-                write!(f, "InvalidRequest")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::ProfileNotFound(msg) => {
-                write!(f, "ProfileNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atprotofans.getProfile
-pub struct GetProfileResponse;
-impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
-    const NSID: &'static str = "com.atprotofans.getProfile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfileOutput<'de>;
-    type Err<'de> = GetProfileError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
-    const NSID: &'static str = "com.atprotofans.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetProfileResponse;
-}
-
-/// Endpoint type for
-///com.atprotofans.getProfile
-pub struct GetProfileRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
-    const PATH: &'static str = "/xrpc/com.atprotofans.getProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfile<'de>;
-    type Response = GetProfileResponse;
 }

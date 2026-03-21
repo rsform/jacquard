@@ -32,6 +32,84 @@ pub struct LinkedAccount<'a> {
     pub order: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LinkedAccountGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: LinkedAccount<'a>,
+}
+
+impl<'a> LinkedAccount<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LinkedAccountRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LinkedAccountRecord;
+impl jacquard_common::xrpc::XrpcResp for LinkedAccountRecord {
+    const NSID: &'static str = "io.whiteside.linkedAccount";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LinkedAccountGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LinkedAccountGetRecordOutput<'_>> for LinkedAccount<'_> {
+    fn from(output: LinkedAccountGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for LinkedAccount<'_> {
+    const NSID: &'static str = "io.whiteside.linkedAccount";
+    type Record = LinkedAccountRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LinkedAccountRecord {
+    const NSID: &'static str = "io.whiteside.linkedAccount";
+    type Record = LinkedAccountRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
+    fn nsid() -> &'static str {
+        "io.whiteside.linkedAccount"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_whiteside_linkedAccount()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod linked_account_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,49 +120,49 @@ pub mod linked_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Link;
+        type Name;
         type Icon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Link = Unset;
+        type Name = Unset;
         type Icon = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Link = S::Link;
-        type Icon = S::Icon;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
-        type Name = S::Name;
         type Link = Set<members::link>;
+        type Name = S::Name;
+        type Icon = S::Icon;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Link = S::Link;
+        type Name = Set<members::name>;
         type Icon = S::Icon;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
-        type Name = S::Name;
         type Link = S::Link;
+        type Name = S::Name;
         type Icon = Set<members::icon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `link` field
         pub struct link(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `icon` field
         pub struct icon(());
     }
@@ -193,8 +271,8 @@ impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
 impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
-    S::Name: linked_account_state::IsSet,
     S::Link: linked_account_state::IsSet,
+    S::Name: linked_account_state::IsSet,
     S::Icon: linked_account_state::IsSet,
 {
     /// Build the final struct
@@ -222,84 +300,6 @@ where
             order: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> LinkedAccount<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LinkedAccountRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkedAccountGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: LinkedAccount<'a>,
-}
-
-impl From<LinkedAccountGetRecordOutput<'_>> for LinkedAccount<'_> {
-    fn from(output: LinkedAccountGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for LinkedAccount<'_> {
-    const NSID: &'static str = "io.whiteside.linkedAccount";
-    type Record = LinkedAccountRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LinkedAccountRecord;
-impl jacquard_common::xrpc::XrpcResp for LinkedAccountRecord {
-    const NSID: &'static str = "io.whiteside.linkedAccount";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkedAccountGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LinkedAccountRecord {
-    const NSID: &'static str = "io.whiteside.linkedAccount";
-    type Record = LinkedAccountRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
-    fn nsid() -> &'static str {
-        "io.whiteside.linkedAccount"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_whiteside_linkedAccount()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -26,6 +26,125 @@ pub struct AppPassword<'a> {
     pub privileged: std::option::Option<bool>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppPassword<'a> {
+    ///A short name for the App Password, to help distinguish them.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub privileged: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppPasswordOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateAppPasswordError<'a> {
+    #[serde(rename = "AccountTakedown")]
+    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CreateAppPasswordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::AccountTakedown(msg) => {
+                write!(f, "AccountTakedown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.server.createAppPassword"
+    }
+    fn def_name() -> &'static str {
+        "appPassword"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_server_createAppPassword()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///com.atproto.server.createAppPassword
+pub struct CreateAppPasswordResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateAppPasswordResponse {
+    const NSID: &'static str = "com.atproto.server.createAppPassword";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateAppPasswordOutput<'de>;
+    type Err<'de> = CreateAppPasswordError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAppPassword<'a> {
+    const NSID: &'static str = "com.atproto.server.createAppPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateAppPasswordResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.createAppPassword
+pub struct CreateAppPasswordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateAppPasswordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createAppPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateAppPassword<'de>;
+    type Response = CreateAppPasswordResponse;
+}
+
 pub mod app_password_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,49 +155,49 @@ pub mod app_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Password;
         type Name;
+        type Password;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Password = Unset;
         type Name = Unset;
+        type Password = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Password = Set<members::password>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Password = S::Password;
         type Name = Set<members::name>;
+        type Password = S::Password;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Name = S::Name;
+        type Password = Set<members::password>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Password = S::Password;
         type Name = S::Name;
+        type Password = S::Password;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `password` field
-        pub struct password(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `password` field
+        pub struct password(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -187,8 +306,8 @@ impl<'a, S: app_password_state::State> AppPasswordBuilder<'a, S> {
 impl<'a, S> AppPasswordBuilder<'a, S>
 where
     S: app_password_state::State,
-    S::Password: app_password_state::IsSet,
     S::Name: app_password_state::IsSet,
+    S::Password: app_password_state::IsSet,
     S::CreatedAt: app_password_state::IsSet,
 {
     /// Build the final struct
@@ -378,123 +497,4 @@ fn lexicon_doc_com_atproto_server_createAppPassword() -> ::jacquard_lexicon::lex
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.server.createAppPassword"
-    }
-    fn def_name() -> &'static str {
-        "appPassword"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_server_createAppPassword()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateAppPassword<'a> {
-    ///A short name for the App Password, to help distinguish them.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateAppPasswordOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateAppPasswordError<'a> {
-    #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CreateAppPasswordError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::AccountTakedown(msg) => {
-                write!(f, "AccountTakedown")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.server.createAppPassword
-pub struct CreateAppPasswordResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateAppPasswordResponse {
-    const NSID: &'static str = "com.atproto.server.createAppPassword";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateAppPasswordOutput<'de>;
-    type Err<'de> = CreateAppPasswordError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAppPassword<'a> {
-    const NSID: &'static str = "com.atproto.server.createAppPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateAppPasswordResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.createAppPassword
-pub struct CreateAppPasswordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateAppPasswordRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.createAppPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateAppPassword<'de>;
-    type Response = CreateAppPasswordResponse;
 }

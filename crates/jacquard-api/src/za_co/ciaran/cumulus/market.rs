@@ -25,6 +25,97 @@ pub struct Market<'a> {
     pub question: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MarketGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Market<'a>,
+}
+
+impl<'a> Market<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MarketRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MarketRecord;
+impl jacquard_common::xrpc::XrpcResp for MarketRecord {
+    const NSID: &'static str = "za.co.ciaran.cumulus.market";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MarketGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MarketGetRecordOutput<'_>> for Market<'_> {
+    fn from(output: MarketGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Market<'_> {
+    const NSID: &'static str = "za.co.ciaran.cumulus.market";
+    type Record = MarketRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MarketRecord {
+    const NSID: &'static str = "za.co.ciaran.cumulus.market";
+    type Record = MarketRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Market<'a> {
+    fn nsid() -> &'static str {
+        "za.co.ciaran.cumulus.market"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_za_co_ciaran_cumulus_market()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.question;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 140usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "question",
+                    ),
+                    max: 140usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod market_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,67 +126,67 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Question;
-        type ClosesAt;
+        type CreatedAt;
         type Liquidity;
+        type ClosesAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Question = Unset;
-        type ClosesAt = Unset;
+        type CreatedAt = Unset;
         type Liquidity = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Question = S::Question;
-        type ClosesAt = S::ClosesAt;
-        type Liquidity = S::Liquidity;
+        type ClosesAt = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type CreatedAt = S::CreatedAt;
         type Question = Set<members::question>;
-        type ClosesAt = S::ClosesAt;
-        type Liquidity = S::Liquidity;
-    }
-    ///State transition - sets the `closes_at` field to Set
-    pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClosesAt<S> {}
-    impl<S: State> State for SetClosesAt<S> {
         type CreatedAt = S::CreatedAt;
-        type Question = S::Question;
-        type ClosesAt = Set<members::closes_at>;
         type Liquidity = S::Liquidity;
+        type ClosesAt = S::ClosesAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Question = S::Question;
+        type CreatedAt = Set<members::created_at>;
+        type Liquidity = S::Liquidity;
+        type ClosesAt = S::ClosesAt;
     }
     ///State transition - sets the `liquidity` field to Set
     pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLiquidity<S> {}
     impl<S: State> State for SetLiquidity<S> {
-        type CreatedAt = S::CreatedAt;
         type Question = S::Question;
-        type ClosesAt = S::ClosesAt;
+        type CreatedAt = S::CreatedAt;
         type Liquidity = Set<members::liquidity>;
+        type ClosesAt = S::ClosesAt;
+    }
+    ///State transition - sets the `closes_at` field to Set
+    pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClosesAt<S> {}
+    impl<S: State> State for SetClosesAt<S> {
+        type Question = S::Question;
+        type CreatedAt = S::CreatedAt;
+        type Liquidity = S::Liquidity;
+        type ClosesAt = Set<members::closes_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `question` field
         pub struct question(());
-        ///Marker type for the `closes_at` field
-        pub struct closes_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `liquidity` field
         pub struct liquidity(());
+        ///Marker type for the `closes_at` field
+        pub struct closes_at(());
     }
 }
 
@@ -208,10 +299,10 @@ where
 impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
-    S::CreatedAt: market_state::IsSet,
     S::Question: market_state::IsSet,
-    S::ClosesAt: market_state::IsSet,
+    S::CreatedAt: market_state::IsSet,
     S::Liquidity: market_state::IsSet,
+    S::ClosesAt: market_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Market<'a> {
@@ -238,97 +329,6 @@ where
             question: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Market<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MarketRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MarketGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Market<'a>,
-}
-
-impl From<MarketGetRecordOutput<'_>> for Market<'_> {
-    fn from(output: MarketGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Market<'_> {
-    const NSID: &'static str = "za.co.ciaran.cumulus.market";
-    type Record = MarketRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MarketRecord;
-impl jacquard_common::xrpc::XrpcResp for MarketRecord {
-    const NSID: &'static str = "za.co.ciaran.cumulus.market";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MarketGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MarketRecord {
-    const NSID: &'static str = "za.co.ciaran.cumulus.market";
-    type Record = MarketRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Market<'a> {
-    fn nsid() -> &'static str {
-        "za.co.ciaran.cumulus.market"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_za_co_ciaran_cumulus_market()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.question;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 140usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "question",
-                    ),
-                    max: 140usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

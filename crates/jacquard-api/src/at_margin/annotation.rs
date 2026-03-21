@@ -37,6 +37,938 @@ pub struct Body<'a> {
     pub value: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// W3C CssSelector - select DOM elements by CSS selector
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CssSelector<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///CSS selector string
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+/// W3C FragmentSelector - select by URI fragment
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FragmentSelector<'a> {
+    ///Specification the fragment conforms to
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub conforms_to: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Fragment identifier value
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+/// The client/agent that created this record
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Generator<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub homepage: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// A W3C-compliant web annotation stored on the AT Protocol
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Annotation<'a> {
+    ///The annotation content (text or reference)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub body: std::option::Option<crate::at_margin::annotation::Body<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///The client/agent that created this record
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub generator: std::option::Option<crate::at_margin::annotation::Generator<'a>>,
+    ///Self-applied content labels for this annotation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ///W3C motivation for the annotation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub motivation: std::option::Option<AnnotationMotivation<'a>>,
+    ///License URI (e.g., https://creativecommons.org/licenses/by/4.0/)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rights: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///Tags for categorization
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///The resource being annotated with optional selector
+    #[serde(borrow)]
+    pub target: crate::at_margin::annotation::Target<'a>,
+}
+
+/// W3C motivation for the annotation
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AnnotationMotivation<'a> {
+    Commenting,
+    Highlighting,
+    Bookmarking,
+    Tagging,
+    Describing,
+    Linking,
+    Replying,
+    Editing,
+    Questioning,
+    Assessing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AnnotationMotivation<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Commenting => "commenting",
+            Self::Highlighting => "highlighting",
+            Self::Bookmarking => "bookmarking",
+            Self::Tagging => "tagging",
+            Self::Describing => "describing",
+            Self::Linking => "linking",
+            Self::Replying => "replying",
+            Self::Editing => "editing",
+            Self::Questioning => "questioning",
+            Self::Assessing => "assessing",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AnnotationMotivation<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "commenting" => Self::Commenting,
+            "highlighting" => Self::Highlighting,
+            "bookmarking" => Self::Bookmarking,
+            "tagging" => Self::Tagging,
+            "describing" => Self::Describing,
+            "linking" => Self::Linking,
+            "replying" => Self::Replying,
+            "editing" => Self::Editing,
+            "questioning" => Self::Questioning,
+            "assessing" => Self::Assessing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AnnotationMotivation<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "commenting" => Self::Commenting,
+            "highlighting" => Self::Highlighting,
+            "bookmarking" => Self::Bookmarking,
+            "tagging" => Self::Tagging,
+            "describing" => Self::Describing,
+            "linking" => Self::Linking,
+            "replying" => Self::Replying,
+            "editing" => Self::Editing,
+            "questioning" => Self::Questioning,
+            "assessing" => Self::Assessing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AnnotationMotivation<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AnnotationMotivation<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AnnotationMotivation<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AnnotationMotivation<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AnnotationMotivation<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AnnotationMotivation<'_> {
+    type Output = AnnotationMotivation<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AnnotationMotivation::Commenting => AnnotationMotivation::Commenting,
+            AnnotationMotivation::Highlighting => AnnotationMotivation::Highlighting,
+            AnnotationMotivation::Bookmarking => AnnotationMotivation::Bookmarking,
+            AnnotationMotivation::Tagging => AnnotationMotivation::Tagging,
+            AnnotationMotivation::Describing => AnnotationMotivation::Describing,
+            AnnotationMotivation::Linking => AnnotationMotivation::Linking,
+            AnnotationMotivation::Replying => AnnotationMotivation::Replying,
+            AnnotationMotivation::Editing => AnnotationMotivation::Editing,
+            AnnotationMotivation::Questioning => AnnotationMotivation::Questioning,
+            AnnotationMotivation::Assessing => AnnotationMotivation::Assessing,
+            AnnotationMotivation::Other(v) => {
+                AnnotationMotivation::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AnnotationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Annotation<'a>,
+}
+
+/// W3C RangeSelector - select range between two selectors
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RangeSelector<'a> {
+    ///Selector for range end
+    #[serde(borrow)]
+    pub end_selector: RangeSelectorEndSelector<'a>,
+    ///Selector for range start
+    #[serde(borrow)]
+    pub start_selector: RangeSelectorStartSelector<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RangeSelectorEndSelector<'a> {
+    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
+    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#textPositionSelector")]
+    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#cssSelector")]
+    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#xpathSelector")]
+    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RangeSelectorStartSelector<'a> {
+    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
+    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#textPositionSelector")]
+    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#cssSelector")]
+    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#xpathSelector")]
+    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+}
+
+/// W3C SpecificResource - the target with optional selector
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Target<'a> {
+    ///Selector to identify the specific segment
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub selector: std::option::Option<TargetSelector<'a>>,
+    ///The URL being annotated
+    #[serde(borrow)]
+    pub source: jacquard_common::types::string::UriValue<'a>,
+    ///SHA256 hash of normalized URL for indexing
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub source_hash: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///State of the resource at annotation time
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub state: std::option::Option<crate::at_margin::annotation::TimeState<'a>>,
+    ///Page title at time of annotation
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum TargetSelector<'a> {
+    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
+    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#textPositionSelector")]
+    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#cssSelector")]
+    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#xpathSelector")]
+    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#fragmentSelector")]
+    FragmentSelector(Box<crate::at_margin::annotation::FragmentSelector<'a>>),
+    #[serde(rename = "at.margin.annotation#rangeSelector")]
+    RangeSelector(Box<crate::at_margin::annotation::RangeSelector<'a>>),
+}
+
+/// W3C TextPositionSelector - select by character offsets
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TextPositionSelector<'a> {
+    ///Ending character position (exclusive)
+    pub end: i64,
+    ///Starting character position (0-indexed, inclusive)
+    pub start: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// W3C TextQuoteSelector - select text by quoting it with context
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TextQuoteSelector<'a> {
+    ///The exact text to match
+    #[serde(borrow)]
+    pub exact: jacquard_common::CowStr<'a>,
+    ///Text immediately before the selection
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Text immediately after the selection
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// W3C TimeState - record when content was captured
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TimeState<'a> {
+    ///URL to cached/archived version
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cached: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///When the source was accessed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source_date: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// W3C XPathSelector - select by XPath expression
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct XpathSelector<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///XPath expression
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Annotation<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AnnotationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Body<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "body"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.value {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.value {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 3000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "value",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CssSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "cssSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.value;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FragmentSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "fragmentSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.value;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "generator"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AnnotationRecord;
+impl jacquard_common::xrpc::XrpcResp for AnnotationRecord {
+    const NSID: &'static str = "at.margin.annotation";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AnnotationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AnnotationGetRecordOutput<'_>> for Annotation<'_> {
+    fn from(output: AnnotationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Annotation<'_> {
+    const NSID: &'static str = "at.margin.annotation";
+    type Record = AnnotationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AnnotationRecord {
+    const NSID: &'static str = "at.margin.annotation";
+    type Record = AnnotationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Annotation<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RangeSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "rangeSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "target"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.title {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextPositionSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "textPositionSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.end;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.start;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "start",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "textQuoteSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.exact;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "exact",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.exact;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "exact",
+                        ),
+                        max: 1500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.prefix {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "prefix",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.prefix {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 150usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "prefix",
+                        ),
+                        max: 150usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.suffix {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "suffix",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.suffix {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 150usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "suffix",
+                        ),
+                        max: 150usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimeState<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "timeState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for XpathSelector<'a> {
+    fn nsid() -> &'static str {
+        "at.margin.annotation"
+    }
+    fn def_name() -> &'static str {
+        "xpathSelector"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_margin_annotation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.value;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn _default_body_format() -> std::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("text/plain"))
 }
@@ -1016,246 +1948,6 @@ fn lexicon_doc_at_margin_annotation() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Body<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "body"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.value {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.value {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "value",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C CssSelector - select DOM elements by CSS selector
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CssSelector<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///CSS selector string
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CssSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "cssSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.value;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C FragmentSelector - select by URI fragment
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FragmentSelector<'a> {
-    ///Specification the fragment conforms to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub conforms_to: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Fragment identifier value
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FragmentSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "fragmentSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.value;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// The client/agent that created this record
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Generator<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub homepage: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "generator"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A W3C-compliant web annotation stored on the AT Protocol
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Annotation<'a> {
-    ///The annotation content (text or reference)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub body: std::option::Option<crate::at_margin::annotation::Body<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///The client/agent that created this record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub generator: std::option::Option<crate::at_margin::annotation::Generator<'a>>,
-    ///Self-applied content labels for this annotation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///W3C motivation for the annotation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub motivation: std::option::Option<AnnotationMotivation<'a>>,
-    ///License URI (e.g., https://creativecommons.org/licenses/by/4.0/)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rights: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///Tags for categorization
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The resource being annotated with optional selector
-    #[serde(borrow)]
-    pub target: crate::at_margin::annotation::Target<'a>,
-}
-
 pub mod annotation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1525,251 +2217,6 @@ where
     }
 }
 
-impl<'a> Annotation<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AnnotationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// W3C motivation for the annotation
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AnnotationMotivation<'a> {
-    Commenting,
-    Highlighting,
-    Bookmarking,
-    Tagging,
-    Describing,
-    Linking,
-    Replying,
-    Editing,
-    Questioning,
-    Assessing,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> AnnotationMotivation<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Commenting => "commenting",
-            Self::Highlighting => "highlighting",
-            Self::Bookmarking => "bookmarking",
-            Self::Tagging => "tagging",
-            Self::Describing => "describing",
-            Self::Linking => "linking",
-            Self::Replying => "replying",
-            Self::Editing => "editing",
-            Self::Questioning => "questioning",
-            Self::Assessing => "assessing",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AnnotationMotivation<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "commenting" => Self::Commenting,
-            "highlighting" => Self::Highlighting,
-            "bookmarking" => Self::Bookmarking,
-            "tagging" => Self::Tagging,
-            "describing" => Self::Describing,
-            "linking" => Self::Linking,
-            "replying" => Self::Replying,
-            "editing" => Self::Editing,
-            "questioning" => Self::Questioning,
-            "assessing" => Self::Assessing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for AnnotationMotivation<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "commenting" => Self::Commenting,
-            "highlighting" => Self::Highlighting,
-            "bookmarking" => Self::Bookmarking,
-            "tagging" => Self::Tagging,
-            "describing" => Self::Describing,
-            "linking" => Self::Linking,
-            "replying" => Self::Replying,
-            "editing" => Self::Editing,
-            "questioning" => Self::Questioning,
-            "assessing" => Self::Assessing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AnnotationMotivation<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for AnnotationMotivation<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for AnnotationMotivation<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for AnnotationMotivation<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for AnnotationMotivation<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for AnnotationMotivation<'_> {
-    type Output = AnnotationMotivation<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AnnotationMotivation::Commenting => AnnotationMotivation::Commenting,
-            AnnotationMotivation::Highlighting => AnnotationMotivation::Highlighting,
-            AnnotationMotivation::Bookmarking => AnnotationMotivation::Bookmarking,
-            AnnotationMotivation::Tagging => AnnotationMotivation::Tagging,
-            AnnotationMotivation::Describing => AnnotationMotivation::Describing,
-            AnnotationMotivation::Linking => AnnotationMotivation::Linking,
-            AnnotationMotivation::Replying => AnnotationMotivation::Replying,
-            AnnotationMotivation::Editing => AnnotationMotivation::Editing,
-            AnnotationMotivation::Questioning => AnnotationMotivation::Questioning,
-            AnnotationMotivation::Assessing => AnnotationMotivation::Assessing,
-            AnnotationMotivation::Other(v) => {
-                AnnotationMotivation::Other(v.into_static())
-            }
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AnnotationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Annotation<'a>,
-}
-
-impl From<AnnotationGetRecordOutput<'_>> for Annotation<'_> {
-    fn from(output: AnnotationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Annotation<'_> {
-    const NSID: &'static str = "at.margin.annotation";
-    type Record = AnnotationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AnnotationRecord;
-impl jacquard_common::xrpc::XrpcResp for AnnotationRecord {
-    const NSID: &'static str = "at.margin.annotation";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AnnotationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AnnotationRecord {
-    const NSID: &'static str = "at.margin.annotation";
-    type Record = AnnotationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Annotation<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C RangeSelector - select range between two selectors
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RangeSelector<'a> {
-    ///Selector for range end
-    #[serde(borrow)]
-    pub end_selector: RangeSelectorEndSelector<'a>,
-    ///Selector for range start
-    #[serde(borrow)]
-    pub start_selector: RangeSelectorStartSelector<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod range_selector_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1927,103 +2374,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RangeSelectorEndSelector<'a> {
-    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RangeSelectorStartSelector<'a> {
-    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RangeSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "rangeSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// W3C SpecificResource - the target with optional selector
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Target<'a> {
-    ///Selector to identify the specific segment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub selector: std::option::Option<TargetSelector<'a>>,
-    ///The URL being annotated
-    #[serde(borrow)]
-    pub source: jacquard_common::types::string::UriValue<'a>,
-    ///SHA256 hash of normalized URL for indexing
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub source_hash: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///State of the resource at annotation time
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub state: std::option::Option<crate::at_margin::annotation::TimeState<'a>>,
-    ///Page title at time of annotation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod target_state {
@@ -2210,84 +2560,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TargetSelector<'a> {
-    #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#fragmentSelector")]
-    FragmentSelector(Box<crate::at_margin::annotation::FragmentSelector<'a>>),
-    #[serde(rename = "at.margin.annotation#rangeSelector")]
-    RangeSelector(Box<crate::at_margin::annotation::RangeSelector<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "target"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.title {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C TextPositionSelector - select by character offsets
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TextPositionSelector<'a> {
-    ///Ending character position (exclusive)
-    pub end: i64,
-    ///Starting character position (0-indexed, inclusive)
-    pub start: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod text_position_selector_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2298,37 +2570,37 @@ pub mod text_position_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type End = S::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnd<S> {}
     impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
         type End = Set<members::end>;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type End = S::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -2421,8 +2693,8 @@ impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a,
 impl<'a, S> TextPositionSelectorBuilder<'a, S>
 where
     S: text_position_selector_state::State,
-    S::Start: text_position_selector_state::IsSet,
     S::End: text_position_selector_state::IsSet,
+    S::Start: text_position_selector_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TextPositionSelector<'a> {
@@ -2447,277 +2719,5 @@ where
             r#type: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextPositionSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "textPositionSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.end;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.start;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "start",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C TextQuoteSelector - select text by quoting it with context
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TextQuoteSelector<'a> {
-    ///The exact text to match
-    #[serde(borrow)]
-    pub exact: jacquard_common::CowStr<'a>,
-    ///Text immediately before the selection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Text immediately after the selection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "textQuoteSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.exact;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exact",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.exact;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "exact",
-                        ),
-                        max: 1500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.prefix {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "prefix",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.prefix {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "prefix",
-                        ),
-                        max: 150usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.suffix {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "suffix",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.suffix {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "suffix",
-                        ),
-                        max: 150usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// W3C TimeState - record when content was captured
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TimeState<'a> {
-    ///URL to cached/archived version
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cached: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///When the source was accessed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub source_date: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimeState<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "timeState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// W3C XPathSelector - select by XPath expression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct XpathSelector<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///XPath expression
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for XpathSelector<'a> {
-    fn nsid() -> &'static str {
-        "at.margin.annotation"
-    }
-    fn def_name() -> &'static str {
-        "xpathSelector"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_margin_annotation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.value;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

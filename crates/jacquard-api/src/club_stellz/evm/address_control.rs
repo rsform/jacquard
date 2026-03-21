@@ -30,6 +30,141 @@ pub struct AddressControl<'a> {
     pub siwe: crate::club_stellz::evm::address_control::SiweMessage<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SiweMessage<'a> {
+    ///Ethereum address in 0x-prefixed, checksummed hex format
+    #[serde(borrow)]
+    pub address: jacquard_common::CowStr<'a>,
+    ///Chain ID of the Ethereum VM network the address is on
+    pub chain_id: i64,
+    ///Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
+    #[serde(borrow)]
+    pub domain: jacquard_common::CowStr<'a>,
+    ///Timestamp when the message was signed
+    pub issued_at: jacquard_common::types::string::Datetime,
+    ///Random nonce the message was signed with
+    #[serde(borrow)]
+    pub nonce: jacquard_common::CowStr<'a>,
+    ///The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
+    #[serde(borrow)]
+    pub statement: jacquard_common::CowStr<'a>,
+    ///URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::UriValue<'a>,
+    ///Sign in With Ethereum message version
+    #[serde(borrow)]
+    pub version: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AddressControl<'a> {
+    fn nsid() -> &'static str {
+        "club.stellz.evm.addressControl"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_club_stellz_evm_addressControl()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
+    fn nsid() -> &'static str {
+        "club.stellz.evm.addressControl"
+    }
+    fn def_name() -> &'static str {
+        "siweMessage"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_club_stellz_evm_addressControl()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.address;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 42usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "address",
+                    ),
+                    max: 42usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.address;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 42usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "address",
+                    ),
+                    min: 42usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.nonce;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nonce",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.nonce;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nonce",
+                    ),
+                    min: 8usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.statement;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 78usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "statement",
+                    ),
+                    min: 78usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod address_control_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,51 +175,51 @@ pub mod address_control_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
         type Siwe;
         type Address;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
         type Siwe = Unset;
         type Address = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signature = Set<members::signature>;
-        type Siwe = S::Siwe;
-        type Address = S::Address;
+        type Signature = Unset;
     }
     ///State transition - sets the `siwe` field to Set
     pub struct SetSiwe<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiwe<S> {}
     impl<S: State> State for SetSiwe<S> {
-        type Signature = S::Signature;
         type Siwe = Set<members::siwe>;
         type Address = S::Address;
+        type Signature = S::Signature;
     }
     ///State transition - sets the `address` field to Set
     pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddress<S> {}
     impl<S: State> State for SetAddress<S> {
-        type Signature = S::Signature;
         type Siwe = S::Siwe;
         type Address = Set<members::address>;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Siwe = S::Siwe;
+        type Address = S::Address;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `siwe` field
         pub struct siwe(());
         ///Marker type for the `address` field
         pub struct address(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -191,9 +326,9 @@ where
 impl<'a, S> AddressControlBuilder<'a, S>
 where
     S: address_control_state::State,
-    S::Signature: address_control_state::IsSet,
     S::Siwe: address_control_state::IsSet,
     S::Address: address_control_state::IsSet,
+    S::Signature: address_control_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddressControl<'a> {
@@ -496,59 +631,6 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AddressControl<'a> {
-    fn nsid() -> &'static str {
-        "club.stellz.evm.addressControl"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_club_stellz_evm_addressControl()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SiweMessage<'a> {
-    ///Ethereum address in 0x-prefixed, checksummed hex format
-    #[serde(borrow)]
-    pub address: jacquard_common::CowStr<'a>,
-    ///Chain ID of the Ethereum VM network the address is on
-    pub chain_id: i64,
-    ///Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
-    #[serde(borrow)]
-    pub domain: jacquard_common::CowStr<'a>,
-    ///Timestamp when the message was signed
-    pub issued_at: jacquard_common::types::string::Datetime,
-    ///Random nonce the message was signed with
-    #[serde(borrow)]
-    pub nonce: jacquard_common::CowStr<'a>,
-    ///The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
-    #[serde(borrow)]
-    pub statement: jacquard_common::CowStr<'a>,
-    ///URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
-    ///Sign in With Ethereum message version
-    #[serde(borrow)]
-    pub version: jacquard_common::CowStr<'a>,
-}
-
 pub mod siwe_message_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -559,151 +641,151 @@ pub mod siwe_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IssuedAt;
+        type Statement;
         type Domain;
+        type ChainId;
         type Nonce;
         type Version;
         type Address;
+        type IssuedAt;
         type Uri;
-        type ChainId;
-        type Statement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IssuedAt = Unset;
+        type Statement = Unset;
         type Domain = Unset;
+        type ChainId = Unset;
         type Nonce = Unset;
         type Version = Unset;
         type Address = Unset;
+        type IssuedAt = Unset;
         type Uri = Unset;
-        type ChainId = Unset;
-        type Statement = Unset;
-    }
-    ///State transition - sets the `issued_at` field to Set
-    pub struct SetIssuedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuedAt<S> {}
-    impl<S: State> State for SetIssuedAt<S> {
-        type IssuedAt = Set<members::issued_at>;
-        type Domain = S::Domain;
-        type Nonce = S::Nonce;
-        type Version = S::Version;
-        type Address = S::Address;
-        type Uri = S::Uri;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = Set<members::domain>;
-        type Nonce = S::Nonce;
-        type Version = S::Version;
-        type Address = S::Address;
-        type Uri = S::Uri;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `nonce` field to Set
-    pub struct SetNonce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNonce<S> {}
-    impl<S: State> State for SetNonce<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = S::Domain;
-        type Nonce = Set<members::nonce>;
-        type Version = S::Version;
-        type Address = S::Address;
-        type Uri = S::Uri;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = S::Domain;
-        type Nonce = S::Nonce;
-        type Version = Set<members::version>;
-        type Address = S::Address;
-        type Uri = S::Uri;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = S::Domain;
-        type Nonce = S::Nonce;
-        type Version = S::Version;
-        type Address = Set<members::address>;
-        type Uri = S::Uri;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = S::Domain;
-        type Nonce = S::Nonce;
-        type Version = S::Version;
-        type Address = S::Address;
-        type Uri = Set<members::uri>;
-        type ChainId = S::ChainId;
-        type Statement = S::Statement;
-    }
-    ///State transition - sets the `chain_id` field to Set
-    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChainId<S> {}
-    impl<S: State> State for SetChainId<S> {
-        type IssuedAt = S::IssuedAt;
-        type Domain = S::Domain;
-        type Nonce = S::Nonce;
-        type Version = S::Version;
-        type Address = S::Address;
-        type Uri = S::Uri;
-        type ChainId = Set<members::chain_id>;
-        type Statement = S::Statement;
     }
     ///State transition - sets the `statement` field to Set
     pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatement<S> {}
     impl<S: State> State for SetStatement<S> {
-        type IssuedAt = S::IssuedAt;
+        type Statement = Set<members::statement>;
         type Domain = S::Domain;
+        type ChainId = S::ChainId;
         type Nonce = S::Nonce;
         type Version = S::Version;
         type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
         type Uri = S::Uri;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Statement = S::Statement;
+        type Domain = Set<members::domain>;
         type ChainId = S::ChainId;
-        type Statement = Set<members::statement>;
+        type Nonce = S::Nonce;
+        type Version = S::Version;
+        type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `chain_id` field to Set
+    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChainId<S> {}
+    impl<S: State> State for SetChainId<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = Set<members::chain_id>;
+        type Nonce = S::Nonce;
+        type Version = S::Version;
+        type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `nonce` field to Set
+    pub struct SetNonce<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNonce<S> {}
+    impl<S: State> State for SetNonce<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = S::ChainId;
+        type Nonce = Set<members::nonce>;
+        type Version = S::Version;
+        type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type Version = Set<members::version>;
+        type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type Version = S::Version;
+        type Address = Set<members::address>;
+        type IssuedAt = S::IssuedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `issued_at` field to Set
+    pub struct SetIssuedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuedAt<S> {}
+    impl<S: State> State for SetIssuedAt<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type Version = S::Version;
+        type Address = S::Address;
+        type IssuedAt = Set<members::issued_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Statement = S::Statement;
+        type Domain = S::Domain;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type Version = S::Version;
+        type Address = S::Address;
+        type IssuedAt = S::IssuedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issued_at` field
-        pub struct issued_at(());
+        ///Marker type for the `statement` field
+        pub struct statement(());
         ///Marker type for the `domain` field
         pub struct domain(());
+        ///Marker type for the `chain_id` field
+        pub struct chain_id(());
         ///Marker type for the `nonce` field
         pub struct nonce(());
         ///Marker type for the `version` field
         pub struct version(());
         ///Marker type for the `address` field
         pub struct address(());
+        ///Marker type for the `issued_at` field
+        pub struct issued_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `chain_id` field
-        pub struct chain_id(());
-        ///Marker type for the `statement` field
-        pub struct statement(());
     }
 }
 
@@ -896,14 +978,14 @@ where
 impl<'a, S> SiweMessageBuilder<'a, S>
 where
     S: siwe_message_state::State,
-    S::IssuedAt: siwe_message_state::IsSet,
+    S::Statement: siwe_message_state::IsSet,
     S::Domain: siwe_message_state::IsSet,
+    S::ChainId: siwe_message_state::IsSet,
     S::Nonce: siwe_message_state::IsSet,
     S::Version: siwe_message_state::IsSet,
     S::Address: siwe_message_state::IsSet,
+    S::IssuedAt: siwe_message_state::IsSet,
     S::Uri: siwe_message_state::IsSet,
-    S::ChainId: siwe_message_state::IsSet,
-    S::Statement: siwe_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SiweMessage<'a> {
@@ -938,87 +1020,5 @@ where
             version: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
-    fn nsid() -> &'static str {
-        "club.stellz.evm.addressControl"
-    }
-    fn def_name() -> &'static str {
-        "siweMessage"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_club_stellz_evm_addressControl()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.address;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "address",
-                    ),
-                    max: 42usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.address;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "address",
-                    ),
-                    min: 42usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.nonce;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "nonce",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.nonce;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "nonce",
-                    ),
-                    min: 8usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.statement;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 78usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "statement",
-                    ),
-                    min: 78usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -29,6 +29,194 @@ pub struct TeamScore<'a> {
     pub team: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TeamScoreGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: TeamScore<'a>,
+}
+
+/// An answer with scores for each expected answer
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScoredAnswer<'a> {
+    ///Reference to the answer record
+    #[serde(borrow)]
+    pub answer: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///Optional commentary from the quiz master
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub commentary: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Points awarded for each expected answer in the question
+    pub scores: Vec<i64>,
+}
+
+impl<'a> TeamScore<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TeamScoreRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TeamScoreRecord;
+impl jacquard_common::xrpc::XrpcResp for TeamScoreRecord {
+    const NSID: &'static str = "pub.quizzy.teamScore";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TeamScoreGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TeamScoreGetRecordOutput<'_>> for TeamScore<'_> {
+    fn from(output: TeamScoreGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for TeamScore<'_> {
+    const NSID: &'static str = "pub.quizzy.teamScore";
+    type Record = TeamScoreRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TeamScoreRecord {
+    const NSID: &'static str = "pub.quizzy.teamScore";
+    type Record = TeamScoreRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.teamScore"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_teamScore()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.answers;
+            #[allow(unused_comparisons)]
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "answers",
+                    ),
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.teamScore"
+    }
+    fn def_name() -> &'static str {
+        "scoredAnswer"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_teamScore()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.commentary {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "commentary",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.commentary {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "commentary",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.scores;
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scores",
+                    ),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.scores;
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scores",
+                    ),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod team_score_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -206,97 +394,6 @@ where
     }
 }
 
-impl<'a> TeamScore<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TeamScoreRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TeamScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TeamScore<'a>,
-}
-
-impl From<TeamScoreGetRecordOutput<'_>> for TeamScore<'_> {
-    fn from(output: TeamScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for TeamScore<'_> {
-    const NSID: &'static str = "pub.quizzy.teamScore";
-    type Record = TeamScoreRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TeamScoreRecord;
-impl jacquard_common::xrpc::XrpcResp for TeamScoreRecord {
-    const NSID: &'static str = "pub.quizzy.teamScore";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TeamScoreGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TeamScoreRecord {
-    const NSID: &'static str = "pub.quizzy.teamScore";
-    type Record = TeamScoreRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.teamScore"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_teamScore()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.answers;
-            #[allow(unused_comparisons)]
-            if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answers",
-                    ),
-                    max: 500usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -457,30 +554,6 @@ fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-/// An answer with scores for each expected answer
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScoredAnswer<'a> {
-    ///Reference to the answer record
-    #[serde(borrow)]
-    pub answer: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///Optional commentary from the quiz master
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub commentary: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Points awarded for each expected answer in the question
-    pub scores: Vec<i64>,
-}
-
 pub mod scored_answer_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -491,37 +564,37 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scores;
         type Answer;
+        type Scores;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scores = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `scores` field to Set
-    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScores<S> {}
-    impl<S: State> State for SetScores<S> {
-        type Scores = Set<members::scores>;
-        type Answer = S::Answer;
+        type Scores = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
-        type Scores = S::Scores;
         type Answer = Set<members::answer>;
+        type Scores = S::Scores;
+    }
+    ///State transition - sets the `scores` field to Set
+    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScores<S> {}
+    impl<S: State> State for SetScores<S> {
+        type Answer = S::Answer;
+        type Scores = Set<members::scores>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scores` field
-        pub struct scores(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `scores` field
+        pub struct scores(());
     }
 }
 
@@ -614,8 +687,8 @@ where
 impl<'a, S> ScoredAnswerBuilder<'a, S>
 where
     S: scored_answer_state::State,
-    S::Scores: scored_answer_state::IsSet,
     S::Answer: scored_answer_state::IsSet,
+    S::Scores: scored_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScoredAnswer<'a> {
@@ -640,78 +713,5 @@ where
             scores: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.teamScore"
-    }
-    fn def_name() -> &'static str {
-        "scoredAnswer"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_teamScore()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.commentary {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "commentary",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.commentary {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "commentary",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.scores;
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scores",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.scores;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scores",
-                    ),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
     }
 }

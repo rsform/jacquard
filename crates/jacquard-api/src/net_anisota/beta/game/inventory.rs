@@ -70,6 +70,199 @@ pub struct Inventory<'a> {
     pub stackable: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct InventoryGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Inventory<'a>,
+}
+
+/// Additional details about how the item was acquired
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceDetails<'a> {
+    ///URI of the game card that provided this item
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///ID of the quest that rewarded this item
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Daily reward streak when item was acquired
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reward_streak: std::option::Option<i64>,
+}
+
+impl<'a> Inventory<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, InventoryRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct InventoryRecord;
+impl jacquard_common::xrpc::XrpcResp for InventoryRecord {
+    const NSID: &'static str = "net.anisota.beta.game.inventory";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = InventoryGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
+    fn from(output: InventoryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Inventory<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.inventory";
+    type Record = InventoryRecord;
+}
+
+impl jacquard_common::types::collection::Collection for InventoryRecord {
+    const NSID: &'static str = "net.anisota.beta.game.inventory";
+    type Record = InventoryRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.inventory"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_inventory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.item_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_id",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.item_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.item_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_type",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.item_value {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_value",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.max_stack {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_stack",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.quantity;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.inventory"
+    }
+    fn def_name() -> &'static str {
+        "sourceDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_inventory()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod inventory_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -80,65 +273,65 @@ pub mod inventory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type AcquiredAt;
         type Quantity;
-        type CreatedAt;
         type ItemId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type AcquiredAt = Unset;
         type Quantity = Unset;
-        type CreatedAt = Unset;
         type ItemId = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type AcquiredAt = S::AcquiredAt;
+        type Quantity = S::Quantity;
+        type ItemId = S::ItemId;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
     impl<S: State> State for SetAcquiredAt<S> {
+        type CreatedAt = S::CreatedAt;
         type AcquiredAt = Set<members::acquired_at>;
         type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
         type ItemId = S::ItemId;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
+        type CreatedAt = S::CreatedAt;
         type AcquiredAt = S::AcquiredAt;
         type Quantity = Set<members::quantity>;
-        type CreatedAt = S::CreatedAt;
-        type ItemId = S::ItemId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AcquiredAt = S::AcquiredAt;
-        type Quantity = S::Quantity;
-        type CreatedAt = Set<members::created_at>;
         type ItemId = S::ItemId;
     }
     ///State transition - sets the `item_id` field to Set
     pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItemId<S> {}
     impl<S: State> State for SetItemId<S> {
+        type CreatedAt = S::CreatedAt;
         type AcquiredAt = S::AcquiredAt;
         type Quantity = S::Quantity;
-        type CreatedAt = S::CreatedAt;
         type ItemId = Set<members::item_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `item_id` field
         pub struct item_id(());
     }
@@ -469,9 +662,9 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 impl<'a, S> InventoryBuilder<'a, S>
 where
     S: inventory_state::State,
+    S::CreatedAt: inventory_state::IsSet,
     S::AcquiredAt: inventory_state::IsSet,
     S::Quantity: inventory_state::IsSet,
-    S::CreatedAt: inventory_state::IsSet,
     S::ItemId: inventory_state::IsSet,
 {
     /// Build the final struct
@@ -521,155 +714,6 @@ where
             stackable: self.__unsafe_private_named.14,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Inventory<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, InventoryRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct InventoryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Inventory<'a>,
-}
-
-impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
-    fn from(output: InventoryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Inventory<'_> {
-    const NSID: &'static str = "net.anisota.beta.game.inventory";
-    type Record = InventoryRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct InventoryRecord;
-impl jacquard_common::xrpc::XrpcResp for InventoryRecord {
-    const NSID: &'static str = "net.anisota.beta.game.inventory";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = InventoryGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for InventoryRecord {
-    const NSID: &'static str = "net.anisota.beta.game.inventory";
-    type Record = InventoryRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.inventory"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_inventory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.item_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "item_id",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "item_name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "item_type",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_value {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "item_value",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_stack {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_stack",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.quantity;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -1048,49 +1092,5 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
             );
             map
         },
-    }
-}
-
-/// Additional details about how the item was acquired
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceDetails<'a> {
-    ///URI of the game card that provided this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ID of the quest that rewarded this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Daily reward streak when item was acquired
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reward_streak: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.inventory"
-    }
-    fn def_name() -> &'static str {
-        "sourceDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_inventory()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

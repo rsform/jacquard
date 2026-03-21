@@ -29,6 +29,84 @@ pub struct RoomGate<'a> {
     pub room: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RoomGateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: RoomGate<'a>,
+}
+
+impl<'a> RoomGate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RoomGateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RoomGateRecord;
+impl jacquard_common::xrpc::XrpcResp for RoomGateRecord {
+    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RoomGateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RoomGateGetRecordOutput<'_>> for RoomGate<'_> {
+    fn from(output: RoomGateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for RoomGate<'_> {
+    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
+    type Record = RoomGateRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RoomGateRecord {
+    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
+    type Record = RoomGateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomGate<'a> {
+    fn nsid() -> &'static str {
+        "tech.tokimeki.kaku.roomGate"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tech_tokimeki_kaku_roomGate()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_room_gate_is_closed() -> std::option::Option<bool> {
     Some(false)
 }
@@ -186,84 +264,6 @@ where
             room: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> RoomGate<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RoomGateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RoomGateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: RoomGate<'a>,
-}
-
-impl From<RoomGateGetRecordOutput<'_>> for RoomGate<'_> {
-    fn from(output: RoomGateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for RoomGate<'_> {
-    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
-    type Record = RoomGateRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RoomGateRecord;
-impl jacquard_common::xrpc::XrpcResp for RoomGateRecord {
-    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RoomGateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RoomGateRecord {
-    const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
-    type Record = RoomGateRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomGate<'a> {
-    fn nsid() -> &'static str {
-        "tech.tokimeki.kaku.roomGate"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_tech_tokimeki_kaku_roomGate()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

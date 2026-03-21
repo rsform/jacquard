@@ -29,181 +29,6 @@ pub struct Presence<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
-pub mod presence_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Status;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type UpdatedAt = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Status = Set<members::status>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct PresenceBuilder<'a, S: presence_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<PresenceStatus<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Presence<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PresenceBuilder<'a, presence_state::Empty> {
-        PresenceBuilder::new()
-    }
-}
-
-impl<'a> PresenceBuilder<'a, presence_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        PresenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
-    /// Set the `awayMessage` field (optional)
-    pub fn away_message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `awayMessage` field to an Option value (optional)
-    pub fn maybe_away_message(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> PresenceBuilder<'a, S>
-where
-    S: presence_state::State,
-    S::Status: presence_state::IsUnset,
-{
-    /// Set the `status` field (required)
-    pub fn status(
-        mut self,
-        value: impl Into<PresenceStatus<'a>>,
-    ) -> PresenceBuilder<'a, presence_state::SetStatus<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        PresenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PresenceBuilder<'a, S>
-where
-    S: presence_state::State,
-    S::UpdatedAt: presence_state::IsUnset,
-{
-    /// Set the `updatedAt` field (required)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> PresenceBuilder<'a, presence_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        PresenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> PresenceBuilder<'a, S>
-where
-    S: presence_state::State,
-    S::UpdatedAt: presence_state::IsSet,
-    S::Status: presence_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Presence<'a> {
-        Presence {
-            away_message: self.__unsafe_private_named.0,
-            status: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Presence<'a> {
-        Presence {
-            away_message: self.__unsafe_private_named.0,
-            status: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Presence<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PresenceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Current presence status.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PresenceStatus<'a> {
@@ -329,16 +154,17 @@ pub struct PresenceGetRecordOutput<'a> {
     pub value: Presence<'a>,
 }
 
-impl From<PresenceGetRecordOutput<'_>> for Presence<'_> {
-    fn from(output: PresenceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Presence<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PresenceRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Presence<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.presence";
-    type Record = PresenceRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -349,6 +175,18 @@ impl jacquard_common::xrpc::XrpcResp for PresenceRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PresenceGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PresenceGetRecordOutput<'_>> for Presence<'_> {
+    fn from(output: PresenceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Presence<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.presence";
+    type Record = PresenceRecord;
 }
 
 impl jacquard_common::types::collection::Collection for PresenceRecord {
@@ -382,6 +220,168 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Presence<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod presence_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Status;
+        type UpdatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Status = Unset;
+        type UpdatedAt = Unset;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Status = S::Status;
+        type UpdatedAt = Set<members::updated_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PresenceBuilder<'a, S: presence_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PresenceStatus<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Presence<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PresenceBuilder<'a, presence_state::Empty> {
+        PresenceBuilder::new()
+    }
+}
+
+impl<'a> PresenceBuilder<'a, presence_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PresenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
+    /// Set the `awayMessage` field (optional)
+    pub fn away_message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `awayMessage` field to an Option value (optional)
+    pub fn maybe_away_message(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> PresenceBuilder<'a, S>
+where
+    S: presence_state::State,
+    S::Status: presence_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<PresenceStatus<'a>>,
+    ) -> PresenceBuilder<'a, presence_state::SetStatus<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PresenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PresenceBuilder<'a, S>
+where
+    S: presence_state::State,
+    S::UpdatedAt: presence_state::IsUnset,
+{
+    /// Set the `updatedAt` field (required)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PresenceBuilder<'a, presence_state::SetUpdatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PresenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PresenceBuilder<'a, S>
+where
+    S: presence_state::State,
+    S::Status: presence_state::IsSet,
+    S::UpdatedAt: presence_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Presence<'a> {
+        Presence {
+            away_message: self.__unsafe_private_named.0,
+            status: self.__unsafe_private_named.1.unwrap(),
+            updated_at: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Presence<'a> {
+        Presence {
+            away_message: self.__unsafe_private_named.0,
+            status: self.__unsafe_private_named.1.unwrap(),
+            updated_at: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
     }
 }
 

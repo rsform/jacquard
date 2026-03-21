@@ -23,6 +23,50 @@ pub struct GetPages<'a> {
     pub limit: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPagesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pages: std::option::Option<Vec<crate::app_blebbit::authr::page::PageView<'a>>>,
+}
+
+/// Response type for
+///app.blebbit.authr.page.getPages
+pub struct GetPagesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPagesResponse {
+    const NSID: &'static str = "app.blebbit.authr.page.getPages";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPagesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPages<'a> {
+    const NSID: &'static str = "app.blebbit.authr.page.getPages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPagesResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.page.getPages
+pub struct GetPagesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPagesRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.getPages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPages<'de>;
+    type Response = GetPagesResponse;
+}
+
 pub mod get_pages_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -110,48 +154,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPagesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pages: std::option::Option<Vec<crate::app_blebbit::authr::page::PageView<'a>>>,
-}
-
-/// Response type for
-///app.blebbit.authr.page.getPages
-pub struct GetPagesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPagesResponse {
-    const NSID: &'static str = "app.blebbit.authr.page.getPages";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPagesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPages<'a> {
-    const NSID: &'static str = "app.blebbit.authr.page.getPages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPagesResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.page.getPages
-pub struct GetPagesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPagesRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.getPages";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPages<'de>;
-    type Response = GetPagesResponse;
 }

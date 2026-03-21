@@ -52,6 +52,2047 @@ pub struct CardioDetails<'a> {
     pub steps: std::option::Option<i64>,
 }
 
+/// Time in seconds spent in each heart rate zone
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CardioZoneData<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub zone1_rest: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub zone2_easy: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub zone3_aerobic: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub zone4_threshold: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub zone5_max: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Exercise<'a> {
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub sets: Vec<crate::app_fitsky::workout::ExerciseSet<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExerciseSet<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reps: std::option::Option<i64>,
+    ///Weight in grams
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub weight_grams: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FlexibilityDetails<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub calories: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cardio_zones: std::option::Option<
+        crate::app_fitsky::workout::CardioZoneData<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate_samples: std::option::Option<
+        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub intensity: std::option::Option<FlexibilityDetailsIntensity<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub movements: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub steps: std::option::Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FlexibilityDetailsIntensity<'a> {
+    Light,
+    Moderate,
+    Intense,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> FlexibilityDetailsIntensity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Light => "light",
+            Self::Moderate => "moderate",
+            Self::Intense => "intense",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for FlexibilityDetailsIntensity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "light" => Self::Light,
+            "moderate" => Self::Moderate,
+            "intense" => Self::Intense,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for FlexibilityDetailsIntensity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "light" => Self::Light,
+            "moderate" => Self::Moderate,
+            "intense" => Self::Intense,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for FlexibilityDetailsIntensity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for FlexibilityDetailsIntensity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for FlexibilityDetailsIntensity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for FlexibilityDetailsIntensity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for FlexibilityDetailsIntensity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for FlexibilityDetailsIntensity<'_> {
+    type Output = FlexibilityDetailsIntensity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
+            FlexibilityDetailsIntensity::Moderate => {
+                FlexibilityDetailsIntensity::Moderate
+            }
+            FlexibilityDetailsIntensity::Intense => FlexibilityDetailsIntensity::Intense,
+            FlexibilityDetailsIntensity::Other(v) => {
+                FlexibilityDetailsIntensity::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HeartRateData<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avg: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub resting: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HeartRateSample<'a> {
+    pub bpm: i64,
+    pub timestamp: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HiitSportsDetails<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub calories: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cardio_zones: std::option::Option<
+        crate::app_fitsky::workout::CardioZoneData<'a>,
+    >,
+    ///Distance in meters
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub distance_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate_samples: std::option::Option<
+        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub intensity: std::option::Option<HiitSportsDetailsIntensity<'a>>,
+    ///Pace in seconds per kilometer
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pace_seconds_per_km: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rounds: std::option::Option<i64>,
+    ///GPS route points recorded during the workout
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub route_points: std::option::Option<
+        Vec<crate::app_fitsky::workout::RoutePoint<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sport: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub steps: std::option::Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum HiitSportsDetailsIntensity<'a> {
+    Light,
+    Moderate,
+    Intense,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> HiitSportsDetailsIntensity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Light => "light",
+            Self::Moderate => "moderate",
+            Self::Intense => "intense",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for HiitSportsDetailsIntensity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "light" => Self::Light,
+            "moderate" => Self::Moderate,
+            "intense" => Self::Intense,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for HiitSportsDetailsIntensity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "light" => Self::Light,
+            "moderate" => Self::Moderate,
+            "intense" => Self::Intense,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for HiitSportsDetailsIntensity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for HiitSportsDetailsIntensity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for HiitSportsDetailsIntensity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for HiitSportsDetailsIntensity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for HiitSportsDetailsIntensity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for HiitSportsDetailsIntensity<'_> {
+    type Output = HiitSportsDetailsIntensity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            HiitSportsDetailsIntensity::Light => HiitSportsDetailsIntensity::Light,
+            HiitSportsDetailsIntensity::Moderate => HiitSportsDetailsIntensity::Moderate,
+            HiitSportsDetailsIntensity::Intense => HiitSportsDetailsIntensity::Intense,
+            HiitSportsDetailsIntensity::Other(v) => {
+                HiitSportsDetailsIntensity::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A fitness workout record
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Workout<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub details: std::option::Option<WorkoutDetails<'a>>,
+    ///Duration in seconds
+    pub duration: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Progress milestones for linear workouts
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub milestones: std::option::Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Open Graph preview image for social sharing
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub og_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///Reference to the workoutPlan used, if any
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub plan_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub started_at: jacquard_common::types::string::Datetime,
+    ///Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<WorkoutStatus<'a>>,
+    #[serde(borrow)]
+    pub title: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub r#type: WorkoutType<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub visibility: std::option::Option<
+        crate::app_fitsky::workout::VisibilitySettings<'a>,
+    >,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum WorkoutDetails<'a> {
+    #[serde(rename = "app.fitsky.workout#cardioDetails")]
+    CardioDetails(Box<crate::app_fitsky::workout::CardioDetails<'a>>),
+    #[serde(rename = "app.fitsky.workout#strengthDetails")]
+    StrengthDetails(Box<crate::app_fitsky::workout::StrengthDetails<'a>>),
+    #[serde(rename = "app.fitsky.workout#flexibilityDetails")]
+    FlexibilityDetails(Box<crate::app_fitsky::workout::FlexibilityDetails<'a>>),
+    #[serde(rename = "app.fitsky.workout#hiitSportsDetails")]
+    HiitSportsDetails(Box<crate::app_fitsky::workout::HiitSportsDetails<'a>>),
+}
+
+/// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WorkoutStatus<'a> {
+    Active,
+    Completed,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WorkoutStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Completed => "completed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WorkoutStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "active" => Self::Active,
+            "completed" => Self::Completed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WorkoutStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "active" => Self::Active,
+            "completed" => Self::Completed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WorkoutStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WorkoutStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WorkoutStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WorkoutStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WorkoutStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WorkoutStatus<'_> {
+    type Output = WorkoutStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WorkoutStatus::Active => WorkoutStatus::Active,
+            WorkoutStatus::Completed => WorkoutStatus::Completed,
+            WorkoutStatus::Other(v) => WorkoutStatus::Other(v.into_static()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WorkoutType<'a> {
+    Running,
+    Cycling,
+    Swimming,
+    Walking,
+    Weightlifting,
+    Bodyweight,
+    Yoga,
+    Hiit,
+    Sports,
+    Stretching,
+    Hiking,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WorkoutType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Running => "running",
+            Self::Cycling => "cycling",
+            Self::Swimming => "swimming",
+            Self::Walking => "walking",
+            Self::Weightlifting => "weightlifting",
+            Self::Bodyweight => "bodyweight",
+            Self::Yoga => "yoga",
+            Self::Hiit => "hiit",
+            Self::Sports => "sports",
+            Self::Stretching => "stretching",
+            Self::Hiking => "hiking",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WorkoutType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "running" => Self::Running,
+            "cycling" => Self::Cycling,
+            "swimming" => Self::Swimming,
+            "walking" => Self::Walking,
+            "weightlifting" => Self::Weightlifting,
+            "bodyweight" => Self::Bodyweight,
+            "yoga" => Self::Yoga,
+            "hiit" => Self::Hiit,
+            "sports" => Self::Sports,
+            "stretching" => Self::Stretching,
+            "hiking" => Self::Hiking,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WorkoutType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "running" => Self::Running,
+            "cycling" => Self::Cycling,
+            "swimming" => Self::Swimming,
+            "walking" => Self::Walking,
+            "weightlifting" => Self::Weightlifting,
+            "bodyweight" => Self::Bodyweight,
+            "yoga" => Self::Yoga,
+            "hiit" => Self::Hiit,
+            "sports" => Self::Sports,
+            "stretching" => Self::Stretching,
+            "hiking" => Self::Hiking,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WorkoutType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WorkoutType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WorkoutType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WorkoutType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WorkoutType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WorkoutType<'_> {
+    type Output = WorkoutType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WorkoutType::Running => WorkoutType::Running,
+            WorkoutType::Cycling => WorkoutType::Cycling,
+            WorkoutType::Swimming => WorkoutType::Swimming,
+            WorkoutType::Walking => WorkoutType::Walking,
+            WorkoutType::Weightlifting => WorkoutType::Weightlifting,
+            WorkoutType::Bodyweight => WorkoutType::Bodyweight,
+            WorkoutType::Yoga => WorkoutType::Yoga,
+            WorkoutType::Hiit => WorkoutType::Hiit,
+            WorkoutType::Sports => WorkoutType::Sports,
+            WorkoutType::Stretching => WorkoutType::Stretching,
+            WorkoutType::Hiking => WorkoutType::Hiking,
+            WorkoutType::Other(v) => WorkoutType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkoutGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Workout<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Milestone<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub timestamp: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub r#type: MilestoneType<'a>,
+    ///Milestone value in meters
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub value_meters: std::option::Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MilestoneType<'a> {
+    Distance,
+    Lap,
+    Note,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MilestoneType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Distance => "distance",
+            Self::Lap => "lap",
+            Self::Note => "note",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MilestoneType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "distance" => Self::Distance,
+            "lap" => Self::Lap,
+            "note" => Self::Note,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MilestoneType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "distance" => Self::Distance,
+            "lap" => Self::Lap,
+            "note" => Self::Note,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MilestoneType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MilestoneType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MilestoneType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MilestoneType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MilestoneType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MilestoneType<'_> {
+    type Output = MilestoneType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MilestoneType::Distance => MilestoneType::Distance,
+            MilestoneType::Lap => MilestoneType::Lap,
+            MilestoneType::Note => MilestoneType::Note,
+            MilestoneType::Other(v) => MilestoneType::Other(v.into_static()),
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RoutePoint<'a> {
+    ///Latitude in microdegrees (degrees * 1,000,000)
+    pub lat_e6: i64,
+    ///Longitude in microdegrees (degrees * 1,000,000)
+    pub lng_e6: i64,
+    pub timestamp: jacquard_common::types::string::Datetime,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StrengthDetails<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub calories: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cardio_zones: std::option::Option<
+        crate::app_fitsky::workout::CardioZoneData<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub exercises: std::option::Option<Vec<crate::app_fitsky::workout::Exercise<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate_samples: std::option::Option<
+        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub steps: std::option::Option<i64>,
+}
+
+/// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VisibilitySettings<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub calories: std::option::Option<VisibilitySettingsCalories<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cardio_zones: std::option::Option<VisibilitySettingsCardioZones<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub details: std::option::Option<VisibilitySettingsDetails<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub heart_rate: std::option::Option<VisibilitySettingsHeartRate<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notes: std::option::Option<VisibilitySettingsNotes<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub steps: std::option::Option<VisibilitySettingsSteps<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsCalories<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsCalories<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsCalories<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsCalories<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsCalories<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsCalories<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsCalories<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCalories<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsCalories<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsCalories<'_> {
+    type Output = VisibilitySettingsCalories<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsCalories::Public => VisibilitySettingsCalories::Public,
+            VisibilitySettingsCalories::Private => VisibilitySettingsCalories::Private,
+            VisibilitySettingsCalories::Other(v) => {
+                VisibilitySettingsCalories::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsCardioZones<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsCardioZones<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsCardioZones<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsCardioZones<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsCardioZones<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsCardioZones<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsCardioZones<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCardioZones<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsCardioZones<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsCardioZones<'_> {
+    type Output = VisibilitySettingsCardioZones<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsCardioZones::Public => {
+                VisibilitySettingsCardioZones::Public
+            }
+            VisibilitySettingsCardioZones::Private => {
+                VisibilitySettingsCardioZones::Private
+            }
+            VisibilitySettingsCardioZones::Other(v) => {
+                VisibilitySettingsCardioZones::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsDetails<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsDetails<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsDetails<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsDetails<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsDetails<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsDetails<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsDetails<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsDetails<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsDetails<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsDetails<'_> {
+    type Output = VisibilitySettingsDetails<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsDetails::Public => VisibilitySettingsDetails::Public,
+            VisibilitySettingsDetails::Private => VisibilitySettingsDetails::Private,
+            VisibilitySettingsDetails::Other(v) => {
+                VisibilitySettingsDetails::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsHeartRate<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsHeartRate<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsHeartRate<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsHeartRate<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsHeartRate<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsHeartRate<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsHeartRate<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsHeartRate<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsHeartRate<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsHeartRate<'_> {
+    type Output = VisibilitySettingsHeartRate<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsHeartRate::Public => VisibilitySettingsHeartRate::Public,
+            VisibilitySettingsHeartRate::Private => VisibilitySettingsHeartRate::Private,
+            VisibilitySettingsHeartRate::Other(v) => {
+                VisibilitySettingsHeartRate::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsNotes<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsNotes<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsNotes<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsNotes<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsNotes<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsNotes<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsNotes<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsNotes<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsNotes<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsNotes<'_> {
+    type Output = VisibilitySettingsNotes<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
+            VisibilitySettingsNotes::Private => VisibilitySettingsNotes::Private,
+            VisibilitySettingsNotes::Other(v) => {
+                VisibilitySettingsNotes::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VisibilitySettingsSteps<'a> {
+    Public,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VisibilitySettingsSteps<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VisibilitySettingsSteps<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VisibilitySettingsSteps<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VisibilitySettingsSteps<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VisibilitySettingsSteps<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VisibilitySettingsSteps<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsSteps<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VisibilitySettingsSteps<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VisibilitySettingsSteps<'_> {
+    type Output = VisibilitySettingsSteps<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
+            VisibilitySettingsSteps::Private => VisibilitySettingsSteps::Private,
+            VisibilitySettingsSteps::Other(v) => {
+                VisibilitySettingsSteps::Other(v.into_static())
+            }
+        }
+    }
+}
+
+impl<'a> Workout<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WorkoutRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "cardioDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.distance_meters {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "distance_meters",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.elevation_gain_meters {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "elevation_gain_meters",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.pace_seconds_per_km {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pace_seconds_per_km",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardioZoneData<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "cardioZoneData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Exercise<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "exercise"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExerciseSet<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "exerciseSet"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.weight_grams {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "weight_grams",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FlexibilityDetails<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "flexibilityDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.intensity {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "intensity",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeartRateData<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "heartRateData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeartRateSample<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "heartRateSample"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "hiitSportsDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.distance_meters {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "distance_meters",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.intensity {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "intensity",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.pace_seconds_per_km {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pace_seconds_per_km",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.sport {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sport",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct WorkoutRecord;
+impl jacquard_common::xrpc::XrpcResp for WorkoutRecord {
+    const NSID: &'static str = "app.fitsky.workout";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WorkoutGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
+    fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Workout<'_> {
+    const NSID: &'static str = "app.fitsky.workout";
+    type Record = WorkoutRecord;
+}
+
+impl jacquard_common::types::collection::Collection for WorkoutRecord {
+    const NSID: &'static str = "app.fitsky.workout";
+    type Record = WorkoutRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.duration;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 2048usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.og_image {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "og_image",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.og_image {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "og_image",
+                        ),
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string()
+                        ],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.status {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "status",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "milestone"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.note {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "note",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "type",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.value_meters {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value_meters",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoutePoint<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "routePoint"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StrengthDetails<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "strengthDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
+    fn nsid() -> &'static str {
+        "app.fitsky.workout"
+    }
+    fn def_name() -> &'static str {
+        "visibilitySettings"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_fitsky_workout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.calories {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "calories",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.cardio_zones {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "cardio_zones",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.details {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "details",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.heart_rate {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "heart_rate",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.steps {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "steps",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_fitsky_workout() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -1373,117 +3414,6 @@ fn lexicon_doc_app_fitsky_workout() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "cardioDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.distance_meters {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_meters",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.elevation_gain_meters {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "elevation_gain_meters",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.pace_seconds_per_km {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pace_seconds_per_km",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Time in seconds spent in each heart rate zone
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CardioZoneData<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub zone1_rest: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub zone2_easy: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub zone3_aerobic: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub zone4_threshold: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub zone5_max: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardioZoneData<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "cardioZoneData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Exercise<'a> {
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub sets: Vec<crate::app_fitsky::workout::ExerciseSet<'a>>,
-}
-
 pub mod exercise_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1494,37 +3424,37 @@ pub mod exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sets;
         type Name;
+        type Sets;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sets = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `sets` field to Set
-    pub struct SetSets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSets<S> {}
-    impl<S: State> State for SetSets<S> {
-        type Sets = Set<members::sets>;
-        type Name = S::Name;
+        type Sets = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Sets = S::Sets;
         type Name = Set<members::name>;
+        type Sets = S::Sets;
+    }
+    ///State transition - sets the `sets` field to Set
+    pub struct SetSets<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSets<S> {}
+    impl<S: State> State for SetSets<S> {
+        type Name = S::Name;
+        type Sets = Set<members::sets>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sets` field
-        pub struct sets(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `sets` field
+        pub struct sets(());
     }
 }
 
@@ -1597,8 +3527,8 @@ where
 impl<'a, S> ExerciseBuilder<'a, S>
 where
     S: exercise_state::State,
-    S::Sets: exercise_state::IsSet,
     S::Name: exercise_state::IsSet,
+    S::Sets: exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Exercise<'a> {
@@ -1622,303 +3552,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Exercise<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "exercise"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExerciseSet<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reps: std::option::Option<i64>,
-    ///Weight in grams
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub weight_grams: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExerciseSet<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "exerciseSet"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.weight_grams {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weight_grams",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct FlexibilityDetails<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub calories: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: std::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: std::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub intensity: std::option::Option<FlexibilityDetailsIntensity<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub movements: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub steps: std::option::Option<i64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FlexibilityDetailsIntensity<'a> {
-    Light,
-    Moderate,
-    Intense,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> FlexibilityDetailsIntensity<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Light => "light",
-            Self::Moderate => "moderate",
-            Self::Intense => "intense",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for FlexibilityDetailsIntensity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for FlexibilityDetailsIntensity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for FlexibilityDetailsIntensity<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for FlexibilityDetailsIntensity<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for FlexibilityDetailsIntensity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for FlexibilityDetailsIntensity<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for FlexibilityDetailsIntensity<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for FlexibilityDetailsIntensity<'_> {
-    type Output = FlexibilityDetailsIntensity<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
-            FlexibilityDetailsIntensity::Moderate => {
-                FlexibilityDetailsIntensity::Moderate
-            }
-            FlexibilityDetailsIntensity::Intense => FlexibilityDetailsIntensity::Intense,
-            FlexibilityDetailsIntensity::Other(v) => {
-                FlexibilityDetailsIntensity::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FlexibilityDetails<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "flexibilityDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.intensity {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "intensity",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HeartRateData<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub avg: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub min: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub resting: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeartRateData<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "heartRateData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HeartRateSample<'a> {
-    pub bpm: i64,
-    pub timestamp: jacquard_common::types::string::Datetime,
 }
 
 pub mod heart_rate_sample_state {
@@ -2061,285 +3694,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeartRateSample<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "heartRateSample"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct HiitSportsDetails<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub calories: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: std::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
-    ///Distance in meters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub distance_meters: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: std::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub intensity: std::option::Option<HiitSportsDetailsIntensity<'a>>,
-    ///Pace in seconds per kilometer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pace_seconds_per_km: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rounds: std::option::Option<i64>,
-    ///GPS route points recorded during the workout
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub route_points: std::option::Option<
-        Vec<crate::app_fitsky::workout::RoutePoint<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sport: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub steps: std::option::Option<i64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum HiitSportsDetailsIntensity<'a> {
-    Light,
-    Moderate,
-    Intense,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> HiitSportsDetailsIntensity<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Light => "light",
-            Self::Moderate => "moderate",
-            Self::Intense => "intense",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for HiitSportsDetailsIntensity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for HiitSportsDetailsIntensity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for HiitSportsDetailsIntensity<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for HiitSportsDetailsIntensity<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for HiitSportsDetailsIntensity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for HiitSportsDetailsIntensity<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for HiitSportsDetailsIntensity<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for HiitSportsDetailsIntensity<'_> {
-    type Output = HiitSportsDetailsIntensity<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            HiitSportsDetailsIntensity::Light => HiitSportsDetailsIntensity::Light,
-            HiitSportsDetailsIntensity::Moderate => HiitSportsDetailsIntensity::Moderate,
-            HiitSportsDetailsIntensity::Intense => HiitSportsDetailsIntensity::Intense,
-            HiitSportsDetailsIntensity::Other(v) => {
-                HiitSportsDetailsIntensity::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "hiitSportsDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.distance_meters {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_meters",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.intensity {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "intensity",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.pace_seconds_per_km {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pace_seconds_per_km",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.sport {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sport",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A fitness workout record
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Workout<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub details: std::option::Option<WorkoutDetails<'a>>,
-    ///Duration in seconds
-    pub duration: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Progress milestones for linear workouts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub milestones: std::option::Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Open Graph preview image for social sharing
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub og_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///Reference to the workoutPlan used, if any
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub plan_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    pub started_at: jacquard_common::types::string::Datetime,
-    ///Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<WorkoutStatus<'a>>,
-    #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub r#type: WorkoutType<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: std::option::Option<
-        crate::app_fitsky::workout::VisibilitySettings<'a>,
-    >,
-}
-
 pub mod workout_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2350,85 +3704,85 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
-        type Duration;
-        type Type;
         type CreatedAt;
+        type Type;
+        type Duration;
         type Title;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
-        type Duration = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
+        type Duration = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type StartedAt = Set<members::started_at>;
-        type Duration = S::Duration;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type StartedAt = S::StartedAt;
-        type Duration = Set<members::duration>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type StartedAt = S::StartedAt;
-        type Duration = S::Duration;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type StartedAt = S::StartedAt;
-        type Duration = S::Duration;
-        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Duration = S::Duration;
         type Title = S::Title;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Duration = Set<members::duration>;
+        type Title = S::Title;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type StartedAt = S::StartedAt;
-        type Duration = S::Duration;
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Duration = S::Duration;
         type Title = Set<members::title>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -2720,11 +4074,11 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
-    S::StartedAt: workout_state::IsSet,
-    S::Duration: workout_state::IsSet,
-    S::Type: workout_state::IsSet,
     S::CreatedAt: workout_state::IsSet,
+    S::Type: workout_state::IsSet,
+    S::Duration: workout_state::IsSet,
     S::Title: workout_state::IsSet,
+    S::StartedAt: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -2772,459 +4126,6 @@ where
     }
 }
 
-impl<'a> Workout<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WorkoutRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum WorkoutDetails<'a> {
-    #[serde(rename = "app.fitsky.workout#cardioDetails")]
-    CardioDetails(Box<crate::app_fitsky::workout::CardioDetails<'a>>),
-    #[serde(rename = "app.fitsky.workout#strengthDetails")]
-    StrengthDetails(Box<crate::app_fitsky::workout::StrengthDetails<'a>>),
-    #[serde(rename = "app.fitsky.workout#flexibilityDetails")]
-    FlexibilityDetails(Box<crate::app_fitsky::workout::FlexibilityDetails<'a>>),
-    #[serde(rename = "app.fitsky.workout#hiitSportsDetails")]
-    HiitSportsDetails(Box<crate::app_fitsky::workout::HiitSportsDetails<'a>>),
-}
-
-/// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutStatus<'a> {
-    Active,
-    Completed,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WorkoutStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Active => "active",
-            Self::Completed => "completed",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WorkoutStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "active" => Self::Active,
-            "completed" => Self::Completed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WorkoutStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "active" => Self::Active,
-            "completed" => Self::Completed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkoutStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WorkoutStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WorkoutStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WorkoutStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WorkoutStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WorkoutStatus<'_> {
-    type Output = WorkoutStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WorkoutStatus::Active => WorkoutStatus::Active,
-            WorkoutStatus::Completed => WorkoutStatus::Completed,
-            WorkoutStatus::Other(v) => WorkoutStatus::Other(v.into_static()),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutType<'a> {
-    Running,
-    Cycling,
-    Swimming,
-    Walking,
-    Weightlifting,
-    Bodyweight,
-    Yoga,
-    Hiit,
-    Sports,
-    Stretching,
-    Hiking,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WorkoutType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Running => "running",
-            Self::Cycling => "cycling",
-            Self::Swimming => "swimming",
-            Self::Walking => "walking",
-            Self::Weightlifting => "weightlifting",
-            Self::Bodyweight => "bodyweight",
-            Self::Yoga => "yoga",
-            Self::Hiit => "hiit",
-            Self::Sports => "sports",
-            Self::Stretching => "stretching",
-            Self::Hiking => "hiking",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WorkoutType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "running" => Self::Running,
-            "cycling" => Self::Cycling,
-            "swimming" => Self::Swimming,
-            "walking" => Self::Walking,
-            "weightlifting" => Self::Weightlifting,
-            "bodyweight" => Self::Bodyweight,
-            "yoga" => Self::Yoga,
-            "hiit" => Self::Hiit,
-            "sports" => Self::Sports,
-            "stretching" => Self::Stretching,
-            "hiking" => Self::Hiking,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WorkoutType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "running" => Self::Running,
-            "cycling" => Self::Cycling,
-            "swimming" => Self::Swimming,
-            "walking" => Self::Walking,
-            "weightlifting" => Self::Weightlifting,
-            "bodyweight" => Self::Bodyweight,
-            "yoga" => Self::Yoga,
-            "hiit" => Self::Hiit,
-            "sports" => Self::Sports,
-            "stretching" => Self::Stretching,
-            "hiking" => Self::Hiking,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkoutType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WorkoutType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WorkoutType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WorkoutType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WorkoutType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WorkoutType<'_> {
-    type Output = WorkoutType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WorkoutType::Running => WorkoutType::Running,
-            WorkoutType::Cycling => WorkoutType::Cycling,
-            WorkoutType::Swimming => WorkoutType::Swimming,
-            WorkoutType::Walking => WorkoutType::Walking,
-            WorkoutType::Weightlifting => WorkoutType::Weightlifting,
-            WorkoutType::Bodyweight => WorkoutType::Bodyweight,
-            WorkoutType::Yoga => WorkoutType::Yoga,
-            WorkoutType::Hiit => WorkoutType::Hiit,
-            WorkoutType::Sports => WorkoutType::Sports,
-            WorkoutType::Stretching => WorkoutType::Stretching,
-            WorkoutType::Hiking => WorkoutType::Hiking,
-            WorkoutType::Other(v) => WorkoutType::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkoutGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Workout<'a>,
-}
-
-impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
-    fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Workout<'_> {
-    const NSID: &'static str = "app.fitsky.workout";
-    type Record = WorkoutRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct WorkoutRecord;
-impl jacquard_common::xrpc::XrpcResp for WorkoutRecord {
-    const NSID: &'static str = "app.fitsky.workout";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = WorkoutGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for WorkoutRecord {
-    const NSID: &'static str = "app.fitsky.workout";
-    type Record = WorkoutRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.duration;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 2048usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.og_image {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "og_image",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.og_image {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "og_image",
-                        ),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
-                        ],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.status {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Milestone<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub timestamp: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub r#type: MilestoneType<'a>,
-    ///Milestone value in meters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub value_meters: std::option::Option<i64>,
-}
-
 pub mod milestone_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3235,37 +4136,37 @@ pub mod milestone_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Type;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type Type = S::Type;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Timestamp = S::Timestamp;
         type Type = Set<members::r#type>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Type = S::Type;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -3369,8 +4270,8 @@ impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
 impl<'a, S> MilestoneBuilder<'a, S>
 where
     S: milestone_state::State,
-    S::Timestamp: milestone_state::IsSet,
     S::Type: milestone_state::IsSet,
+    S::Timestamp: milestone_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Milestone<'a> {
@@ -3400,171 +4301,6 @@ where
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MilestoneType<'a> {
-    Distance,
-    Lap,
-    Note,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MilestoneType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Distance => "distance",
-            Self::Lap => "lap",
-            Self::Note => "note",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MilestoneType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "distance" => Self::Distance,
-            "lap" => Self::Lap,
-            "note" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MilestoneType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "distance" => Self::Distance,
-            "lap" => Self::Lap,
-            "note" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MilestoneType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MilestoneType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MilestoneType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MilestoneType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MilestoneType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MilestoneType<'_> {
-    type Output = MilestoneType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MilestoneType::Distance => MilestoneType::Distance,
-            MilestoneType::Lap => MilestoneType::Lap,
-            MilestoneType::Note => MilestoneType::Note,
-            MilestoneType::Other(v) => MilestoneType::Other(v.into_static()),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "milestone"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.note {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.r#type;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.value_meters {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value_meters",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RoutePoint<'a> {
-    ///Latitude in microdegrees (degrees * 1,000,000)
-    pub lat_e6: i64,
-    ///Longitude in microdegrees (degrees * 1,000,000)
-    pub lng_e6: i64,
-    pub timestamp: jacquard_common::types::string::Datetime,
-}
-
 pub mod route_point_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -3576,50 +4312,50 @@ pub mod route_point_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type LatE6;
-        type Timestamp;
         type LngE6;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type LatE6 = Unset;
-        type Timestamp = Unset;
         type LngE6 = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `lat_e6` field to Set
     pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLatE6<S> {}
     impl<S: State> State for SetLatE6<S> {
         type LatE6 = Set<members::lat_e6>;
+        type LngE6 = S::LngE6;
         type Timestamp = S::Timestamp;
-        type LngE6 = S::LngE6;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type LatE6 = S::LatE6;
-        type Timestamp = Set<members::timestamp>;
-        type LngE6 = S::LngE6;
     }
     ///State transition - sets the `lng_e6` field to Set
     pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLngE6<S> {}
     impl<S: State> State for SetLngE6<S> {
         type LatE6 = S::LatE6;
-        type Timestamp = S::Timestamp;
         type LngE6 = Set<members::lng_e6>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type LatE6 = S::LatE6;
+        type LngE6 = S::LngE6;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `lat_e6` field
         pub struct lat_e6(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `lng_e6` field
         pub struct lng_e6(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -3713,8 +4449,8 @@ impl<'a, S> RoutePointBuilder<'a, S>
 where
     S: route_point_state::State,
     S::LatE6: route_point_state::IsSet,
-    S::Timestamp: route_point_state::IsSet,
     S::LngE6: route_point_state::IsSet,
+    S::Timestamp: route_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoutePoint<'a> {
@@ -3739,741 +4475,5 @@ where
             timestamp: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoutePoint<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "routePoint"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct StrengthDetails<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub calories: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: std::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub exercises: std::option::Option<Vec<crate::app_fitsky::workout::Exercise<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: std::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: std::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub steps: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StrengthDetails<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "strengthDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VisibilitySettings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub calories: std::option::Option<VisibilitySettingsCalories<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: std::option::Option<VisibilitySettingsCardioZones<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub details: std::option::Option<VisibilitySettingsDetails<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: std::option::Option<VisibilitySettingsHeartRate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notes: std::option::Option<VisibilitySettingsNotes<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub steps: std::option::Option<VisibilitySettingsSteps<'a>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCalories<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsCalories<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsCalories<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsCalories<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsCalories<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsCalories<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsCalories<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCalories<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsCalories<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsCalories<'_> {
-    type Output = VisibilitySettingsCalories<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsCalories::Public => VisibilitySettingsCalories::Public,
-            VisibilitySettingsCalories::Private => VisibilitySettingsCalories::Private,
-            VisibilitySettingsCalories::Other(v) => {
-                VisibilitySettingsCalories::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCardioZones<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsCardioZones<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsCardioZones<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsCardioZones<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsCardioZones<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsCardioZones<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsCardioZones<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCardioZones<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsCardioZones<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsCardioZones<'_> {
-    type Output = VisibilitySettingsCardioZones<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsCardioZones::Public => {
-                VisibilitySettingsCardioZones::Public
-            }
-            VisibilitySettingsCardioZones::Private => {
-                VisibilitySettingsCardioZones::Private
-            }
-            VisibilitySettingsCardioZones::Other(v) => {
-                VisibilitySettingsCardioZones::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDetails<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsDetails<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsDetails<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsDetails<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsDetails<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsDetails<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsDetails<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsDetails<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsDetails<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsDetails<'_> {
-    type Output = VisibilitySettingsDetails<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsDetails::Public => VisibilitySettingsDetails::Public,
-            VisibilitySettingsDetails::Private => VisibilitySettingsDetails::Private,
-            VisibilitySettingsDetails::Other(v) => {
-                VisibilitySettingsDetails::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsHeartRate<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsHeartRate<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsHeartRate<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsHeartRate<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsHeartRate<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsHeartRate<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsHeartRate<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsHeartRate<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsHeartRate<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsHeartRate<'_> {
-    type Output = VisibilitySettingsHeartRate<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsHeartRate::Public => VisibilitySettingsHeartRate::Public,
-            VisibilitySettingsHeartRate::Private => VisibilitySettingsHeartRate::Private,
-            VisibilitySettingsHeartRate::Other(v) => {
-                VisibilitySettingsHeartRate::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsNotes<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsNotes<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsNotes<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsNotes<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsNotes<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsNotes<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsNotes<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsNotes<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsNotes<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsNotes<'_> {
-    type Output = VisibilitySettingsNotes<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
-            VisibilitySettingsNotes::Private => VisibilitySettingsNotes::Private,
-            VisibilitySettingsNotes::Other(v) => {
-                VisibilitySettingsNotes::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsSteps<'a> {
-    Public,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> VisibilitySettingsSteps<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsSteps<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for VisibilitySettingsSteps<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsSteps<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for VisibilitySettingsSteps<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for VisibilitySettingsSteps<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsSteps<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for VisibilitySettingsSteps<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for VisibilitySettingsSteps<'_> {
-    type Output = VisibilitySettingsSteps<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
-            VisibilitySettingsSteps::Private => VisibilitySettingsSteps::Private,
-            VisibilitySettingsSteps::Other(v) => {
-                VisibilitySettingsSteps::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
-    fn nsid() -> &'static str {
-        "app.fitsky.workout"
-    }
-    fn def_name() -> &'static str {
-        "visibilitySettings"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_fitsky_workout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.calories {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "calories",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.cardio_zones {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cardio_zones",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.details {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "details",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.heart_rate {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "heart_rate",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.steps {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "steps",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

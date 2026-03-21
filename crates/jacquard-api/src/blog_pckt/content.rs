@@ -33,6 +33,23 @@ pub struct Content<'a> {
     pub references: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.content"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_content()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blog_pckt_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -108,22 +125,5 @@ fn lexicon_doc_blog_pckt_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.content"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_content()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

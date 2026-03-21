@@ -39,6 +39,214 @@ pub struct Channel<'a> {
     pub room: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Who can post messages in this channel.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ChannelPostPolicy<'a> {
+    Everyone,
+    Owner,
+    Moderators,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ChannelPostPolicy<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Everyone => "everyone",
+            Self::Owner => "owner",
+            Self::Moderators => "moderators",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ChannelPostPolicy<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "everyone" => Self::Everyone,
+            "owner" => Self::Owner,
+            "moderators" => Self::Moderators,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ChannelPostPolicy<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "everyone" => Self::Everyone,
+            "owner" => Self::Owner,
+            "moderators" => Self::Moderators,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ChannelPostPolicy<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ChannelPostPolicy<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ChannelPostPolicy<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ChannelPostPolicy<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ChannelPostPolicy<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
+    type Output = ChannelPostPolicy<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ChannelPostPolicy::Everyone => ChannelPostPolicy::Everyone,
+            ChannelPostPolicy::Owner => ChannelPostPolicy::Owner,
+            ChannelPostPolicy::Moderators => ChannelPostPolicy::Moderators,
+            ChannelPostPolicy::Other(v) => ChannelPostPolicy::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChannelGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Channel<'a>,
+}
+
+impl<'a> Channel<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ChannelRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChannelRecord;
+impl jacquard_common::xrpc::XrpcResp for ChannelRecord {
+    const NSID: &'static str = "app.protoimsg.chat.channel";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ChannelGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ChannelGetRecordOutput<'_>> for Channel<'_> {
+    fn from(output: ChannelGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Channel<'_> {
+    const NSID: &'static str = "app.protoimsg.chat.channel";
+    type Record = ChannelRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ChannelRecord {
+    const NSID: &'static str = "app.protoimsg.chat.channel";
+    type Record = ChannelRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
+    fn nsid() -> &'static str {
+        "app.protoimsg.chat.channel"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_protoimsg_chat_channel()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.description {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
+                    max: 500usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.position {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod channel_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -49,51 +257,51 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Room;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Room = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Room = S::Room;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoom<S> {}
     impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
         type Room = Set<members::room>;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Room = S::Room;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Room = S::Room;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -237,9 +445,9 @@ where
 impl<'a, S> ChannelBuilder<'a, S>
 where
     S: channel_state::State,
-    S::CreatedAt: channel_state::IsSet,
     S::Room: channel_state::IsSet,
     S::Name: channel_state::IsSet,
+    S::CreatedAt: channel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Channel<'a> {
@@ -270,214 +478,6 @@ where
             room: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Channel<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ChannelRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Who can post messages in this channel.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChannelPostPolicy<'a> {
-    Everyone,
-    Owner,
-    Moderators,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> ChannelPostPolicy<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Everyone => "everyone",
-            Self::Owner => "owner",
-            Self::Moderators => "moderators",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for ChannelPostPolicy<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "everyone" => Self::Everyone,
-            "owner" => Self::Owner,
-            "moderators" => Self::Moderators,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for ChannelPostPolicy<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "everyone" => Self::Everyone,
-            "owner" => Self::Owner,
-            "moderators" => Self::Moderators,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ChannelPostPolicy<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for ChannelPostPolicy<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for ChannelPostPolicy<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for ChannelPostPolicy<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for ChannelPostPolicy<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
-    type Output = ChannelPostPolicy<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ChannelPostPolicy::Everyone => ChannelPostPolicy::Everyone,
-            ChannelPostPolicy::Owner => ChannelPostPolicy::Owner,
-            ChannelPostPolicy::Moderators => ChannelPostPolicy::Moderators,
-            ChannelPostPolicy::Other(v) => ChannelPostPolicy::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Channel<'a>,
-}
-
-impl From<ChannelGetRecordOutput<'_>> for Channel<'_> {
-    fn from(output: ChannelGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Channel<'_> {
-    const NSID: &'static str = "app.protoimsg.chat.channel";
-    type Record = ChannelRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ChannelRecord;
-impl jacquard_common::xrpc::XrpcResp for ChannelRecord {
-    const NSID: &'static str = "app.protoimsg.chat.channel";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ChannelGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ChannelRecord {
-    const NSID: &'static str = "app.protoimsg.chat.channel";
-    type Record = ChannelRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
-    fn nsid() -> &'static str {
-        "app.protoimsg.chat.channel"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_protoimsg_chat_channel()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 500usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.position {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "position",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(10i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,87 @@ pub struct SearchSlugs<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchSlugsOutput<'a> {
+    #[serde(borrow)]
+    pub slugs: Vec<crate::games_gamesgamesgamesgames::search_slugs::SlugResult<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SlugResult<'a> {
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub slug: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.searchSlugs
+pub struct SearchSlugsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchSlugsResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchSlugsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchSlugs<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchSlugsResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.searchSlugs
+pub struct SearchSlugsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchSlugsRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchSlugs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchSlugs<'de>;
+    type Response = SearchSlugsResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SlugResult<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.searchSlugs"
+    }
+    fn def_name() -> &'static str {
+        "slugResult"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_searchSlugs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(10i64)
 }
 
 pub mod search_slugs_state {
@@ -134,66 +211,6 @@ where
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchSlugsOutput<'a> {
-    #[serde(borrow)]
-    pub slugs: Vec<crate::games_gamesgamesgamesgames::search_slugs::SlugResult<'a>>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.searchSlugs
-pub struct SearchSlugsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchSlugsResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchSlugsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchSlugs<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchSlugsResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.searchSlugs
-pub struct SearchSlugsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchSlugsRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchSlugs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchSlugs<'de>;
-    type Response = SearchSlugsResponse;
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SlugResult<'a> {
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub slug: jacquard_common::CowStr<'a>,
-}
-
 pub mod slug_result_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -204,37 +221,37 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Ref;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Ref = S::Ref;
+        type Slug = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Slug = S::Slug;
         type Ref = Set<members::r#ref>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Ref = S::Ref;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -307,8 +324,8 @@ where
 impl<'a, S> SlugResultBuilder<'a, S>
 where
     S: slug_result_state::State,
-    S::Slug: slug_result_state::IsSet,
     S::Ref: slug_result_state::IsSet,
+    S::Slug: slug_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SlugResult<'a> {
@@ -459,22 +476,5 @@ fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::l
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SlugResult<'a> {
-    fn nsid() -> &'static str {
-        "games.gamesgamesgamesgames.searchSlugs"
-    }
-    fn def_name() -> &'static str {
-        "slugResult"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_games_gamesgamesgamesgames_searchSlugs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -38,6 +38,576 @@ pub struct AdaptiveIcon<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Android<'a> {
+    ///Configuration for the adaptive icon on Android.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub adaptive_icon: std::option::Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
+    ///Whether edge-to-edge mode is enabled for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub edge_to_edge_enabled: std::option::Option<bool>,
+}
+
+/// Android status bar configuration.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AndroidStatusBar<'a> {
+    ///The background color of the Android status bar.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Asset<'a> {
+    ///The blob of the asset
+    #[serde(borrow)]
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    ///The hash of the asset
+    #[serde(borrow)]
+    pub hash: jacquard_common::CowStr<'a>,
+    ///The type of the asset
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+    ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Db<'a> {
+    ///The ID of the database.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Developer<'a> {
+    ///The tool used for development, e.g., 'expo-cli'.
+    #[serde(borrow)]
+    pub tool: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExpoClient<'a> {
+    ///Android-specific configuration for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub android: std::option::Option<crate::app_ocho::plugin::Android<'a>>,
+    ///Configuration for the Android status bar.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub android_status_bar: std::option::Option<
+        crate::app_ocho::plugin::AndroidStatusBar<'a>,
+    >,
+    ///Experimental features enabled for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub expirements: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///Additional configuration for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub extra: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///The URL to the app icon.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///ios-specific configuration for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ios: std::option::Option<crate::app_ocho::plugin::Ios<'a>>,
+    ///Localization settings for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub locales: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///The name of the Expo client application.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Whether the new architecture is enabled for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub new_arch_enabled: std::option::Option<bool>,
+    ///The default orientation of the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub orientation: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The platforms supported by the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platforms: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///A list of plugins used by the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub plugins: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///The custom URI scheme for deep linking.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub scheme: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The SDK version of the Expo client.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sdk_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///A URL-friendly identifier for the app.
+    #[serde(borrow)]
+    pub slug: jacquard_common::CowStr<'a>,
+    ///The default user interface style.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub user_interface_style: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The version of the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Web-specific configuration for the app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub web: std::option::Option<crate::app_ocho::plugin::Web<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ExpoGo<'a> {
+    ///Developer-specific configuration for the Expo Go app.
+    #[serde(borrow)]
+    pub developer: crate::app_ocho::plugin::Developer<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Ios<'a> {
+    ///Whether the app supports iPad.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub supports_tablet: std::option::Option<bool>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LaunchAsset<'a> {
+    ///The MIME type of the asset, e.g., 'image/png'.
+    #[serde(borrow)]
+    pub content_type: jacquard_common::CowStr<'a>,
+    ///The unique key for this asset, used to reference it in the plugin.
+    #[serde(borrow)]
+    pub key: jacquard_common::CowStr<'a>,
+    ///The URL where the asset can be accessed.
+    #[serde(borrow)]
+    pub url: jacquard_common::types::string::UriValue<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Manifest<'a> {
+    ///The date and time when this plugin manifest was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Additional metadata for the plugin, including Expo client and Go configurations.
+    #[serde(borrow)]
+    pub extra: crate::app_ocho::plugin::ManifestExtra<'a>,
+    ///The unique identifier for this plugin manifest.
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///The launch asset for the plugin (the main javascipt bundle).
+    #[serde(borrow)]
+    pub launch_asset: crate::app_ocho::plugin::LaunchAsset<'a>,
+    #[serde(borrow)]
+    pub metadata: jacquard_common::types::value::Data<'a>,
+    ///The version of the Expo runtime this plugin is compatible with.
+    #[serde(borrow)]
+    pub runtime_version: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ManifestExtra<'a> {
+    #[serde(borrow)]
+    pub expo_client: crate::app_ocho::plugin::ExpoClient<'a>,
+    #[serde(borrow)]
+    pub expo_go: crate::app_ocho::plugin::ExpoGo<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PluginItem<'a> {
+    #[serde(rename = "app.ocho.plugin.defs#stringId")]
+    StringId(Box<crate::app_ocho::plugin::StringId<'a>>),
+    #[serde(rename = "app.ocho.plugin.defs#pluginConfig")]
+    PluginConfig(Box<crate::app_ocho::plugin::PluginConfig<'a>>),
+}
+
+pub type Plugin<'a> = Vec<PluginItem<'a>>;
+pub type PluginConfig<'a> = jacquard_common::types::value::Data<'a>;
+/// A string identifier for a plugin, used to reference it in the app.
+pub type StringId<'a> = jacquard_common::CowStr<'a>;
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Web<'a> {
+    ///The bundler used for the web app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub bundler: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The URL to the favicon for the web app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub favicon: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub favicon_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ///The output directory for the web app.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdaptiveIcon<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "adaptiveIcon"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Android<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "android"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "androidStatusBar"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "asset"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Db<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "db"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Developer<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "developer"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "expoClient"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "expoGo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "ios"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "launchAsset"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "manifest"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "manifestExtra"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Web<'a> {
+    fn nsid() -> &'static str {
+        "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "web"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_ocho_plugin_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -1063,125 +1633,6 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdaptiveIcon<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "adaptiveIcon"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Android<'a> {
-    ///Configuration for the adaptive icon on Android.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub adaptive_icon: std::option::Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
-    ///Whether edge-to-edge mode is enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edge_to_edge_enabled: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Android<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "android"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Android status bar configuration.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AndroidStatusBar<'a> {
-    ///The background color of the Android status bar.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "androidStatusBar"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Asset<'a> {
-    ///The blob of the asset
-    #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
-    ///The hash of the asset
-    #[serde(borrow)]
-    pub hash: jacquard_common::CowStr<'a>,
-    ///The type of the asset
-    #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
-    ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod asset_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1192,51 +1643,51 @@ pub mod asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Blob;
         type Hash;
         type Type;
-        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Blob = Unset;
         type Hash = Unset;
         type Type = Unset;
-        type Blob = Unset;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type Hash = Set<members::hash>;
-        type Type = S::Type;
-        type Blob = S::Blob;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Hash = S::Hash;
-        type Type = Set<members::r#type>;
-        type Blob = S::Blob;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
+        type Blob = Set<members::blob>;
         type Hash = S::Hash;
         type Type = S::Type;
-        type Blob = Set<members::blob>;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Blob = S::Blob;
+        type Hash = Set<members::hash>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Blob = S::Blob;
+        type Hash = S::Hash;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `blob` field
+        pub struct blob(());
         ///Marker type for the `hash` field
         pub struct hash(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `blob` field
-        pub struct blob(());
     }
 }
 
@@ -1349,9 +1800,9 @@ impl<'a, S: asset_state::State> AssetBuilder<'a, S> {
 impl<'a, S> AssetBuilder<'a, S>
 where
     S: asset_state::State,
+    S::Blob: asset_state::IsSet,
     S::Hash: asset_state::IsSet,
     S::Type: asset_state::IsSet,
-    S::Blob: asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Asset<'a> {
@@ -1379,213 +1830,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "asset"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Db<'a> {
-    ///The ID of the database.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Db<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "db"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Developer<'a> {
-    ///The tool used for development, e.g., 'expo-cli'.
-    #[serde(borrow)]
-    pub tool: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Developer<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "developer"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExpoClient<'a> {
-    ///Android-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub android: std::option::Option<crate::app_ocho::plugin::Android<'a>>,
-    ///Configuration for the Android status bar.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub android_status_bar: std::option::Option<
-        crate::app_ocho::plugin::AndroidStatusBar<'a>,
-    >,
-    ///Experimental features enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub expirements: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Additional configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub extra: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The URL to the app icon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ios-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub ios: std::option::Option<crate::app_ocho::plugin::Ios<'a>>,
-    ///Localization settings for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub locales: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The name of the Expo client application.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Whether the new architecture is enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub new_arch_enabled: std::option::Option<bool>,
-    ///The default orientation of the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub orientation: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The platforms supported by the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platforms: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///A list of plugins used by the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub plugins: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The custom URI scheme for deep linking.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub scheme: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The SDK version of the Expo client.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub sdk_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A URL-friendly identifier for the app.
-    #[serde(borrow)]
-    pub slug: jacquard_common::CowStr<'a>,
-    ///The default user interface style.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub user_interface_style: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The version of the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Web-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub web: std::option::Option<crate::app_ocho::plugin::Web<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "expoClient"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ExpoGo<'a> {
-    ///Developer-specific configuration for the Expo Go app.
-    #[serde(borrow)]
-    pub developer: crate::app_ocho::plugin::Developer<'a>,
 }
 
 pub mod expo_go_state {
@@ -1691,81 +1935,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "expoGo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Ios<'a> {
-    ///Whether the app supports iPad.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub supports_tablet: std::option::Option<bool>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "ios"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LaunchAsset<'a> {
-    ///The MIME type of the asset, e.g., 'image/png'.
-    #[serde(borrow)]
-    pub content_type: jacquard_common::CowStr<'a>,
-    ///The unique key for this asset, used to reference it in the plugin.
-    #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
-    ///The URL where the asset can be accessed.
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
 pub mod launch_asset_state {
@@ -1945,53 +2114,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "launchAsset"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Manifest<'a> {
-    ///The date and time when this plugin manifest was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Additional metadata for the plugin, including Expo client and Go configurations.
-    #[serde(borrow)]
-    pub extra: crate::app_ocho::plugin::ManifestExtra<'a>,
-    ///The unique identifier for this plugin manifest.
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///The launch asset for the plugin (the main javascipt bundle).
-    #[serde(borrow)]
-    pub launch_asset: crate::app_ocho::plugin::LaunchAsset<'a>,
-    #[serde(borrow)]
-    pub metadata: jacquard_common::types::value::Data<'a>,
-    ///The version of the Expo runtime this plugin is compatible with.
-    #[serde(borrow)]
-    pub runtime_version: jacquard_common::CowStr<'a>,
-}
-
 pub mod manifest_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2002,105 +2124,105 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RuntimeVersion;
         type Extra;
         type LaunchAsset;
-        type Id;
-        type Metadata;
         type CreatedAt;
+        type Metadata;
+        type RuntimeVersion;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RuntimeVersion = Unset;
         type Extra = Unset;
         type LaunchAsset = Unset;
-        type Id = Unset;
-        type Metadata = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `runtime_version` field to Set
-    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
-    impl<S: State> State for SetRuntimeVersion<S> {
-        type RuntimeVersion = Set<members::runtime_version>;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-        type Id = S::Id;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
+        type Metadata = Unset;
+        type RuntimeVersion = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `extra` field to Set
     pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExtra<S> {}
     impl<S: State> State for SetExtra<S> {
-        type RuntimeVersion = S::RuntimeVersion;
         type Extra = Set<members::extra>;
         type LaunchAsset = S::LaunchAsset;
-        type Id = S::Id;
-        type Metadata = S::Metadata;
         type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Id = S::Id;
     }
     ///State transition - sets the `launch_asset` field to Set
     pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
     impl<S: State> State for SetLaunchAsset<S> {
-        type RuntimeVersion = S::RuntimeVersion;
         type Extra = S::Extra;
         type LaunchAsset = Set<members::launch_asset>;
-        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
         type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
         type RuntimeVersion = S::RuntimeVersion;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-        type Id = Set<members::id>;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetadata<S> {}
-    impl<S: State> State for SetMetadata<S> {
-        type RuntimeVersion = S::RuntimeVersion;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
         type Id = S::Id;
-        type Metadata = Set<members::metadata>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type RuntimeVersion = S::RuntimeVersion;
         type Extra = S::Extra;
         type LaunchAsset = S::LaunchAsset;
-        type Id = S::Id;
-        type Metadata = S::Metadata;
         type CreatedAt = Set<members::created_at>;
+        type Metadata = S::Metadata;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetadata<S> {}
+    impl<S: State> State for SetMetadata<S> {
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = Set<members::metadata>;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type RuntimeVersion = Set<members::runtime_version>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `runtime_version` field
-        pub struct runtime_version(());
         ///Marker type for the `extra` field
         pub struct extra(());
         ///Marker type for the `launch_asset` field
         pub struct launch_asset(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2253,12 +2375,12 @@ where
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::RuntimeVersion: manifest_state::IsSet,
     S::Extra: manifest_state::IsSet,
     S::LaunchAsset: manifest_state::IsSet,
-    S::Id: manifest_state::IsSet,
-    S::Metadata: manifest_state::IsSet,
     S::CreatedAt: manifest_state::IsSet,
+    S::Metadata: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
+    S::Id: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -2290,41 +2412,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "manifest"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ManifestExtra<'a> {
-    #[serde(borrow)]
-    pub expo_client: crate::app_ocho::plugin::ExpoClient<'a>,
-    #[serde(borrow)]
-    pub expo_go: crate::app_ocho::plugin::ExpoGo<'a>,
 }
 
 pub mod manifest_extra_state {
@@ -2464,92 +2551,5 @@ where
             expo_go: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "manifestExtra"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PluginItem<'a> {
-    #[serde(rename = "app.ocho.plugin.defs#stringId")]
-    StringId(Box<crate::app_ocho::plugin::StringId<'a>>),
-    #[serde(rename = "app.ocho.plugin.defs#pluginConfig")]
-    PluginConfig(Box<crate::app_ocho::plugin::PluginConfig<'a>>),
-}
-
-pub type Plugin<'a> = Vec<PluginItem<'a>>;
-pub type PluginConfig<'a> = jacquard_common::types::value::Data<'a>;
-/// A string identifier for a plugin, used to reference it in the app.
-pub type StringId<'a> = jacquard_common::CowStr<'a>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Web<'a> {
-    ///The bundler used for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub bundler: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URL to the favicon for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub favicon: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub favicon_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ///The output directory for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Web<'a> {
-    fn nsid() -> &'static str {
-        "app.ocho.plugin.defs"
-    }
-    fn def_name() -> &'static str {
-        "web"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_ocho_plugin_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

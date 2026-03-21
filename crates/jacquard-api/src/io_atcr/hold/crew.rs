@@ -35,6 +35,208 @@ pub struct Crew<'a> {
     pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Member's role in the hold
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CrewRole<'a> {
+    Owner,
+    Admin,
+    Write,
+    Read,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CrewRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Owner => "owner",
+            Self::Admin => "admin",
+            Self::Write => "write",
+            Self::Read => "read",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CrewRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "owner" => Self::Owner,
+            "admin" => Self::Admin,
+            "write" => Self::Write,
+            "read" => Self::Read,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CrewRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "owner" => Self::Owner,
+            "admin" => Self::Admin,
+            "write" => Self::Write,
+            "read" => Self::Read,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CrewRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CrewRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CrewRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CrewRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CrewRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CrewRole<'_> {
+    type Output = CrewRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CrewRole::Owner => CrewRole::Owner,
+            CrewRole::Admin => CrewRole::Admin,
+            CrewRole::Write => CrewRole::Write,
+            CrewRole::Read => CrewRole::Read,
+            CrewRole::Other(v) => CrewRole::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CrewGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Crew<'a>,
+}
+
+impl<'a> Crew<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CrewRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CrewRecord;
+impl jacquard_common::xrpc::XrpcResp for CrewRecord {
+    const NSID: &'static str = "io.atcr.hold.crew";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CrewGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CrewGetRecordOutput<'_>> for Crew<'_> {
+    fn from(output: CrewGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Crew<'_> {
+    const NSID: &'static str = "io.atcr.hold.crew";
+    type Record = CrewRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CrewRecord {
+    const NSID: &'static str = "io.atcr.hold.crew";
+    type Record = CrewRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.crew"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_crew()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.role;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "role",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tier {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tier",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod crew_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -45,67 +247,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Member;
-        type Role;
-        type AddedAt;
         type Permissions;
+        type AddedAt;
+        type Role;
+        type Member;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Member = Unset;
-        type Role = Unset;
-        type AddedAt = Unset;
         type Permissions = Unset;
-    }
-    ///State transition - sets the `member` field to Set
-    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMember<S> {}
-    impl<S: State> State for SetMember<S> {
-        type Member = Set<members::member>;
-        type Role = S::Role;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Member = S::Member;
-        type Role = Set<members::role>;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Member = S::Member;
-        type Role = S::Role;
-        type AddedAt = Set<members::added_at>;
-        type Permissions = S::Permissions;
+        type AddedAt = Unset;
+        type Role = Unset;
+        type Member = Unset;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
-        type Member = S::Member;
-        type Role = S::Role;
-        type AddedAt = S::AddedAt;
         type Permissions = Set<members::permissions>;
+        type AddedAt = S::AddedAt;
+        type Role = S::Role;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Permissions = S::Permissions;
+        type AddedAt = Set<members::added_at>;
+        type Role = S::Role;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Permissions = S::Permissions;
+        type AddedAt = S::AddedAt;
+        type Role = Set<members::role>;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `member` field to Set
+    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMember<S> {}
+    impl<S: State> State for SetMember<S> {
+        type Permissions = S::Permissions;
+        type AddedAt = S::AddedAt;
+        type Role = S::Role;
+        type Member = Set<members::member>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `member` field
-        pub struct member(());
-        ///Marker type for the `role` field
-        pub struct role(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
+        ///Marker type for the `role` field
+        pub struct role(());
+        ///Marker type for the `member` field
+        pub struct member(());
     }
 }
 
@@ -235,10 +437,10 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Member: crew_state::IsSet,
-    S::Role: crew_state::IsSet,
-    S::AddedAt: crew_state::IsSet,
     S::Permissions: crew_state::IsSet,
+    S::AddedAt: crew_state::IsSet,
+    S::Role: crew_state::IsSet,
+    S::Member: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -267,208 +469,6 @@ where
             tier: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Crew<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CrewRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Member's role in the hold
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CrewRole<'a> {
-    Owner,
-    Admin,
-    Write,
-    Read,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CrewRole<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Owner => "owner",
-            Self::Admin => "admin",
-            Self::Write => "write",
-            Self::Read => "read",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CrewRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "owner" => Self::Owner,
-            "admin" => Self::Admin,
-            "write" => Self::Write,
-            "read" => Self::Read,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CrewRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "owner" => Self::Owner,
-            "admin" => Self::Admin,
-            "write" => Self::Write,
-            "read" => Self::Read,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CrewRole<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CrewRole<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CrewRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CrewRole<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CrewRole<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CrewRole<'_> {
-    type Output = CrewRole<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CrewRole::Owner => CrewRole::Owner,
-            CrewRole::Admin => CrewRole::Admin,
-            CrewRole::Write => CrewRole::Write,
-            CrewRole::Read => CrewRole::Read,
-            CrewRole::Other(v) => CrewRole::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CrewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Crew<'a>,
-}
-
-impl From<CrewGetRecordOutput<'_>> for Crew<'_> {
-    fn from(output: CrewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Crew<'_> {
-    const NSID: &'static str = "io.atcr.hold.crew";
-    type Record = CrewRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CrewRecord;
-impl jacquard_common::xrpc::XrpcResp for CrewRecord {
-    const NSID: &'static str = "io.atcr.hold.crew";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CrewGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CrewRecord {
-    const NSID: &'static str = "io.atcr.hold.crew";
-    type Record = CrewRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.crew"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_crew()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.role;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "role",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tier {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tier",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

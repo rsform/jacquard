@@ -23,6 +23,36 @@ pub struct RemoveSecret<'a> {
     pub repo: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Response type for
+///sh.tangled.repo.removeSecret
+pub struct RemoveSecretResponse;
+impl jacquard_common::xrpc::XrpcResp for RemoveSecretResponse {
+    const NSID: &'static str = "sh.tangled.repo.removeSecret";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveSecret<'a> {
+    const NSID: &'static str = "sh.tangled.repo.removeSecret";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RemoveSecretResponse;
+}
+
+/// Endpoint type for
+///sh.tangled.repo.removeSecret
+pub struct RemoveSecretRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.removeSecret";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveSecret<'de>;
+    type Response = RemoveSecretResponse;
+}
+
 pub mod remove_secret_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,34 +191,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///sh.tangled.repo.removeSecret
-pub struct RemoveSecretResponse;
-impl jacquard_common::xrpc::XrpcResp for RemoveSecretResponse {
-    const NSID: &'static str = "sh.tangled.repo.removeSecret";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveSecret<'a> {
-    const NSID: &'static str = "sh.tangled.repo.removeSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = RemoveSecretResponse;
-}
-
-/// Endpoint type for
-///sh.tangled.repo.removeSecret
-pub struct RemoveSecretRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {
-    const PATH: &'static str = "/xrpc/sh.tangled.repo.removeSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = RemoveSecret<'de>;
-    type Response = RemoveSecretResponse;
 }

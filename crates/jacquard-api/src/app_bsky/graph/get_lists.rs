@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,55 @@ pub struct GetLists<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
+}
+
+/// Response type for
+///app.bsky.graph.getLists
+pub struct GetListsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetListsResponse {
+    const NSID: &'static str = "app.bsky.graph.getLists";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetListsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLists<'a> {
+    const NSID: &'static str = "app.bsky.graph.getLists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.graph.getLists
+pub struct GetListsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getLists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLists<'de>;
+    type Response = GetListsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_lists_state {
@@ -177,49 +222,4 @@ where
             purposes: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetListsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
-}
-
-/// Response type for
-///app.bsky.graph.getLists
-pub struct GetListsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetListsResponse {
-    const NSID: &'static str = "app.bsky.graph.getLists";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLists<'a> {
-    const NSID: &'static str = "app.bsky.graph.getLists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetListsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.graph.getLists
-pub struct GetListsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetListsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.graph.getLists";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLists<'de>;
-    type Response = GetListsResponse;
 }

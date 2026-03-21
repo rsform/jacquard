@@ -28,6 +28,84 @@ pub struct Collectionitem<'a> {
     pub work: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionitemGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collectionitem<'a>,
+}
+
+impl<'a> Collectionitem<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CollectionitemRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CollectionitemRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionitemRecord {
+    const NSID: &'static str = "social.lexical.works.collectionitem";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionitemGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CollectionitemGetRecordOutput<'_>> for Collectionitem<'_> {
+    fn from(output: CollectionitemGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Collectionitem<'_> {
+    const NSID: &'static str = "social.lexical.works.collectionitem";
+    type Record = CollectionitemRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CollectionitemRecord {
+    const NSID: &'static str = "social.lexical.works.collectionitem";
+    type Record = CollectionitemRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
+    fn nsid() -> &'static str {
+        "social.lexical.works.collectionitem"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_lexical_works_collectionitem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod collectionitem_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,51 +116,51 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Work;
         type List;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Work = Unset;
         type List = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work` field to Set
-    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWork<S> {}
-    impl<S: State> State for SetWork<S> {
-        type Work = Set<members::work>;
-        type List = S::List;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type Work = S::Work;
-        type List = Set<members::list>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Work = S::Work;
         type List = S::List;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `work` field to Set
+    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWork<S> {}
+    impl<S: State> State for SetWork<S> {
+        type CreatedAt = S::CreatedAt;
+        type Work = Set<members::work>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type CreatedAt = S::CreatedAt;
+        type Work = S::Work;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `work` field
         pub struct work(());
         ///Marker type for the `list` field
         pub struct list(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -175,9 +253,9 @@ where
 impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
+    S::CreatedAt: collectionitem_state::IsSet,
     S::Work: collectionitem_state::IsSet,
     S::List: collectionitem_state::IsSet,
-    S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collectionitem<'a> {
@@ -202,84 +280,6 @@ where
             work: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Collectionitem<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CollectionitemRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionitemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collectionitem<'a>,
-}
-
-impl From<CollectionitemGetRecordOutput<'_>> for Collectionitem<'_> {
-    fn from(output: CollectionitemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Collectionitem<'_> {
-    const NSID: &'static str = "social.lexical.works.collectionitem";
-    type Record = CollectionitemRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CollectionitemRecord;
-impl jacquard_common::xrpc::XrpcResp for CollectionitemRecord {
-    const NSID: &'static str = "social.lexical.works.collectionitem";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionitemGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CollectionitemRecord {
-    const NSID: &'static str = "social.lexical.works.collectionitem";
-    type Record = CollectionitemRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
-    fn nsid() -> &'static str {
-        "social.lexical.works.collectionitem"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_lexical_works_collectionitem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

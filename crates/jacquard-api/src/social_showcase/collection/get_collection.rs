@@ -20,6 +20,49 @@ pub struct GetCollection<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetCollectionOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::social_showcase::CollectionView<'a>,
+}
+
+/// Response type for
+///social.showcase.collection.getCollection
+pub struct GetCollectionResponse;
+impl jacquard_common::xrpc::XrpcResp for GetCollectionResponse {
+    const NSID: &'static str = "social.showcase.collection.getCollection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetCollectionOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollection<'a> {
+    const NSID: &'static str = "social.showcase.collection.getCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetCollectionResponse;
+}
+
+/// Endpoint type for
+///social.showcase.collection.getCollection
+pub struct GetCollectionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetCollectionRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.collection.getCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetCollection<'de>;
+    type Response = GetCollectionResponse;
+}
+
 pub mod get_collection_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetCollectionOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::social_showcase::CollectionView<'a>,
-}
-
-/// Response type for
-///social.showcase.collection.getCollection
-pub struct GetCollectionResponse;
-impl jacquard_common::xrpc::XrpcResp for GetCollectionResponse {
-    const NSID: &'static str = "social.showcase.collection.getCollection";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCollectionOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollection<'a> {
-    const NSID: &'static str = "social.showcase.collection.getCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetCollectionResponse;
-}
-
-/// Endpoint type for
-///social.showcase.collection.getCollection
-pub struct GetCollectionRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetCollectionRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.collection.getCollection";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCollection<'de>;
-    type Response = GetCollectionResponse;
 }

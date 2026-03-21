@@ -26,6 +26,160 @@ pub struct TangledString<'a> {
     pub filename: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TangledStringGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: TangledString<'a>,
+}
+
+impl<'a> TangledString<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, TangledStringRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TangledStringRecord;
+impl jacquard_common::xrpc::XrpcResp for TangledStringRecord {
+    const NSID: &'static str = "sh.tangled.string";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TangledStringGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<TangledStringGetRecordOutput<'_>> for TangledString<'_> {
+    fn from(output: TangledStringGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for TangledString<'_> {
+    const NSID: &'static str = "sh.tangled.string";
+    type Record = TangledStringRecord;
+}
+
+impl jacquard_common::types::collection::Collection for TangledStringRecord {
+    const NSID: &'static str = "sh.tangled.string";
+    type Record = TangledStringRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.string"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_string()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.contents;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count < 1usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "contents",
+                        ),
+                        min: 1usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.description;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 280usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 280usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.filename;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 140usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "filename",
+                        ),
+                        max: 140usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.filename;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count < 1usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "filename",
+                        ),
+                        min: 1usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod tangled_string_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,67 +190,67 @@ pub mod tangled_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Filename;
-        type CreatedAt;
-        type Description;
         type Contents;
+        type Filename;
+        type Description;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Filename = Unset;
-        type CreatedAt = Unset;
-        type Description = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `filename` field to Set
-    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFilename<S> {}
-    impl<S: State> State for SetFilename<S> {
-        type Filename = Set<members::filename>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Contents = S::Contents;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Filename = S::Filename;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Contents = S::Contents;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Filename = S::Filename;
-        type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Contents = S::Contents;
+        type Filename = Unset;
+        type Description = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContents<S> {}
     impl<S: State> State for SetContents<S> {
-        type Filename = S::Filename;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
         type Contents = Set<members::contents>;
+        type Filename = S::Filename;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `filename` field to Set
+    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFilename<S> {}
+    impl<S: State> State for SetFilename<S> {
+        type Contents = S::Contents;
+        type Filename = Set<members::filename>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Contents = S::Contents;
+        type Filename = S::Filename;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Contents = S::Contents;
+        type Filename = S::Filename;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `filename` field
-        pub struct filename(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `filename` field
+        pub struct filename(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -209,10 +363,10 @@ where
 impl<'a, S> TangledStringBuilder<'a, S>
 where
     S: tangled_string_state::State,
-    S::Filename: tangled_string_state::IsSet,
-    S::CreatedAt: tangled_string_state::IsSet,
-    S::Description: tangled_string_state::IsSet,
     S::Contents: tangled_string_state::IsSet,
+    S::Filename: tangled_string_state::IsSet,
+    S::Description: tangled_string_state::IsSet,
+    S::CreatedAt: tangled_string_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledString<'a> {
@@ -239,160 +393,6 @@ where
             filename: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> TangledString<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TangledStringRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TangledStringGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TangledString<'a>,
-}
-
-impl From<TangledStringGetRecordOutput<'_>> for TangledString<'_> {
-    fn from(output: TangledStringGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for TangledString<'_> {
-    const NSID: &'static str = "sh.tangled.string";
-    type Record = TangledStringRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct TangledStringRecord;
-impl jacquard_common::xrpc::XrpcResp for TangledStringRecord {
-    const NSID: &'static str = "sh.tangled.string";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = TangledStringGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for TangledStringRecord {
-    const NSID: &'static str = "sh.tangled.string";
-    type Record = TangledStringRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.string"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_string()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.contents;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count < 1usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "contents",
-                        ),
-                        min: 1usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.description;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 280usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 280usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.filename;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "filename",
-                        ),
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.filename;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count < 1usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "filename",
-                        ),
-                        min: 1usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

@@ -30,134 +30,6 @@ pub struct GetBook<'a> {
     pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-pub mod get_book_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {}
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {}
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {}
-}
-
-/// Builder for constructing an instance of this type
-pub struct GetBookBuilder<'a, S: get_book_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> GetBook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetBookBuilder<'a, get_book_state::Empty> {
-        GetBookBuilder::new()
-    }
-}
-
-impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        GetBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
-    /// Set the `goodreadsId` field (optional)
-    pub fn goodreads_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `goodreadsId` field to an Option value (optional)
-    pub fn maybe_goodreads_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
-    /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
-    /// Set the `isbn` field (optional)
-    pub fn isbn(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `isbn` field to an Option value (optional)
-    pub fn maybe_isbn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
-    /// Set the `isbn13` field (optional)
-    pub fn isbn13(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `isbn13` field to an Option value (optional)
-    pub fn maybe_isbn13(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S> GetBookBuilder<'a, S>
-where
-    S: get_book_state::State,
-{
-    /// Build the final struct
-    pub fn build(self) -> GetBook<'a> {
-        GetBook {
-            goodreads_id: self.__unsafe_private_named.0,
-            id: self.__unsafe_private_named.1,
-            isbn: self.__unsafe_private_named.2,
-            isbn13: self.__unsafe_private_named.3,
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -338,4 +210,132 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Request<'de> = GetBook<'de>;
     type Response = GetBookResponse;
+}
+
+pub mod get_book_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetBookBuilder<'a, S: get_book_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetBook<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetBookBuilder<'a, get_book_state::Empty> {
+        GetBookBuilder::new()
+    }
+}
+
+impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetBookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `goodreadsId` field (optional)
+    pub fn goodreads_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `goodreadsId` field to an Option value (optional)
+    pub fn maybe_goodreads_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `isbn` field (optional)
+    pub fn isbn(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `isbn` field to an Option value (optional)
+    pub fn maybe_isbn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+    /// Set the `isbn13` field (optional)
+    pub fn isbn13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `isbn13` field to an Option value (optional)
+    pub fn maybe_isbn13(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetBookBuilder<'a, S>
+where
+    S: get_book_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetBook<'a> {
+        GetBook {
+            goodreads_id: self.__unsafe_private_named.0,
+            id: self.__unsafe_private_named.1,
+            isbn: self.__unsafe_private_named.2,
+            isbn13: self.__unsafe_private_named.3,
+        }
+    }
 }

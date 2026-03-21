@@ -23,6 +23,52 @@ pub struct GetGroups<'a> {
     pub limit: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetGroupsOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub groups: std::option::Option<
+        Vec<crate::app_blebbit::authr::group::GroupView<'a>>,
+    >,
+}
+
+/// Response type for
+///app.blebbit.authr.group.getGroups
+pub struct GetGroupsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetGroupsResponse {
+    const NSID: &'static str = "app.blebbit.authr.group.getGroups";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetGroupsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroups<'a> {
+    const NSID: &'static str = "app.blebbit.authr.group.getGroups";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetGroupsResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.group.getGroups
+pub struct GetGroupsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetGroupsRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroups";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetGroups<'de>;
+    type Response = GetGroupsResponse;
+}
+
 pub mod get_groups_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -110,50 +156,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetGroupsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub groups: std::option::Option<
-        Vec<crate::app_blebbit::authr::group::GroupView<'a>>,
-    >,
-}
-
-/// Response type for
-///app.blebbit.authr.group.getGroups
-pub struct GetGroupsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetGroupsResponse {
-    const NSID: &'static str = "app.blebbit.authr.group.getGroups";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGroupsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroups<'a> {
-    const NSID: &'static str = "app.blebbit.authr.group.getGroups";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetGroupsResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.group.getGroups
-pub struct GetGroupsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetGroupsRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroups";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGroups<'de>;
-    type Response = GetGroupsResponse;
 }

@@ -29,6 +29,223 @@ pub struct Block<'a> {
     pub y: i64,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum BlockBlock<'a> {
+    #[serde(rename = "pub.leaflet.blocks.iframe")]
+    Iframe(Box<crate::pub_leaflet::blocks::iframe::Iframe<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.text")]
+    Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.blockquote")]
+    Blockquote(Box<crate::pub_leaflet::blocks::blockquote::Blockquote<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.header")]
+    Header(Box<crate::pub_leaflet::blocks::header::Header<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.image")]
+    Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.unorderedList")]
+    UnorderedList(Box<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.orderedList")]
+    OrderedList(Box<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.website")]
+    Website(Box<crate::pub_leaflet::blocks::website::Website<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.math")]
+    Math(Box<crate::pub_leaflet::blocks::math::Math<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.code")]
+    Code(Box<crate::pub_leaflet::blocks::code::Code<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.horizontalRule")]
+    HorizontalRule(Box<crate::pub_leaflet::blocks::horizontal_rule::HorizontalRule<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.bskyPost")]
+    BskyPost(Box<crate::pub_leaflet::blocks::bsky_post::BskyPost<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.page")]
+    Page(Box<crate::pub_leaflet::blocks::page::Page<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.poll")]
+    Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.button")]
+    Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Canvas<'a> {
+    #[serde(borrow)]
+    pub blocks: Vec<crate::pub_leaflet::pages::canvas::Block<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Position<'a> {
+    pub block: Vec<i64>,
+    pub offset: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Quote<'a> {
+    #[serde(borrow)]
+    pub end: crate::pub_leaflet::pages::canvas::Position<'a>,
+    #[serde(borrow)]
+    pub start: crate::pub_leaflet::pages::canvas::Position<'a>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignCenter;
+impl std::fmt::Display for TextAlignCenter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignCenter")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignLeft;
+impl std::fmt::Display for TextAlignLeft {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignLeft")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignRight;
+impl std::fmt::Display for TextAlignRight {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignRight")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "block"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_canvas()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_canvas()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "position"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_canvas()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "quote"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_pages_canvas()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod block_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,66 +257,66 @@ pub mod block_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Block;
+        type Y;
         type X;
         type Width;
-        type Y;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Block = Unset;
+        type Y = Unset;
         type X = Unset;
         type Width = Unset;
-        type Y = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
         type Block = Set<members::block>;
+        type Y = S::Y;
         type X = S::X;
         type Width = S::Width;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetX<S> {}
-    impl<S: State> State for SetX<S> {
-        type Block = S::Block;
-        type X = Set<members::x>;
-        type Width = S::Width;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Block = S::Block;
-        type X = S::X;
-        type Width = Set<members::width>;
-        type Y = S::Y;
     }
     ///State transition - sets the `y` field to Set
     pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetY<S> {}
     impl<S: State> State for SetY<S> {
         type Block = S::Block;
+        type Y = Set<members::y>;
         type X = S::X;
         type Width = S::Width;
-        type Y = Set<members::y>;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetX<S> {}
+    impl<S: State> State for SetX<S> {
+        type Block = S::Block;
+        type Y = S::Y;
+        type X = Set<members::x>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Block = S::Block;
+        type Y = S::Y;
+        type X = S::X;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `block` field
         pub struct block(());
+        ///Marker type for the `y` field
+        pub struct y(());
         ///Marker type for the `x` field
         pub struct x(());
         ///Marker type for the `width` field
         pub struct width(());
-        ///Marker type for the `y` field
-        pub struct y(());
     }
 }
 
@@ -235,9 +452,9 @@ impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
     S::Block: block_state::IsSet,
+    S::Y: block_state::IsSet,
     S::X: block_state::IsSet,
     S::Width: block_state::IsSet,
-    S::Y: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -269,51 +486,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlockBlock<'a> {
-    #[serde(rename = "pub.leaflet.blocks.iframe")]
-    Iframe(Box<crate::pub_leaflet::blocks::iframe::Iframe<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.blockquote")]
-    Blockquote(Box<crate::pub_leaflet::blocks::blockquote::Blockquote<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<crate::pub_leaflet::blocks::header::Header<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.unorderedList")]
-    UnorderedList(Box<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.orderedList")]
-    OrderedList(Box<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.website")]
-    Website(Box<crate::pub_leaflet::blocks::website::Website<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.math")]
-    Math(Box<crate::pub_leaflet::blocks::math::Math<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.code")]
-    Code(Box<crate::pub_leaflet::blocks::code::Code<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.horizontalRule")]
-    HorizontalRule(Box<crate::pub_leaflet::blocks::horizontal_rule::HorizontalRule<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.bskyPost")]
-    BskyPost(Box<crate::pub_leaflet::blocks::bsky_post::BskyPost<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.page")]
-    Page(Box<crate::pub_leaflet::blocks::page::Page<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.poll")]
-    Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
-    #[serde(rename = "pub.leaflet.blocks.button")]
-    Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
 }
 
 fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -589,42 +761,6 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.canvas"
-    }
-    fn def_name() -> &'static str {
-        "block"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_canvas()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Canvas<'a> {
-    #[serde(borrow)]
-    pub blocks: Vec<crate::pub_leaflet::pages::canvas::Block<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
 pub mod canvas_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -744,39 +880,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.canvas"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_canvas()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Position<'a> {
-    pub block: Vec<i64>,
-    pub offset: i64,
 }
 
 pub mod position_state {
@@ -919,41 +1022,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.canvas"
-    }
-    fn def_name() -> &'static str {
-        "position"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_canvas()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
-    #[serde(borrow)]
-    pub end: crate::pub_leaflet::pages::canvas::Position<'a>,
-    #[serde(borrow)]
-    pub start: crate::pub_leaflet::pages::canvas::Position<'a>,
-}
-
 pub mod quote_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -964,37 +1032,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Start = S::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -1067,8 +1135,8 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::End: quote_state::IsSet,
     S::Start: quote_state::IsSet,
+    S::End: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
@@ -1091,73 +1159,5 @@ where
             start: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
-    fn nsid() -> &'static str {
-        "pub.leaflet.pages.canvas"
-    }
-    fn def_name() -> &'static str {
-        "quote"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_leaflet_pages_canvas()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignCenter;
-impl std::fmt::Display for TextAlignCenter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignCenter")
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignLeft;
-impl std::fmt::Display for TextAlignLeft {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignLeft")
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct TextAlignRight;
-impl std::fmt::Display for TextAlignRight {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "textAlignRight")
     }
 }

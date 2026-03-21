@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -34,6 +30,92 @@ pub struct SearchActorsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchActorsSkeletonOutput<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::unspecced::SkeletonSearchActor<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hits_total: std::option::Option<i64>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchActorsSkeletonError<'a> {
+    #[serde(rename = "BadQueryString")]
+    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SearchActorsSkeletonError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BadQueryString(msg) => {
+                write!(f, "BadQueryString")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.unspecced.searchActorsSkeleton
+pub struct SearchActorsSkeletonResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchActorsSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchActorsSkeletonOutput<'de>;
+    type Err<'de> = SearchActorsSkeletonError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsSkeleton<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchActorsSkeletonResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.searchActorsSkeleton
+pub struct SearchActorsSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchActorsSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActorsSkeleton<'de>;
+    type Response = SearchActorsSkeletonResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_actors_skeleton_state {
@@ -197,86 +279,4 @@ where
             viewer: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchActorsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::unspecced::SkeletonSearchActor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hits_total: std::option::Option<i64>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchActorsSkeletonError<'a> {
-    #[serde(rename = "BadQueryString")]
-    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SearchActorsSkeletonError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BadQueryString(msg) => {
-                write!(f, "BadQueryString")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.unspecced.searchActorsSkeleton
-pub struct SearchActorsSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchActorsSkeletonResponse {
-    const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsSkeletonOutput<'de>;
-    type Err<'de> = SearchActorsSkeletonError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsSkeleton<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchActorsSkeletonResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.searchActorsSkeleton
-pub struct SearchActorsSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsSkeletonRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchActorsSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActorsSkeleton<'de>;
-    type Response = SearchActorsSkeletonResponse;
 }

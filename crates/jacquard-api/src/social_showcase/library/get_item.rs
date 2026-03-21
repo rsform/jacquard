@@ -20,6 +20,49 @@ pub struct GetItem<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetItemOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::social_showcase::ItemView<'a>,
+}
+
+/// Response type for
+///social.showcase.library.getItem
+pub struct GetItemResponse;
+impl jacquard_common::xrpc::XrpcResp for GetItemResponse {
+    const NSID: &'static str = "social.showcase.library.getItem";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetItemOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetItem<'a> {
+    const NSID: &'static str = "social.showcase.library.getItem";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetItemResponse;
+}
+
+/// Endpoint type for
+///social.showcase.library.getItem
+pub struct GetItemRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetItemRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.library.getItem";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetItem<'de>;
+    type Response = GetItemResponse;
+}
+
 pub mod get_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,47 +152,4 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetItemOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::social_showcase::ItemView<'a>,
-}
-
-/// Response type for
-///social.showcase.library.getItem
-pub struct GetItemResponse;
-impl jacquard_common::xrpc::XrpcResp for GetItemResponse {
-    const NSID: &'static str = "social.showcase.library.getItem";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetItemOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetItem<'a> {
-    const NSID: &'static str = "social.showcase.library.getItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetItemResponse;
-}
-
-/// Endpoint type for
-///social.showcase.library.getItem
-pub struct GetItemRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetItemRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.library.getItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetItem<'de>;
-    type Response = GetItemResponse;
 }

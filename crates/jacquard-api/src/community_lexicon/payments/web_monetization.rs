@@ -27,6 +27,84 @@ pub struct WebMonetization<'a> {
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WebMonetizationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: WebMonetization<'a>,
+}
+
+impl<'a> WebMonetization<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WebMonetizationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct WebMonetizationRecord;
+impl jacquard_common::xrpc::XrpcResp for WebMonetizationRecord {
+    const NSID: &'static str = "community.lexicon.payments.webMonetization";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WebMonetizationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'_> {
+    fn from(output: WebMonetizationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for WebMonetization<'_> {
+    const NSID: &'static str = "community.lexicon.payments.webMonetization";
+    type Record = WebMonetizationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for WebMonetizationRecord {
+    const NSID: &'static str = "community.lexicon.payments.webMonetization";
+    type Record = WebMonetizationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebMonetization<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.payments.webMonetization"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_payments_webMonetization()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod web_monetization_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -148,84 +226,6 @@ where
             note: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> WebMonetization<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WebMonetizationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WebMonetizationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WebMonetization<'a>,
-}
-
-impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'_> {
-    fn from(output: WebMonetizationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for WebMonetization<'_> {
-    const NSID: &'static str = "community.lexicon.payments.webMonetization";
-    type Record = WebMonetizationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct WebMonetizationRecord;
-impl jacquard_common::xrpc::XrpcResp for WebMonetizationRecord {
-    const NSID: &'static str = "community.lexicon.payments.webMonetization";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = WebMonetizationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for WebMonetizationRecord {
-    const NSID: &'static str = "community.lexicon.payments.webMonetization";
-    type Record = WebMonetizationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebMonetization<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.payments.webMonetization"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_payments_webMonetization()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

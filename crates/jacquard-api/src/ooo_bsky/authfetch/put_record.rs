@@ -33,6 +33,53 @@ pub struct PutRecord<'a> {
     pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutRecordOutput<'a> {
+    ///The AT URI of the stored record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///ooo.bsky.authfetch.putRecord
+pub struct PutRecordResponse;
+impl jacquard_common::xrpc::XrpcResp for PutRecordResponse {
+    const NSID: &'static str = "ooo.bsky.authfetch.putRecord";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutRecordOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutRecord<'a> {
+    const NSID: &'static str = "ooo.bsky.authfetch.putRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutRecordResponse;
+}
+
+/// Endpoint type for
+///ooo.bsky.authfetch.putRecord
+pub struct PutRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutRecordRequest {
+    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.putRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutRecord<'de>;
+    type Response = PutRecordResponse;
+}
+
 pub mod put_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,67 +90,67 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Strategy;
-        type Collection;
         type Record;
+        type Collection;
         type Rkey;
+        type Strategy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Strategy = Unset;
-        type Collection = Unset;
         type Record = Unset;
+        type Collection = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Strategy = Set<members::strategy>;
-        type Collection = S::Collection;
-        type Record = S::Record;
-        type Rkey = S::Rkey;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Strategy = S::Strategy;
-        type Collection = Set<members::collection>;
-        type Record = S::Record;
-        type Rkey = S::Rkey;
+        type Strategy = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Strategy = S::Strategy;
-        type Collection = S::Collection;
         type Record = Set<members::record>;
+        type Collection = S::Collection;
         type Rkey = S::Rkey;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Record = S::Record;
+        type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+        type Strategy = S::Strategy;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Strategy = S::Strategy;
-        type Collection = S::Collection;
         type Record = S::Record;
+        type Collection = S::Collection;
         type Rkey = Set<members::rkey>;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Record = S::Record;
+        type Collection = S::Collection;
+        type Rkey = S::Rkey;
+        type Strategy = Set<members::strategy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `strategy` field
-        pub struct strategy(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `strategy` field
+        pub struct strategy(());
     }
 }
 
@@ -224,10 +271,10 @@ where
 impl<'a, S> PutRecordBuilder<'a, S>
 where
     S: put_record_state::State,
-    S::Strategy: put_record_state::IsSet,
-    S::Collection: put_record_state::IsSet,
     S::Record: put_record_state::IsSet,
+    S::Collection: put_record_state::IsSet,
     S::Rkey: put_record_state::IsSet,
+    S::Strategy: put_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutRecord<'a> {
@@ -255,51 +302,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutRecordOutput<'a> {
-    ///The AT URI of the stored record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-/// Response type for
-///ooo.bsky.authfetch.putRecord
-pub struct PutRecordResponse;
-impl jacquard_common::xrpc::XrpcResp for PutRecordResponse {
-    const NSID: &'static str = "ooo.bsky.authfetch.putRecord";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutRecordOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutRecord<'a> {
-    const NSID: &'static str = "ooo.bsky.authfetch.putRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutRecordResponse;
-}
-
-/// Endpoint type for
-///ooo.bsky.authfetch.putRecord
-pub struct PutRecordRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutRecordRequest {
-    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.putRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutRecord<'de>;
-    type Response = PutRecordResponse;
 }

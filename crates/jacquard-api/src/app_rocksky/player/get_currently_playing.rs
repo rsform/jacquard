@@ -24,6 +24,49 @@ pub struct GetCurrentlyPlaying<'a> {
     pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetCurrentlyPlayingOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::player::CurrentlyPlayingViewDetailed<'a>,
+}
+
+/// Response type for
+///app.rocksky.player.getCurrentlyPlaying
+pub struct GetCurrentlyPlayingResponse;
+impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
+    const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetCurrentlyPlayingOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
+    const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetCurrentlyPlayingResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.player.getCurrentlyPlaying
+pub struct GetCurrentlyPlayingRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.player.getCurrentlyPlaying";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetCurrentlyPlaying<'de>;
+    type Response = GetCurrentlyPlayingResponse;
+}
+
 pub mod get_currently_playing_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -120,47 +163,4 @@ where
             player_id: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetCurrentlyPlayingOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::player::CurrentlyPlayingViewDetailed<'a>,
-}
-
-/// Response type for
-///app.rocksky.player.getCurrentlyPlaying
-pub struct GetCurrentlyPlayingResponse;
-impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
-    const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCurrentlyPlayingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
-    const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetCurrentlyPlayingResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.player.getCurrentlyPlaying
-pub struct GetCurrentlyPlayingRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.player.getCurrentlyPlaying";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCurrentlyPlaying<'de>;
-    type Response = GetCurrentlyPlayingResponse;
 }

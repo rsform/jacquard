@@ -34,6 +34,132 @@ pub struct MatchAndContactIndex<'a> {
     pub r#match: crate::app_bsky::actor::ProfileView<'a>,
 }
 
+/// A stash object to be sent via bsync representing a notification to be created.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Notification<'a> {
+    ///The DID of who this notification comes from.
+    #[serde(borrow)]
+    pub from: jacquard_common::types::string::Did<'a>,
+    ///The DID of who this notification should go to.
+    #[serde(borrow)]
+    pub to: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SyncStatus<'a> {
+    ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
+    pub matches_count: i64,
+    ///Last date when contacts where imported.
+    pub synced_at: jacquard_common::types::string::Datetime,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MatchAndContactIndex<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.contact.defs"
+    }
+    fn def_name() -> &'static str {
+        "matchAndContactIndex"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_contact_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.contact_index;
+            if *value > 999i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "contact_index",
+                    ),
+                    max: 999i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.contact_index;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "contact_index",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.contact.defs"
+    }
+    fn def_name() -> &'static str {
+        "notification"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_contact_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.contact.defs"
+    }
+    fn def_name() -> &'static str {
+        "syncStatus"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_contact_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.matches_count;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "matches_count",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod match_and_contact_index_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -363,68 +489,6 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MatchAndContactIndex<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.contact.defs"
-    }
-    fn def_name() -> &'static str {
-        "matchAndContactIndex"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_contact_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.contact_index;
-            if *value > 999i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "contact_index",
-                    ),
-                    max: 999i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.contact_index;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "contact_index",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A stash object to be sent via bsync representing a notification to be created.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Notification<'a> {
-    ///The DID of who this notification comes from.
-    #[serde(borrow)]
-    pub from: jacquard_common::types::string::Did<'a>,
-    ///The DID of who this notification should go to.
-    #[serde(borrow)]
-    pub to: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod notification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -565,41 +629,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.contact.defs"
-    }
-    fn def_name() -> &'static str {
-        "notification"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_contact_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SyncStatus<'a> {
-    ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
-    pub matches_count: i64,
-    ///Last date when contacts where imported.
-    pub synced_at: jacquard_common::types::string::Datetime,
-}
-
 pub mod sync_status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -610,37 +639,37 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncedAt;
         type MatchesCount;
+        type SyncedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncedAt = Unset;
         type MatchesCount = Unset;
-    }
-    ///State transition - sets the `synced_at` field to Set
-    pub struct SetSyncedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncedAt<S> {}
-    impl<S: State> State for SetSyncedAt<S> {
-        type SyncedAt = Set<members::synced_at>;
-        type MatchesCount = S::MatchesCount;
+        type SyncedAt = Unset;
     }
     ///State transition - sets the `matches_count` field to Set
     pub struct SetMatchesCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMatchesCount<S> {}
     impl<S: State> State for SetMatchesCount<S> {
-        type SyncedAt = S::SyncedAt;
         type MatchesCount = Set<members::matches_count>;
+        type SyncedAt = S::SyncedAt;
+    }
+    ///State transition - sets the `synced_at` field to Set
+    pub struct SetSyncedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncedAt<S> {}
+    impl<S: State> State for SetSyncedAt<S> {
+        type MatchesCount = S::MatchesCount;
+        type SyncedAt = Set<members::synced_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `synced_at` field
-        pub struct synced_at(());
         ///Marker type for the `matches_count` field
         pub struct matches_count(());
+        ///Marker type for the `synced_at` field
+        pub struct synced_at(());
     }
 }
 
@@ -713,8 +742,8 @@ where
 impl<'a, S> SyncStatusBuilder<'a, S>
 where
     S: sync_status_state::State,
-    S::SyncedAt: sync_status_state::IsSet,
     S::MatchesCount: sync_status_state::IsSet,
+    S::SyncedAt: sync_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncStatus<'a> {
@@ -737,34 +766,5 @@ where
             synced_at: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.contact.defs"
-    }
-    fn def_name() -> &'static str {
-        "syncStatus"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_contact_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.matches_count;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "matches_count",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -36,6 +36,163 @@ pub struct Source<'a> {
     pub vary: SourceVary<'a>,
 }
 
+/// Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SourceVary<'a> {
+    Authenticated,
+    Unauthenticated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SourceVary<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Authenticated => "authenticated",
+            Self::Unauthenticated => "unauthenticated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SourceVary<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "authenticated" => Self::Authenticated,
+            "unauthenticated" => Self::Unauthenticated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SourceVary<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "authenticated" => Self::Authenticated,
+            "unauthenticated" => Self::Unauthenticated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SourceVary<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SourceVary<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SourceVary<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SourceVary<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SourceVary<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SourceVary<'_> {
+    type Output = SourceVary<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SourceVary::Authenticated => SourceVary::Authenticated,
+            SourceVary::Unauthenticated => SourceVary::Unauthenticated,
+            SourceVary::Other(v) => SourceVary::Other(v.into_static()),
+        }
+    }
+}
+
+/// A strong reference to a record, including its content hash for verification.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectRef<'a> {
+    ///CID of the full record content for integrity verification.
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///AT-URI of the record at the hydration service.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.defs"
+    }
+    fn def_name() -> &'static str {
+        "source"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.vary;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "vary",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
+    fn nsid() -> &'static str {
+        "zone.stratos.defs"
+    }
+    fn def_name() -> &'static str {
+        "subjectRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_zone_stratos_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod source_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -46,49 +203,49 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Service;
         type Subject;
+        type Service;
         type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Service = Unset;
         type Subject = Unset;
+        type Service = Unset;
         type Vary = Unset;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetService<S> {}
-    impl<S: State> State for SetService<S> {
-        type Service = Set<members::service>;
-        type Subject = S::Subject;
-        type Vary = S::Vary;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Service = S::Service;
         type Subject = Set<members::subject>;
+        type Service = S::Service;
+        type Vary = S::Vary;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetService<S> {}
+    impl<S: State> State for SetService<S> {
+        type Subject = S::Subject;
+        type Service = Set<members::service>;
         type Vary = S::Vary;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVary<S> {}
     impl<S: State> State for SetVary<S> {
-        type Service = S::Service;
         type Subject = S::Subject;
+        type Service = S::Service;
         type Vary = Set<members::vary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `service` field
-        pub struct service(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `service` field
+        pub struct service(());
         ///Marker type for the `vary` field
         pub struct vary(());
     }
@@ -183,8 +340,8 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
-    S::Service: source_state::IsSet,
     S::Subject: source_state::IsSet,
+    S::Service: source_state::IsSet,
     S::Vary: source_state::IsSet,
 {
     /// Build the final struct
@@ -209,95 +366,6 @@ where
             subject: self.__unsafe_private_named.1.unwrap(),
             vary: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SourceVary<'a> {
-    Authenticated,
-    Unauthenticated,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> SourceVary<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Authenticated => "authenticated",
-            Self::Unauthenticated => "unauthenticated",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for SourceVary<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "authenticated" => Self::Authenticated,
-            "unauthenticated" => Self::Unauthenticated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for SourceVary<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "authenticated" => Self::Authenticated,
-            "unauthenticated" => Self::Unauthenticated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SourceVary<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for SourceVary<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for SourceVary<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for SourceVary<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for SourceVary<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for SourceVary<'_> {
-    type Output = SourceVary<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SourceVary::Authenticated => SourceVary::Authenticated,
-            SourceVary::Unauthenticated => SourceVary::Unauthenticated,
-            SourceVary::Other(v) => SourceVary::Other(v.into_static()),
         }
     }
 }
@@ -459,57 +527,6 @@ fn lexicon_doc_zone_stratos_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.defs"
-    }
-    fn def_name() -> &'static str {
-        "source"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.vary;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "vary",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A strong reference to a record, including its content hash for verification.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectRef<'a> {
-    ///CID of the full record content for integrity verification.
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///AT-URI of the record at the hydration service.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod subject_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -520,37 +537,37 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -623,8 +640,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Uri: subject_ref_state::IsSet,
     S::Cid: subject_ref_state::IsSet,
+    S::Uri: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {
@@ -647,22 +664,5 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
-    fn nsid() -> &'static str {
-        "zone.stratos.defs"
-    }
-    fn def_name() -> &'static str {
-        "subjectRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_zone_stratos_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

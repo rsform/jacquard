@@ -45,6 +45,203 @@ pub struct Master<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MasterSnapshotScope<'a> {
+    None,
+    Custom,
+    Full,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MasterSnapshotScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::Custom => "custom",
+            Self::Full => "full",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MasterSnapshotScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "custom" => Self::Custom,
+            "full" => Self::Full,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MasterSnapshotScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "custom" => Self::Custom,
+            "full" => Self::Full,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MasterSnapshotScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MasterSnapshotScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MasterSnapshotScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MasterSnapshotScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MasterSnapshotScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
+    type Output = MasterSnapshotScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MasterSnapshotScope::None => MasterSnapshotScope::None,
+            MasterSnapshotScope::Custom => MasterSnapshotScope::Custom,
+            MasterSnapshotScope::Full => MasterSnapshotScope::Full,
+            MasterSnapshotScope::Other(v) => MasterSnapshotScope::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MasterGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Master<'a>,
+}
+
+impl<'a> Master<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MasterRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MasterRecord;
+impl jacquard_common::xrpc::XrpcResp for MasterRecord {
+    const NSID: &'static str = "actor.rpg.master";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MasterGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MasterGetRecordOutput<'_>> for Master<'_> {
+    fn from(output: MasterGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Master<'_> {
+    const NSID: &'static str = "actor.rpg.master";
+    type Record = MasterRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MasterRecord {
+    const NSID: &'static str = "actor.rpg.master";
+    type Record = MasterRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Master<'a> {
+    fn nsid() -> &'static str {
+        "actor.rpg.master"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_actor_rpg_master()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.campaign {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "campaign",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.system;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "system",
+                    ),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod master_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -55,51 +252,51 @@ pub mod master_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Player;
         type System;
+        type Player;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Player = Unset;
         type System = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Player = S::Player;
-        type System = S::System;
-    }
-    ///State transition - sets the `player` field to Set
-    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayer<S> {}
-    impl<S: State> State for SetPlayer<S> {
-        type CreatedAt = S::CreatedAt;
-        type Player = Set<members::player>;
-        type System = S::System;
+        type Player = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `system` field to Set
     pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSystem<S> {}
     impl<S: State> State for SetSystem<S> {
-        type CreatedAt = S::CreatedAt;
-        type Player = S::Player;
         type System = Set<members::system>;
+        type Player = S::Player;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `player` field to Set
+    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayer<S> {}
+    impl<S: State> State for SetPlayer<S> {
+        type System = S::System;
+        type Player = Set<members::player>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type System = S::System;
+        type Player = S::Player;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `player` field
-        pub struct player(());
         ///Marker type for the `system` field
         pub struct system(());
+        ///Marker type for the `player` field
+        pub struct player(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -289,9 +486,9 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
-    S::CreatedAt: master_state::IsSet,
-    S::Player: master_state::IsSet,
     S::System: master_state::IsSet,
+    S::Player: master_state::IsSet,
+    S::CreatedAt: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {
@@ -326,203 +523,6 @@ where
             updated_at: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Master<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MasterRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MasterSnapshotScope<'a> {
-    None,
-    Custom,
-    Full,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> MasterSnapshotScope<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::Custom => "custom",
-            Self::Full => "full",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for MasterSnapshotScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "custom" => Self::Custom,
-            "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for MasterSnapshotScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "custom" => Self::Custom,
-            "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MasterSnapshotScope<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for MasterSnapshotScope<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for MasterSnapshotScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for MasterSnapshotScope<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for MasterSnapshotScope<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
-    type Output = MasterSnapshotScope<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MasterSnapshotScope::None => MasterSnapshotScope::None,
-            MasterSnapshotScope::Custom => MasterSnapshotScope::Custom,
-            MasterSnapshotScope::Full => MasterSnapshotScope::Full,
-            MasterSnapshotScope::Other(v) => MasterSnapshotScope::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MasterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Master<'a>,
-}
-
-impl From<MasterGetRecordOutput<'_>> for Master<'_> {
-    fn from(output: MasterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Master<'_> {
-    const NSID: &'static str = "actor.rpg.master";
-    type Record = MasterRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MasterRecord;
-impl jacquard_common::xrpc::XrpcResp for MasterRecord {
-    const NSID: &'static str = "actor.rpg.master";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MasterGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MasterRecord {
-    const NSID: &'static str = "actor.rpg.master";
-    type Record = MasterRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Master<'a> {
-    fn nsid() -> &'static str {
-        "actor.rpg.master"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_actor_rpg_master()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.campaign {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "campaign",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.system;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system",
-                    ),
-                    max: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

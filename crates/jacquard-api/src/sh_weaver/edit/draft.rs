@@ -21,6 +21,84 @@ pub struct Draft<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DraftGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Draft<'a>,
+}
+
+impl<'a> Draft<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DraftRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DraftRecord;
+impl jacquard_common::xrpc::XrpcResp for DraftRecord {
+    const NSID: &'static str = "sh.weaver.edit.draft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DraftGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
+    fn from(output: DraftGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Draft<'_> {
+    const NSID: &'static str = "sh.weaver.edit.draft";
+    type Record = DraftRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DraftRecord {
+    const NSID: &'static str = "sh.weaver.edit.draft";
+    type Record = DraftRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.draft"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_draft()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod draft_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -123,84 +201,6 @@ where
             created_at: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Draft<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DraftRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Draft<'a>,
-}
-
-impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
-    fn from(output: DraftGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Draft<'_> {
-    const NSID: &'static str = "sh.weaver.edit.draft";
-    type Record = DraftRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DraftRecord;
-impl jacquard_common::xrpc::XrpcResp for DraftRecord {
-    const NSID: &'static str = "sh.weaver.edit.draft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DraftGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DraftRecord {
-    const NSID: &'static str = "sh.weaver.edit.draft";
-    type Record = DraftRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.draft"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_draft()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

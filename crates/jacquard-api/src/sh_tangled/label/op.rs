@@ -27,6 +27,121 @@ pub struct Op<'a> {
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OpGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Op<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Operand<'a> {
+    ///ATURI to the label definition
+    #[serde(borrow)]
+    pub key: jacquard_common::types::string::AtUri<'a>,
+    ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Op<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, OpRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct OpRecord;
+impl jacquard_common::xrpc::XrpcResp for OpRecord {
+    const NSID: &'static str = "sh.tangled.label.op";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = OpGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<OpGetRecordOutput<'_>> for Op<'_> {
+    fn from(output: OpGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Op<'_> {
+    const NSID: &'static str = "sh.tangled.label.op";
+    type Record = OpRecord;
+}
+
+impl jacquard_common::types::collection::Collection for OpRecord {
+    const NSID: &'static str = "sh.tangled.label.op";
+    type Record = OpRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Op<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.label.op"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_label_op()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Operand<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.label.op"
+    }
+    fn def_name() -> &'static str {
+        "operand"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_label_op()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod op_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -38,66 +153,66 @@ pub mod op_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Delete;
+        type PerformedAt;
         type Subject;
         type Add;
-        type PerformedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Delete = Unset;
+        type PerformedAt = Unset;
         type Subject = Unset;
         type Add = Unset;
-        type PerformedAt = Unset;
     }
     ///State transition - sets the `delete` field to Set
     pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDelete<S> {}
     impl<S: State> State for SetDelete<S> {
         type Delete = Set<members::delete>;
+        type PerformedAt = S::PerformedAt;
         type Subject = S::Subject;
         type Add = S::Add;
-        type PerformedAt = S::PerformedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Delete = S::Delete;
-        type Subject = Set<members::subject>;
-        type Add = S::Add;
-        type PerformedAt = S::PerformedAt;
-    }
-    ///State transition - sets the `add` field to Set
-    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAdd<S> {}
-    impl<S: State> State for SetAdd<S> {
-        type Delete = S::Delete;
-        type Subject = S::Subject;
-        type Add = Set<members::add>;
-        type PerformedAt = S::PerformedAt;
     }
     ///State transition - sets the `performed_at` field to Set
     pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
     impl<S: State> State for SetPerformedAt<S> {
         type Delete = S::Delete;
+        type PerformedAt = Set<members::performed_at>;
         type Subject = S::Subject;
         type Add = S::Add;
-        type PerformedAt = Set<members::performed_at>;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+        type Subject = Set<members::subject>;
+        type Add = S::Add;
+    }
+    ///State transition - sets the `add` field to Set
+    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAdd<S> {}
+    impl<S: State> State for SetAdd<S> {
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+        type Subject = S::Subject;
+        type Add = Set<members::add>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `delete` field
         pub struct delete(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `add` field
         pub struct add(());
-        ///Marker type for the `performed_at` field
-        pub struct performed_at(());
     }
 }
 
@@ -211,9 +326,9 @@ impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
     S::Delete: op_state::IsSet,
+    S::PerformedAt: op_state::IsSet,
     S::Subject: op_state::IsSet,
     S::Add: op_state::IsSet,
-    S::PerformedAt: op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Op<'a> {
@@ -240,84 +355,6 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Op<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, OpRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OpGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Op<'a>,
-}
-
-impl From<OpGetRecordOutput<'_>> for Op<'_> {
-    fn from(output: OpGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Op<'_> {
-    const NSID: &'static str = "sh.tangled.label.op";
-    type Record = OpRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct OpRecord;
-impl jacquard_common::xrpc::XrpcResp for OpRecord {
-    const NSID: &'static str = "sh.tangled.label.op";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = OpGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for OpRecord {
-    const NSID: &'static str = "sh.tangled.label.op";
-    type Record = OpRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Op<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.label.op"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_label_op()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -492,26 +529,6 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Operand<'a> {
-    ///ATURI to the label definition
-    #[serde(borrow)]
-    pub key: jacquard_common::types::string::AtUri<'a>,
-    ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
 pub mod operand_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -649,22 +666,5 @@ where
             value: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Operand<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.label.op"
-    }
-    fn def_name() -> &'static str {
-        "operand"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_label_op()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -23,6 +23,57 @@ pub struct PutActivitySubscription<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutActivitySubscriptionOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub activity_subscription: std::option::Option<
+        crate::app_bsky::notification::ActivitySubscription<'a>,
+    >,
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+/// Response type for
+///app.bsky.notification.putActivitySubscription
+pub struct PutActivitySubscriptionResponse;
+impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
+    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutActivitySubscriptionOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
+    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutActivitySubscriptionResponse;
+}
+
+/// Endpoint type for
+///app.bsky.notification.putActivitySubscription
+pub struct PutActivitySubscriptionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.putActivitySubscription";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutActivitySubscription<'de>;
+    type Response = PutActivitySubscriptionResponse;
+}
+
 pub mod put_activity_subscription_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,37 +84,37 @@ pub mod put_activity_subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type ActivitySubscription;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type ActivitySubscription = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type ActivitySubscription = S::ActivitySubscription;
+        type Subject = Unset;
     }
     ///State transition - sets the `activity_subscription` field to Set
     pub struct SetActivitySubscription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivitySubscription<S> {}
     impl<S: State> State for SetActivitySubscription<S> {
-        type Subject = S::Subject;
         type ActivitySubscription = Set<members::activity_subscription>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type ActivitySubscription = S::ActivitySubscription;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `activity_subscription` field
         pub struct activity_subscription(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -148,8 +199,8 @@ where
 impl<'a, S> PutActivitySubscriptionBuilder<'a, S>
 where
     S: put_activity_subscription_state::State,
-    S::Subject: put_activity_subscription_state::IsSet,
     S::ActivitySubscription: put_activity_subscription_state::IsSet,
+    S::Subject: put_activity_subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutActivitySubscription<'a> {
@@ -173,55 +224,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutActivitySubscriptionOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
-        crate::app_bsky::notification::ActivitySubscription<'a>,
-    >,
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
-}
-
-/// Response type for
-///app.bsky.notification.putActivitySubscription
-pub struct PutActivitySubscriptionResponse;
-impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
-    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutActivitySubscriptionOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
-    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutActivitySubscriptionResponse;
-}
-
-/// Endpoint type for
-///app.bsky.notification.putActivitySubscription
-pub struct PutActivitySubscriptionRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.notification.putActivitySubscription";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutActivitySubscription<'de>;
-    type Response = PutActivitySubscriptionResponse;
 }

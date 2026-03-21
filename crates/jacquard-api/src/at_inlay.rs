@@ -158,6 +158,250 @@ pub enum CachePolicyTagsItem<'a> {
     TagLink(Box<crate::at_inlay::TagLink<'a>>),
 }
 
+/// A renderable Inlay element.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Element<'a> {
+    ///Stable key that identifies the component among its siblings.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub key: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Properties to pass to the component.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub props: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///NSID of the component to render.
+    #[serde(borrow)]
+    pub r#type: jacquard_common::types::string::Nsid<'a>,
+}
+
+/// Standard response from a component render call.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Response<'a> {
+    ///Cache lifetime and invalidation tags
+    #[serde(borrow)]
+    pub cache: crate::at_inlay::CachePolicy<'a>,
+    ///Rendered element tree
+    #[serde(borrow)]
+    pub node: crate::at_inlay::Element<'a>,
+}
+
+/// Cache tag: depend on backlink relationships to a subject.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagLink<'a> {
+    ///Collection NSID of the linking records. Omit for any collection.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub from: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    ///Subject AT URI that is linked to
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Cache tag: depend on a specific record, collection, or identity.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TagRecord<'a> {
+    ///AT URI at record, collection, or identity granularity
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViaValtown<'a> {
+    ///Val Town val UUID
+    #[serde(borrow)]
+    pub val_id: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CachePolicy<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "cachePolicy"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.life {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "life",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Element<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "element"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.key {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "response"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagLink<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "tagLink"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagRecord<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "tagRecord"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViaValtown<'a> {
+    fn nsid() -> &'static str {
+        "at.inlay.defs"
+    }
+    fn def_name() -> &'static str {
+        "viaValtown"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_inlay_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.val_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "val_id",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -491,61 +735,6 @@ fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CachePolicy<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "cachePolicy"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.life {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "life",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A renderable Inlay element.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Element<'a> {
-    ///Stable key that identifies the component among its siblings.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub key: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Properties to pass to the component.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub props: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///NSID of the component to render.
-    #[serde(borrow)]
-    pub r#type: jacquard_common::types::string::Nsid<'a>,
-}
-
 pub mod element_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -689,56 +878,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Element<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "element"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.key {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "key",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Standard response from a component render call.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Response<'a> {
-    ///Cache lifetime and invalidation tags
-    #[serde(borrow)]
-    pub cache: crate::at_inlay::CachePolicy<'a>,
-    ///Rendered element tree
-    #[serde(borrow)]
-    pub node: crate::at_inlay::Element<'a>,
-}
-
 pub mod response_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -749,37 +888,37 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Cache;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Cache = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Cache = S::Cache;
+        type Node = Unset;
     }
     ///State transition - sets the `cache` field to Set
     pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCache<S> {}
     impl<S: State> State for SetCache<S> {
-        type Node = S::Node;
         type Cache = Set<members::cache>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Cache = S::Cache;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `cache` field
         pub struct cache(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -852,8 +991,8 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Node: response_state::IsSet,
     S::Cache: response_state::IsSet,
+    S::Node: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -877,45 +1016,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "response"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Cache tag: depend on backlink relationships to a subject.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagLink<'a> {
-    ///Collection NSID of the linking records. Omit for any collection.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub from: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
-    ///Subject AT URI that is linked to
-    #[serde(borrow)]
-    pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod tag_link_state {
@@ -1045,41 +1145,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagLink<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "tagLink"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Cache tag: depend on a specific record, collection, or identity.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TagRecord<'a> {
-    ///AT URI at record, collection, or identity granularity
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod tag_record_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1182,70 +1247,5 @@ where
             uri: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagRecord<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "tagRecord"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViaValtown<'a> {
-    ///Val Town val UUID
-    #[serde(borrow)]
-    pub val_id: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViaValtown<'a> {
-    fn nsid() -> &'static str {
-        "at.inlay.defs"
-    }
-    fn def_name() -> &'static str {
-        "viaValtown"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_inlay_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.val_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "val_id",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

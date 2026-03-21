@@ -44,196 +44,6 @@ pub struct Config<'a> {
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-pub mod config_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {}
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {}
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {}
-}
-
-/// Builder for constructing an instance of this type
-pub struct ConfigBuilder<'a, S: config_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<ConfigBodyFont<'a>>,
-        ::core::option::Option<ConfigFontBody<'a>>,
-        ::core::option::Option<ConfigFontHeading<'a>>,
-        ::core::option::Option<ConfigHeadingFont<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Config<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigBuilder<'a, config_state::Empty> {
-        ConfigBuilder::new()
-    }
-}
-
-impl<'a> ConfigBuilder<'a, config_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        ConfigBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `bodyFont` field (optional)
-    pub fn body_font(mut self, value: impl Into<Option<ConfigBodyFont<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `bodyFont` field to an Option value (optional)
-    pub fn maybe_body_font(mut self, value: Option<ConfigBodyFont<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `fontBody` field (optional)
-    pub fn font_body(mut self, value: impl Into<Option<ConfigFontBody<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `fontBody` field to an Option value (optional)
-    pub fn maybe_font_body(mut self, value: Option<ConfigFontBody<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `fontHeading` field (optional)
-    pub fn font_heading(
-        mut self,
-        value: impl Into<Option<ConfigFontHeading<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `fontHeading` field to an Option value (optional)
-    pub fn maybe_font_heading(mut self, value: Option<ConfigFontHeading<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `headingFont` field (optional)
-    pub fn heading_font(
-        mut self,
-        value: impl Into<Option<ConfigHeadingFont<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `headingFont` field to an Option value (optional)
-    pub fn maybe_heading_font(mut self, value: Option<ConfigHeadingFont<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `subtitle` field (optional)
-    pub fn subtitle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `subtitle` field to an Option value (optional)
-    pub fn maybe_subtitle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
-    /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<'a, S> ConfigBuilder<'a, S>
-where
-    S: config_state::State,
-{
-    /// Build the final struct
-    pub fn build(self) -> Config<'a> {
-        Config {
-            body_font: self.__unsafe_private_named.0,
-            font_body: self.__unsafe_private_named.1,
-            font_heading: self.__unsafe_private_named.2,
-            heading_font: self.__unsafe_private_named.3,
-            subtitle: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Config<'a> {
-        Config {
-            body_font: self.__unsafe_private_named.0,
-            font_body: self.__unsafe_private_named.1,
-            font_heading: self.__unsafe_private_named.2,
-            heading_font: self.__unsafe_private_named.3,
-            subtitle: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> Config<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ConfigRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
 /// Body font ID
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigBodyFont<'a> {
@@ -651,16 +461,17 @@ pub struct ConfigGetRecordOutput<'a> {
     pub value: Config<'a>,
 }
 
-impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
-    fn from(output: ConfigGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<'a> Config<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ConfigRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
-}
-
-impl jacquard_common::types::collection::Collection for Config<'_> {
-    const NSID: &'static str = "coop.hypha.spores.site.config";
-    type Record = ConfigRecord;
 }
 
 /// Marker type for deserializing records from this collection.
@@ -671,6 +482,18 @@ impl jacquard_common::xrpc::XrpcResp for ConfigRecord {
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ConfigGetRecordOutput<'de>;
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
+    fn from(output: ConfigGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Config<'_> {
+    const NSID: &'static str = "coop.hypha.spores.site.config";
+    type Record = ConfigRecord;
 }
 
 impl jacquard_common::types::collection::Collection for ConfigRecord {
@@ -800,6 +623,183 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
             }
         }
         Ok(())
+    }
+}
+
+pub mod config_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ConfigBuilder<'a, S: config_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ConfigBodyFont<'a>>,
+        ::core::option::Option<ConfigFontBody<'a>>,
+        ::core::option::Option<ConfigFontHeading<'a>>,
+        ::core::option::Option<ConfigHeadingFont<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Config<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ConfigBuilder<'a, config_state::Empty> {
+        ConfigBuilder::new()
+    }
+}
+
+impl<'a> ConfigBuilder<'a, config_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ConfigBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `bodyFont` field (optional)
+    pub fn body_font(mut self, value: impl Into<Option<ConfigBodyFont<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `bodyFont` field to an Option value (optional)
+    pub fn maybe_body_font(mut self, value: Option<ConfigBodyFont<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `fontBody` field (optional)
+    pub fn font_body(mut self, value: impl Into<Option<ConfigFontBody<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `fontBody` field to an Option value (optional)
+    pub fn maybe_font_body(mut self, value: Option<ConfigFontBody<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `fontHeading` field (optional)
+    pub fn font_heading(
+        mut self,
+        value: impl Into<Option<ConfigFontHeading<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `fontHeading` field to an Option value (optional)
+    pub fn maybe_font_heading(mut self, value: Option<ConfigFontHeading<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `headingFont` field (optional)
+    pub fn heading_font(
+        mut self,
+        value: impl Into<Option<ConfigHeadingFont<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `headingFont` field to an Option value (optional)
+    pub fn maybe_heading_font(mut self, value: Option<ConfigHeadingFont<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `subtitle` field (optional)
+    pub fn subtitle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `subtitle` field to an Option value (optional)
+    pub fn maybe_subtitle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> ConfigBuilder<'a, S>
+where
+    S: config_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Config<'a> {
+        Config {
+            body_font: self.__unsafe_private_named.0,
+            font_body: self.__unsafe_private_named.1,
+            font_heading: self.__unsafe_private_named.2,
+            heading_font: self.__unsafe_private_named.3,
+            subtitle: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Config<'a> {
+        Config {
+            body_font: self.__unsafe_private_named.0,
+            font_body: self.__unsafe_private_named.1,
+            font_heading: self.__unsafe_private_named.2,
+            heading_font: self.__unsafe_private_named.3,
+            subtitle: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
     }
 }
 

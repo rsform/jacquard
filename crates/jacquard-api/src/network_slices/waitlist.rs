@@ -42,6 +42,64 @@ pub struct InviteView<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+/// A request to join the waitlist with profile information
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RequestView<'a> {
+    ///When the user joined the waitlist
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Profile of the requester
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ///The AT URI of the slice being requested access to
+    #[serde(borrow)]
+    pub slice: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.waitlist.defs"
+    }
+    fn def_name() -> &'static str {
+        "inviteView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_waitlist_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestView<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.waitlist.defs"
+    }
+    fn def_name() -> &'static str {
+        "requestView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_slices_waitlist_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod invite_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -528,47 +586,6 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.waitlist.defs"
-    }
-    fn def_name() -> &'static str {
-        "inviteView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_waitlist_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A request to join the waitlist with profile information
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestView<'a> {
-    ///When the user joined the waitlist
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Profile of the requester
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    ///The AT URI of the slice being requested access to
-    #[serde(borrow)]
-    pub slice: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod request_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -728,22 +745,5 @@ where
             slice: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestView<'a> {
-    fn nsid() -> &'static str {
-        "network.slices.waitlist.defs"
-    }
-    fn def_name() -> &'static str {
-        "requestView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_slices_waitlist_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -21,6 +21,53 @@ pub struct AviHandle<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AviHandleOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+/// Response type for
+///mov.danabra.AviHandle
+pub struct AviHandleResponse;
+impl jacquard_common::xrpc::XrpcResp for AviHandleResponse {
+    const NSID: &'static str = "mov.danabra.AviHandle";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AviHandleOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for AviHandle<'a> {
+    const NSID: &'static str = "mov.danabra.AviHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AviHandleResponse;
+}
+
+/// Endpoint type for
+///mov.danabra.AviHandle
+pub struct AviHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AviHandleRequest {
+    const PATH: &'static str = "/xrpc/mov.danabra.AviHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AviHandle<'de>;
+    type Response = AviHandleResponse;
+}
+
 pub mod avi_handle_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -124,51 +171,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AviHandleOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///mov.danabra.AviHandle
-pub struct AviHandleResponse;
-impl jacquard_common::xrpc::XrpcResp for AviHandleResponse {
-    const NSID: &'static str = "mov.danabra.AviHandle";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AviHandleOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for AviHandle<'a> {
-    const NSID: &'static str = "mov.danabra.AviHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = AviHandleResponse;
-}
-
-/// Endpoint type for
-///mov.danabra.AviHandle
-pub struct AviHandleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AviHandleRequest {
-    const PATH: &'static str = "/xrpc/mov.danabra.AviHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = AviHandle<'de>;
-    type Response = AviHandleResponse;
 }

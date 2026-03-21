@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -24,6 +20,52 @@ pub struct GetSuggestedAuthors {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSuggestedAuthorsOutput<'a> {
+    #[serde(borrow)]
+    pub authors: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+/// Response type for
+///sh.weaver.actor.getSuggestedAuthors
+pub struct GetSuggestedAuthorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
+    const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSuggestedAuthorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetSuggestedAuthors {
+    const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestedAuthorsResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.actor.getSuggestedAuthors
+pub struct GetSuggestedAuthorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedAuthors;
+    type Response = GetSuggestedAuthorsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
 }
 
 pub mod get_suggested_authors_state {
@@ -91,46 +133,4 @@ where
             limit: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSuggestedAuthorsOutput<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-/// Response type for
-///sh.weaver.actor.getSuggestedAuthors
-pub struct GetSuggestedAuthorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
-    const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedAuthorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetSuggestedAuthors {
-    const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSuggestedAuthorsResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.actor.getSuggestedAuthors
-pub struct GetSuggestedAuthorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedAuthors;
-    type Response = GetSuggestedAuthorsResponse;
 }

@@ -24,6 +24,49 @@ pub struct SendInteractions<'a> {
     pub interactions: Vec<crate::app_bsky::feed::Interaction<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SendInteractionsOutput<'a> {}
+/// Response type for
+///app.bsky.feed.sendInteractions
+pub struct SendInteractionsResponse;
+impl jacquard_common::xrpc::XrpcResp for SendInteractionsResponse {
+    const NSID: &'static str = "app.bsky.feed.sendInteractions";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SendInteractionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SendInteractions<'a> {
+    const NSID: &'static str = "app.bsky.feed.sendInteractions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SendInteractionsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.sendInteractions
+pub struct SendInteractionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendInteractionsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.sendInteractions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendInteractions<'de>;
+    type Response = SendInteractionsResponse;
+}
+
 pub mod send_interactions_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -149,47 +192,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SendInteractionsOutput<'a> {}
-/// Response type for
-///app.bsky.feed.sendInteractions
-pub struct SendInteractionsResponse;
-impl jacquard_common::xrpc::XrpcResp for SendInteractionsResponse {
-    const NSID: &'static str = "app.bsky.feed.sendInteractions";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SendInteractionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SendInteractions<'a> {
-    const NSID: &'static str = "app.bsky.feed.sendInteractions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SendInteractionsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.sendInteractions
-pub struct SendInteractionsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SendInteractionsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.sendInteractions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SendInteractions<'de>;
-    type Response = SendInteractionsResponse;
 }

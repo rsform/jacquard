@@ -29,6 +29,116 @@ pub struct Buzz<'a> {
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BuzzGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Buzz<'a>,
+}
+
+impl<'a> Buzz<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BuzzRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BuzzRecord;
+impl jacquard_common::xrpc::XrpcResp for BuzzRecord {
+    const NSID: &'static str = "buzz.bookhive.buzz";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BuzzGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BuzzGetRecordOutput<'_>> for Buzz<'_> {
+    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Buzz<'_> {
+    const NSID: &'static str = "buzz.bookhive.buzz";
+    type Record = BuzzRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BuzzRecord {
+    const NSID: &'static str = "buzz.bookhive.buzz";
+    type Record = BuzzRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
+    fn nsid() -> &'static str {
+        "buzz.bookhive.buzz"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_buzz_bookhive_buzz()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.comment;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.comment;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "comment",
+                        ),
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod buzz_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -39,67 +149,67 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type Parent;
-        type Comment;
         type CreatedAt;
+        type Comment;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type Parent = Unset;
-        type Comment = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type Parent = S::Parent;
-        type Comment = S::Comment;
-        type CreatedAt = S::CreatedAt;
+        type Comment = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Book = S::Book;
         type Parent = Set<members::parent>;
+        type CreatedAt = S::CreatedAt;
         type Comment = S::Comment;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
         type Book = S::Book;
-        type Parent = S::Parent;
-        type Comment = Set<members::comment>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
         type Parent = S::Parent;
-        type Comment = S::Comment;
         type CreatedAt = Set<members::created_at>;
+        type Comment = S::Comment;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Comment = Set<members::comment>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Comment = S::Comment;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `parent` field
         pub struct parent(());
-        ///Marker type for the `comment` field
-        pub struct comment(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `comment` field
+        pub struct comment(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -212,10 +322,10 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
-    S::Book: buzz_state::IsSet,
     S::Parent: buzz_state::IsSet,
-    S::Comment: buzz_state::IsSet,
     S::CreatedAt: buzz_state::IsSet,
+    S::Comment: buzz_state::IsSet,
+    S::Book: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {
@@ -242,116 +352,6 @@ where
             parent: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Buzz<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BuzzRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BuzzGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Buzz<'a>,
-}
-
-impl From<BuzzGetRecordOutput<'_>> for Buzz<'_> {
-    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Buzz<'_> {
-    const NSID: &'static str = "buzz.bookhive.buzz";
-    type Record = BuzzRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BuzzRecord;
-impl jacquard_common::xrpc::XrpcResp for BuzzRecord {
-    const NSID: &'static str = "buzz.bookhive.buzz";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BuzzGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BuzzRecord {
-    const NSID: &'static str = "buzz.bookhive.buzz";
-    type Record = BuzzRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
-    fn nsid() -> &'static str {
-        "buzz.bookhive.buzz"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_buzz_bookhive_buzz()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.comment;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "comment",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.comment;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "comment",
-                        ),
-                        max: 10000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

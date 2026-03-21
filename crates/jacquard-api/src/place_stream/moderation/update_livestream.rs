@@ -29,6 +29,121 @@ pub struct UpdateLivestream<'a> {
     pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateLivestreamOutput<'a> {
+    ///The CID of the updated livestream record.
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///The AT-URI of the updated livestream record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateLivestreamError<'a> {
+    /// The request lacks valid authentication credentials.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The caller does not have permission to update livestream metadata for this streamer.
+    #[serde(rename = "Forbidden")]
+    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The streamer's OAuth session could not be found or is invalid.
+    #[serde(rename = "SessionNotFound")]
+    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The specified livestream record does not exist.
+    #[serde(rename = "RecordNotFound")]
+    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for UpdateLivestreamError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Forbidden(msg) => {
+                write!(f, "Forbidden")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::SessionNotFound(msg) => {
+                write!(f, "SessionNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RecordNotFound(msg) => {
+                write!(f, "RecordNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.moderation.updateLivestream
+pub struct UpdateLivestreamResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
+    const NSID: &'static str = "place.stream.moderation.updateLivestream";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateLivestreamOutput<'de>;
+    type Err<'de> = UpdateLivestreamError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<'a> {
+    const NSID: &'static str = "place.stream.moderation.updateLivestream";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateLivestreamResponse;
+}
+
+/// Endpoint type for
+///place.stream.moderation.updateLivestream
+pub struct UpdateLivestreamRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
+    const PATH: &'static str = "/xrpc/place.stream.moderation.updateLivestream";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateLivestream<'de>;
+    type Response = UpdateLivestreamResponse;
+}
+
 pub mod update_livestream_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -186,119 +301,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateLivestreamOutput<'a> {
-    ///The CID of the updated livestream record.
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///The AT-URI of the updated livestream record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateLivestreamError<'a> {
-    /// The request lacks valid authentication credentials.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The caller does not have permission to update livestream metadata for this streamer.
-    #[serde(rename = "Forbidden")]
-    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The streamer's OAuth session could not be found or is invalid.
-    #[serde(rename = "SessionNotFound")]
-    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The specified livestream record does not exist.
-    #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for UpdateLivestreamError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Forbidden(msg) => {
-                write!(f, "Forbidden")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::SessionNotFound(msg) => {
-                write!(f, "SessionNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::RecordNotFound(msg) => {
-                write!(f, "RecordNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.moderation.updateLivestream
-pub struct UpdateLivestreamResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
-    const NSID: &'static str = "place.stream.moderation.updateLivestream";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateLivestreamOutput<'de>;
-    type Err<'de> = UpdateLivestreamError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<'a> {
-    const NSID: &'static str = "place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateLivestreamResponse;
-}
-
-/// Endpoint type for
-///place.stream.moderation.updateLivestream
-pub struct UpdateLivestreamRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
-    const PATH: &'static str = "/xrpc/place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateLivestream<'de>;
-    type Response = UpdateLivestreamResponse;
 }

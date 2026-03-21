@@ -30,6 +30,158 @@ pub struct UpdateReadingProgress<'a> {
     pub status: std::option::Option<UpdateReadingProgressStatus<'a>>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateReadingProgressStatus<'a> {
+    Reading,
+    Finished,
+    Abandoned,
+    WantToRead,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateReadingProgressStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Reading => "reading",
+            Self::Finished => "finished",
+            Self::Abandoned => "abandoned",
+            Self::WantToRead => "want-to-read",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateReadingProgressStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateReadingProgressStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateReadingProgressStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateReadingProgressStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateReadingProgressStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateReadingProgressStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateReadingProgressStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateReadingProgressStatus<'_> {
+    type Output = UpdateReadingProgressStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateReadingProgressStatus::Reading => UpdateReadingProgressStatus::Reading,
+            UpdateReadingProgressStatus::Finished => {
+                UpdateReadingProgressStatus::Finished
+            }
+            UpdateReadingProgressStatus::Abandoned => {
+                UpdateReadingProgressStatus::Abandoned
+            }
+            UpdateReadingProgressStatus::WantToRead => {
+                UpdateReadingProgressStatus::WantToRead
+            }
+            UpdateReadingProgressStatus::Other(v) => {
+                UpdateReadingProgressStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateReadingProgressOutput<'a> {
+    #[serde(borrow)]
+    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
+}
+
+/// Response type for
+///sh.weaver.notebook.updateReadingProgress
+pub struct UpdateReadingProgressResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateReadingProgressResponse {
+    const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateReadingProgressOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateReadingProgress<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateReadingProgressResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.updateReadingProgress
+pub struct UpdateReadingProgressRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadingProgressRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.updateReadingProgress";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateReadingProgress<'de>;
+    type Response = UpdateReadingProgressResponse;
+}
+
 pub mod update_reading_progress_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -199,156 +351,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateReadingProgressStatus<'a> {
-    Reading,
-    Finished,
-    Abandoned,
-    WantToRead,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> UpdateReadingProgressStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Reading => "reading",
-            Self::Finished => "finished",
-            Self::Abandoned => "abandoned",
-            Self::WantToRead => "want-to-read",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for UpdateReadingProgressStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "reading" => Self::Reading,
-            "finished" => Self::Finished,
-            "abandoned" => Self::Abandoned,
-            "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for UpdateReadingProgressStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "reading" => Self::Reading,
-            "finished" => Self::Finished,
-            "abandoned" => Self::Abandoned,
-            "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UpdateReadingProgressStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for UpdateReadingProgressStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for UpdateReadingProgressStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for UpdateReadingProgressStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for UpdateReadingProgressStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateReadingProgressStatus<'_> {
-    type Output = UpdateReadingProgressStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateReadingProgressStatus::Reading => UpdateReadingProgressStatus::Reading,
-            UpdateReadingProgressStatus::Finished => {
-                UpdateReadingProgressStatus::Finished
-            }
-            UpdateReadingProgressStatus::Abandoned => {
-                UpdateReadingProgressStatus::Abandoned
-            }
-            UpdateReadingProgressStatus::WantToRead => {
-                UpdateReadingProgressStatus::WantToRead
-            }
-            UpdateReadingProgressStatus::Other(v) => {
-                UpdateReadingProgressStatus::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateReadingProgressOutput<'a> {
-    #[serde(borrow)]
-    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
-}
-
-/// Response type for
-///sh.weaver.notebook.updateReadingProgress
-pub struct UpdateReadingProgressResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateReadingProgressResponse {
-    const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateReadingProgressOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateReadingProgress<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateReadingProgressResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.updateReadingProgress
-pub struct UpdateReadingProgressRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadingProgressRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.updateReadingProgress";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateReadingProgress<'de>;
-    type Response = UpdateReadingProgressResponse;
 }

@@ -22,6 +22,97 @@ pub struct DenyTeleport<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DenyTeleportOutput<'a> {
+    ///Whether the teleport was successfully denied.
+    pub success: bool,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DenyTeleportError<'a> {
+    /// The specified teleport was not found.
+    #[serde(rename = "TeleportNotFound")]
+    TeleportNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The authenticated user is not the target of this teleport.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DenyTeleportError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::TeleportNotFound(msg) => {
+                write!(f, "TeleportNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.live.denyTeleport
+pub struct DenyTeleportResponse;
+impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
+    const NSID: &'static str = "place.stream.live.denyTeleport";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DenyTeleportOutput<'de>;
+    type Err<'de> = DenyTeleportError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
+    const NSID: &'static str = "place.stream.live.denyTeleport";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DenyTeleportResponse;
+}
+
+/// Endpoint type for
+///place.stream.live.denyTeleport
+pub struct DenyTeleportRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.denyTeleport";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DenyTeleport<'de>;
+    type Response = DenyTeleportResponse;
+}
+
 pub mod deny_teleport_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,95 +216,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DenyTeleportOutput<'a> {
-    ///Whether the teleport was successfully denied.
-    pub success: bool,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DenyTeleportError<'a> {
-    /// The specified teleport was not found.
-    #[serde(rename = "TeleportNotFound")]
-    TeleportNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The authenticated user is not the target of this teleport.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DenyTeleportError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::TeleportNotFound(msg) => {
-                write!(f, "TeleportNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.live.denyTeleport
-pub struct DenyTeleportResponse;
-impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
-    const NSID: &'static str = "place.stream.live.denyTeleport";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DenyTeleportOutput<'de>;
-    type Err<'de> = DenyTeleportError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
-    const NSID: &'static str = "place.stream.live.denyTeleport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DenyTeleportResponse;
-}
-
-/// Endpoint type for
-///place.stream.live.denyTeleport
-pub struct DenyTeleportRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
-    const PATH: &'static str = "/xrpc/place.stream.live.denyTeleport";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DenyTeleport<'de>;
-    type Response = DenyTeleportResponse;
 }

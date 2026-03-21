@@ -21,6 +21,118 @@ pub struct AspectRatio<'a> {
     pub width: i64,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Clip<'a> {
+    #[serde(borrow)]
+    pub children: jacquard_common::types::value::Data<'a>,
+    ///Maximum box proportions (tallest allowed shape). E.g. {width:1, height:2} means at most twice as tall as wide.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub max: std::option::Option<crate::org_atsui::clip::AspectRatio<'a>>,
+    ///Minimum box proportions (shortest allowed shape). E.g. {width:1, height:1} means at least as tall as wide.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub min: std::option::Option<crate::org_atsui::clip::AspectRatio<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ClipOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::at_inlay::Response<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+    fn nsid() -> &'static str {
+        "org.atsui.Clip"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_atsui_Clip()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.height;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.width;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "width",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Response type for
+///org.atsui.Clip
+pub struct ClipResponse;
+impl jacquard_common::xrpc::XrpcResp for ClipResponse {
+    const NSID: &'static str = "org.atsui.Clip";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ClipOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Clip<'a> {
+    const NSID: &'static str = "org.atsui.Clip";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ClipResponse;
+}
+
+/// Endpoint type for
+///org.atsui.Clip
+pub struct ClipRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ClipRequest {
+    const PATH: &'static str = "/xrpc/org.atsui.Clip";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Clip<'de>;
+    type Response = ClipResponse;
+}
+
 pub mod aspect_ratio_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -272,71 +384,6 @@ fn lexicon_doc_org_atsui_Clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
-    fn nsid() -> &'static str {
-        "org.atsui.Clip"
-    }
-    fn def_name() -> &'static str {
-        "aspectRatio"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_atsui_Clip()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.height;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.width;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Clip<'a> {
-    #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
-    ///Maximum box proportions (tallest allowed shape). E.g. {width:1, height:2} means at most twice as tall as wide.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub max: std::option::Option<crate::org_atsui::clip::AspectRatio<'a>>,
-    ///Minimum box proportions (shortest allowed shape). E.g. {width:1, height:1} means at least as tall as wide.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub min: std::option::Option<crate::org_atsui::clip::AspectRatio<'a>>,
-}
-
 pub mod clip_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -484,51 +531,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ClipOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
-}
-
-/// Response type for
-///org.atsui.Clip
-pub struct ClipResponse;
-impl jacquard_common::xrpc::XrpcResp for ClipResponse {
-    const NSID: &'static str = "org.atsui.Clip";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ClipOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Clip<'a> {
-    const NSID: &'static str = "org.atsui.Clip";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = ClipResponse;
-}
-
-/// Endpoint type for
-///org.atsui.Clip
-pub struct ClipRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ClipRequest {
-    const PATH: &'static str = "/xrpc/org.atsui.Clip";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Clip<'de>;
-    type Response = ClipResponse;
 }

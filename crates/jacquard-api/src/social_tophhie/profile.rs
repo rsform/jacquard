@@ -22,6 +22,164 @@ pub struct CommunicationPreferences<'a> {
     pub marketing: bool,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Profile<'a> {
+    ///User's opt-in/out preferences for communications.
+    #[serde(borrow)]
+    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<
+        'a,
+    >,
+    ///ISO 8601 timestamp when this profile record was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///User's opt-in/out preferences for PDS features.
+    #[serde(borrow)]
+    pub pds_preferences: crate::social_tophhie::profile::PdsPreferences<'a>,
+    ///ISO 8601 timestamp when this profile record was updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Profile<'a>,
+}
+
+/// Granular PDS preference consent flags.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PdsPreferences<'a> {
+    ///True if the user participates in accessibility scoring.
+    pub accessibility_scoring: bool,
+    ///True if the user is shown on the Tophhie Social homepage.
+    pub show_on_homepage: bool,
+}
+
+impl<'a> Profile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<'a> {
+    fn nsid() -> &'static str {
+        "social.tophhie.profile"
+    }
+    fn def_name() -> &'static str {
+        "communicationPreferences"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_tophhie_profile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfileRecord;
+impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
+    const NSID: &'static str = "social.tophhie.profile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProfileGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
+    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Profile<'_> {
+    const NSID: &'static str = "social.tophhie.profile";
+    type Record = ProfileRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ProfileRecord {
+    const NSID: &'static str = "social.tophhie.profile";
+    type Record = ProfileRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+    fn nsid() -> &'static str {
+        "social.tophhie.profile"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_tophhie_profile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PdsPreferences<'a> {
+    fn nsid() -> &'static str {
+        "social.tophhie.profile"
+    }
+    fn def_name() -> &'static str {
+        "pdsPreferences"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_tophhie_profile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod communication_preferences_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -319,50 +477,6 @@ fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<'a> {
-    fn nsid() -> &'static str {
-        "social.tophhie.profile"
-    }
-    fn def_name() -> &'static str {
-        "communicationPreferences"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_tophhie_profile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Profile<'a> {
-    ///User's opt-in/out preferences for communications.
-    #[serde(borrow)]
-    pub communication_preferences: crate::social_tophhie::profile::CommunicationPreferences<
-        'a,
-    >,
-    ///ISO 8601 timestamp when this profile record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///User's opt-in/out preferences for PDS features.
-    #[serde(borrow)]
-    pub pds_preferences: crate::social_tophhie::profile::PdsPreferences<'a>,
-    ///ISO 8601 timestamp when this profile record was updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
 pub mod profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -373,51 +487,51 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommunicationPreferences;
-        type CreatedAt;
         type PdsPreferences;
+        type CreatedAt;
+        type CommunicationPreferences;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommunicationPreferences = Unset;
-        type CreatedAt = Unset;
         type PdsPreferences = Unset;
-    }
-    ///State transition - sets the `communication_preferences` field to Set
-    pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
-    impl<S: State> State for SetCommunicationPreferences<S> {
-        type CommunicationPreferences = Set<members::communication_preferences>;
-        type CreatedAt = S::CreatedAt;
-        type PdsPreferences = S::PdsPreferences;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CommunicationPreferences = S::CommunicationPreferences;
-        type CreatedAt = Set<members::created_at>;
-        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = Unset;
+        type CommunicationPreferences = Unset;
     }
     ///State transition - sets the `pds_preferences` field to Set
     pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
     impl<S: State> State for SetPdsPreferences<S> {
-        type CommunicationPreferences = S::CommunicationPreferences;
-        type CreatedAt = S::CreatedAt;
         type PdsPreferences = Set<members::pds_preferences>;
+        type CreatedAt = S::CreatedAt;
+        type CommunicationPreferences = S::CommunicationPreferences;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = Set<members::created_at>;
+        type CommunicationPreferences = S::CommunicationPreferences;
+    }
+    ///State transition - sets the `communication_preferences` field to Set
+    pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
+    impl<S: State> State for SetCommunicationPreferences<S> {
+        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = S::CreatedAt;
+        type CommunicationPreferences = Set<members::communication_preferences>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `communication_preferences` field
-        pub struct communication_preferences(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `pds_preferences` field
         pub struct pds_preferences(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `communication_preferences` field
+        pub struct communication_preferences(());
     }
 }
 
@@ -532,9 +646,9 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::CommunicationPreferences: profile_state::IsSet,
-    S::CreatedAt: profile_state::IsSet,
     S::PdsPreferences: profile_state::IsSet,
+    S::CreatedAt: profile_state::IsSet,
+    S::CommunicationPreferences: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -562,103 +676,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
-}
-
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Profile<'_> {
-    const NSID: &'static str = "social.tophhie.profile";
-    type Record = ProfileRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ProfileRecord;
-impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
-    const NSID: &'static str = "social.tophhie.profile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ProfileRecord {
-    const NSID: &'static str = "social.tophhie.profile";
-    type Record = ProfileRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
-    fn nsid() -> &'static str {
-        "social.tophhie.profile"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_tophhie_profile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Granular PDS preference consent flags.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PdsPreferences<'a> {
-    ///True if the user participates in accessibility scoring.
-    pub accessibility_scoring: bool,
-    ///True if the user is shown on the Tophhie Social homepage.
-    pub show_on_homepage: bool,
 }
 
 pub mod pds_preferences_state {
@@ -795,22 +812,5 @@ where
             show_on_homepage: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PdsPreferences<'a> {
-    fn nsid() -> &'static str {
-        "social.tophhie.profile"
-    }
-    fn def_name() -> &'static str {
-        "pdsPreferences"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_tophhie_profile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

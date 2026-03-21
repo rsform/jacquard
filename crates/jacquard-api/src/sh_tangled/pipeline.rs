@@ -25,6 +25,470 @@ pub struct CloneOpts<'a> {
     pub submodules: bool,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Pipeline<'a> {
+    #[serde(borrow)]
+    pub trigger_metadata: crate::sh_tangled::pipeline::TriggerMetadata<'a>,
+    #[serde(borrow)]
+    pub workflows: Vec<crate::sh_tangled::pipeline::Workflow<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PipelineGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pipeline<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ManualTriggerData<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub inputs: std::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Pair<'a> {
+    #[serde(borrow)]
+    pub key: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PullRequestTriggerData<'a> {
+    #[serde(borrow)]
+    pub action: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub source_branch: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub source_sha: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub target_branch: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PushTriggerData<'a> {
+    #[serde(borrow)]
+    pub new_sha: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub old_sha: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub r#ref: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TriggerMetadata<'a> {
+    #[serde(borrow)]
+    pub kind: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub manual: std::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pull_request: std::option::Option<
+        crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub push: std::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    #[serde(borrow)]
+    pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TriggerRepo<'a> {
+    #[serde(borrow)]
+    pub default_branch: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub knot: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Workflow<'a> {
+    #[serde(borrow)]
+    pub clone: crate::sh_tangled::pipeline::CloneOpts<'a>,
+    #[serde(borrow)]
+    pub engine: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub raw: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Pipeline<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PipelineRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "cloneOpts"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PipelineRecord;
+impl jacquard_common::xrpc::XrpcResp for PipelineRecord {
+    const NSID: &'static str = "sh.tangled.pipeline";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PipelineGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
+    fn from(output: PipelineGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pipeline<'_> {
+    const NSID: &'static str = "sh.tangled.pipeline";
+    type Record = PipelineRecord;
+}
+
+impl jacquard_common::types::collection::Collection for PipelineRecord {
+    const NSID: &'static str = "sh.tangled.pipeline";
+    type Record = PipelineRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "manualTriggerData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "pair"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "pullRequestTriggerData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.source_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source_sha",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.source_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source_sha",
+                    ),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "pushTriggerData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.new_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.new_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "triggerMetadata"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "triggerRepo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "workflow"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_tangled_pipeline()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod clone_opts_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -36,50 +500,50 @@ pub mod clone_opts_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Submodules;
-        type Skip;
         type Depth;
+        type Skip;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Submodules = Unset;
-        type Skip = Unset;
         type Depth = Unset;
+        type Skip = Unset;
     }
     ///State transition - sets the `submodules` field to Set
     pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubmodules<S> {}
     impl<S: State> State for SetSubmodules<S> {
         type Submodules = Set<members::submodules>;
+        type Depth = S::Depth;
         type Skip = S::Skip;
-        type Depth = S::Depth;
-    }
-    ///State transition - sets the `skip` field to Set
-    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSkip<S> {}
-    impl<S: State> State for SetSkip<S> {
-        type Submodules = S::Submodules;
-        type Skip = Set<members::skip>;
-        type Depth = S::Depth;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
         type Submodules = S::Submodules;
-        type Skip = S::Skip;
         type Depth = Set<members::depth>;
+        type Skip = S::Skip;
+    }
+    ///State transition - sets the `skip` field to Set
+    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSkip<S> {}
+    impl<S: State> State for SetSkip<S> {
+        type Submodules = S::Submodules;
+        type Depth = S::Depth;
+        type Skip = Set<members::skip>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `submodules` field
         pub struct submodules(());
-        ///Marker type for the `skip` field
-        pub struct skip(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `skip` field
+        pub struct skip(());
     }
 }
 
@@ -173,8 +637,8 @@ impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
     S::Submodules: clone_opts_state::IsSet,
-    S::Skip: clone_opts_state::IsSet,
     S::Depth: clone_opts_state::IsSet,
+    S::Skip: clone_opts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CloneOpts<'a> {
@@ -808,41 +1272,6 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "cloneOpts"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Pipeline<'a> {
-    #[serde(borrow)]
-    pub trigger_metadata: crate::sh_tangled::pipeline::TriggerMetadata<'a>,
-    #[serde(borrow)]
-    pub workflows: Vec<crate::sh_tangled::pipeline::Workflow<'a>>,
-}
-
 pub mod pipeline_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -853,37 +1282,37 @@ pub mod pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerMetadata;
         type Workflows;
+        type TriggerMetadata;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerMetadata = Unset;
         type Workflows = Unset;
-    }
-    ///State transition - sets the `trigger_metadata` field to Set
-    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
-    impl<S: State> State for SetTriggerMetadata<S> {
-        type TriggerMetadata = Set<members::trigger_metadata>;
-        type Workflows = S::Workflows;
+        type TriggerMetadata = Unset;
     }
     ///State transition - sets the `workflows` field to Set
     pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflows<S> {}
     impl<S: State> State for SetWorkflows<S> {
-        type TriggerMetadata = S::TriggerMetadata;
         type Workflows = Set<members::workflows>;
+        type TriggerMetadata = S::TriggerMetadata;
+    }
+    ///State transition - sets the `trigger_metadata` field to Set
+    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
+    impl<S: State> State for SetTriggerMetadata<S> {
+        type Workflows = S::Workflows;
+        type TriggerMetadata = Set<members::trigger_metadata>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_metadata` field
-        pub struct trigger_metadata(());
         ///Marker type for the `workflows` field
         pub struct workflows(());
+        ///Marker type for the `trigger_metadata` field
+        pub struct trigger_metadata(());
     }
 }
 
@@ -956,8 +1385,8 @@ where
 impl<'a, S> PipelineBuilder<'a, S>
 where
     S: pipeline_state::State,
-    S::TriggerMetadata: pipeline_state::IsSet,
     S::Workflows: pipeline_state::IsSet,
+    S::TriggerMetadata: pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pipeline<'a> {
@@ -983,340 +1412,6 @@ where
     }
 }
 
-impl<'a> Pipeline<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PipelineRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PipelineGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pipeline<'a>,
-}
-
-impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
-    fn from(output: PipelineGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Pipeline<'_> {
-    const NSID: &'static str = "sh.tangled.pipeline";
-    type Record = PipelineRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct PipelineRecord;
-impl jacquard_common::xrpc::XrpcResp for PipelineRecord {
-    const NSID: &'static str = "sh.tangled.pipeline";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PipelineGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for PipelineRecord {
-    const NSID: &'static str = "sh.tangled.pipeline";
-    type Record = PipelineRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ManualTriggerData<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub inputs: std::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "manualTriggerData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Pair<'a> {
-    #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "pair"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PullRequestTriggerData<'a> {
-    #[serde(borrow)]
-    pub action: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub source_branch: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub source_sha: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub target_branch: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "pullRequestTriggerData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.source_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_sha",
-                    ),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.source_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_sha",
-                    ),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PushTriggerData<'a> {
-    #[serde(borrow)]
-    pub new_sha: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub old_sha: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "pushTriggerData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.new_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.new_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.old_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
-                    max: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.old_sha;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
-                    min: 40usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TriggerMetadata<'a> {
-    #[serde(borrow)]
-    pub kind: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub manual: std::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pull_request: std::option::Option<
-        crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub push: std::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
-    #[serde(borrow)]
-    pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
-}
-
 pub mod trigger_metadata_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1327,37 +1422,37 @@ pub mod trigger_metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Kind;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Kind = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Kind = S::Kind;
+        type Repo = Unset;
     }
     ///State transition - sets the `kind` field to Set
     pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKind<S> {}
     impl<S: State> State for SetKind<S> {
-        type Repo = S::Repo;
         type Kind = Set<members::kind>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Kind = S::Kind;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `kind` field
         pub struct kind(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -1490,8 +1585,8 @@ where
 impl<'a, S> TriggerMetadataBuilder<'a, S>
 where
     S: trigger_metadata_state::State,
-    S::Repo: trigger_metadata_state::IsSet,
     S::Kind: trigger_metadata_state::IsSet,
+    S::Repo: trigger_metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerMetadata<'a> {
@@ -1523,45 +1618,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "triggerMetadata"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TriggerRepo<'a> {
-    #[serde(borrow)]
-    pub default_branch: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(borrow)]
-    pub knot: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
-}
-
 pub mod trigger_repo_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1572,65 +1628,65 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Repo;
         type Knot;
+        type Did;
         type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Repo = Unset;
         type Knot = Unset;
+        type Did = Unset;
         type DefaultBranch = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Repo = S::Repo;
-        type Knot = S::Knot;
-        type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Did = S::Did;
         type Repo = Set<members::repo>;
         type Knot = S::Knot;
+        type Did = S::Did;
         type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `knot` field to Set
     pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKnot<S> {}
     impl<S: State> State for SetKnot<S> {
-        type Did = S::Did;
         type Repo = S::Repo;
         type Knot = Set<members::knot>;
+        type Did = S::Did;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Repo = S::Repo;
+        type Knot = S::Knot;
+        type Did = Set<members::did>;
         type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
-        type Did = S::Did;
         type Repo = S::Repo;
         type Knot = S::Knot;
+        type Did = S::Did;
         type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `knot` field
         pub struct knot(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `default_branch` field
         pub struct default_branch(());
     }
@@ -1745,9 +1801,9 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::Did: trigger_repo_state::IsSet,
     S::Repo: trigger_repo_state::IsSet,
     S::Knot: trigger_repo_state::IsSet,
+    S::Did: trigger_repo_state::IsSet,
     S::DefaultBranch: trigger_repo_state::IsSet,
 {
     /// Build the final struct
@@ -1778,45 +1834,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "triggerRepo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Workflow<'a> {
-    #[serde(borrow)]
-    pub clone: crate::sh_tangled::pipeline::CloneOpts<'a>,
-    #[serde(borrow)]
-    pub engine: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub raw: jacquard_common::CowStr<'a>,
-}
-
 pub mod workflow_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1828,66 +1845,66 @@ pub mod workflow_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Raw;
-        type Engine;
-        type Name;
         type Clone;
+        type Name;
+        type Engine;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Raw = Unset;
-        type Engine = Unset;
-        type Name = Unset;
         type Clone = Unset;
+        type Name = Unset;
+        type Engine = Unset;
     }
     ///State transition - sets the `raw` field to Set
     pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRaw<S> {}
     impl<S: State> State for SetRaw<S> {
         type Raw = Set<members::raw>;
-        type Engine = S::Engine;
+        type Clone = S::Clone;
         type Name = S::Name;
-        type Clone = S::Clone;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Raw = S::Raw;
-        type Engine = Set<members::engine>;
-        type Name = S::Name;
-        type Clone = S::Clone;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Raw = S::Raw;
         type Engine = S::Engine;
-        type Name = Set<members::name>;
-        type Clone = S::Clone;
     }
     ///State transition - sets the `clone` field to Set
     pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClone<S> {}
     impl<S: State> State for SetClone<S> {
         type Raw = S::Raw;
-        type Engine = S::Engine;
-        type Name = S::Name;
         type Clone = Set<members::clone>;
+        type Name = S::Name;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Raw = S::Raw;
+        type Clone = S::Clone;
+        type Name = Set<members::name>;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Raw = S::Raw;
+        type Clone = S::Clone;
+        type Name = S::Name;
+        type Engine = Set<members::engine>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `raw` field
         pub struct raw(());
-        ///Marker type for the `engine` field
-        pub struct engine(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `clone` field
         pub struct clone(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
     }
 }
 
@@ -2001,9 +2018,9 @@ impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
     S::Raw: workflow_state::IsSet,
-    S::Engine: workflow_state::IsSet,
-    S::Name: workflow_state::IsSet,
     S::Clone: workflow_state::IsSet,
+    S::Name: workflow_state::IsSet,
+    S::Engine: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
@@ -2030,22 +2047,5 @@ where
             raw: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
-    fn nsid() -> &'static str {
-        "sh.tangled.pipeline"
-    }
-    fn def_name() -> &'static str {
-        "workflow"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_pipeline()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

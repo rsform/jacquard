@@ -36,6 +36,251 @@ pub struct DefinitionDoc<'a> {
     >,
 }
 
+/// A string with an associated language code.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalizedString<'a> {
+    ///ISO 639 language code (e.g., 'en', 'es', 'ja').
+    pub lang: jacquard_common::types::string::Language,
+    ///The localized string value.
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+/// Auxiliary documentation for a lexicon schema, supporting localized descriptions for the lexicon and its properties.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Documentation<'a> {
+    ///Timestamp when this documentation was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub definitions: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>,
+    >,
+    ///Localized descriptions for the lexicon.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+    >,
+    ///The NSID of the lexicon being documented.
+    #[serde(borrow)]
+    pub lexicon: jacquard_common::types::string::Nsid<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Documentation<'a>,
+}
+
+/// Documentation for a specific property within a definition.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PropertyDoc<'a> {
+    ///Localized descriptions for this property.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<
+        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
+    >,
+    ///The property name being documented.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Documentation<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DocumentationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.documentation"
+    }
+    fn def_name() -> &'static str {
+        "definitionDoc"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_documentation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.documentation"
+    }
+    fn def_name() -> &'static str {
+        "localizedString"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_documentation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.value;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
+                    max: 10000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentationRecord;
+impl jacquard_common::xrpc::XrpcResp for DocumentationRecord {
+    const NSID: &'static str = "garden.lexicon.documentation";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DocumentationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DocumentationGetRecordOutput<'_>> for Documentation<'_> {
+    fn from(output: DocumentationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Documentation<'_> {
+    const NSID: &'static str = "garden.lexicon.documentation";
+    type Record = DocumentationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DocumentationRecord {
+    const NSID: &'static str = "garden.lexicon.documentation";
+    type Record = DocumentationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Documentation<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.documentation"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_documentation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.documentation"
+    }
+    fn def_name() -> &'static str {
+        "propertyDoc"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_documentation()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -373,56 +618,6 @@ fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::Le
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.documentation"
-    }
-    fn def_name() -> &'static str {
-        "definitionDoc"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_documentation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A string with an associated language code.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LocalizedString<'a> {
-    ///ISO 639 language code (e.g., 'en', 'es', 'ja').
-    pub lang: jacquard_common::types::string::Language,
-    ///The localized string value.
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
 pub mod localized_string_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -433,37 +628,37 @@ pub mod localized_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Lang;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Lang = S::Lang;
+        type Value = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Value = S::Value;
         type Lang = Set<members::lang>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Lang = S::Lang;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -536,8 +731,8 @@ where
 impl<'a, S> LocalizedStringBuilder<'a, S>
 where
     S: localized_string_state::State,
-    S::Value: localized_string_state::IsSet,
     S::Lang: localized_string_state::IsSet,
+    S::Value: localized_string_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LocalizedString<'a> {
@@ -563,68 +758,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.documentation"
-    }
-    fn def_name() -> &'static str {
-        "localizedString"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_documentation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.value;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Auxiliary documentation for a lexicon schema, supporting localized descriptions for the lexicon and its properties.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Documentation<'a> {
-    ///Timestamp when this documentation was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub definitions: std::option::Option<
-        Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>,
-    >,
-    ///Localized descriptions for the lexicon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<
-        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
-    >,
-    ///The NSID of the lexicon being documented.
-    #[serde(borrow)]
-    pub lexicon: jacquard_common::types::string::Nsid<'a>,
-}
-
 pub mod documentation_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -635,37 +768,37 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type CreatedAt;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Lexicon = Set<members::lexicon>;
-        type CreatedAt = S::CreatedAt;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lexicon = S::Lexicon;
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = S::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type CreatedAt = S::CreatedAt;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -786,8 +919,8 @@ where
 impl<'a, S> DocumentationBuilder<'a, S>
 where
     S: documentation_state::State,
-    S::Lexicon: documentation_state::IsSet,
     S::CreatedAt: documentation_state::IsSet,
+    S::Lexicon: documentation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Documentation<'a> {
@@ -814,138 +947,5 @@ where
             lexicon: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Documentation<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DocumentationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Documentation<'a>,
-}
-
-impl From<DocumentationGetRecordOutput<'_>> for Documentation<'_> {
-    fn from(output: DocumentationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Documentation<'_> {
-    const NSID: &'static str = "garden.lexicon.documentation";
-    type Record = DocumentationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DocumentationRecord;
-impl jacquard_common::xrpc::XrpcResp for DocumentationRecord {
-    const NSID: &'static str = "garden.lexicon.documentation";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DocumentationRecord {
-    const NSID: &'static str = "garden.lexicon.documentation";
-    type Record = DocumentationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Documentation<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.documentation"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_documentation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Documentation for a specific property within a definition.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PropertyDoc<'a> {
-    ///Localized descriptions for this property.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<
-        Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
-    >,
-    ///The property name being documented.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.documentation"
-    }
-    fn def_name() -> &'static str {
-        "propertyDoc"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_documentation()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

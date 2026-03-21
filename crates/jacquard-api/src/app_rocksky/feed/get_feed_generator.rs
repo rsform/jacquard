@@ -20,6 +20,50 @@ pub struct GetFeedGenerator<'a> {
     pub feed: jacquard_common::types::string::AtUri<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFeedGeneratorOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub view: std::option::Option<crate::app_rocksky::feed::FeedGeneratorView<'a>>,
+}
+
+/// Response type for
+///app.rocksky.feed.getFeedGenerator
+pub struct GetFeedGeneratorResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorResponse {
+    const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFeedGeneratorOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerator<'a> {
+    const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFeedGeneratorResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.feed.getFeedGenerator
+pub struct GetFeedGeneratorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerator";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFeedGenerator<'de>;
+    type Response = GetFeedGeneratorResponse;
+}
+
 pub mod get_feed_generator_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,48 +153,4 @@ where
             feed: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFeedGeneratorOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub view: std::option::Option<crate::app_rocksky::feed::FeedGeneratorView<'a>>,
-}
-
-/// Response type for
-///app.rocksky.feed.getFeedGenerator
-pub struct GetFeedGeneratorResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorResponse {
-    const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerator<'a> {
-    const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFeedGeneratorResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.feed.getFeedGenerator
-pub struct GetFeedGeneratorRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeedGenerator<'de>;
-    type Response = GetFeedGeneratorResponse;
 }

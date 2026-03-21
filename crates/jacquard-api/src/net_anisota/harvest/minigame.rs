@@ -70,6 +70,333 @@ pub struct Minigame<'a> {
     pub total_shapes_spawned: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MinigameGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Minigame<'a>,
+}
+
+/// Count of each rarity level collected
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RarityBreakdown<'a> {
+    ///Number of common (triangle) shapes collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub common: std::option::Option<i64>,
+    ///Number of rare (star) shapes collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rare: std::option::Option<i64>,
+    ///Number of uncommon (diamond) shapes collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub uncommon: std::option::Option<i64>,
+    ///Number of very common (circle) shapes collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub very_common: std::option::Option<i64>,
+    ///Number of very rare (sparkle) shapes collected
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub very_rare: std::option::Option<i64>,
+}
+
+impl<'a> Minigame<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MinigameRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MinigameRecord;
+impl jacquard_common::xrpc::XrpcResp for MinigameRecord {
+    const NSID: &'static str = "net.anisota.harvest.minigame";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MinigameGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MinigameGetRecordOutput<'_>> for Minigame<'_> {
+    fn from(output: MinigameGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Minigame<'_> {
+    const NSID: &'static str = "net.anisota.harvest.minigame";
+    type Record = MinigameRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MinigameRecord {
+    const NSID: &'static str = "net.anisota.harvest.minigame";
+    type Record = MinigameRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Minigame<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.harvest.minigame"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_harvest_minigame()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.early_harvests {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "early_harvests",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.efficiency_bonus {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "efficiency_bonus",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.final_score;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "final_score",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.late_harvests {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "late_harvests",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.peak_harvest_rate {
+            if *value > 10000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "peak_harvest_rate",
+                    ),
+                    max: 10000i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.peak_harvest_rate {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "peak_harvest_rate",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.peak_rate_bonus {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "peak_rate_bonus",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.perfect_harvests {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "perfect_harvests",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.points_per_second {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "points_per_second",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.round_duration;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "round_duration",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.shapes_collected;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shapes_collected",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.shapes_missed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shapes_missed",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_shapes_spawned {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_shapes_spawned",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.harvest.minigame"
+    }
+    fn def_name() -> &'static str {
+        "rarityBreakdown"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_harvest_minigame()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.common {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.rare {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rare",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.uncommon {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "uncommon",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.very_common {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "very_common",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.very_rare {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "very_rare",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod minigame_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -80,83 +407,83 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RoundDuration;
         type FinalScore;
         type PlayedAt;
         type ShapesCollected;
+        type RoundDuration;
         type GameContext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RoundDuration = Unset;
         type FinalScore = Unset;
         type PlayedAt = Unset;
         type ShapesCollected = Unset;
+        type RoundDuration = Unset;
         type GameContext = Unset;
-    }
-    ///State transition - sets the `round_duration` field to Set
-    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
-    impl<S: State> State for SetRoundDuration<S> {
-        type RoundDuration = Set<members::round_duration>;
-        type FinalScore = S::FinalScore;
-        type PlayedAt = S::PlayedAt;
-        type ShapesCollected = S::ShapesCollected;
-        type GameContext = S::GameContext;
     }
     ///State transition - sets the `final_score` field to Set
     pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFinalScore<S> {}
     impl<S: State> State for SetFinalScore<S> {
-        type RoundDuration = S::RoundDuration;
         type FinalScore = Set<members::final_score>;
         type PlayedAt = S::PlayedAt;
         type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
         type GameContext = S::GameContext;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
-        type RoundDuration = S::RoundDuration;
         type FinalScore = S::FinalScore;
         type PlayedAt = Set<members::played_at>;
         type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
         type GameContext = S::GameContext;
     }
     ///State transition - sets the `shapes_collected` field to Set
     pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
     impl<S: State> State for SetShapesCollected<S> {
-        type RoundDuration = S::RoundDuration;
         type FinalScore = S::FinalScore;
         type PlayedAt = S::PlayedAt;
         type ShapesCollected = Set<members::shapes_collected>;
+        type RoundDuration = S::RoundDuration;
+        type GameContext = S::GameContext;
+    }
+    ///State transition - sets the `round_duration` field to Set
+    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
+    impl<S: State> State for SetRoundDuration<S> {
+        type FinalScore = S::FinalScore;
+        type PlayedAt = S::PlayedAt;
+        type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = Set<members::round_duration>;
         type GameContext = S::GameContext;
     }
     ///State transition - sets the `game_context` field to Set
     pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameContext<S> {}
     impl<S: State> State for SetGameContext<S> {
-        type RoundDuration = S::RoundDuration;
         type FinalScore = S::FinalScore;
         type PlayedAt = S::PlayedAt;
         type ShapesCollected = S::ShapesCollected;
+        type RoundDuration = S::RoundDuration;
         type GameContext = Set<members::game_context>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `round_duration` field
-        pub struct round_duration(());
         ///Marker type for the `final_score` field
         pub struct final_score(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
         ///Marker type for the `shapes_collected` field
         pub struct shapes_collected(());
+        ///Marker type for the `round_duration` field
+        pub struct round_duration(());
         ///Marker type for the `game_context` field
         pub struct game_context(());
     }
@@ -499,10 +826,10 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::RoundDuration: minigame_state::IsSet,
     S::FinalScore: minigame_state::IsSet,
     S::PlayedAt: minigame_state::IsSet,
     S::ShapesCollected: minigame_state::IsSet,
+    S::RoundDuration: minigame_state::IsSet,
     S::GameContext: minigame_state::IsSet,
 {
     /// Build the final struct
@@ -556,230 +883,6 @@ where
             total_shapes_spawned: self.__unsafe_private_named.16,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Minigame<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MinigameRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MinigameGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Minigame<'a>,
-}
-
-impl From<MinigameGetRecordOutput<'_>> for Minigame<'_> {
-    fn from(output: MinigameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Minigame<'_> {
-    const NSID: &'static str = "net.anisota.harvest.minigame";
-    type Record = MinigameRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MinigameRecord;
-impl jacquard_common::xrpc::XrpcResp for MinigameRecord {
-    const NSID: &'static str = "net.anisota.harvest.minigame";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MinigameGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MinigameRecord {
-    const NSID: &'static str = "net.anisota.harvest.minigame";
-    type Record = MinigameRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Minigame<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.harvest.minigame"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_harvest_minigame()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.early_harvests {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "early_harvests",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.efficiency_bonus {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "efficiency_bonus",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.final_score;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "final_score",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.late_harvests {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "late_harvests",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.peak_harvest_rate {
-            if *value > 10000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "peak_harvest_rate",
-                    ),
-                    max: 10000i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.peak_harvest_rate {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "peak_harvest_rate",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.peak_rate_bonus {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "peak_rate_bonus",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.perfect_harvests {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "perfect_harvests",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.points_per_second {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "points_per_second",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.round_duration;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "round_duration",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.shapes_collected;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shapes_collected",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.shapes_missed {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shapes_missed",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.total_shapes_spawned {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_shapes_spawned",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -1163,108 +1266,5 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-/// Count of each rarity level collected
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RarityBreakdown<'a> {
-    ///Number of common (triangle) shapes collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub common: std::option::Option<i64>,
-    ///Number of rare (star) shapes collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rare: std::option::Option<i64>,
-    ///Number of uncommon (diamond) shapes collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub uncommon: std::option::Option<i64>,
-    ///Number of very common (circle) shapes collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub very_common: std::option::Option<i64>,
-    ///Number of very rare (sparkle) shapes collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub very_rare: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.harvest.minigame"
-    }
-    fn def_name() -> &'static str {
-        "rarityBreakdown"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_harvest_minigame()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.common {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "common",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.rare {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rare",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.uncommon {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uncommon",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.very_common {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "very_common",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.very_rare {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "very_rare",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -20,6 +20,93 @@ pub struct GetWebhook<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetWebhookOutput<'a> {
+    #[serde(borrow)]
+    pub webhook: crate::place_stream::server::Webhook<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetWebhookError<'a> {
+    /// The specified webhook was not found.
+    #[serde(rename = "WebhookNotFound")]
+    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The authenticated user does not have access to this webhook.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetWebhookError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::WebhookNotFound(msg) => {
+                write!(f, "WebhookNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.server.getWebhook
+pub struct GetWebhookResponse;
+impl jacquard_common::xrpc::XrpcResp for GetWebhookResponse {
+    const NSID: &'static str = "place.stream.server.getWebhook";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetWebhookOutput<'de>;
+    type Err<'de> = GetWebhookError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetWebhook<'a> {
+    const NSID: &'static str = "place.stream.server.getWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetWebhookResponse;
+}
+
+/// Endpoint type for
+///place.stream.server.getWebhook
+pub struct GetWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetWebhookRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.getWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetWebhook<'de>;
+    type Response = GetWebhookResponse;
+}
+
 pub mod get_webhook_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -107,91 +194,4 @@ where
             id: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetWebhookOutput<'a> {
-    #[serde(borrow)]
-    pub webhook: crate::place_stream::server::Webhook<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetWebhookError<'a> {
-    /// The specified webhook was not found.
-    #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The authenticated user does not have access to this webhook.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetWebhookError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::WebhookNotFound(msg) => {
-                write!(f, "WebhookNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.server.getWebhook
-pub struct GetWebhookResponse;
-impl jacquard_common::xrpc::XrpcResp for GetWebhookResponse {
-    const NSID: &'static str = "place.stream.server.getWebhook";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetWebhookOutput<'de>;
-    type Err<'de> = GetWebhookError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetWebhook<'a> {
-    const NSID: &'static str = "place.stream.server.getWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetWebhookResponse;
-}
-
-/// Endpoint type for
-///place.stream.server.getWebhook
-pub struct GetWebhookRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetWebhookRequest {
-    const PATH: &'static str = "/xrpc/place.stream.server.getWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetWebhook<'de>;
-    type Response = GetWebhookResponse;
 }

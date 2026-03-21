@@ -33,6 +33,49 @@ pub struct GetScrobblesChart<'a> {
     pub songuri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetScrobblesChartOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::app_rocksky::charts::ChartsView<'a>,
+}
+
+/// Response type for
+///app.rocksky.charts.getScrobblesChart
+pub struct GetScrobblesChartResponse;
+impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
+    const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetScrobblesChartOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<'a> {
+    const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetScrobblesChartResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.charts.getScrobblesChart
+pub struct GetScrobblesChartRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.charts.getScrobblesChart";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetScrobblesChart<'de>;
+    type Response = GetScrobblesChartResponse;
+}
+
 pub mod get_scrobbles_chart_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -189,47 +232,4 @@ where
             songuri: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetScrobblesChartOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::app_rocksky::charts::ChartsView<'a>,
-}
-
-/// Response type for
-///app.rocksky.charts.getScrobblesChart
-pub struct GetScrobblesChartResponse;
-impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
-    const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobblesChartOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<'a> {
-    const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetScrobblesChartResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.charts.getScrobblesChart
-pub struct GetScrobblesChartRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.charts.getScrobblesChart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobblesChart<'de>;
-    type Response = GetScrobblesChartResponse;
 }

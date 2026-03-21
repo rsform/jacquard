@@ -44,6 +44,252 @@ pub struct WikiEntry<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WikiEntryStatus<'a> {
+    Draft,
+    Stable,
+    Deprecated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WikiEntryStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Draft => "draft",
+            Self::Stable => "stable",
+            Self::Deprecated => "deprecated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WikiEntryStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "draft" => Self::Draft,
+            "stable" => Self::Stable,
+            "deprecated" => Self::Deprecated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WikiEntryStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "draft" => Self::Draft,
+            "stable" => Self::Stable,
+            "deprecated" => Self::Deprecated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WikiEntryStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WikiEntryStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WikiEntryStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WikiEntryStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WikiEntryStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WikiEntryStatus<'_> {
+    type Output = WikiEntryStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WikiEntryStatus::Draft => WikiEntryStatus::Draft,
+            WikiEntryStatus::Stable => WikiEntryStatus::Stable,
+            WikiEntryStatus::Deprecated => WikiEntryStatus::Deprecated,
+            WikiEntryStatus::Other(v) => WikiEntryStatus::Other(v.into_static()),
+        }
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WikiEntryGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: WikiEntry<'a>,
+}
+
+impl<'a> WikiEntry<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WikiEntryRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct WikiEntryRecord;
+impl jacquard_common::xrpc::XrpcResp for WikiEntryRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WikiEntryGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<WikiEntryGetRecordOutput<'_>> for WikiEntry<'_> {
+    fn from(output: WikiEntryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for WikiEntry<'_> {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
+    type Record = WikiEntryRecord;
+}
+
+impl jacquard_common::types::collection::Collection for WikiEntryRecord {
+    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
+    type Record = WikiEntryRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiEntry<'a> {
+    fn nsid() -> &'static str {
+        "diy.razorgirl.winter.wikiEntry"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_diy_razorgirl_winter_wikiEntry()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.aliases {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "aliases",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.content;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
+                    max: 100000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.slug;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "slug",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.summary {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "summary",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
+                    max: 20usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod wiki_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -54,83 +300,83 @@ pub mod wiki_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
+        type LastUpdated;
         type Title;
         type Content;
-        type LastUpdated;
+        type Slug;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
+        type LastUpdated = Unset;
         type Title = Unset;
         type Content = Unset;
-        type LastUpdated = Unset;
+        type Slug = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type LastUpdated = Set<members::last_updated>;
         type Title = S::Title;
         type Content = S::Content;
-        type LastUpdated = S::LastUpdated;
+        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Slug = S::Slug;
+        type LastUpdated = S::LastUpdated;
         type Title = Set<members::title>;
         type Content = S::Content;
-        type LastUpdated = S::LastUpdated;
+        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Slug = S::Slug;
+        type LastUpdated = S::LastUpdated;
         type Title = S::Title;
         type Content = Set<members::content>;
-        type LastUpdated = S::LastUpdated;
+        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Slug = S::Slug;
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type LastUpdated = S::LastUpdated;
         type Title = S::Title;
         type Content = S::Content;
-        type LastUpdated = Set<members::last_updated>;
+        type Slug = Set<members::slug>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
+        type LastUpdated = S::LastUpdated;
         type Title = S::Title;
         type Content = S::Content;
-        type LastUpdated = S::LastUpdated;
+        type Slug = S::Slug;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -367,10 +613,10 @@ where
 impl<'a, S> WikiEntryBuilder<'a, S>
 where
     S: wiki_entry_state::State,
-    S::Slug: wiki_entry_state::IsSet,
+    S::LastUpdated: wiki_entry_state::IsSet,
     S::Title: wiki_entry_state::IsSet,
     S::Content: wiki_entry_state::IsSet,
-    S::LastUpdated: wiki_entry_state::IsSet,
+    S::Slug: wiki_entry_state::IsSet,
     S::CreatedAt: wiki_entry_state::IsSet,
 {
     /// Build the final struct
@@ -410,252 +656,6 @@ where
             title: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> WikiEntry<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WikiEntryRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WikiEntryStatus<'a> {
-    Draft,
-    Stable,
-    Deprecated,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> WikiEntryStatus<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Draft => "draft",
-            Self::Stable => "stable",
-            Self::Deprecated => "deprecated",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for WikiEntryStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "draft" => Self::Draft,
-            "stable" => Self::Stable,
-            "deprecated" => Self::Deprecated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for WikiEntryStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "draft" => Self::Draft,
-            "stable" => Self::Stable,
-            "deprecated" => Self::Deprecated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WikiEntryStatus<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for WikiEntryStatus<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for WikiEntryStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for WikiEntryStatus<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for WikiEntryStatus<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for WikiEntryStatus<'_> {
-    type Output = WikiEntryStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            WikiEntryStatus::Draft => WikiEntryStatus::Draft,
-            WikiEntryStatus::Stable => WikiEntryStatus::Stable,
-            WikiEntryStatus::Deprecated => WikiEntryStatus::Deprecated,
-            WikiEntryStatus::Other(v) => WikiEntryStatus::Other(v.into_static()),
-        }
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct WikiEntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WikiEntry<'a>,
-}
-
-impl From<WikiEntryGetRecordOutput<'_>> for WikiEntry<'_> {
-    fn from(output: WikiEntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for WikiEntry<'_> {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
-    type Record = WikiEntryRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct WikiEntryRecord;
-impl jacquard_common::xrpc::XrpcResp for WikiEntryRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = WikiEntryGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for WikiEntryRecord {
-    const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
-    type Record = WikiEntryRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiEntry<'a> {
-    fn nsid() -> &'static str {
-        "diy.razorgirl.winter.wikiEntry"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_diy_razorgirl_winter_wikiEntry()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.aliases {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "aliases",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.content;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
-                    max: 100000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.slug;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.summary {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "summary",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            #[allow(unused_comparisons)]
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

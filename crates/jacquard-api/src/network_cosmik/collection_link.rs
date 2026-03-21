@@ -44,6 +44,84 @@ pub struct CollectionLink<'a> {
     pub provenance: std::option::Option<crate::network_cosmik::Provenance<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionLinkGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: CollectionLink<'a>,
+}
+
+impl<'a> CollectionLink<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CollectionLinkRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CollectionLinkRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionLinkRecord {
+    const NSID: &'static str = "network.cosmik.collectionLink";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionLinkGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CollectionLinkGetRecordOutput<'_>> for CollectionLink<'_> {
+    fn from(output: CollectionLinkGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for CollectionLink<'_> {
+    const NSID: &'static str = "network.cosmik.collectionLink";
+    type Record = CollectionLinkRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CollectionLinkRecord {
+    const NSID: &'static str = "network.cosmik.collectionLink";
+    type Record = CollectionLinkRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
+    fn nsid() -> &'static str {
+        "network.cosmik.collectionLink"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_network_cosmik_collectionLink()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod collection_link_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -54,67 +132,67 @@ pub mod collection_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type AddedBy;
         type Card;
         type AddedAt;
+        type AddedBy;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type AddedBy = Unset;
         type Card = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type AddedBy = S::AddedBy;
-        type Card = S::Card;
-        type AddedAt = S::AddedAt;
-    }
-    ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type Collection = S::Collection;
-        type AddedBy = Set<members::added_by>;
-        type Card = S::Card;
-        type AddedAt = S::AddedAt;
+        type AddedBy = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `card` field to Set
     pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
-        type Collection = S::Collection;
-        type AddedBy = S::AddedBy;
         type Card = Set<members::card>;
         type AddedAt = S::AddedAt;
+        type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Collection = S::Collection;
-        type AddedBy = S::AddedBy;
         type Card = S::Card;
         type AddedAt = Set<members::added_at>;
+        type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `added_by` field to Set
+    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
+    impl<S: State> State for SetAddedBy<S> {
+        type Card = S::Card;
+        type AddedAt = S::AddedAt;
+        type AddedBy = Set<members::added_by>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Card = S::Card;
+        type AddedAt = S::AddedAt;
+        type AddedBy = S::AddedBy;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `added_by` field
-        pub struct added_by(());
         ///Marker type for the `card` field
         pub struct card(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `added_by` field
+        pub struct added_by(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -287,10 +365,10 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
 impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
-    S::Collection: collection_link_state::IsSet,
-    S::AddedBy: collection_link_state::IsSet,
     S::Card: collection_link_state::IsSet,
     S::AddedAt: collection_link_state::IsSet,
+    S::AddedBy: collection_link_state::IsSet,
+    S::Collection: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {
@@ -323,84 +401,6 @@ where
             provenance: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> CollectionLink<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CollectionLinkRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CollectionLink<'a>,
-}
-
-impl From<CollectionLinkGetRecordOutput<'_>> for CollectionLink<'_> {
-    fn from(output: CollectionLinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for CollectionLink<'_> {
-    const NSID: &'static str = "network.cosmik.collectionLink";
-    type Record = CollectionLinkRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CollectionLinkRecord;
-impl jacquard_common::xrpc::XrpcResp for CollectionLinkRecord {
-    const NSID: &'static str = "network.cosmik.collectionLink";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionLinkGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CollectionLinkRecord {
-    const NSID: &'static str = "network.cosmik.collectionLink";
-    type Record = CollectionLinkRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
-    fn nsid() -> &'static str {
-        "network.cosmik.collectionLink"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_network_cosmik_collectionLink()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

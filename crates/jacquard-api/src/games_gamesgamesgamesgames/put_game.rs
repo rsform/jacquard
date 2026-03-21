@@ -106,6 +106,54 @@ pub struct PutGame<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutGameOutput<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.putGame
+pub struct PutGameResponse;
+impl jacquard_common::xrpc::XrpcResp for PutGameResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.putGame";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutGameOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutGame<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.putGame";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutGameResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.putGame
+pub struct PutGameRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutGameRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.putGame";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutGame<'de>;
+    type Response = PutGameResponse;
+}
+
 pub mod put_game_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -116,37 +164,37 @@ pub mod put_game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -674,8 +722,8 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S> PutGameBuilder<'a, S>
 where
     S: put_game_state::State,
-    S::Name: put_game_state::IsSet,
     S::Uri: put_game_state::IsSet,
+    S::Name: put_game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutGame<'a> {
@@ -741,52 +789,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutGameOutput<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.putGame
-pub struct PutGameResponse;
-impl jacquard_common::xrpc::XrpcResp for PutGameResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.putGame";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutGameOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutGame<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.putGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutGameResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.putGame
-pub struct PutGameRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutGameRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.putGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutGame<'de>;
-    type Response = PutGameResponse;
 }

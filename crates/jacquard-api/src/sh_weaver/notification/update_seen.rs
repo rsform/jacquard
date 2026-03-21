@@ -20,6 +20,49 @@ pub struct UpdateSeen<'a> {
     pub seen_at: jacquard_common::types::string::Datetime,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSeenOutput<'a> {}
+/// Response type for
+///sh.weaver.notification.updateSeen
+pub struct UpdateSeenResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
+    const NSID: &'static str = "sh.weaver.notification.updateSeen";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateSeenOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
+    const NSID: &'static str = "sh.weaver.notification.updateSeen";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateSeenResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notification.updateSeen
+pub struct UpdateSeenRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notification.updateSeen";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateSeen<'de>;
+    type Response = UpdateSeenResponse;
+}
+
 pub mod update_seen_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -123,47 +166,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateSeenOutput<'a> {}
-/// Response type for
-///sh.weaver.notification.updateSeen
-pub struct UpdateSeenResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
-    const NSID: &'static str = "sh.weaver.notification.updateSeen";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateSeenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
-    const NSID: &'static str = "sh.weaver.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateSeenResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notification.updateSeen
-pub struct UpdateSeenRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateSeen<'de>;
-    type Response = UpdateSeenResponse;
 }

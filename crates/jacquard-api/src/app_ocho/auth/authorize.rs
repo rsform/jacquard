@@ -23,6 +23,53 @@ pub struct Authorize<'a> {
     pub input: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorizeOutput<'a> {
+    #[serde(borrow)]
+    pub url: jacquard_common::CowStr<'a>,
+}
+
+/// Response type for
+///app.ocho.auth.authorize
+pub struct AuthorizeResponse;
+impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
+    const NSID: &'static str = "app.ocho.auth.authorize";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AuthorizeOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
+    const NSID: &'static str = "app.ocho.auth.authorize";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AuthorizeResponse;
+}
+
+/// Endpoint type for
+///app.ocho.auth.authorize
+pub struct AuthorizeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
+    const PATH: &'static str = "/xrpc/app.ocho.auth.authorize";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Authorize<'de>;
+    type Response = AuthorizeResponse;
+}
+
 pub mod authorize_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -161,51 +208,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthorizeOutput<'a> {
-    #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
-}
-
-/// Response type for
-///app.ocho.auth.authorize
-pub struct AuthorizeResponse;
-impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
-    const NSID: &'static str = "app.ocho.auth.authorize";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AuthorizeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
-    const NSID: &'static str = "app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = AuthorizeResponse;
-}
-
-/// Endpoint type for
-///app.ocho.auth.authorize
-pub struct AuthorizeRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
-    const PATH: &'static str = "/xrpc/app.ocho.auth.authorize";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Authorize<'de>;
-    type Response = AuthorizeResponse;
 }

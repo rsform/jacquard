@@ -22,6 +22,137 @@ pub struct GetStateOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Output<'a> {
+    #[serde(borrow)]
+    pub favorite_albums: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub favorite_artists: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub favorite_deltarune_characters: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub favorite_games: Vec<jacquard_common::CowStr<'a>>,
+    ///Named title color mode for the site.
+    #[serde(borrow)]
+    pub title_colors: OutputTitleColors<'a>,
+    ///Whether to show Susie instead of Kris in prophecy content.
+    pub use_susie_prophecy: bool,
+}
+
+/// Named title color mode for the site.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OutputTitleColors<'a> {
+    None,
+    Enby,
+    Trans,
+    Pan,
+    Latvia,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> OutputTitleColors<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::Enby => "enby",
+            Self::Trans => "trans",
+            Self::Pan => "pan",
+            Self::Latvia => "latvia",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for OutputTitleColors<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "enby" => Self::Enby,
+            "trans" => Self::Trans,
+            "pan" => Self::Pan,
+            "latvia" => Self::Latvia,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for OutputTitleColors<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "enby" => Self::Enby,
+            "trans" => Self::Trans,
+            "pan" => Self::Pan,
+            "latvia" => Self::Latvia,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for OutputTitleColors<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for OutputTitleColors<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for OutputTitleColors<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for OutputTitleColors<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for OutputTitleColors<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for OutputTitleColors<'_> {
+    type Output = OutputTitleColors<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OutputTitleColors::None => OutputTitleColors::None,
+            OutputTitleColors::Enby => OutputTitleColors::Enby,
+            OutputTitleColors::Trans => OutputTitleColors::Trans,
+            OutputTitleColors::Pan => OutputTitleColors::Pan,
+            OutputTitleColors::Latvia => OutputTitleColors::Latvia,
+            OutputTitleColors::Other(v) => OutputTitleColors::Other(v.into_static()),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(
     Debug,
@@ -60,31 +191,21 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
     type Response = GetStateResponse;
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Output<'a> {
-    #[serde(borrow)]
-    pub favorite_albums: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_artists: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_deltarune_characters: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_games: Vec<jacquard_common::CowStr<'a>>,
-    ///Named title color mode for the site.
-    #[serde(borrow)]
-    pub title_colors: OutputTitleColors<'a>,
-    ///Whether to show Susie instead of Kris in prophecy content.
-    pub use_susie_prophecy: bool,
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Output<'a> {
+    fn nsid() -> &'static str {
+        "download.darkworld.site.getState"
+    }
+    fn def_name() -> &'static str {
+        "output"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_download_darkworld_site_getState()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
 }
 
 pub mod output_state {
@@ -97,105 +218,105 @@ pub mod output_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseSusieProphecy;
-        type TitleColors;
-        type FavoriteArtists;
         type FavoriteAlbums;
-        type FavoriteDeltaruneCharacters;
         type FavoriteGames;
+        type UseSusieProphecy;
+        type FavoriteArtists;
+        type FavoriteDeltaruneCharacters;
+        type TitleColors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseSusieProphecy = Unset;
-        type TitleColors = Unset;
-        type FavoriteArtists = Unset;
         type FavoriteAlbums = Unset;
-        type FavoriteDeltaruneCharacters = Unset;
         type FavoriteGames = Unset;
-    }
-    ///State transition - sets the `use_susie_prophecy` field to Set
-    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
-    impl<S: State> State for SetUseSusieProphecy<S> {
-        type UseSusieProphecy = Set<members::use_susie_prophecy>;
-        type TitleColors = S::TitleColors;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `title_colors` field to Set
-    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
-    impl<S: State> State for SetTitleColors<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = Set<members::title_colors>;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_artists` field to Set
-    pub struct SetFavoriteArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteArtists<S> {}
-    impl<S: State> State for SetFavoriteArtists<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteArtists = Set<members::favorite_artists>;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = Unset;
+        type FavoriteArtists = Unset;
+        type FavoriteDeltaruneCharacters = Unset;
+        type TitleColors = Unset;
     }
     ///State transition - sets the `favorite_albums` field to Set
     pub struct SetFavoriteAlbums<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
     impl<S: State> State for SetFavoriteAlbums<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteArtists = S::FavoriteArtists;
         type FavoriteAlbums = Set<members::favorite_albums>;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type FavoriteGames = S::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_deltarune_characters` field to Set
-    pub struct SetFavoriteDeltaruneCharacters<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
-    impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
         type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
-        type FavoriteGames = S::FavoriteGames;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
     }
     ///State transition - sets the `favorite_games` field to Set
     pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
     impl<S: State> State for SetFavoriteGames<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteArtists = S::FavoriteArtists;
         type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
         type FavoriteGames = Set<members::favorite_games>;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `use_susie_prophecy` field to Set
+    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
+    impl<S: State> State for SetUseSusieProphecy<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = Set<members::use_susie_prophecy>;
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `favorite_artists` field to Set
+    pub struct SetFavoriteArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteArtists<S> {}
+    impl<S: State> State for SetFavoriteArtists<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteArtists = Set<members::favorite_artists>;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `favorite_deltarune_characters` field to Set
+    pub struct SetFavoriteDeltaruneCharacters<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
+    impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
+        type TitleColors = S::TitleColors;
+    }
+    ///State transition - sets the `title_colors` field to Set
+    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
+    impl<S: State> State for SetTitleColors<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteGames = S::FavoriteGames;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteArtists = S::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+        type TitleColors = Set<members::title_colors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_susie_prophecy` field
-        pub struct use_susie_prophecy(());
-        ///Marker type for the `title_colors` field
-        pub struct title_colors(());
-        ///Marker type for the `favorite_artists` field
-        pub struct favorite_artists(());
         ///Marker type for the `favorite_albums` field
         pub struct favorite_albums(());
-        ///Marker type for the `favorite_deltarune_characters` field
-        pub struct favorite_deltarune_characters(());
         ///Marker type for the `favorite_games` field
         pub struct favorite_games(());
+        ///Marker type for the `use_susie_prophecy` field
+        pub struct use_susie_prophecy(());
+        ///Marker type for the `favorite_artists` field
+        pub struct favorite_artists(());
+        ///Marker type for the `favorite_deltarune_characters` field
+        pub struct favorite_deltarune_characters(());
+        ///Marker type for the `title_colors` field
+        pub struct title_colors(());
     }
 }
 
@@ -348,12 +469,12 @@ where
 impl<'a, S> OutputBuilder<'a, S>
 where
     S: output_state::State,
-    S::UseSusieProphecy: output_state::IsSet,
-    S::TitleColors: output_state::IsSet,
-    S::FavoriteArtists: output_state::IsSet,
     S::FavoriteAlbums: output_state::IsSet,
-    S::FavoriteDeltaruneCharacters: output_state::IsSet,
     S::FavoriteGames: output_state::IsSet,
+    S::UseSusieProphecy: output_state::IsSet,
+    S::FavoriteArtists: output_state::IsSet,
+    S::FavoriteDeltaruneCharacters: output_state::IsSet,
+    S::TitleColors: output_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Output<'a> {
@@ -383,110 +504,6 @@ where
             title_colors: self.__unsafe_private_named.4.unwrap(),
             use_susie_prophecy: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// Named title color mode for the site.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OutputTitleColors<'a> {
-    None,
-    Enby,
-    Trans,
-    Pan,
-    Latvia,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> OutputTitleColors<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::None => "none",
-            Self::Enby => "enby",
-            Self::Trans => "trans",
-            Self::Pan => "pan",
-            Self::Latvia => "latvia",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for OutputTitleColors<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "none" => Self::None,
-            "enby" => Self::Enby,
-            "trans" => Self::Trans,
-            "pan" => Self::Pan,
-            "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for OutputTitleColors<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "enby" => Self::Enby,
-            "trans" => Self::Trans,
-            "pan" => Self::Pan,
-            "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for OutputTitleColors<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for OutputTitleColors<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for OutputTitleColors<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for OutputTitleColors<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for OutputTitleColors<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for OutputTitleColors<'_> {
-    type Output = OutputTitleColors<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            OutputTitleColors::None => OutputTitleColors::None,
-            OutputTitleColors::Enby => OutputTitleColors::Enby,
-            OutputTitleColors::Trans => OutputTitleColors::Trans,
-            OutputTitleColors::Pan => OutputTitleColors::Pan,
-            OutputTitleColors::Latvia => OutputTitleColors::Latvia,
-            OutputTitleColors::Other(v) => OutputTitleColors::Other(v.into_static()),
         }
     }
 }
@@ -653,22 +670,5 @@ fn lexicon_doc_download_darkworld_site_getState() -> ::jacquard_lexicon::lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Output<'a> {
-    fn nsid() -> &'static str {
-        "download.darkworld.site.getState"
-    }
-    fn def_name() -> &'static str {
-        "output"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_download_darkworld_site_getState()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

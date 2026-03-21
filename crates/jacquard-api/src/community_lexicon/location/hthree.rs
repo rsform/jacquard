@@ -28,6 +28,23 @@ pub struct Hthree<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hthree<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.location.hthree"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_community_lexicon_location_hthree()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_community_lexicon_location_hthree() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -103,22 +120,5 @@ fn lexicon_doc_community_lexicon_location_hthree() -> ::jacquard_lexicon::lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hthree<'a> {
-    fn nsid() -> &'static str {
-        "community.lexicon.location.hthree"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_community_lexicon_location_hthree()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

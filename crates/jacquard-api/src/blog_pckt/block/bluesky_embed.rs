@@ -22,6 +22,23 @@ pub struct BlueskyEmbed<'a> {
     pub post_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyEmbed<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.blueskyEmbed"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_blueskyEmbed()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod bluesky_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -167,22 +184,5 @@ fn lexicon_doc_blog_pckt_block_blueskyEmbed() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyEmbed<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.blueskyEmbed"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_blueskyEmbed()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

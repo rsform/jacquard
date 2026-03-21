@@ -20,6 +20,52 @@ pub struct GetActorNeighbours<'a> {
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetActorNeighboursOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub neighbours: std::option::Option<
+        Vec<crate::app_rocksky::actor::NeighbourViewBasic<'a>>,
+    >,
+}
+
+/// Response type for
+///app.rocksky.actor.getActorNeighbours
+pub struct GetActorNeighboursResponse;
+impl jacquard_common::xrpc::XrpcResp for GetActorNeighboursResponse {
+    const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetActorNeighboursOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorNeighbours<'a> {
+    const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetActorNeighboursResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.actor.getActorNeighbours
+pub struct GetActorNeighboursRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorNeighboursRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorNeighbours";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorNeighbours<'de>;
+    type Response = GetActorNeighboursResponse;
+}
+
 pub mod get_actor_neighbours_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,50 +155,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetActorNeighboursOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub neighbours: std::option::Option<
-        Vec<crate::app_rocksky::actor::NeighbourViewBasic<'a>>,
-    >,
-}
-
-/// Response type for
-///app.rocksky.actor.getActorNeighbours
-pub struct GetActorNeighboursResponse;
-impl jacquard_common::xrpc::XrpcResp for GetActorNeighboursResponse {
-    const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorNeighboursOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorNeighbours<'a> {
-    const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetActorNeighboursResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.actor.getActorNeighbours
-pub struct GetActorNeighboursRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetActorNeighboursRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorNeighbours";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorNeighbours<'de>;
-    type Response = GetActorNeighboursResponse;
 }

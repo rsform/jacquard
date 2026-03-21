@@ -22,6 +22,48 @@ pub struct GetPlay<'a> {
     pub rkey: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPlayOutput<'a> {
+    #[serde(borrow)]
+    pub play: crate::fm_teal::alpha::feed::PlayView<'a>,
+}
+
+/// Response type for
+///fm.teal.alpha.feed.getPlay
+pub struct GetPlayResponse;
+impl jacquard_common::xrpc::XrpcResp for GetPlayResponse {
+    const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetPlayOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPlay<'a> {
+    const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPlayResponse;
+}
+
+/// Endpoint type for
+///fm.teal.alpha.feed.getPlay
+pub struct GetPlayRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
+    const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getPlay";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPlay<'de>;
+    type Response = GetPlayResponse;
+}
+
 pub mod get_play_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -145,46 +187,4 @@ where
             rkey: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetPlayOutput<'a> {
-    #[serde(borrow)]
-    pub play: crate::fm_teal::alpha::feed::PlayView<'a>,
-}
-
-/// Response type for
-///fm.teal.alpha.feed.getPlay
-pub struct GetPlayResponse;
-impl jacquard_common::xrpc::XrpcResp for GetPlayResponse {
-    const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPlayOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPlay<'a> {
-    const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetPlayResponse;
-}
-
-/// Endpoint type for
-///fm.teal.alpha.feed.getPlay
-pub struct GetPlayRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
-    const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getPlay";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPlay<'de>;
-    type Response = GetPlayResponse;
 }

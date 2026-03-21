@@ -25,6 +25,530 @@ pub struct BlobInfo<'a> {
     pub size: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChildManifestInfo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub platform: std::option::Option<
+        crate::io_atcr::hold::notify_manifest::PlatformInfo<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LayerInfo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotifyManifest<'a> {
+    #[serde(borrow)]
+    pub manifest: crate::io_atcr::hold::notify_manifest::ManifestInfo<'a>,
+    ///Manifest digest for building layer record AT-URIs
+    #[serde(borrow)]
+    pub manifest_digest: jacquard_common::CowStr<'a>,
+    ///Operation type (defaults to 'push' for backward compatibility)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub operation: std::option::Option<NotifyManifestOperation<'a>>,
+    ///Image repository name
+    #[serde(borrow)]
+    pub repository: jacquard_common::CowStr<'a>,
+    ///Image tag (optional, required for Bluesky posts)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///DID of the image owner
+    #[serde(borrow)]
+    pub user_did: jacquard_common::types::string::Did<'a>,
+}
+
+/// Operation type (defaults to 'push' for backward compatibility)
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NotifyManifestOperation<'a> {
+    Push,
+    Pull,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> NotifyManifestOperation<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Push => "push",
+            Self::Pull => "pull",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for NotifyManifestOperation<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "push" => Self::Push,
+            "pull" => Self::Pull,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for NotifyManifestOperation<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "push" => Self::Push,
+            "pull" => Self::Pull,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for NotifyManifestOperation<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for NotifyManifestOperation<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for NotifyManifestOperation<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for NotifyManifestOperation<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for NotifyManifestOperation<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for NotifyManifestOperation<'_> {
+    type Output = NotifyManifestOperation<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            NotifyManifestOperation::Push => NotifyManifestOperation::Push,
+            NotifyManifestOperation::Pull => NotifyManifestOperation::Pull,
+            NotifyManifestOperation::Other(v) => {
+                NotifyManifestOperation::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotifyManifestOutput<'a> {
+    ///Number of layer records created (push only)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub layers_created: std::option::Option<i64>,
+    ///The operation that was performed ('push' or 'pull')
+    #[serde(borrow)]
+    pub operation: jacquard_common::CowStr<'a>,
+    ///Whether a Bluesky post was created (push only)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub post_created: std::option::Option<bool>,
+    ///AT-URI of the created Bluesky post (if postCreated is true)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub post_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ///Whether stats were successfully updated
+    pub stats_updated: bool,
+    ///Whether the operation completed successfully
+    pub success: bool,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum NotifyManifestError<'a> {
+    #[serde(rename = "InvalidOperation")]
+    InvalidOperation(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "UserMismatch")]
+    UserMismatch(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "QuotaExceeded")]
+    QuotaExceeded(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for NotifyManifestError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidOperation(msg) => {
+                write!(f, "InvalidOperation")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::UserMismatch(msg) => {
+                write!(f, "UserMismatch")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::QuotaExceeded(msg) => {
+                write!(f, "QuotaExceeded")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// OCI manifest information
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ManifestInfo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub config: std::option::Option<crate::io_atcr::hold::notify_manifest::BlobInfo<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub layers: std::option::Option<
+        Vec<crate::io_atcr::hold::notify_manifest::LayerInfo<'a>>,
+    >,
+    ///Child manifests for multi-arch images
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub manifests: std::option::Option<
+        Vec<crate::io_atcr::hold::notify_manifest::ChildManifestInfo<'a>>,
+    >,
+    ///OCI media type
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformInfo<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub architecture: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.notifyManifest"
+    }
+    fn def_name() -> &'static str {
+        "blobInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_notifyManifest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.digest {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChildManifestInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.notifyManifest"
+    }
+    fn def_name() -> &'static str {
+        "childManifestInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_notifyManifest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.digest {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.media_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LayerInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.notifyManifest"
+    }
+    fn def_name() -> &'static str {
+        "layerInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_notifyManifest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.digest {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.media_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Response type for
+///io.atcr.hold.notifyManifest
+pub struct NotifyManifestResponse;
+impl jacquard_common::xrpc::XrpcResp for NotifyManifestResponse {
+    const NSID: &'static str = "io.atcr.hold.notifyManifest";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = NotifyManifestOutput<'de>;
+    type Err<'de> = NotifyManifestError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyManifest<'a> {
+    const NSID: &'static str = "io.atcr.hold.notifyManifest";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = NotifyManifestResponse;
+}
+
+/// Endpoint type for
+///io.atcr.hold.notifyManifest
+pub struct NotifyManifestRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for NotifyManifestRequest {
+    const PATH: &'static str = "/xrpc/io.atcr.hold.notifyManifest";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = NotifyManifest<'de>;
+    type Response = NotifyManifestResponse;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.notifyManifest"
+    }
+    fn def_name() -> &'static str {
+        "manifestInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_notifyManifest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.media_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformInfo<'a> {
+    fn nsid() -> &'static str {
+        "io.atcr.hold.notifyManifest"
+    }
+    fn def_name() -> &'static str {
+        "platformInfo"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_atcr_hold_notifyManifest()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.architecture {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "architecture",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.os {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "os",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -490,201 +1014,6 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::Lex
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.notifyManifest"
-    }
-    fn def_name() -> &'static str {
-        "blobInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_notifyManifest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.digest {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChildManifestInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub platform: std::option::Option<
-        crate::io_atcr::hold::notify_manifest::PlatformInfo<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChildManifestInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.notifyManifest"
-    }
-    fn def_name() -> &'static str {
-        "childManifestInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_notifyManifest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.digest {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.media_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LayerInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LayerInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.notifyManifest"
-    }
-    fn def_name() -> &'static str {
-        "layerInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_notifyManifest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.digest {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.media_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotifyManifest<'a> {
-    #[serde(borrow)]
-    pub manifest: crate::io_atcr::hold::notify_manifest::ManifestInfo<'a>,
-    ///Manifest digest for building layer record AT-URIs
-    #[serde(borrow)]
-    pub manifest_digest: jacquard_common::CowStr<'a>,
-    ///Operation type (defaults to 'push' for backward compatibility)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub operation: std::option::Option<NotifyManifestOperation<'a>>,
-    ///Image repository name
-    #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
-    ///Image tag (optional, required for Bluesky posts)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of the image owner
-    #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
-}
-
 pub mod notify_manifest_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -695,67 +1024,67 @@ pub mod notify_manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ManifestDigest;
         type Manifest;
         type Repository;
         type UserDid;
-        type ManifestDigest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ManifestDigest = Unset;
         type Manifest = Unset;
         type Repository = Unset;
         type UserDid = Unset;
-        type ManifestDigest = Unset;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetManifest<S> {}
-    impl<S: State> State for SetManifest<S> {
-        type Manifest = Set<members::manifest>;
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
-        type ManifestDigest = S::ManifestDigest;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Manifest = S::Manifest;
-        type Repository = Set<members::repository>;
-        type UserDid = S::UserDid;
-        type ManifestDigest = S::ManifestDigest;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Manifest = S::Manifest;
-        type Repository = S::Repository;
-        type UserDid = Set<members::user_did>;
-        type ManifestDigest = S::ManifestDigest;
     }
     ///State transition - sets the `manifest_digest` field to Set
     pub struct SetManifestDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifestDigest<S> {}
     impl<S: State> State for SetManifestDigest<S> {
+        type ManifestDigest = Set<members::manifest_digest>;
         type Manifest = S::Manifest;
         type Repository = S::Repository;
         type UserDid = S::UserDid;
-        type ManifestDigest = Set<members::manifest_digest>;
+    }
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = Set<members::manifest>;
+        type Repository = S::Repository;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = S::Manifest;
+        type Repository = Set<members::repository>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = S::Manifest;
+        type Repository = S::Repository;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `manifest_digest` field
+        pub struct manifest_digest(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `manifest_digest` field
-        pub struct manifest_digest(());
     }
 }
 
@@ -902,10 +1231,10 @@ where
 impl<'a, S> NotifyManifestBuilder<'a, S>
 where
     S: notify_manifest_state::State,
+    S::ManifestDigest: notify_manifest_state::IsSet,
     S::Manifest: notify_manifest_state::IsSet,
     S::Repository: notify_manifest_state::IsSet,
     S::UserDid: notify_manifest_state::IsSet,
-    S::ManifestDigest: notify_manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotifyManifest<'a> {
@@ -936,334 +1265,5 @@ where
             user_did: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-/// Operation type (defaults to 'push' for backward compatibility)
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NotifyManifestOperation<'a> {
-    Push,
-    Pull,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> NotifyManifestOperation<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Push => "push",
-            Self::Pull => "pull",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for NotifyManifestOperation<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "push" => Self::Push,
-            "pull" => Self::Pull,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for NotifyManifestOperation<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "push" => Self::Push,
-            "pull" => Self::Pull,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for NotifyManifestOperation<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for NotifyManifestOperation<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for NotifyManifestOperation<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for NotifyManifestOperation<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for NotifyManifestOperation<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for NotifyManifestOperation<'_> {
-    type Output = NotifyManifestOperation<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            NotifyManifestOperation::Push => NotifyManifestOperation::Push,
-            NotifyManifestOperation::Pull => NotifyManifestOperation::Pull,
-            NotifyManifestOperation::Other(v) => {
-                NotifyManifestOperation::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotifyManifestOutput<'a> {
-    ///Number of layer records created (push only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub layers_created: std::option::Option<i64>,
-    ///The operation that was performed ('push' or 'pull')
-    #[serde(borrow)]
-    pub operation: jacquard_common::CowStr<'a>,
-    ///Whether a Bluesky post was created (push only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_created: std::option::Option<bool>,
-    ///AT-URI of the created Bluesky post (if postCreated is true)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub post_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///Whether stats were successfully updated
-    pub stats_updated: bool,
-    ///Whether the operation completed successfully
-    pub success: bool,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum NotifyManifestError<'a> {
-    #[serde(rename = "InvalidOperation")]
-    InvalidOperation(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "UserMismatch")]
-    UserMismatch(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "QuotaExceeded")]
-    QuotaExceeded(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for NotifyManifestError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidOperation(msg) => {
-                write!(f, "InvalidOperation")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::UserMismatch(msg) => {
-                write!(f, "UserMismatch")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::QuotaExceeded(msg) => {
-                write!(f, "QuotaExceeded")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///io.atcr.hold.notifyManifest
-pub struct NotifyManifestResponse;
-impl jacquard_common::xrpc::XrpcResp for NotifyManifestResponse {
-    const NSID: &'static str = "io.atcr.hold.notifyManifest";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = NotifyManifestOutput<'de>;
-    type Err<'de> = NotifyManifestError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyManifest<'a> {
-    const NSID: &'static str = "io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = NotifyManifestResponse;
-}
-
-/// Endpoint type for
-///io.atcr.hold.notifyManifest
-pub struct NotifyManifestRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for NotifyManifestRequest {
-    const PATH: &'static str = "/xrpc/io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = NotifyManifest<'de>;
-    type Response = NotifyManifestResponse;
-}
-
-/// OCI manifest information
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ManifestInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub config: std::option::Option<crate::io_atcr::hold::notify_manifest::BlobInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub layers: std::option::Option<
-        Vec<crate::io_atcr::hold::notify_manifest::LayerInfo<'a>>,
-    >,
-    ///Child manifests for multi-arch images
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub manifests: std::option::Option<
-        Vec<crate::io_atcr::hold::notify_manifest::ChildManifestInfo<'a>>,
-    >,
-    ///OCI media type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.notifyManifest"
-    }
-    fn def_name() -> &'static str {
-        "manifestInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_notifyManifest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.media_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
-                    max: 256usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub architecture: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformInfo<'a> {
-    fn nsid() -> &'static str {
-        "io.atcr.hold.notifyManifest"
-    }
-    fn def_name() -> &'static str {
-        "platformInfo"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_atcr_hold_notifyManifest()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.architecture {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "architecture",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.os {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "os",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

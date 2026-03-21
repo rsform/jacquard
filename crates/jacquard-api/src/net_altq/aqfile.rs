@@ -121,6 +121,297 @@ impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
     }
 }
 
+/// File metadata describing the uploaded blob.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct File<'a> {
+    ///MIME type, e.g. 'video/mp4'.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Client-side last-modified timestamp.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub modified_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///User-visible filename.
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///File size in bytes.
+    pub size: i64,
+}
+
+/// A record representing an uploaded file blob with metadata.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Aqfile<'a> {
+    ///Handle or DID of the account to attribute this upload to.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub attribution: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
+    ///The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
+    #[serde(borrow)]
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    ///Optional cryptographic checksum for integrity verification.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub checksum: std::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
+    ///Timestamp when this record was created.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Metadata about the file.
+    #[serde(borrow)]
+    pub file: crate::net_altq::aqfile::File<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AqfileGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Aqfile<'a>,
+}
+
+impl<'a> Aqfile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, AqfileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
+    fn nsid() -> &'static str {
+        "net.altq.aqfile"
+    }
+    fn def_name() -> &'static str {
+        "checksum"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_altq_aqfile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.algo;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "algo",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.hash;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hash",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
+    fn nsid() -> &'static str {
+        "net.altq.aqfile"
+    }
+    fn def_name() -> &'static str {
+        "file"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_altq_aqfile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.mime_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "mime_type",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value > 1000000000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
+                    max: 1000000000i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct AqfileRecord;
+impl jacquard_common::xrpc::XrpcResp for AqfileRecord {
+    const NSID: &'static str = "net.altq.aqfile";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AqfileGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
+    fn from(output: AqfileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Aqfile<'_> {
+    const NSID: &'static str = "net.altq.aqfile";
+    type Record = AqfileRecord;
+}
+
+impl jacquard_common::types::collection::Collection for AqfileRecord {
+    const NSID: &'static str = "net.altq.aqfile";
+    type Record = AqfileRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
+    fn nsid() -> &'static str {
+        "net.altq.aqfile"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_altq_aqfile()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blob;
+            {
+                let size = value.blob().size;
+                if size > 1000000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        max: 1000000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.blob;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "blob",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -399,76 +690,6 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
-    fn nsid() -> &'static str {
-        "net.altq.aqfile"
-    }
-    fn def_name() -> &'static str {
-        "checksum"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_altq_aqfile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.algo;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "algo",
-                    ),
-                    max: 32usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.hash;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hash",
-                    ),
-                    max: 128usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// File metadata describing the uploaded blob.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct File<'a> {
-    ///MIME type, e.g. 'video/mp4'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Client-side last-modified timestamp.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub modified_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///User-visible filename.
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///File size in bytes.
-    pub size: i64,
-}
-
 pub mod file_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -651,105 +872,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
-    fn nsid() -> &'static str {
-        "net.altq.aqfile"
-    }
-    fn def_name() -> &'static str {
-        "file"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_altq_aqfile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.mime_type {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mime_type",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 512usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.size;
-            if *value > 1000000000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
-                    max: 1000000000i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.size;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A record representing an uploaded file blob with metadata.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Aqfile<'a> {
-    ///Handle or DID of the account to attribute this upload to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attribution: std::option::Option<
-        jacquard_common::types::ident::AtIdentifier<'a>,
-    >,
-    ///The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
-    #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
-    ///Optional cryptographic checksum for integrity verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub checksum: std::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
-    ///Timestamp when this record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Metadata about the file.
-    #[serde(borrow)]
-    pub file: crate::net_altq::aqfile::File<'a>,
 }
 
 pub mod aqfile_state {
@@ -970,127 +1092,5 @@ where
             file: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Aqfile<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AqfileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct AqfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Aqfile<'a>,
-}
-
-impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
-    fn from(output: AqfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Aqfile<'_> {
-    const NSID: &'static str = "net.altq.aqfile";
-    type Record = AqfileRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct AqfileRecord;
-impl jacquard_common::xrpc::XrpcResp for AqfileRecord {
-    const NSID: &'static str = "net.altq.aqfile";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = AqfileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for AqfileRecord {
-    const NSID: &'static str = "net.altq.aqfile";
-    type Record = AqfileRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
-    fn nsid() -> &'static str {
-        "net.altq.aqfile"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_altq_aqfile()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blob;
-            {
-                let size = value.blob().size;
-                if size > 1000000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        max: 1000000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.blob;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }

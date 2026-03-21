@@ -26,6 +26,90 @@ pub struct ResolveLabel<'a> {
     pub version: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveLabelOutput<'a> {
+    ///CID of the resolved dataset entry
+    #[serde(borrow)]
+    pub cid: jacquard_common::CowStr<'a>,
+    ///The label record that was resolved
+    #[serde(borrow)]
+    pub label: crate::science_alt::dataset::label::Label<'a>,
+    ///AT-URI of the resolved dataset entry
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveLabelError<'a> {
+    /// No label found with the given name
+    #[serde(rename = "LabelNotFound")]
+    LabelNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveLabelError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::LabelNotFound(msg) => {
+                write!(f, "LabelNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///science.alt.dataset.resolveLabel
+pub struct ResolveLabelResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveLabelResponse {
+    const NSID: &'static str = "science.alt.dataset.resolveLabel";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveLabelOutput<'de>;
+    type Err<'de> = ResolveLabelError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveLabel<'a> {
+    const NSID: &'static str = "science.alt.dataset.resolveLabel";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveLabelResponse;
+}
+
+/// Endpoint type for
+///science.alt.dataset.resolveLabel
+pub struct ResolveLabelRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveLabelRequest {
+    const PATH: &'static str = "/xrpc/science.alt.dataset.resolveLabel";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveLabel<'de>;
+    type Response = ResolveLabelResponse;
+}
+
 pub mod resolve_label_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -167,88 +251,4 @@ where
             version: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveLabelOutput<'a> {
-    ///CID of the resolved dataset entry
-    #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
-    ///The label record that was resolved
-    #[serde(borrow)]
-    pub label: crate::science_alt::dataset::label::Label<'a>,
-    ///AT-URI of the resolved dataset entry
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveLabelError<'a> {
-    /// No label found with the given name
-    #[serde(rename = "LabelNotFound")]
-    LabelNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveLabelError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::LabelNotFound(msg) => {
-                write!(f, "LabelNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///science.alt.dataset.resolveLabel
-pub struct ResolveLabelResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveLabelResponse {
-    const NSID: &'static str = "science.alt.dataset.resolveLabel";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveLabelOutput<'de>;
-    type Err<'de> = ResolveLabelError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveLabel<'a> {
-    const NSID: &'static str = "science.alt.dataset.resolveLabel";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveLabelResponse;
-}
-
-/// Endpoint type for
-///science.alt.dataset.resolveLabel
-pub struct ResolveLabelRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveLabelRequest {
-    const PATH: &'static str = "/xrpc/science.alt.dataset.resolveLabel";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveLabel<'de>;
-    type Response = ResolveLabelResponse;
 }

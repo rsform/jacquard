@@ -21,6 +21,48 @@ pub struct PlayParams<'a> {
     pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct Play;
+/// Response type for
+///app.rocksky.player.play
+pub struct PlayResponse;
+impl jacquard_common::xrpc::XrpcResp for PlayResponse {
+    const NSID: &'static str = "app.rocksky.player.play";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for Play {
+    const NSID: &'static str = "app.rocksky.player.play";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PlayResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.player.play
+pub struct PlayRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.player.play";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Play;
+    type Response = PlayResponse;
+}
+
 pub mod play_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -94,46 +136,4 @@ where
             player_id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct Play;
-/// Response type for
-///app.rocksky.player.play
-pub struct PlayResponse;
-impl jacquard_common::xrpc::XrpcResp for PlayResponse {
-    const NSID: &'static str = "app.rocksky.player.play";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for Play {
-    const NSID: &'static str = "app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PlayResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.player.play
-pub struct PlayRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = Play;
-    type Response = PlayResponse;
 }

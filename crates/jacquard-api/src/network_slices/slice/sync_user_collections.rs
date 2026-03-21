@@ -27,10 +27,6 @@ pub struct SyncUserCollections<'a> {
     pub timeout_seconds: std::option::Option<i64>,
 }
 
-fn _default_sync_user_collections_timeout_seconds() -> std::option::Option<i64> {
-    Some(30i64)
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -79,4 +75,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
     );
     type Request<'de> = SyncUserCollections<'de>;
     type Response = SyncUserCollectionsResponse;
+}
+
+fn _default_sync_user_collections_timeout_seconds() -> std::option::Option<i64> {
+    Some(30i64)
 }

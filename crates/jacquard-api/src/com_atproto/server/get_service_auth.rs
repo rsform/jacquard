@@ -25,6 +25,84 @@ pub struct GetServiceAuth<'a> {
     pub lxm: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetServiceAuthOutput<'a> {
+    #[serde(borrow)]
+    pub token: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetServiceAuthError<'a> {
+    /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
+    #[serde(rename = "BadExpiration")]
+    BadExpiration(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetServiceAuthError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BadExpiration(msg) => {
+                write!(f, "BadExpiration")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.server.getServiceAuth
+pub struct GetServiceAuthResponse;
+impl jacquard_common::xrpc::XrpcResp for GetServiceAuthResponse {
+    const NSID: &'static str = "com.atproto.server.getServiceAuth";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetServiceAuthOutput<'de>;
+    type Err<'de> = GetServiceAuthError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetServiceAuth<'a> {
+    const NSID: &'static str = "com.atproto.server.getServiceAuth";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetServiceAuthResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.getServiceAuth
+pub struct GetServiceAuthRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.getServiceAuth";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetServiceAuth<'de>;
+    type Response = GetServiceAuthResponse;
+}
+
 pub mod get_service_auth_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -150,82 +228,4 @@ where
             lxm: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetServiceAuthOutput<'a> {
-    #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetServiceAuthError<'a> {
-    /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
-    #[serde(rename = "BadExpiration")]
-    BadExpiration(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetServiceAuthError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BadExpiration(msg) => {
-                write!(f, "BadExpiration")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.server.getServiceAuth
-pub struct GetServiceAuthResponse;
-impl jacquard_common::xrpc::XrpcResp for GetServiceAuthResponse {
-    const NSID: &'static str = "com.atproto.server.getServiceAuth";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetServiceAuthOutput<'de>;
-    type Err<'de> = GetServiceAuthError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetServiceAuth<'a> {
-    const NSID: &'static str = "com.atproto.server.getServiceAuth";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetServiceAuthResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.getServiceAuth
-pub struct GetServiceAuthRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.getServiceAuth";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetServiceAuth<'de>;
-    type Response = GetServiceAuthResponse;
 }

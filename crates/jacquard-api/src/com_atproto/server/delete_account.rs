@@ -25,6 +25,79 @@ pub struct DeleteAccount<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteAccountError<'a> {
+    #[serde(rename = "ExpiredToken")]
+    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidToken")]
+    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for DeleteAccountError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ExpiredToken(msg) => {
+                write!(f, "ExpiredToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidToken(msg) => {
+                write!(f, "InvalidToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///com.atproto.server.deleteAccount
+pub struct DeleteAccountResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
+    const NSID: &'static str = "com.atproto.server.deleteAccount";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = DeleteAccountError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
+    const NSID: &'static str = "com.atproto.server.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteAccountResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.deleteAccount
+pub struct DeleteAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteAccount<'de>;
+    type Response = DeleteAccountResponse;
+}
+
 pub mod delete_account_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,51 +108,51 @@ pub mod delete_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Password;
         type Token;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Password = Unset;
         type Token = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Password = S::Password;
-        type Token = S::Token;
+        type Did = Unset;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type Did = S::Did;
         type Password = Set<members::password>;
         type Token = S::Token;
+        type Did = S::Did;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
-        type Did = S::Did;
         type Password = S::Password;
         type Token = Set<members::token>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Password = S::Password;
+        type Token = S::Token;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `password` field
         pub struct password(());
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -172,9 +245,9 @@ where
 impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
-    S::Did: delete_account_state::IsSet,
     S::Password: delete_account_state::IsSet,
     S::Token: delete_account_state::IsSet,
+    S::Did: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
@@ -200,77 +273,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteAccountError<'a> {
-    #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for DeleteAccountError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::ExpiredToken(msg) => {
-                write!(f, "ExpiredToken")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::InvalidToken(msg) => {
-                write!(f, "InvalidToken")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///com.atproto.server.deleteAccount
-pub struct DeleteAccountResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
-    const NSID: &'static str = "com.atproto.server.deleteAccount";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteAccountError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
-    const NSID: &'static str = "com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteAccountResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.deleteAccount
-pub struct DeleteAccountRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteAccount<'de>;
-    type Response = DeleteAccountResponse;
 }

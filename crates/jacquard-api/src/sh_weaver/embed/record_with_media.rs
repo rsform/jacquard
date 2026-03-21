@@ -23,6 +23,101 @@ pub struct RecordWithMedia<'a> {
     pub records: crate::sh_weaver::embed::records::Records<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RecordWithMediaMedia<'a> {
+    #[serde(rename = "sh.weaver.embed.images")]
+    Images(Box<crate::sh_weaver::embed::images::Images<'a>>),
+    #[serde(rename = "sh.weaver.embed.external")]
+    External(Box<crate::sh_weaver::embed::external::External<'a>>),
+    #[serde(rename = "sh.weaver.embed.video")]
+    Video(Box<crate::sh_weaver::embed::video::VideoRecord<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct View<'a> {
+    #[serde(borrow)]
+    pub media: ViewMedia<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub records: std::option::Option<crate::sh_weaver::embed::records::View<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewMedia<'a> {
+    #[serde(rename = "sh.weaver.embed.images#view")]
+    ImagesView(Box<crate::sh_weaver::embed::images::View<'a>>),
+    #[serde(rename = "sh.weaver.embed.external#view")]
+    ExternalView(Box<crate::sh_weaver::embed::external::View<'a>>),
+    #[serde(rename = "sh.weaver.embed.video#view")]
+    VideoView(Box<crate::sh_weaver::embed::video::View<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.recordWithMedia"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_recordWithMedia()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.recordWithMedia"
+    }
+    fn def_name() -> &'static str {
+        "view"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_recordWithMedia()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod record_with_media_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -163,27 +258,6 @@ where
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RecordWithMediaMedia<'a> {
-    #[serde(rename = "sh.weaver.embed.images")]
-    Images(Box<crate::sh_weaver::embed::images::Images<'a>>),
-    #[serde(rename = "sh.weaver.embed.external")]
-    External(Box<crate::sh_weaver::embed::external::External<'a>>),
-    #[serde(rename = "sh.weaver.embed.video")]
-    Video(Box<crate::sh_weaver::embed::video::VideoRecord<'a>>),
-}
-
 fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -283,42 +357,6 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon:
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.embed.recordWithMedia"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_embed_recordWithMedia()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    #[serde(borrow)]
-    pub media: ViewMedia<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub records: std::option::Option<crate::sh_weaver::embed::records::View<'a>>,
 }
 
 pub mod view_state {
@@ -458,43 +496,5 @@ where
             records: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewMedia<'a> {
-    #[serde(rename = "sh.weaver.embed.images#view")]
-    ImagesView(Box<crate::sh_weaver::embed::images::View<'a>>),
-    #[serde(rename = "sh.weaver.embed.external#view")]
-    ExternalView(Box<crate::sh_weaver::embed::external::View<'a>>),
-    #[serde(rename = "sh.weaver.embed.video#view")]
-    VideoView(Box<crate::sh_weaver::embed::video::View<'a>>),
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.embed.recordWithMedia"
-    }
-    fn def_name() -> &'static str {
-        "view"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_embed_recordWithMedia()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

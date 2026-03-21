@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,92 @@ pub struct SearchStarterPacksSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchStarterPacksSkeletonOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hits_total: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub starter_packs: Vec<crate::app_bsky::unspecced::SkeletonSearchStarterPack<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SearchStarterPacksSkeletonError<'a> {
+    #[serde(rename = "BadQueryString")]
+    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SearchStarterPacksSkeletonError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BadQueryString(msg) => {
+                write!(f, "BadQueryString")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///app.bsky.unspecced.searchStarterPacksSkeleton
+pub struct SearchStarterPacksSkeletonResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.searchStarterPacksSkeleton";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchStarterPacksSkeletonOutput<'de>;
+    type Err<'de> = SearchStarterPacksSkeletonError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacksSkeleton<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.searchStarterPacksSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchStarterPacksSkeletonResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.searchStarterPacksSkeleton
+pub struct SearchStarterPacksSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchStarterPacksSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchStarterPacksSkeleton<'de>;
+    type Response = SearchStarterPacksSkeletonResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_starter_packs_skeleton_state {
@@ -197,86 +279,4 @@ where
             viewer: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchStarterPacksSkeletonOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hits_total: std::option::Option<i64>,
-    #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::unspecced::SkeletonSearchStarterPack<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchStarterPacksSkeletonError<'a> {
-    #[serde(rename = "BadQueryString")]
-    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SearchStarterPacksSkeletonError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::BadQueryString(msg) => {
-                write!(f, "BadQueryString")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///app.bsky.unspecced.searchStarterPacksSkeleton
-pub struct SearchStarterPacksSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksSkeletonResponse {
-    const NSID: &'static str = "app.bsky.unspecced.searchStarterPacksSkeleton";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchStarterPacksSkeletonOutput<'de>;
-    type Err<'de> = SearchStarterPacksSkeletonError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacksSkeleton<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.searchStarterPacksSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchStarterPacksSkeletonResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.searchStarterPacksSkeleton
-pub struct SearchStarterPacksSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksSkeletonRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchStarterPacksSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchStarterPacksSkeleton<'de>;
-    type Response = SearchStarterPacksSkeletonResponse;
 }

@@ -31,6 +31,400 @@ pub struct DocRef<'a> {
     pub value: DocRefValue<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DocRefValue<'a> {
+    #[serde(rename = "sh.weaver.edit.defs#notebookRef")]
+    NotebookRef(Box<crate::sh_weaver::edit::NotebookRef<'a>>),
+    #[serde(rename = "sh.weaver.edit.defs#entryRef")]
+    EntryRef(Box<crate::sh_weaver::edit::EntryRef<'a>>),
+    #[serde(rename = "sh.weaver.edit.defs#draftRef")]
+    DraftRef(Box<crate::sh_weaver::edit::DraftRef<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DraftRef<'a> {
+    #[serde(borrow)]
+    pub draft_key: jacquard_common::CowStr<'a>,
+}
+
+/// A branch/fork in edit history (for when collaborators diverge).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditBranchView<'a> {
+    #[serde(borrow)]
+    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    ///Common ancestor if this is a fork
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub diverges_from: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(borrow)]
+    pub head: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_merged: std::option::Option<bool>,
+    pub last_updated: jacquard_common::types::string::Datetime,
+    ///Number of diffs in this branch
+    pub length: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+}
+
+/// Summary of an edit (root or diff) for history queries.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditHistoryEntry<'a> {
+    #[serde(borrow)]
+    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_inline_diff: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prev_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub root_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub snapshot_cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub r#type: EditHistoryEntryType<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EditHistoryEntryType<'a> {
+    Root,
+    Diff,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EditHistoryEntryType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Root => "root",
+            Self::Diff => "diff",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EditHistoryEntryType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "root" => Self::Root,
+            "diff" => Self::Diff,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EditHistoryEntryType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "root" => Self::Root,
+            "diff" => Self::Diff,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EditHistoryEntryType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EditHistoryEntryType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EditHistoryEntryType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EditHistoryEntryType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EditHistoryEntryType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EditHistoryEntryType<'_> {
+    type Output = EditHistoryEntryType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EditHistoryEntryType::Root => EditHistoryEntryType::Root,
+            EditHistoryEntryType::Diff => EditHistoryEntryType::Diff,
+            EditHistoryEntryType::Other(v) => {
+                EditHistoryEntryType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Full tree structure showing all branches for a resource.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditTreeView<'a> {
+    #[serde(borrow)]
+    pub branches: Vec<crate::sh_weaver::edit::EditBranchView<'a>>,
+    ///Diffs where branches diverge
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub conflict_points: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_conflicts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub main_branch: std::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
+    #[serde(borrow)]
+    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EntryRef<'a> {
+    #[serde(borrow)]
+    pub entry: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NotebookRef<'a> {
+    #[serde(borrow)]
+    pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "docRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "draftRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.draft_key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "draft_key",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editBranchView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editHistoryEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editTreeView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "entryRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "notebookRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod doc_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -132,27 +526,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DocRefValue<'a> {
-    #[serde(rename = "sh.weaver.edit.defs#notebookRef")]
-    NotebookRef(Box<crate::sh_weaver::edit::NotebookRef<'a>>),
-    #[serde(rename = "sh.weaver.edit.defs#entryRef")]
-    EntryRef(Box<crate::sh_weaver::edit::EntryRef<'a>>),
-    #[serde(rename = "sh.weaver.edit.defs#draftRef")]
-    DraftRef(Box<crate::sh_weaver::edit::DraftRef<'a>>),
 }
 
 fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -654,103 +1027,6 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "docRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftRef<'a> {
-    #[serde(borrow)]
-    pub draft_key: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "draftRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.draft_key;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "draft_key",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A branch/fork in edit history (for when collaborators diverge).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EditBranchView<'a> {
-    #[serde(borrow)]
-    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    ///Common ancestor if this is a fork
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub diverges_from: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    #[serde(borrow)]
-    pub head: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_merged: std::option::Option<bool>,
-    pub last_updated: jacquard_common::types::string::Datetime,
-    ///Number of diffs in this branch
-    pub length: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-}
-
 pub mod edit_branch_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -761,67 +1037,67 @@ pub mod edit_branch_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Length;
-        type LastUpdated;
         type Author;
         type Head;
+        type LastUpdated;
+        type Length;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Length = Unset;
-        type LastUpdated = Unset;
         type Author = Unset;
         type Head = Unset;
-    }
-    ///State transition - sets the `length` field to Set
-    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLength<S> {}
-    impl<S: State> State for SetLength<S> {
-        type Length = Set<members::length>;
-        type LastUpdated = S::LastUpdated;
-        type Author = S::Author;
-        type Head = S::Head;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Length = S::Length;
-        type LastUpdated = Set<members::last_updated>;
-        type Author = S::Author;
-        type Head = S::Head;
+        type LastUpdated = Unset;
+        type Length = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Length = S::Length;
-        type LastUpdated = S::LastUpdated;
         type Author = Set<members::author>;
         type Head = S::Head;
+        type LastUpdated = S::LastUpdated;
+        type Length = S::Length;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHead<S> {}
     impl<S: State> State for SetHead<S> {
-        type Length = S::Length;
-        type LastUpdated = S::LastUpdated;
         type Author = S::Author;
         type Head = Set<members::head>;
+        type LastUpdated = S::LastUpdated;
+        type Length = S::Length;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Author = S::Author;
+        type Head = S::Head;
+        type LastUpdated = Set<members::last_updated>;
+        type Length = S::Length;
+    }
+    ///State transition - sets the `length` field to Set
+    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLength<S> {}
+    impl<S: State> State for SetLength<S> {
+        type Author = S::Author;
+        type Head = S::Head;
+        type LastUpdated = S::LastUpdated;
+        type Length = Set<members::length>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `length` field
-        pub struct length(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `head` field
         pub struct head(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `length` field
+        pub struct length(());
     }
 }
 
@@ -988,10 +1264,10 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
 impl<'a, S> EditBranchViewBuilder<'a, S>
 where
     S: edit_branch_view_state::State,
-    S::Length: edit_branch_view_state::IsSet,
-    S::LastUpdated: edit_branch_view_state::IsSet,
     S::Author: edit_branch_view_state::IsSet,
     S::Head: edit_branch_view_state::IsSet,
+    S::LastUpdated: edit_branch_view_state::IsSet,
+    S::Length: edit_branch_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditBranchView<'a> {
@@ -1027,62 +1303,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "editBranchView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Summary of an edit (root or diff) for history queries.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EditHistoryEntry<'a> {
-    #[serde(borrow)]
-    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_inline_diff: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub prev_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub root_ref: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub snapshot_cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub r#type: EditHistoryEntryType<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
 pub mod edit_history_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1095,9 +1315,9 @@ pub mod edit_history_entry_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Author;
-        type Type;
         type CreatedAt;
+        type Type;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -1105,9 +1325,9 @@ pub mod edit_history_entry_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Author = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1115,9 +1335,9 @@ pub mod edit_history_entry_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Author = S::Author;
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1125,29 +1345,9 @@ pub mod edit_history_entry_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
-        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
         type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
         type Author = S::Author;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1155,9 +1355,29 @@ pub mod edit_history_entry_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
-        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -1166,12 +1386,12 @@ pub mod edit_history_entry_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -1390,9 +1610,9 @@ where
     S: edit_history_entry_state::State,
     S::Uri: edit_history_entry_state::IsSet,
     S::Cid: edit_history_entry_state::IsSet,
-    S::Author: edit_history_entry_state::IsSet,
-    S::Type: edit_history_entry_state::IsSet,
     S::CreatedAt: edit_history_entry_state::IsSet,
+    S::Type: edit_history_entry_state::IsSet,
+    S::Author: edit_history_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditHistoryEntry<'a> {
@@ -1430,143 +1650,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EditHistoryEntryType<'a> {
-    Root,
-    Diff,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> EditHistoryEntryType<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Root => "root",
-            Self::Diff => "diff",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for EditHistoryEntryType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "root" => Self::Root,
-            "diff" => Self::Diff,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for EditHistoryEntryType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "root" => Self::Root,
-            "diff" => Self::Diff,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EditHistoryEntryType<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for EditHistoryEntryType<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for EditHistoryEntryType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for EditHistoryEntryType<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for EditHistoryEntryType<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for EditHistoryEntryType<'_> {
-    type Output = EditHistoryEntryType<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EditHistoryEntryType::Root => EditHistoryEntryType::Root,
-            EditHistoryEntryType::Diff => EditHistoryEntryType::Diff,
-            EditHistoryEntryType::Other(v) => {
-                EditHistoryEntryType::Other(v.into_static())
-            }
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "editHistoryEntry"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Full tree structure showing all branches for a resource.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EditTreeView<'a> {
-    #[serde(borrow)]
-    pub branches: Vec<crate::sh_weaver::edit::EditBranchView<'a>>,
-    ///Diffs where branches diverge
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub conflict_points: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_conflicts: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub main_branch: std::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
-    #[serde(borrow)]
-    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod edit_tree_view_state {
@@ -1771,39 +1854,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "editTreeView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryRef<'a> {
-    #[serde(borrow)]
-    pub entry: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod entry_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1909,39 +1959,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "entryRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NotebookRef<'a> {
-    #[serde(borrow)]
-    pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-}
-
 pub mod notebook_ref_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -2044,22 +2061,5 @@ where
             notebook: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.defs"
-    }
-    fn def_name() -> &'static str {
-        "notebookRef"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

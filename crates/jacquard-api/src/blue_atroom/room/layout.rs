@@ -23,6 +23,460 @@ pub struct Color<'a> {
     pub red: i64,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Floor<'a> {
+    #[serde(borrow)]
+    pub surface: crate::blue_atroom::room::layout::Surface<'a>,
+}
+
+/// A placed object in the room.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Furnishing<'a> {
+    ///Strong reference to a blue.atroom.room.object record.
+    #[serde(borrow)]
+    pub object: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    ///Position [x, y, z] in millimeters.
+    pub position: Vec<i64>,
+    ///Euler rotation [x, y, z] in degrees.
+    pub rotation: Vec<i64>,
+}
+
+/// A room layout with placed objects.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Layout<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub floor: crate::blue_atroom::room::layout::Floor<'a>,
+    #[serde(borrow)]
+    pub furnishings: Vec<crate::blue_atroom::room::layout::Furnishing<'a>>,
+    ///Room size in millimeters (square room).
+    pub size: i64,
+    #[serde(borrow)]
+    pub wall: crate::blue_atroom::room::layout::Wall<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LayoutGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Layout<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Surface<'a> {
+    #[serde(borrow)]
+    pub color: crate::blue_atroom::room::layout::Color<'a>,
+    ///Texture identifier.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub texture: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Texture tiling [u, v].
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub texture_tiling: std::option::Option<Vec<i64>>,
+}
+
+/// Wall configuration.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Wall<'a> {
+    ///Wall height in millimeters.
+    pub height: i64,
+    #[serde(borrow)]
+    pub surface: crate::blue_atroom::room::layout::Surface<'a>,
+    ///Wall thickness in millimeters.
+    pub thickness: i64,
+}
+
+impl<'a> Layout<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, LayoutRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "color"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.blue;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.blue;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.green;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.green;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.red;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.red;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Floor<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "floor"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "furnishing"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.position;
+            #[allow(unused_comparisons)]
+            if value.len() > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.position;
+            #[allow(unused_comparisons)]
+            if value.len() < 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "position",
+                    ),
+                    min: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.rotation;
+            #[allow(unused_comparisons)]
+            if value.len() > 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rotation",
+                    ),
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.rotation;
+            #[allow(unused_comparisons)]
+            if value.len() < 3usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rotation",
+                    ),
+                    min: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct LayoutRecord;
+impl jacquard_common::xrpc::XrpcResp for LayoutRecord {
+    const NSID: &'static str = "blue.atroom.room.layout";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LayoutGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<LayoutGetRecordOutput<'_>> for Layout<'_> {
+    fn from(output: LayoutGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Layout<'_> {
+    const NSID: &'static str = "blue.atroom.room.layout";
+    type Record = LayoutRecord;
+}
+
+impl jacquard_common::types::collection::Collection for LayoutRecord {
+    const NSID: &'static str = "blue.atroom.room.layout";
+    type Record = LayoutRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.furnishings;
+            #[allow(unused_comparisons)]
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "furnishings",
+                    ),
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value > 20000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
+                    max: 20000i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value < 1000i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "size",
+                    ),
+                    min: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Surface<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "surface"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.texture_tiling {
+            #[allow(unused_comparisons)]
+            if value.len() > 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "texture_tiling",
+                    ),
+                    max: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.texture_tiling {
+            #[allow(unused_comparisons)]
+            if value.len() < 2usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "texture_tiling",
+                    ),
+                    min: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Wall<'a> {
+    fn nsid() -> &'static str {
+        "blue.atroom.room.layout"
+    }
+    fn def_name() -> &'static str {
+        "wall"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_atroom_room_layout()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod color_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,49 +487,49 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Green;
         type Red;
+        type Green;
         type Blue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Green = Unset;
         type Red = Unset;
+        type Green = Unset;
         type Blue = Unset;
-    }
-    ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Green = Set<members::green>;
-        type Red = S::Red;
-        type Blue = S::Blue;
     }
     ///State transition - sets the `red` field to Set
     pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRed<S> {}
     impl<S: State> State for SetRed<S> {
-        type Green = S::Green;
         type Red = Set<members::red>;
+        type Green = S::Green;
+        type Blue = S::Blue;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGreen<S> {}
+    impl<S: State> State for SetGreen<S> {
+        type Red = S::Red;
+        type Green = Set<members::green>;
         type Blue = S::Blue;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlue<S> {}
     impl<S: State> State for SetBlue<S> {
-        type Green = S::Green;
         type Red = S::Red;
+        type Green = S::Green;
         type Blue = Set<members::blue>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `green` field
-        pub struct green(());
         ///Marker type for the `red` field
         pub struct red(());
+        ///Marker type for the `green` field
+        pub struct green(());
         ///Marker type for the `blue` field
         pub struct blue(());
     }
@@ -170,8 +624,8 @@ where
 impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
-    S::Green: color_state::IsSet,
     S::Red: color_state::IsSet,
+    S::Green: color_state::IsSet,
     S::Blue: color_state::IsSet,
 {
     /// Build the final struct
@@ -597,111 +1051,6 @@ fn lexicon_doc_blue_atroom_room_layout() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "color"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.blue;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blue",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.blue;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blue",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.green;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "green",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.green;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "green",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.red;
-            if *value > 255i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "red",
-                    ),
-                    max: 255i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.red;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "red",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Floor<'a> {
-    #[serde(borrow)]
-    pub surface: crate::blue_atroom::room::layout::Surface<'a>,
-}
-
 pub mod floor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -805,45 +1154,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Floor<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "floor"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// A placed object in the room.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Furnishing<'a> {
-    ///Strong reference to a blue.atroom.room.object record.
-    #[serde(borrow)]
-    pub object: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///Position [x, y, z] in millimeters.
-    pub position: Vec<i64>,
-    ///Euler rotation [x, y, z] in degrees.
-    pub rotation: Vec<i64>,
 }
 
 pub mod furnishing_state {
@@ -1023,99 +1333,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Furnishing<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "furnishing"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.position;
-            #[allow(unused_comparisons)]
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "position",
-                    ),
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.position;
-            #[allow(unused_comparisons)]
-            if value.len() < 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "position",
-                    ),
-                    min: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.rotation;
-            #[allow(unused_comparisons)]
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rotation",
-                    ),
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.rotation;
-            #[allow(unused_comparisons)]
-            if value.len() < 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rotation",
-                    ),
-                    min: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A room layout with placed objects.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Layout<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(borrow)]
-    pub floor: crate::blue_atroom::room::layout::Floor<'a>,
-    #[serde(borrow)]
-    pub furnishings: Vec<crate::blue_atroom::room::layout::Furnishing<'a>>,
-    ///Room size in millimeters (square room).
-    pub size: i64,
-    #[serde(borrow)]
-    pub wall: crate::blue_atroom::room::layout::Wall<'a>,
-}
-
 pub mod layout_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1126,85 +1343,85 @@ pub mod layout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Floor;
-        type Size;
-        type Wall;
         type Furnishings;
+        type Size;
         type CreatedAt;
+        type Floor;
+        type Wall;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Floor = Unset;
-        type Size = Unset;
-        type Wall = Unset;
         type Furnishings = Unset;
+        type Size = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `floor` field to Set
-    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFloor<S> {}
-    impl<S: State> State for SetFloor<S> {
-        type Floor = Set<members::floor>;
-        type Size = S::Size;
-        type Wall = S::Wall;
-        type Furnishings = S::Furnishings;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Floor = S::Floor;
-        type Size = Set<members::size>;
-        type Wall = S::Wall;
-        type Furnishings = S::Furnishings;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `wall` field to Set
-    pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWall<S> {}
-    impl<S: State> State for SetWall<S> {
-        type Floor = S::Floor;
-        type Size = S::Size;
-        type Wall = Set<members::wall>;
-        type Furnishings = S::Furnishings;
-        type CreatedAt = S::CreatedAt;
+        type Floor = Unset;
+        type Wall = Unset;
     }
     ///State transition - sets the `furnishings` field to Set
     pub struct SetFurnishings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFurnishings<S> {}
     impl<S: State> State for SetFurnishings<S> {
-        type Floor = S::Floor;
-        type Size = S::Size;
-        type Wall = S::Wall;
         type Furnishings = Set<members::furnishings>;
+        type Size = S::Size;
         type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
+        type Wall = S::Wall;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Furnishings = S::Furnishings;
+        type Size = Set<members::size>;
+        type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
+        type Wall = S::Wall;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Floor = S::Floor;
-        type Size = S::Size;
-        type Wall = S::Wall;
         type Furnishings = S::Furnishings;
+        type Size = S::Size;
         type CreatedAt = Set<members::created_at>;
+        type Floor = S::Floor;
+        type Wall = S::Wall;
+    }
+    ///State transition - sets the `floor` field to Set
+    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFloor<S> {}
+    impl<S: State> State for SetFloor<S> {
+        type Furnishings = S::Furnishings;
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
+        type Floor = Set<members::floor>;
+        type Wall = S::Wall;
+    }
+    ///State transition - sets the `wall` field to Set
+    pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWall<S> {}
+    impl<S: State> State for SetWall<S> {
+        type Furnishings = S::Furnishings;
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
+        type Wall = Set<members::wall>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `floor` field
-        pub struct floor(());
-        ///Marker type for the `size` field
-        pub struct size(());
-        ///Marker type for the `wall` field
-        pub struct wall(());
         ///Marker type for the `furnishings` field
         pub struct furnishings(());
+        ///Marker type for the `size` field
+        pub struct size(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `floor` field
+        pub struct floor(());
+        ///Marker type for the `wall` field
+        pub struct wall(());
     }
 }
 
@@ -1337,11 +1554,11 @@ where
 impl<'a, S> LayoutBuilder<'a, S>
 where
     S: layout_state::State,
-    S::Floor: layout_state::IsSet,
-    S::Size: layout_state::IsSet,
-    S::Wall: layout_state::IsSet,
     S::Furnishings: layout_state::IsSet,
+    S::Size: layout_state::IsSet,
     S::CreatedAt: layout_state::IsSet,
+    S::Floor: layout_state::IsSet,
+    S::Wall: layout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layout<'a> {
@@ -1371,144 +1588,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> Layout<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LayoutRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct LayoutGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Layout<'a>,
-}
-
-impl From<LayoutGetRecordOutput<'_>> for Layout<'_> {
-    fn from(output: LayoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Layout<'_> {
-    const NSID: &'static str = "blue.atroom.room.layout";
-    type Record = LayoutRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LayoutRecord;
-impl jacquard_common::xrpc::XrpcResp for LayoutRecord {
-    const NSID: &'static str = "blue.atroom.room.layout";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = LayoutGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for LayoutRecord {
-    const NSID: &'static str = "blue.atroom.room.layout";
-    type Record = LayoutRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layout<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.furnishings;
-            #[allow(unused_comparisons)]
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "furnishings",
-                    ),
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.size;
-            if *value > 20000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
-                    max: 20000i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.size;
-            if *value < 1000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
-                    min: 1000i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Surface<'a> {
-    #[serde(borrow)]
-    pub color: crate::blue_atroom::room::layout::Color<'a>,
-    ///Texture identifier.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub texture: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Texture tiling [u, v].
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub texture_tiling: std::option::Option<Vec<i64>>,
 }
 
 pub mod surface_state {
@@ -1651,68 +1730,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Surface<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "surface"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.texture_tiling {
-            #[allow(unused_comparisons)]
-            if value.len() > 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "texture_tiling",
-                    ),
-                    max: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.texture_tiling {
-            #[allow(unused_comparisons)]
-            if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "texture_tiling",
-                    ),
-                    min: 2usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// Wall configuration.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Wall<'a> {
-    ///Wall height in millimeters.
-    pub height: i64,
-    #[serde(borrow)]
-    pub surface: crate::blue_atroom::room::layout::Surface<'a>,
-    ///Wall thickness in millimeters.
-    pub thickness: i64,
-}
-
 pub mod wall_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1723,51 +1740,51 @@ pub mod wall_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Thickness;
         type Surface;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Thickness = Unset;
         type Surface = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Thickness = S::Thickness;
-        type Surface = S::Surface;
+        type Height = Unset;
     }
     ///State transition - sets the `thickness` field to Set
     pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThickness<S> {}
     impl<S: State> State for SetThickness<S> {
-        type Height = S::Height;
         type Thickness = Set<members::thickness>;
         type Surface = S::Surface;
+        type Height = S::Height;
     }
     ///State transition - sets the `surface` field to Set
     pub struct SetSurface<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSurface<S> {}
     impl<S: State> State for SetSurface<S> {
-        type Height = S::Height;
         type Thickness = S::Thickness;
         type Surface = Set<members::surface>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Thickness = S::Thickness;
+        type Surface = S::Surface;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `thickness` field
         pub struct thickness(());
         ///Marker type for the `surface` field
         pub struct surface(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -1860,9 +1877,9 @@ where
 impl<'a, S> WallBuilder<'a, S>
 where
     S: wall_state::State,
-    S::Height: wall_state::IsSet,
     S::Thickness: wall_state::IsSet,
     S::Surface: wall_state::IsSet,
+    S::Height: wall_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Wall<'a> {
@@ -1887,22 +1904,5 @@ where
             thickness: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Wall<'a> {
-    fn nsid() -> &'static str {
-        "blue.atroom.room.layout"
-    }
-    fn def_name() -> &'static str {
-        "wall"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_atroom_room_layout()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

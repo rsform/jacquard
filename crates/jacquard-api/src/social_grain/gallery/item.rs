@@ -28,6 +28,84 @@ pub struct Item<'a> {
     pub position: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ItemGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Item<'a>,
+}
+
+impl<'a> Item<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ItemRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ItemRecord;
+impl jacquard_common::xrpc::XrpcResp for ItemRecord {
+    const NSID: &'static str = "social.grain.gallery.item";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ItemGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ItemGetRecordOutput<'_>> for Item<'_> {
+    fn from(output: ItemGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Item<'_> {
+    const NSID: &'static str = "social.grain.gallery.item";
+    type Record = ItemRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ItemRecord {
+    const NSID: &'static str = "social.grain.gallery.item";
+    type Record = ItemRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+    fn nsid() -> &'static str {
+        "social.grain.gallery.item"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_grain_gallery_item()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_item_position() -> std::option::Option<i64> {
     Some(0i64)
 }
@@ -42,49 +120,49 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Gallery;
         type Item;
+        type Gallery;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Gallery = Unset;
         type Item = Unset;
+        type Gallery = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gallery` field to Set
-    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGallery<S> {}
-    impl<S: State> State for SetGallery<S> {
-        type Gallery = Set<members::gallery>;
-        type Item = S::Item;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
-        type Gallery = S::Gallery;
         type Item = Set<members::item>;
+        type Gallery = S::Gallery;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `gallery` field to Set
+    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGallery<S> {}
+    impl<S: State> State for SetGallery<S> {
+        type Item = S::Item;
+        type Gallery = Set<members::gallery>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Gallery = S::Gallery;
         type Item = S::Item;
+        type Gallery = S::Gallery;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gallery` field
-        pub struct gallery(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `gallery` field
+        pub struct gallery(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -193,8 +271,8 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::Gallery: item_state::IsSet,
     S::Item: item_state::IsSet,
+    S::Gallery: item_state::IsSet,
     S::CreatedAt: item_state::IsSet,
 {
     /// Build the final struct
@@ -222,84 +300,6 @@ where
             position: self.__unsafe_private_named.3.or_else(|| Some(0i64)),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Item<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ItemRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Item<'a>,
-}
-
-impl From<ItemGetRecordOutput<'_>> for Item<'_> {
-    fn from(output: ItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Item<'_> {
-    const NSID: &'static str = "social.grain.gallery.item";
-    type Record = ItemRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ItemRecord;
-impl jacquard_common::xrpc::XrpcResp for ItemRecord {
-    const NSID: &'static str = "social.grain.gallery.item";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ItemGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ItemRecord {
-    const NSID: &'static str = "social.grain.gallery.item";
-    type Record = ItemRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
-    fn nsid() -> &'static str {
-        "social.grain.gallery.item"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_grain_gallery_item()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

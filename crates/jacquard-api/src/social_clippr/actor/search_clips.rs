@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,57 @@ pub struct SearchClips<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchClipsOutput<'a> {
+    ///A list of clips and their associated details
+    #[serde(borrow)]
+    pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
+    ///A parameter to paginate results
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///social.clippr.actor.searchClips
+pub struct SearchClipsResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchClipsResponse {
+    const NSID: &'static str = "social.clippr.actor.searchClips";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchClipsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchClips<'a> {
+    const NSID: &'static str = "social.clippr.actor.searchClips";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchClipsResponse;
+}
+
+/// Endpoint type for
+///social.clippr.actor.searchClips
+pub struct SearchClipsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchClipsRequest {
+    const PATH: &'static str = "/xrpc/social.clippr.actor.searchClips";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchClips<'de>;
+    type Response = SearchClipsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_clips_state {
@@ -177,51 +224,4 @@ where
             q: self.__unsafe_private_named.3.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchClipsOutput<'a> {
-    ///A list of clips and their associated details
-    #[serde(borrow)]
-    pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
-    ///A parameter to paginate results
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///social.clippr.actor.searchClips
-pub struct SearchClipsResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchClipsResponse {
-    const NSID: &'static str = "social.clippr.actor.searchClips";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchClipsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchClips<'a> {
-    const NSID: &'static str = "social.clippr.actor.searchClips";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchClipsResponse;
-}
-
-/// Endpoint type for
-///social.clippr.actor.searchClips
-pub struct SearchClipsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchClipsRequest {
-    const PATH: &'static str = "/xrpc/social.clippr.actor.searchClips";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchClips<'de>;
-    type Response = SearchClipsResponse;
 }

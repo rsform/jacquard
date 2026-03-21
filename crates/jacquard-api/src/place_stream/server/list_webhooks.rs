@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,6 +28,91 @@ pub struct ListWebhooks<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListWebhooksOutput<'a> {
+    ///A cursor for pagination, if there are more results.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub webhooks: Vec<crate::place_stream::server::Webhook<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListWebhooksError<'a> {
+    /// The provided cursor is invalid or expired.
+    #[serde(rename = "InvalidCursor")]
+    InvalidCursor(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ListWebhooksError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidCursor(msg) => {
+                write!(f, "InvalidCursor")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.server.listWebhooks
+pub struct ListWebhooksResponse;
+impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
+    const NSID: &'static str = "place.stream.server.listWebhooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListWebhooksOutput<'de>;
+    type Err<'de> = ListWebhooksError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListWebhooks<'a> {
+    const NSID: &'static str = "place.stream.server.listWebhooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListWebhooksResponse;
+}
+
+/// Endpoint type for
+///place.stream.server.listWebhooks
+pub struct ListWebhooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.listWebhooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListWebhooks<'de>;
+    type Response = ListWebhooksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_webhooks_state {
@@ -154,85 +235,4 @@ where
             limit: self.__unsafe_private_named.3,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListWebhooksOutput<'a> {
-    ///A cursor for pagination, if there are more results.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub webhooks: Vec<crate::place_stream::server::Webhook<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListWebhooksError<'a> {
-    /// The provided cursor is invalid or expired.
-    #[serde(rename = "InvalidCursor")]
-    InvalidCursor(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ListWebhooksError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidCursor(msg) => {
-                write!(f, "InvalidCursor")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.server.listWebhooks
-pub struct ListWebhooksResponse;
-impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
-    const NSID: &'static str = "place.stream.server.listWebhooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListWebhooksOutput<'de>;
-    type Err<'de> = ListWebhooksError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListWebhooks<'a> {
-    const NSID: &'static str = "place.stream.server.listWebhooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListWebhooksResponse;
-}
-
-/// Endpoint type for
-///place.stream.server.listWebhooks
-pub struct ListWebhooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {
-    const PATH: &'static str = "/xrpc/place.stream.server.listWebhooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListWebhooks<'de>;
-    type Response = ListWebhooksResponse;
 }

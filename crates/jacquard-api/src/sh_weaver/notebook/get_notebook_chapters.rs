@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,55 @@ pub struct GetNotebookChapters<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetNotebookChaptersOutput<'a> {
+    #[serde(borrow)]
+    pub chapters: Vec<crate::sh_weaver::notebook::ChapterView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notebook.getNotebookChapters
+pub struct GetNotebookChaptersResponse;
+impl jacquard_common::xrpc::XrpcResp for GetNotebookChaptersResponse {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetNotebookChaptersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookChapters<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetNotebookChaptersResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.getNotebookChapters
+pub struct GetNotebookChaptersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookChaptersRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookChapters";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetNotebookChapters<'de>;
+    type Response = GetNotebookChaptersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_notebook_chapters_state {
@@ -153,49 +198,4 @@ where
             notebook: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetNotebookChaptersOutput<'a> {
-    #[serde(borrow)]
-    pub chapters: Vec<crate::sh_weaver::notebook::ChapterView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notebook.getNotebookChapters
-pub struct GetNotebookChaptersResponse;
-impl jacquard_common::xrpc::XrpcResp for GetNotebookChaptersResponse {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookChaptersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookChapters<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetNotebookChaptersResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.getNotebookChapters
-pub struct GetNotebookChaptersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookChaptersRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookChapters";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebookChapters<'de>;
-    type Response = GetNotebookChaptersResponse;
 }

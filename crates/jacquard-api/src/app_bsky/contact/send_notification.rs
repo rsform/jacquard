@@ -25,6 +25,49 @@ pub struct SendNotification<'a> {
     pub to: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SendNotificationOutput<'a> {}
+/// Response type for
+///app.bsky.contact.sendNotification
+pub struct SendNotificationResponse;
+impl jacquard_common::xrpc::XrpcResp for SendNotificationResponse {
+    const NSID: &'static str = "app.bsky.contact.sendNotification";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SendNotificationOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SendNotification<'a> {
+    const NSID: &'static str = "app.bsky.contact.sendNotification";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SendNotificationResponse;
+}
+
+/// Endpoint type for
+///app.bsky.contact.sendNotification
+pub struct SendNotificationRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendNotificationRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.contact.sendNotification";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendNotification<'de>;
+    type Response = SendNotificationResponse;
+}
+
 pub mod send_notification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -163,47 +206,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SendNotificationOutput<'a> {}
-/// Response type for
-///app.bsky.contact.sendNotification
-pub struct SendNotificationResponse;
-impl jacquard_common::xrpc::XrpcResp for SendNotificationResponse {
-    const NSID: &'static str = "app.bsky.contact.sendNotification";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SendNotificationOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SendNotification<'a> {
-    const NSID: &'static str = "app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = SendNotificationResponse;
-}
-
-/// Endpoint type for
-///app.bsky.contact.sendNotification
-pub struct SendNotificationRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SendNotificationRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = SendNotification<'de>;
-    type Response = SendNotificationResponse;
 }

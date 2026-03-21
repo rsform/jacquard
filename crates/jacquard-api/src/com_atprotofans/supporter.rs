@@ -27,6 +27,105 @@ pub struct Supporter<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SupporterSignaturesItem<'a> {
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "com.atprotofans.supporterProof")]
+    SupporterProof(Box<crate::com_atprotofans::supporter_proof::SupporterProof<'a>>),
+    #[serde(rename = "com.atprotofans.brokerProof")]
+    BrokerProof(Box<crate::com_atprotofans::broker_proof::BrokerProof<'a>>),
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SupporterGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Supporter<'a>,
+}
+
+impl<'a> Supporter<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SupporterRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SupporterRecord;
+impl jacquard_common::xrpc::XrpcResp for SupporterRecord {
+    const NSID: &'static str = "com.atprotofans.supporter";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SupporterGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<SupporterGetRecordOutput<'_>> for Supporter<'_> {
+    fn from(output: SupporterGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Supporter<'_> {
+    const NSID: &'static str = "com.atprotofans.supporter";
+    type Record = SupporterRecord;
+}
+
+impl jacquard_common::types::collection::Collection for SupporterRecord {
+    const NSID: &'static str = "com.atprotofans.supporter";
+    type Record = SupporterRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Supporter<'a> {
+    fn nsid() -> &'static str {
+        "com.atprotofans.supporter"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atprotofans_supporter()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod supporter_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -151,105 +250,6 @@ where
             subject: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Supporter<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SupporterRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SupporterSignaturesItem<'a> {
-    #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
-    #[serde(rename = "com.atprotofans.supporterProof")]
-    SupporterProof(Box<crate::com_atprotofans::supporter_proof::SupporterProof<'a>>),
-    #[serde(rename = "com.atprotofans.brokerProof")]
-    BrokerProof(Box<crate::com_atprotofans::broker_proof::BrokerProof<'a>>),
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SupporterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Supporter<'a>,
-}
-
-impl From<SupporterGetRecordOutput<'_>> for Supporter<'_> {
-    fn from(output: SupporterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Supporter<'_> {
-    const NSID: &'static str = "com.atprotofans.supporter";
-    type Record = SupporterRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct SupporterRecord;
-impl jacquard_common::xrpc::XrpcResp for SupporterRecord {
-    const NSID: &'static str = "com.atprotofans.supporter";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SupporterGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for SupporterRecord {
-    const NSID: &'static str = "com.atprotofans.supporter";
-    type Record = SupporterRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Supporter<'a> {
-    fn nsid() -> &'static str {
-        "com.atprotofans.supporter"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atprotofans_supporter()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

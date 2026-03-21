@@ -108,6 +108,184 @@ impl jacquard_common::IntoStatic for InfoName<'_> {
     }
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Labels<'a> {
+    #[serde(borrow)]
+    pub labels: Vec<crate::com_atproto::label::Label<'a>>,
+    pub seq: i64,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscribeLabels {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: std::option::Option<i64>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubscribeLabelsMessage<'a> {
+    #[serde(rename = "#labels")]
+    Labels(Box<crate::com_atproto::label::subscribe_labels::Labels<'a>>),
+    #[serde(rename = "#info")]
+    Info(Box<crate::com_atproto::label::subscribe_labels::Info<'a>>),
+}
+
+impl<'a> SubscribeLabelsMessage<'a> {
+    /// Decode a framed DAG-CBOR message (header + body).
+    pub fn decode_framed<'de: 'a>(
+        bytes: &'de [u8],
+    ) -> Result<SubscribeLabelsMessage<'a>, jacquard_common::error::DecodeError> {
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
+        match header.t.as_str() {
+            "#labels" => {
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
+                Ok(Self::Labels(Box::new(variant)))
+            }
+            "#info" => {
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
+                Ok(Self::Info(Box::new(variant)))
+            }
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
+        }
+    }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubscribeLabelsError<'a> {
+    #[serde(rename = "FutureCursor")]
+    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for SubscribeLabelsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::FutureCursor(msg) => {
+                write!(f, "FutureCursor")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.subscribeLabels"
+    }
+    fn def_name() -> &'static str {
+        "info"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_subscribeLabels()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.label.subscribeLabels"
+    }
+    fn def_name() -> &'static str {
+        "labels"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_label_subscribeLabels()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+///Stream response type for
+///com.atproto.label.subscribeLabels
+pub struct SubscribeLabelsStream;
+impl jacquard_common::xrpc::SubscriptionResp for SubscribeLabelsStream {
+    const NSID: &'static str = "com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Message<'de> = SubscribeLabelsMessage<'de>;
+    type Error<'de> = SubscribeLabelsError<'de>;
+    fn decode_message<'de>(
+        bytes: &'de [u8],
+    ) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+        SubscribeLabelsMessage::decode_framed(bytes)
+    }
+}
+
+impl jacquard_common::xrpc::XrpcSubscription for SubscribeLabels {
+    const NSID: &'static str = "com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Stream = SubscribeLabelsStream;
+}
+
+pub struct SubscribeLabelsEndpoint;
+impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeLabelsEndpoint {
+    const PATH: &'static str = "/xrpc/com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Params<'de> = SubscribeLabels;
+    type Stream = SubscribeLabelsStream;
+}
+
 fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -254,40 +432,6 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.subscribeLabels"
-    }
-    fn def_name() -> &'static str {
-        "info"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_subscribeLabels()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Labels<'a> {
-    #[serde(borrow)]
-    pub labels: Vec<crate::com_atproto::label::Label<'a>>,
-    pub seq: i64,
-}
-
 pub mod labels_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -298,37 +442,37 @@ pub mod labels_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
         type Labels;
+        type Seq;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
         type Labels = Unset;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Seq = Set<members::seq>;
-        type Labels = S::Labels;
+        type Seq = Unset;
     }
     ///State transition - sets the `labels` field to Set
     pub struct SetLabels<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabels<S> {}
     impl<S: State> State for SetLabels<S> {
-        type Seq = S::Seq;
         type Labels = Set<members::labels>;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Labels = S::Labels;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `labels` field
         pub struct labels(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
     }
 }
 
@@ -401,8 +545,8 @@ where
 impl<'a, S> LabelsBuilder<'a, S>
 where
     S: labels_state::State,
-    S::Seq: labels_state::IsSet,
     S::Labels: labels_state::IsSet,
+    S::Seq: labels_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Labels<'a> {
@@ -426,38 +570,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.label.subscribeLabels"
-    }
-    fn def_name() -> &'static str {
-        "labels"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_label_subscribeLabels()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeLabels {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor: std::option::Option<i64>,
 }
 
 pub mod subscribe_labels_state {
@@ -525,116 +637,4 @@ where
             cursor: self.__unsafe_private_named.0,
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeLabelsMessage<'a> {
-    #[serde(rename = "#labels")]
-    Labels(Box<crate::com_atproto::label::subscribe_labels::Labels<'a>>),
-    #[serde(rename = "#info")]
-    Info(Box<crate::com_atproto::label::subscribe_labels::Info<'a>>),
-}
-
-impl<'a> SubscribeLabelsMessage<'a> {
-    /// Decode a framed DAG-CBOR message (header + body).
-    pub fn decode_framed<'de: 'a>(
-        bytes: &'de [u8],
-    ) -> Result<SubscribeLabelsMessage<'a>, jacquard_common::error::DecodeError> {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
-            bytes,
-        )?;
-        match header.t.as_str() {
-            "#labels" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
-                Ok(Self::Labels(Box::new(variant)))
-            }
-            "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
-                    body,
-                )?;
-                Ok(Self::Info(Box::new(variant)))
-            }
-            unknown => {
-                Err(
-                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
-                )
-            }
-        }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeLabelsError<'a> {
-    #[serde(rename = "FutureCursor")]
-    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for SubscribeLabelsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::FutureCursor(msg) => {
-                write!(f, "FutureCursor")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-///Stream response type for
-///com.atproto.label.subscribeLabels
-pub struct SubscribeLabelsStream;
-impl jacquard_common::xrpc::SubscriptionResp for SubscribeLabelsStream {
-    const NSID: &'static str = "com.atproto.label.subscribeLabels";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
-    type Message<'de> = SubscribeLabelsMessage<'de>;
-    type Error<'de> = SubscribeLabelsError<'de>;
-    fn decode_message<'de>(
-        bytes: &'de [u8],
-    ) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
-        SubscribeLabelsMessage::decode_framed(bytes)
-    }
-}
-
-impl jacquard_common::xrpc::XrpcSubscription for SubscribeLabels {
-    const NSID: &'static str = "com.atproto.label.subscribeLabels";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
-    type Stream = SubscribeLabelsStream;
-}
-
-pub struct SubscribeLabelsEndpoint;
-impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeLabelsEndpoint {
-    const PATH: &'static str = "/xrpc/com.atproto.label.subscribeLabels";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
-    type Params<'de> = SubscribeLabels;
-    type Stream = SubscribeLabelsStream;
 }

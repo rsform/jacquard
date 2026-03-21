@@ -29,6 +29,111 @@ pub struct CreateBlock<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateBlockOutput<'a> {
+    ///The CID of the created block record.
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    ///The AT-URI of the created block record.
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum CreateBlockError<'a> {
+    /// The request lacks valid authentication credentials.
+    #[serde(rename = "Unauthorized")]
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The caller does not have permission to create blocks for this streamer.
+    #[serde(rename = "Forbidden")]
+    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// The streamer's OAuth session could not be found or is invalid.
+    #[serde(rename = "SessionNotFound")]
+    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for CreateBlockError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unauthorized(msg) => {
+                write!(f, "Unauthorized")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Forbidden(msg) => {
+                write!(f, "Forbidden")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::SessionNotFound(msg) => {
+                write!(f, "SessionNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.moderation.createBlock
+pub struct CreateBlockResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
+    const NSID: &'static str = "place.stream.moderation.createBlock";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateBlockOutput<'de>;
+    type Err<'de> = CreateBlockError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBlock<'a> {
+    const NSID: &'static str = "place.stream.moderation.createBlock";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateBlockResponse;
+}
+
+/// Endpoint type for
+///place.stream.moderation.createBlock
+pub struct CreateBlockRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateBlockRequest {
+    const PATH: &'static str = "/xrpc/place.stream.moderation.createBlock";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateBlock<'de>;
+    type Response = CreateBlockResponse;
+}
+
 pub mod create_block_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -186,109 +291,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateBlockOutput<'a> {
-    ///The CID of the created block record.
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    ///The AT-URI of the created block record.
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateBlockError<'a> {
-    /// The request lacks valid authentication credentials.
-    #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The caller does not have permission to create blocks for this streamer.
-    #[serde(rename = "Forbidden")]
-    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// The streamer's OAuth session could not be found or is invalid.
-    #[serde(rename = "SessionNotFound")]
-    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for CreateBlockError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unauthorized(msg) => {
-                write!(f, "Unauthorized")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Forbidden(msg) => {
-                write!(f, "Forbidden")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::SessionNotFound(msg) => {
-                write!(f, "SessionNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.moderation.createBlock
-pub struct CreateBlockResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
-    const NSID: &'static str = "place.stream.moderation.createBlock";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateBlockOutput<'de>;
-    type Err<'de> = CreateBlockError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBlock<'a> {
-    const NSID: &'static str = "place.stream.moderation.createBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateBlockResponse;
-}
-
-/// Endpoint type for
-///place.stream.moderation.createBlock
-pub struct CreateBlockRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateBlockRequest {
-    const PATH: &'static str = "/xrpc/place.stream.moderation.createBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateBlock<'de>;
-    type Response = CreateBlockResponse;
 }

@@ -47,6 +47,223 @@ pub struct CompletionDetails<'a> {
     pub year: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CompletionDetailsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: CompletionDetails<'a>,
+}
+
+impl<'a> CompletionDetails<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CompletionDetailsRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CompletionDetailsRecord;
+impl jacquard_common::xrpc::XrpcResp for CompletionDetailsRecord {
+    const NSID: &'static str = "garden.goals.completionDetails";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CompletionDetailsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CompletionDetailsGetRecordOutput<'_>> for CompletionDetails<'_> {
+    fn from(output: CompletionDetailsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for CompletionDetails<'_> {
+    const NSID: &'static str = "garden.goals.completionDetails";
+    type Record = CompletionDetailsRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CompletionDetailsRecord {
+    const NSID: &'static str = "garden.goals.completionDetails";
+    type Record = CompletionDetailsRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
+    fn nsid() -> &'static str {
+        "garden.goals.completionDetails"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_goals_completionDetails()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.day;
+            if *value > 31i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "day",
+                    ),
+                    max: 31i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.day;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "day",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.goal_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "goal_id",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.month;
+            if *value > 12i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "month",
+                    ),
+                    max: 12i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.month;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "month",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 99usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
+                    max: 99usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.photo_alt {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "photo_alt",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.photo_blob {
+            {
+                let size = value.blob().size;
+                if size > 1000000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "photo_blob",
+                        ),
+                        max: 1000000usize,
+                        actual: size,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.photo_blob {
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["image/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "photo_blob",
+                        ),
+                        accepted: vec!["image/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.year;
+            if *value < 1970i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "year",
+                    ),
+                    min: 1970i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod completion_details_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -58,9 +275,9 @@ pub mod completion_details_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type GoalId;
-        type Month;
         type Year;
         type Day;
+        type Month;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
@@ -68,9 +285,9 @@ pub mod completion_details_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type GoalId = Unset;
-        type Month = Unset;
         type Year = Unset;
         type Day = Unset;
+        type Month = Unset;
         type UpdatedAt = Unset;
     }
     ///State transition - sets the `goal_id` field to Set
@@ -78,19 +295,9 @@ pub mod completion_details_state {
     impl<S: State> sealed::Sealed for SetGoalId<S> {}
     impl<S: State> State for SetGoalId<S> {
         type GoalId = Set<members::goal_id>;
+        type Year = S::Year;
+        type Day = S::Day;
         type Month = S::Month;
-        type Year = S::Year;
-        type Day = S::Day;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonth<S> {}
-    impl<S: State> State for SetMonth<S> {
-        type GoalId = S::GoalId;
-        type Month = Set<members::month>;
-        type Year = S::Year;
-        type Day = S::Day;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `year` field to Set
@@ -98,9 +305,9 @@ pub mod completion_details_state {
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
         type GoalId = S::GoalId;
-        type Month = S::Month;
         type Year = Set<members::year>;
         type Day = S::Day;
+        type Month = S::Month;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `day` field to Set
@@ -108,9 +315,19 @@ pub mod completion_details_state {
     impl<S: State> sealed::Sealed for SetDay<S> {}
     impl<S: State> State for SetDay<S> {
         type GoalId = S::GoalId;
-        type Month = S::Month;
         type Year = S::Year;
         type Day = Set<members::day>;
+        type Month = S::Month;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonth<S> {}
+    impl<S: State> State for SetMonth<S> {
+        type GoalId = S::GoalId;
+        type Year = S::Year;
+        type Day = S::Day;
+        type Month = Set<members::month>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
@@ -118,9 +335,9 @@ pub mod completion_details_state {
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type GoalId = S::GoalId;
-        type Month = S::Month;
         type Year = S::Year;
         type Day = S::Day;
+        type Month = S::Month;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
@@ -128,12 +345,12 @@ pub mod completion_details_state {
     pub mod members {
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
-        ///Marker type for the `month` field
-        pub struct month(());
         ///Marker type for the `year` field
         pub struct year(());
         ///Marker type for the `day` field
         pub struct day(());
+        ///Marker type for the `month` field
+        pub struct month(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -356,9 +573,9 @@ impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
     S::GoalId: completion_details_state::IsSet,
-    S::Month: completion_details_state::IsSet,
     S::Year: completion_details_state::IsSet,
     S::Day: completion_details_state::IsSet,
+    S::Month: completion_details_state::IsSet,
     S::UpdatedAt: completion_details_state::IsSet,
 {
     /// Build the final struct
@@ -396,223 +613,6 @@ where
             year: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> CompletionDetails<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CompletionDetailsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CompletionDetailsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CompletionDetails<'a>,
-}
-
-impl From<CompletionDetailsGetRecordOutput<'_>> for CompletionDetails<'_> {
-    fn from(output: CompletionDetailsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for CompletionDetails<'_> {
-    const NSID: &'static str = "garden.goals.completionDetails";
-    type Record = CompletionDetailsRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CompletionDetailsRecord;
-impl jacquard_common::xrpc::XrpcResp for CompletionDetailsRecord {
-    const NSID: &'static str = "garden.goals.completionDetails";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CompletionDetailsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CompletionDetailsRecord {
-    const NSID: &'static str = "garden.goals.completionDetails";
-    type Record = CompletionDetailsRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
-    fn nsid() -> &'static str {
-        "garden.goals.completionDetails"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_goals_completionDetails()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.day;
-            if *value > 31i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
-                    max: 31i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.day;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.goal_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "goal_id",
-                    ),
-                    max: 64usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.month;
-            if *value > 12i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
-                    max: 12i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.month;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.notes {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 99usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
-                    max: 99usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.photo_alt {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "photo_alt",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.photo_blob {
-            {
-                let size = value.blob().size;
-                if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "photo_blob",
-                        ),
-                        max: 1000000usize,
-                        actual: size,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.photo_blob {
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "photo_blob",
-                        ),
-                        accepted: vec!["image/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.year;
-            if *value < 1970i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
-                    min: 1970i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }
 

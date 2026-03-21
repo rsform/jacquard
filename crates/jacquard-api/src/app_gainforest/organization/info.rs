@@ -55,6 +55,162 @@ pub struct Info<'a> {
     pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct InfoGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Info<'a>,
+}
+
+impl<'a> Info<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, InfoRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct InfoRecord;
+impl jacquard_common::xrpc::XrpcResp for InfoRecord {
+    const NSID: &'static str = "app.gainforest.organization.info";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = InfoGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<InfoGetRecordOutput<'_>> for Info<'_> {
+    fn from(output: InfoGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Info<'_> {
+    const NSID: &'static str = "app.gainforest.organization.info";
+    type Record = InfoRecord;
+}
+
+impl jacquard_common::types::collection::Collection for InfoRecord {
+    const NSID: &'static str = "app.gainforest.organization.info";
+    type Record = InfoRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+    fn nsid() -> &'static str {
+        "app.gainforest.organization.info"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_gainforest_organization_info()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.display_name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.display_name;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 8usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    min: 8usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.long_description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "long_description",
+                    ),
+                    max: 5000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.long_description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "long_description",
+                    ),
+                    min: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.short_description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "short_description",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.short_description;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "short_description",
+                    ),
+                    min: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod info_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -65,127 +221,127 @@ pub mod info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LongDescription;
-        type ShortDescription;
-        type Country;
+        type CreatedAt;
         type DisplayName;
+        type LongDescription;
         type Visibility;
         type Objectives;
-        type CreatedAt;
+        type Country;
+        type ShortDescription;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LongDescription = Unset;
-        type ShortDescription = Unset;
-        type Country = Unset;
+        type CreatedAt = Unset;
         type DisplayName = Unset;
+        type LongDescription = Unset;
         type Visibility = Unset;
         type Objectives = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `long_description` field to Set
-    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
-    impl<S: State> State for SetLongDescription<S> {
-        type LongDescription = Set<members::long_description>;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type Objectives = S::Objectives;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = Set<members::short_description>;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type Objectives = S::Objectives;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `country` field to Set
-    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountry<S> {}
-    impl<S: State> State for SetCountry<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = S::ShortDescription;
-        type Country = Set<members::country>;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type Objectives = S::Objectives;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type DisplayName = Set<members::display_name>;
-        type Visibility = S::Visibility;
-        type Objectives = S::Objectives;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = Set<members::visibility>;
-        type Objectives = S::Objectives;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `objectives` field to Set
-    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectives<S> {}
-    impl<S: State> State for SetObjectives<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type Objectives = Set<members::objectives>;
-        type CreatedAt = S::CreatedAt;
+        type Country = Unset;
+        type ShortDescription = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type LongDescription = S::LongDescription;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
+        type CreatedAt = Set<members::created_at>;
         type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
         type Visibility = S::Visibility;
         type Objectives = S::Objectives;
-        type CreatedAt = Set<members::created_at>;
+        type Country = S::Country;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = Set<members::display_name>;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type Objectives = S::Objectives;
+        type Country = S::Country;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `long_description` field to Set
+    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
+    impl<S: State> State for SetLongDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = Set<members::long_description>;
+        type Visibility = S::Visibility;
+        type Objectives = S::Objectives;
+        type Country = S::Country;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Visibility = Set<members::visibility>;
+        type Objectives = S::Objectives;
+        type Country = S::Country;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `objectives` field to Set
+    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectives<S> {}
+    impl<S: State> State for SetObjectives<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type Objectives = Set<members::objectives>;
+        type Country = S::Country;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `country` field to Set
+    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountry<S> {}
+    impl<S: State> State for SetCountry<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type Objectives = S::Objectives;
+        type Country = Set<members::country>;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
+    impl<S: State> State for SetShortDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Visibility = S::Visibility;
+        type Objectives = S::Objectives;
+        type Country = S::Country;
+        type ShortDescription = Set<members::short_description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `long_description` field
-        pub struct long_description(());
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
-        ///Marker type for the `country` field
-        pub struct country(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `long_description` field
+        pub struct long_description(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `objectives` field
         pub struct objectives(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `country` field
+        pub struct country(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
     }
 }
 
@@ -450,13 +606,13 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
 impl<'a, S> InfoBuilder<'a, S>
 where
     S: info_state::State,
-    S::LongDescription: info_state::IsSet,
-    S::ShortDescription: info_state::IsSet,
-    S::Country: info_state::IsSet,
+    S::CreatedAt: info_state::IsSet,
     S::DisplayName: info_state::IsSet,
+    S::LongDescription: info_state::IsSet,
     S::Visibility: info_state::IsSet,
     S::Objectives: info_state::IsSet,
-    S::CreatedAt: info_state::IsSet,
+    S::Country: info_state::IsSet,
+    S::ShortDescription: info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Info<'a> {
@@ -497,162 +653,6 @@ where
             website: self.__unsafe_private_named.10,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Info<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, InfoRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct InfoGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Info<'a>,
-}
-
-impl From<InfoGetRecordOutput<'_>> for Info<'_> {
-    fn from(output: InfoGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Info<'_> {
-    const NSID: &'static str = "app.gainforest.organization.info";
-    type Record = InfoRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct InfoRecord;
-impl jacquard_common::xrpc::XrpcResp for InfoRecord {
-    const NSID: &'static str = "app.gainforest.organization.info";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = InfoGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for InfoRecord {
-    const NSID: &'static str = "app.gainforest.organization.info";
-    type Record = InfoRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
-    fn nsid() -> &'static str {
-        "app.gainforest.organization.info"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_gainforest_organization_info()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.display_name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 255usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.display_name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    min: 8usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.long_description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "long_description",
-                    ),
-                    max: 5000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.long_description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "long_description",
-                    ),
-                    min: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.short_description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "short_description",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.short_description;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) < 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "short_description",
-                    ),
-                    min: 50usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 

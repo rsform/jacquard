@@ -31,6 +31,157 @@ pub struct Artifact<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// A distribution of an application.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Distribution<'a> {
+    ///The list of downloadable artifacts for this distribution.
+    #[serde(borrow)]
+    pub artifacts: Vec<
+        crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>,
+    >,
+    ///An optional description of this distribution.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The version of this distribution, e.g. '0.14.0'.
+    #[serde(borrow)]
+    pub version: jacquard_common::CowStr<'a>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DistributionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Distribution<'a>,
+}
+
+impl<'a> Distribution<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DistributionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.distribution"
+    }
+    fn def_name() -> &'static str {
+        "artifact"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_distribution()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.download;
+            {
+                let mime = value.blob().mime_type.as_str();
+                let accepted: &[&str] = &["*/*"];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
+                if !matched {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "download",
+                        ),
+                        accepted: vec!["*/*".to_string()],
+                        actual: mime.to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DistributionRecord;
+impl jacquard_common::xrpc::XrpcResp for DistributionRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DistributionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<DistributionGetRecordOutput<'_>> for Distribution<'_> {
+    fn from(output: DistributionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Distribution<'_> {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
+    type Record = DistributionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for DistributionRecord {
+    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
+    type Record = DistributionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Distribution<'a> {
+    fn nsid() -> &'static str {
+        "garden.lexicon.exultant-zebra.distribution"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_garden_lexicon_exultant_zebra_distribution()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod artifact_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -361,79 +512,6 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> ::jacquard_lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.distribution"
-    }
-    fn def_name() -> &'static str {
-        "artifact"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_distribution()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.download;
-            {
-                let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["*/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
-                if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "download",
-                        ),
-                        accepted: vec!["*/*".to_string()],
-                        actual: mime.to_string(),
-                    });
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A distribution of an application.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Distribution<'a> {
-    ///The list of downloadable artifacts for this distribution.
-    #[serde(borrow)]
-    pub artifacts: Vec<
-        crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>,
-    >,
-    ///An optional description of this distribution.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The version of this distribution, e.g. '0.14.0'.
-    #[serde(borrow)]
-    pub version: jacquard_common::CowStr<'a>,
-}
-
 pub mod distribution_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -444,37 +522,37 @@ pub mod distribution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
         type Artifacts;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
         type Artifacts = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type Artifacts = S::Artifacts;
+        type Version = Unset;
     }
     ///State transition - sets the `artifacts` field to Set
     pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtifacts<S> {}
     impl<S: State> State for SetArtifacts<S> {
-        type Version = S::Version;
         type Artifacts = Set<members::artifacts>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Artifacts = S::Artifacts;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `artifacts` field
         pub struct artifacts(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -571,8 +649,8 @@ where
 impl<'a, S> DistributionBuilder<'a, S>
 where
     S: distribution_state::State,
-    S::Version: distribution_state::IsSet,
     S::Artifacts: distribution_state::IsSet,
+    S::Version: distribution_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Distribution<'a> {
@@ -597,83 +675,5 @@ where
             version: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Distribution<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DistributionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DistributionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Distribution<'a>,
-}
-
-impl From<DistributionGetRecordOutput<'_>> for Distribution<'_> {
-    fn from(output: DistributionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Distribution<'_> {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
-    type Record = DistributionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct DistributionRecord;
-impl jacquard_common::xrpc::XrpcResp for DistributionRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DistributionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for DistributionRecord {
-    const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
-    type Record = DistributionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Distribution<'a> {
-    fn nsid() -> &'static str {
-        "garden.lexicon.exultant-zebra.distribution"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_garden_lexicon_exultant_zebra_distribution()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

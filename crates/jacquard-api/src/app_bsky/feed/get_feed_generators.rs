@@ -20,6 +20,48 @@ pub struct GetFeedGenerators<'a> {
     pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFeedGeneratorsOutput<'a> {
+    #[serde(borrow)]
+    pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
+}
+
+/// Response type for
+///app.bsky.feed.getFeedGenerators
+pub struct GetFeedGeneratorsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
+    const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetFeedGeneratorsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerators<'a> {
+    const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFeedGeneratorsResponse;
+}
+
+/// Endpoint type for
+///app.bsky.feed.getFeedGenerators
+pub struct GetFeedGeneratorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getFeedGenerators";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFeedGenerators<'de>;
+    type Response = GetFeedGeneratorsResponse;
+}
+
 pub mod get_feed_generators_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,46 +151,4 @@ where
             feeds: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetFeedGeneratorsOutput<'a> {
-    #[serde(borrow)]
-    pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
-}
-
-/// Response type for
-///app.bsky.feed.getFeedGenerators
-pub struct GetFeedGeneratorsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
-    const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerators<'a> {
-    const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetFeedGeneratorsResponse;
-}
-
-/// Endpoint type for
-///app.bsky.feed.getFeedGenerators
-pub struct GetFeedGeneratorsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.feed.getFeedGenerators";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeedGenerators<'de>;
-    type Response = GetFeedGeneratorsResponse;
 }

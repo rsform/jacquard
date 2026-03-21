@@ -29,6 +29,61 @@ pub struct ChartsView<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScrobbleViewBasic<'a> {
+    ///The number of scrobbles on this date.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub count: std::option::Option<i64>,
+    ///The date of the scrobble.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChartsView<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.charts.defs"
+    }
+    fn def_name() -> &'static str {
+        "chartsView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_charts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
+    fn nsid() -> &'static str {
+        "app.rocksky.charts.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewBasic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_rocksky_charts_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -121,60 +176,5 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChartsView<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.charts.defs"
-    }
-    fn def_name() -> &'static str {
-        "chartsView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_charts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ScrobbleViewBasic<'a> {
-    ///The number of scrobbles on this date.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub count: std::option::Option<i64>,
-    ///The date of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
-    fn nsid() -> &'static str {
-        "app.rocksky.charts.defs"
-    }
-    fn def_name() -> &'static str {
-        "scrobbleViewBasic"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_rocksky_charts_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(100i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,52 @@ pub struct GetJetstreamLogs<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub slice: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetJetstreamLogsOutput<'a> {
+    #[serde(borrow)]
+    pub logs: Vec<crate::network_slices::slice::get_job_logs::LogEntry<'a>>,
+}
+
+/// Response type for
+///network.slices.slice.getJetstreamLogs
+pub struct GetJetstreamLogsResponse;
+impl jacquard_common::xrpc::XrpcResp for GetJetstreamLogsResponse {
+    const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetJetstreamLogsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetJetstreamLogs<'a> {
+    const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetJetstreamLogsResponse;
+}
+
+/// Endpoint type for
+///network.slices.slice.getJetstreamLogs
+pub struct GetJetstreamLogsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamLogs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJetstreamLogs<'de>;
+    type Response = GetJetstreamLogsResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(100i64)
 }
 
 pub mod get_jetstream_logs_state {
@@ -116,46 +158,4 @@ where
             slice: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetJetstreamLogsOutput<'a> {
-    #[serde(borrow)]
-    pub logs: Vec<crate::network_slices::slice::get_job_logs::LogEntry<'a>>,
-}
-
-/// Response type for
-///network.slices.slice.getJetstreamLogs
-pub struct GetJetstreamLogsResponse;
-impl jacquard_common::xrpc::XrpcResp for GetJetstreamLogsResponse {
-    const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJetstreamLogsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetJetstreamLogs<'a> {
-    const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetJetstreamLogsResponse;
-}
-
-/// Endpoint type for
-///network.slices.slice.getJetstreamLogs
-pub struct GetJetstreamLogsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {
-    const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamLogs";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetJetstreamLogs<'de>;
-    type Response = GetJetstreamLogsResponse;
 }

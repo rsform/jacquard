@@ -23,6 +23,84 @@ pub struct Membership<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct MembershipGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Membership<'a>,
+}
+
+impl<'a> Membership<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, MembershipRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct MembershipRecord;
+impl jacquard_common::xrpc::XrpcResp for MembershipRecord {
+    const NSID: &'static str = "social.colibri.membership";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = MembershipGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<MembershipGetRecordOutput<'_>> for Membership<'_> {
+    fn from(output: MembershipGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Membership<'_> {
+    const NSID: &'static str = "social.colibri.membership";
+    type Record = MembershipRecord;
+}
+
+impl jacquard_common::types::collection::Collection for MembershipRecord {
+    const NSID: &'static str = "social.colibri.membership";
+    type Record = MembershipRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
+    fn nsid() -> &'static str {
+        "social.colibri.membership"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_colibri_membership()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod membership_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -33,37 +111,37 @@ pub mod membership_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Community;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Community = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Community = S::Community;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `community` field to Set
     pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunity<S> {}
     impl<S: State> State for SetCommunity<S> {
-        type CreatedAt = S::CreatedAt;
         type Community = Set<members::community>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Community = S::Community;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `community` field
         pub struct community(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -136,8 +214,8 @@ where
 impl<'a, S> MembershipBuilder<'a, S>
 where
     S: membership_state::State,
-    S::CreatedAt: membership_state::IsSet,
     S::Community: membership_state::IsSet,
+    S::CreatedAt: membership_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Membership<'a> {
@@ -160,84 +238,6 @@ where
             created_at: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Membership<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MembershipRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct MembershipGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Membership<'a>,
-}
-
-impl From<MembershipGetRecordOutput<'_>> for Membership<'_> {
-    fn from(output: MembershipGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Membership<'_> {
-    const NSID: &'static str = "social.colibri.membership";
-    type Record = MembershipRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct MembershipRecord;
-impl jacquard_common::xrpc::XrpcResp for MembershipRecord {
-    const NSID: &'static str = "social.colibri.membership";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = MembershipGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for MembershipRecord {
-    const NSID: &'static str = "social.colibri.membership";
-    type Record = MembershipRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
-    fn nsid() -> &'static str {
-        "social.colibri.membership"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_colibri_membership()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

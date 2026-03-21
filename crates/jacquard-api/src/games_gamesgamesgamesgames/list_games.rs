@@ -5,18 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("indexed_at"))
-}
-
-fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -48,6 +36,63 @@ pub struct ListGames<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListGamesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub games: Vec<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.listGames
+pub struct ListGamesResponse;
+impl jacquard_common::xrpc::XrpcResp for ListGamesResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListGamesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListGames<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListGamesResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.listGames
+pub struct ListGamesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listGames";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListGames<'de>;
+    type Response = ListGamesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
+}
+
+fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("indexed_at"))
+}
+
+fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
+    Some(jacquard_common::CowStr::from("desc"))
 }
 
 pub mod list_games_state {
@@ -197,49 +242,4 @@ where
             sort_direction: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGamesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub games: Vec<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.listGames
-pub struct ListGamesResponse;
-impl jacquard_common::xrpc::XrpcResp for ListGamesResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGamesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListGames<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListGamesResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.listGames
-pub struct ListGamesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listGames";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListGames<'de>;
-    type Response = ListGamesResponse;
 }

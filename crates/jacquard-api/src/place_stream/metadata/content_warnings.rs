@@ -132,6 +132,95 @@ pub struct ContentWarnings<'a> {
     pub warnings: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// The content could be perceived as offensive due to nudity.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Nudity;
+impl std::fmt::Display for Nudity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "nudity")
+    }
+}
+
+/// The content could be perceived as offensive due to the discussion or display of sexuality.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Sexuality;
+impl std::fmt::Display for Sexuality {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "sexuality")
+    }
+}
+
+/// The content could be perceived as distressing due to the discussion or display of suffering or triggering topics, including suicide, eating disorders or self harm.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Suffering;
+impl std::fmt::Display for Suffering {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "suffering")
+    }
+}
+
+/// The content could be perceived as offensive due to the discussion or display of violence.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Violence;
+impl std::fmt::Display for Violence {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "violence")
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentWarnings<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.metadata.contentWarnings"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_stream_metadata_contentWarnings()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_place_stream_metadata_contentWarnings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -247,94 +336,5 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> ::jacquard_lexicon::le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentWarnings<'a> {
-    fn nsid() -> &'static str {
-        "place.stream.metadata.contentWarnings"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_stream_metadata_contentWarnings()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// The content could be perceived as offensive due to nudity.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Nudity;
-impl std::fmt::Display for Nudity {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "nudity")
-    }
-}
-
-/// The content could be perceived as offensive due to the discussion or display of sexuality.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Sexuality;
-impl std::fmt::Display for Sexuality {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "sexuality")
-    }
-}
-
-/// The content could be perceived as distressing due to the discussion or display of suffering or triggering topics, including suicide, eating disorders or self harm.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Suffering;
-impl std::fmt::Display for Suffering {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "suffering")
-    }
-}
-
-/// The content could be perceived as offensive due to the discussion or display of violence.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    jacquard_derive::IntoStatic
-)]
-pub struct Violence;
-impl std::fmt::Display for Violence {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "violence")
     }
 }

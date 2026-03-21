@@ -24,6 +24,99 @@ pub struct ResolveEntry<'a> {
     pub notebook: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveEntryOutput<'a> {
+    #[serde(borrow)]
+    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    pub notebook_count: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub notebooks: std::option::Option<
+        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
+    >,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveEntryError<'a> {
+    #[serde(rename = "NotebookNotFound")]
+    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "EntryNotFound")]
+    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ResolveEntryError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotebookNotFound(msg) => {
+                write!(f, "NotebookNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::EntryNotFound(msg) => {
+                write!(f, "EntryNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///sh.weaver.notebook.resolveEntry
+pub struct ResolveEntryResponse;
+impl jacquard_common::xrpc::XrpcResp for ResolveEntryResponse {
+    const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ResolveEntryOutput<'de>;
+    type Err<'de> = ResolveEntryError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveEntry<'a> {
+    const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ResolveEntryResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notebook.resolveEntry
+pub struct ResolveEntryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveEntryRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveEntry<'de>;
+    type Response = ResolveEntryResponse;
+}
+
 pub mod resolve_entry_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -34,51 +127,51 @@ pub mod resolve_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Entry;
         type Actor;
         type Notebook;
-        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Entry = Unset;
         type Actor = Unset;
         type Notebook = Unset;
-        type Entry = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type Notebook = S::Notebook;
-        type Entry = S::Entry;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Actor = S::Actor;
-        type Notebook = Set<members::notebook>;
-        type Entry = S::Entry;
     }
     ///State transition - sets the `entry` field to Set
     pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntry<S> {}
     impl<S: State> State for SetEntry<S> {
+        type Entry = Set<members::entry>;
         type Actor = S::Actor;
         type Notebook = S::Notebook;
-        type Entry = Set<members::entry>;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Entry = S::Entry;
+        type Actor = Set<members::actor>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Entry = S::Entry;
+        type Actor = S::Actor;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `entry` field
+        pub struct entry(());
         ///Marker type for the `actor` field
         pub struct actor(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
-        ///Marker type for the `entry` field
-        pub struct entry(());
     }
 }
 
@@ -171,9 +264,9 @@ where
 impl<'a, S> ResolveEntryBuilder<'a, S>
 where
     S: resolve_entry_state::State,
+    S::Entry: resolve_entry_state::IsSet,
     S::Actor: resolve_entry_state::IsSet,
     S::Notebook: resolve_entry_state::IsSet,
-    S::Entry: resolve_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveEntry<'a> {
@@ -183,97 +276,4 @@ where
             notebook: self.__unsafe_private_named.2.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ResolveEntryOutput<'a> {
-    #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
-    pub notebook_count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub notebooks: std::option::Option<
-        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-    >,
-    #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveEntryError<'a> {
-    #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ResolveEntryError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::NotebookNotFound(msg) => {
-                write!(f, "NotebookNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::EntryNotFound(msg) => {
-                write!(f, "EntryNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///sh.weaver.notebook.resolveEntry
-pub struct ResolveEntryResponse;
-impl jacquard_common::xrpc::XrpcResp for ResolveEntryResponse {
-    const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveEntryOutput<'de>;
-    type Err<'de> = ResolveEntryError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveEntry<'a> {
-    const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ResolveEntryResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notebook.resolveEntry
-pub struct ResolveEntryRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ResolveEntryRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveEntry<'de>;
-    type Response = ResolveEntryResponse;
 }

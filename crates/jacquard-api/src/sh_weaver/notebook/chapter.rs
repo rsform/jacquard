@@ -44,6 +44,84 @@ pub struct Chapter<'a> {
     pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ChapterGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Chapter<'a>,
+}
+
+impl<'a> Chapter<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ChapterRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChapterRecord;
+impl jacquard_common::xrpc::XrpcResp for ChapterRecord {
+    const NSID: &'static str = "sh.weaver.notebook.chapter";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ChapterGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
+    fn from(output: ChapterGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Chapter<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.chapter";
+    type Record = ChapterRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ChapterRecord {
+    const NSID: &'static str = "sh.weaver.notebook.chapter";
+    type Record = ChapterRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chapter<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.chapter"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_chapter()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod chapter_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -54,51 +132,51 @@ pub mod chapter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryList;
-        type Notebook;
         type Authors;
+        type Notebook;
+        type EntryList;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryList = Unset;
-        type Notebook = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `entry_list` field to Set
-    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryList<S> {}
-    impl<S: State> State for SetEntryList<S> {
-        type EntryList = Set<members::entry_list>;
-        type Notebook = S::Notebook;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type EntryList = S::EntryList;
-        type Notebook = Set<members::notebook>;
-        type Authors = S::Authors;
+        type Notebook = Unset;
+        type EntryList = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type EntryList = S::EntryList;
-        type Notebook = S::Notebook;
         type Authors = Set<members::authors>;
+        type Notebook = S::Notebook;
+        type EntryList = S::EntryList;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Authors = S::Authors;
+        type Notebook = Set<members::notebook>;
+        type EntryList = S::EntryList;
+    }
+    ///State transition - sets the `entry_list` field to Set
+    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryList<S> {}
+    impl<S: State> State for SetEntryList<S> {
+        type Authors = S::Authors;
+        type Notebook = S::Notebook;
+        type EntryList = Set<members::entry_list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_list` field
-        pub struct entry_list(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
+        ///Marker type for the `entry_list` field
+        pub struct entry_list(());
     }
 }
 
@@ -291,9 +369,9 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
-    S::EntryList: chapter_state::IsSet,
-    S::Notebook: chapter_state::IsSet,
     S::Authors: chapter_state::IsSet,
+    S::Notebook: chapter_state::IsSet,
+    S::EntryList: chapter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chapter<'a> {
@@ -328,84 +406,6 @@ where
             title: self.__unsafe_private_named.7,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Chapter<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ChapterRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ChapterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Chapter<'a>,
-}
-
-impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
-    fn from(output: ChapterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Chapter<'_> {
-    const NSID: &'static str = "sh.weaver.notebook.chapter";
-    type Record = ChapterRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ChapterRecord;
-impl jacquard_common::xrpc::XrpcResp for ChapterRecord {
-    const NSID: &'static str = "sh.weaver.notebook.chapter";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ChapterGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ChapterRecord {
-    const NSID: &'static str = "sh.weaver.notebook.chapter";
-    type Record = ChapterRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chapter<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.notebook.chapter"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_notebook_chapter()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

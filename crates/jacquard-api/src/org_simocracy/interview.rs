@@ -31,6 +31,218 @@ pub struct Interview<'a> {
     pub yes_no_answers: Vec<crate::org_simocracy::interview::ValueResponse<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct InterviewGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Interview<'a>,
+}
+
+/// A single open-ended interview answer.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OpenAnswer<'a> {
+    ///The transcribed voice answer
+    #[serde(borrow)]
+    pub answer: jacquard_common::CowStr<'a>,
+    ///The interview question that was asked
+    #[serde(borrow)]
+    pub question: jacquard_common::CowStr<'a>,
+}
+
+/// A yes/no response to a value statement.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ValueResponse<'a> {
+    ///Whether the interviewee agreed (true) or disagreed (false)
+    pub answer: bool,
+    ///The value statement presented
+    #[serde(borrow)]
+    pub statement: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Interview<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, InterviewRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct InterviewRecord;
+impl jacquard_common::xrpc::XrpcResp for InterviewRecord {
+    const NSID: &'static str = "org.simocracy.interview";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = InterviewGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<InterviewGetRecordOutput<'_>> for Interview<'_> {
+    fn from(output: InterviewGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Interview<'_> {
+    const NSID: &'static str = "org.simocracy.interview";
+    type Record = InterviewRecord;
+}
+
+impl jacquard_common::types::collection::Collection for InterviewRecord {
+    const NSID: &'static str = "org.simocracy.interview";
+    type Record = InterviewRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interview<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.interview"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_interview()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.interview"
+    }
+    fn def_name() -> &'static str {
+        "openAnswer"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_interview()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.answer;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 30000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "answer",
+                    ),
+                    max: 30000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.answer;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 3000usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "answer",
+                        ),
+                        max: 3000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.question;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "question",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueResponse<'a> {
+    fn nsid() -> &'static str {
+        "org.simocracy.interview"
+    }
+    fn def_name() -> &'static str {
+        "valueResponse"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_org_simocracy_interview()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.statement;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "statement",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod interview_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -43,8 +255,8 @@ pub mod interview_state {
     pub trait State: sealed::Sealed {
         type OpenAnswers;
         type Sim;
-        type CreatedAt;
         type YesNoAnswers;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -52,8 +264,8 @@ pub mod interview_state {
     impl State for Empty {
         type OpenAnswers = Unset;
         type Sim = Unset;
-        type CreatedAt = Unset;
         type YesNoAnswers = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `open_answers` field to Set
     pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
@@ -61,8 +273,8 @@ pub mod interview_state {
     impl<S: State> State for SetOpenAnswers<S> {
         type OpenAnswers = Set<members::open_answers>;
         type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
         type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
@@ -70,17 +282,8 @@ pub mod interview_state {
     impl<S: State> State for SetSim<S> {
         type OpenAnswers = S::OpenAnswers;
         type Sim = Set<members::sim>;
+        type YesNoAnswers = S::YesNoAnswers;
         type CreatedAt = S::CreatedAt;
-        type YesNoAnswers = S::YesNoAnswers;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type OpenAnswers = S::OpenAnswers;
-        type Sim = S::Sim;
-        type CreatedAt = Set<members::created_at>;
-        type YesNoAnswers = S::YesNoAnswers;
     }
     ///State transition - sets the `yes_no_answers` field to Set
     pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
@@ -88,8 +291,17 @@ pub mod interview_state {
     impl<S: State> State for SetYesNoAnswers<S> {
         type OpenAnswers = S::OpenAnswers;
         type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
         type YesNoAnswers = Set<members::yes_no_answers>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type OpenAnswers = S::OpenAnswers;
+        type Sim = S::Sim;
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -98,10 +310,10 @@ pub mod interview_state {
         pub struct open_answers(());
         ///Marker type for the `sim` field
         pub struct sim(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `yes_no_answers` field
         pub struct yes_no_answers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -216,8 +428,8 @@ where
     S: interview_state::State,
     S::OpenAnswers: interview_state::IsSet,
     S::Sim: interview_state::IsSet,
-    S::CreatedAt: interview_state::IsSet,
     S::YesNoAnswers: interview_state::IsSet,
+    S::CreatedAt: interview_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Interview<'a> {
@@ -244,84 +456,6 @@ where
             yes_no_answers: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Interview<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, InterviewRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct InterviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Interview<'a>,
-}
-
-impl From<InterviewGetRecordOutput<'_>> for Interview<'_> {
-    fn from(output: InterviewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Interview<'_> {
-    const NSID: &'static str = "org.simocracy.interview";
-    type Record = InterviewRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct InterviewRecord;
-impl jacquard_common::xrpc::XrpcResp for InterviewRecord {
-    const NSID: &'static str = "org.simocracy.interview";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = InterviewGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for InterviewRecord {
-    const NSID: &'static str = "org.simocracy.interview";
-    type Record = InterviewRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interview<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.interview"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_interview()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 
@@ -557,110 +691,6 @@ fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-/// A single open-ended interview answer.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OpenAnswer<'a> {
-    ///The transcribed voice answer
-    #[serde(borrow)]
-    pub answer: jacquard_common::CowStr<'a>,
-    ///The interview question that was asked
-    #[serde(borrow)]
-    pub question: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.interview"
-    }
-    fn def_name() -> &'static str {
-        "openAnswer"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_interview()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.answer;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 30000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answer",
-                    ),
-                    max: 30000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.answer;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "answer",
-                        ),
-                        max: 3000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.question;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "question",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-/// A yes/no response to a value statement.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ValueResponse<'a> {
-    ///Whether the interviewee agreed (true) or disagreed (false)
-    pub answer: bool,
-    ///The value statement presented
-    #[serde(borrow)]
-    pub statement: jacquard_common::CowStr<'a>,
-}
-
 pub mod value_response_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -671,37 +701,37 @@ pub mod value_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answer;
         type Statement;
+        type Answer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answer = Unset;
         type Statement = Unset;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Answer = Set<members::answer>;
-        type Statement = S::Statement;
+        type Answer = Unset;
     }
     ///State transition - sets the `statement` field to Set
     pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatement<S> {}
     impl<S: State> State for SetStatement<S> {
-        type Answer = S::Answer;
         type Statement = Set<members::statement>;
+        type Answer = S::Answer;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswer<S> {}
+    impl<S: State> State for SetAnswer<S> {
+        type Statement = S::Statement;
+        type Answer = Set<members::answer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer` field
-        pub struct answer(());
         ///Marker type for the `statement` field
         pub struct statement(());
+        ///Marker type for the `answer` field
+        pub struct answer(());
     }
 }
 
@@ -774,8 +804,8 @@ where
 impl<'a, S> ValueResponseBuilder<'a, S>
 where
     S: value_response_state::State,
-    S::Answer: value_response_state::IsSet,
     S::Statement: value_response_state::IsSet,
+    S::Answer: value_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValueResponse<'a> {
@@ -798,35 +828,5 @@ where
             statement: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueResponse<'a> {
-    fn nsid() -> &'static str {
-        "org.simocracy.interview"
-    }
-    fn def_name() -> &'static str {
-        "valueResponse"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_org_simocracy_interview()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.statement;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "statement",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }

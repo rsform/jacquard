@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(5i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -26,6 +22,52 @@ pub struct GetSimilarGamesFeed<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSimilarGamesFeedOutput<'a> {
+    #[serde(borrow)]
+    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
+}
+
+/// Response type for
+///games.gamesgamesgamesgames.feed.getSimilarGamesFeed
+pub struct GetSimilarGamesFeedResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSimilarGamesFeedResponse {
+    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSimilarGamesFeedOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarGamesFeed<'a> {
+    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSimilarGamesFeedResponse;
+}
+
+/// Endpoint type for
+///games.gamesgamesgamesgames.feed.getSimilarGamesFeed
+pub struct GetSimilarGamesFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarGamesFeedRequest {
+    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSimilarGamesFeed<'de>;
+    type Response = GetSimilarGamesFeedResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(5i64)
 }
 
 pub mod get_similar_games_feed_state {
@@ -132,46 +174,4 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSimilarGamesFeedOutput<'a> {
-    #[serde(borrow)]
-    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
-}
-
-/// Response type for
-///games.gamesgamesgamesgames.feed.getSimilarGamesFeed
-pub struct GetSimilarGamesFeedResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSimilarGamesFeedResponse {
-    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSimilarGamesFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarGamesFeed<'a> {
-    const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSimilarGamesFeedResponse;
-}
-
-/// Endpoint type for
-///games.gamesgamesgamesgames.feed.getSimilarGamesFeed
-pub struct GetSimilarGamesFeedRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarGamesFeedRequest {
-    const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSimilarGamesFeed<'de>;
-    type Response = GetSimilarGamesFeedResponse;
 }

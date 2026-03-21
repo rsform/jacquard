@@ -30,6 +30,84 @@ pub struct QuizBegin<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuizBeginGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: QuizBegin<'a>,
+}
+
+impl<'a> QuizBegin<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, QuizBeginRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct QuizBeginRecord;
+impl jacquard_common::xrpc::XrpcResp for QuizBeginRecord {
+    const NSID: &'static str = "pub.quizzy.quizBegin";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = QuizBeginGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<QuizBeginGetRecordOutput<'_>> for QuizBegin<'_> {
+    fn from(output: QuizBeginGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for QuizBegin<'_> {
+    const NSID: &'static str = "pub.quizzy.quizBegin";
+    type Record = QuizBeginRecord;
+}
+
+impl jacquard_common::types::collection::Collection for QuizBeginRecord {
+    const NSID: &'static str = "pub.quizzy.quizBegin";
+    type Record = QuizBeginRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizBegin<'a> {
+    fn nsid() -> &'static str {
+        "pub.quizzy.quizBegin"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_quizzy_quizBegin()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod quiz_begin_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -42,8 +120,8 @@ pub mod quiz_begin_state {
     pub trait State: sealed::Sealed {
         type StartedAt;
         type Quiz;
-        type League;
         type EndsAt;
+        type League;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -51,8 +129,8 @@ pub mod quiz_begin_state {
     impl State for Empty {
         type StartedAt = Unset;
         type Quiz = Unset;
-        type League = Unset;
         type EndsAt = Unset;
+        type League = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -60,8 +138,8 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetStartedAt<S> {
         type StartedAt = Set<members::started_at>;
         type Quiz = S::Quiz;
-        type League = S::League;
         type EndsAt = S::EndsAt;
+        type League = S::League;
     }
     ///State transition - sets the `quiz` field to Set
     pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
@@ -69,17 +147,8 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetQuiz<S> {
         type StartedAt = S::StartedAt;
         type Quiz = Set<members::quiz>;
+        type EndsAt = S::EndsAt;
         type League = S::League;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `league` field to Set
-    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLeague<S> {}
-    impl<S: State> State for SetLeague<S> {
-        type StartedAt = S::StartedAt;
-        type Quiz = S::Quiz;
-        type League = Set<members::league>;
-        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -87,8 +156,17 @@ pub mod quiz_begin_state {
     impl<S: State> State for SetEndsAt<S> {
         type StartedAt = S::StartedAt;
         type Quiz = S::Quiz;
-        type League = S::League;
         type EndsAt = Set<members::ends_at>;
+        type League = S::League;
+    }
+    ///State transition - sets the `league` field to Set
+    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLeague<S> {}
+    impl<S: State> State for SetLeague<S> {
+        type StartedAt = S::StartedAt;
+        type Quiz = S::Quiz;
+        type EndsAt = S::EndsAt;
+        type League = Set<members::league>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -97,10 +175,10 @@ pub mod quiz_begin_state {
         pub struct started_at(());
         ///Marker type for the `quiz` field
         pub struct quiz(());
-        ///Marker type for the `league` field
-        pub struct league(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `league` field
+        pub struct league(());
     }
 }
 
@@ -215,8 +293,8 @@ where
     S: quiz_begin_state::State,
     S::StartedAt: quiz_begin_state::IsSet,
     S::Quiz: quiz_begin_state::IsSet,
-    S::League: quiz_begin_state::IsSet,
     S::EndsAt: quiz_begin_state::IsSet,
+    S::League: quiz_begin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizBegin<'a> {
@@ -243,84 +321,6 @@ where
             started_at: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> QuizBegin<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, QuizBeginRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizBeginGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: QuizBegin<'a>,
-}
-
-impl From<QuizBeginGetRecordOutput<'_>> for QuizBegin<'_> {
-    fn from(output: QuizBeginGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for QuizBegin<'_> {
-    const NSID: &'static str = "pub.quizzy.quizBegin";
-    type Record = QuizBeginRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct QuizBeginRecord;
-impl jacquard_common::xrpc::XrpcResp for QuizBeginRecord {
-    const NSID: &'static str = "pub.quizzy.quizBegin";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizBeginGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for QuizBeginRecord {
-    const NSID: &'static str = "pub.quizzy.quizBegin";
-    type Record = QuizBeginRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizBegin<'a> {
-    fn nsid() -> &'static str {
-        "pub.quizzy.quizBegin"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_pub_quizzy_quizBegin()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

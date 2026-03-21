@@ -24,6 +24,99 @@ pub struct UpdateCrewTier<'a> {
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateCrewTierOutput<'a> {
+    ///Resolved tier name on this hold.
+    #[serde(borrow)]
+    pub tier_name: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateCrewTierError<'a> {
+    /// Valid appview token required.
+    #[serde(rename = "AuthRequired")]
+    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    /// User is not a crew member on this hold.
+    #[serde(rename = "UserNotFound")]
+    UserNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for UpdateCrewTierError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::AuthRequired(msg) => {
+                write!(f, "AuthRequired")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::UserNotFound(msg) => {
+                write!(f, "UserNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///io.atcr.hold.updateCrewTier
+pub struct UpdateCrewTierResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
+    const NSID: &'static str = "io.atcr.hold.updateCrewTier";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateCrewTierOutput<'de>;
+    type Err<'de> = UpdateCrewTierError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
+    const NSID: &'static str = "io.atcr.hold.updateCrewTier";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateCrewTierResponse;
+}
+
+/// Endpoint type for
+///io.atcr.hold.updateCrewTier
+pub struct UpdateCrewTierRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
+    const PATH: &'static str = "/xrpc/io.atcr.hold.updateCrewTier";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateCrewTier<'de>;
+    type Response = UpdateCrewTierResponse;
+}
+
 pub mod update_crew_tier_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,97 +255,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateCrewTierOutput<'a> {
-    ///Resolved tier name on this hold.
-    #[serde(borrow)]
-    pub tier_name: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateCrewTierError<'a> {
-    /// Valid appview token required.
-    #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
-    /// User is not a crew member on this hold.
-    #[serde(rename = "UserNotFound")]
-    UserNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for UpdateCrewTierError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::AuthRequired(msg) => {
-                write!(f, "AuthRequired")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::UserNotFound(msg) => {
-                write!(f, "UserNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///io.atcr.hold.updateCrewTier
-pub struct UpdateCrewTierResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
-    const NSID: &'static str = "io.atcr.hold.updateCrewTier";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateCrewTierOutput<'de>;
-    type Err<'de> = UpdateCrewTierError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
-    const NSID: &'static str = "io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateCrewTierResponse;
-}
-
-/// Endpoint type for
-///io.atcr.hold.updateCrewTier
-pub struct UpdateCrewTierRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
-    const PATH: &'static str = "/xrpc/io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateCrewTier<'de>;
-    type Response = UpdateCrewTierResponse;
 }

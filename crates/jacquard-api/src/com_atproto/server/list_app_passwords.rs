@@ -24,6 +24,111 @@ pub struct AppPassword<'a> {
     pub privileged: std::option::Option<bool>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListAppPasswordsOutput<'a> {
+    #[serde(borrow)]
+    pub passwords: Vec<crate::com_atproto::server::list_app_passwords::AppPassword<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListAppPasswordsError<'a> {
+    #[serde(rename = "AccountTakedown")]
+    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for ListAppPasswordsError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::AccountTakedown(msg) => {
+                write!(f, "AccountTakedown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
+    fn nsid() -> &'static str {
+        "com.atproto.server.listAppPasswords"
+    }
+    fn def_name() -> &'static str {
+        "appPassword"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_com_atproto_server_listAppPasswords()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct ListAppPasswords;
+/// Response type for
+///com.atproto.server.listAppPasswords
+pub struct ListAppPasswordsResponse;
+impl jacquard_common::xrpc::XrpcResp for ListAppPasswordsResponse {
+    const NSID: &'static str = "com.atproto.server.listAppPasswords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListAppPasswordsOutput<'de>;
+    type Err<'de> = ListAppPasswordsError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for ListAppPasswords {
+    const NSID: &'static str = "com.atproto.server.listAppPasswords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListAppPasswordsResponse;
+}
+
+/// Endpoint type for
+///com.atproto.server.listAppPasswords
+pub struct ListAppPasswordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListAppPasswordsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.listAppPasswords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListAppPasswords;
+    type Response = ListAppPasswordsResponse;
+}
+
 pub mod app_password_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -266,109 +371,4 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
-    fn nsid() -> &'static str {
-        "com.atproto.server.listAppPasswords"
-    }
-    fn def_name() -> &'static str {
-        "appPassword"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_com_atproto_server_listAppPasswords()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListAppPasswordsOutput<'a> {
-    #[serde(borrow)]
-    pub passwords: Vec<crate::com_atproto::server::list_app_passwords::AppPassword<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListAppPasswordsError<'a> {
-    #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for ListAppPasswordsError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::AccountTakedown(msg) => {
-                write!(f, "AccountTakedown")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct ListAppPasswords;
-/// Response type for
-///com.atproto.server.listAppPasswords
-pub struct ListAppPasswordsResponse;
-impl jacquard_common::xrpc::XrpcResp for ListAppPasswordsResponse {
-    const NSID: &'static str = "com.atproto.server.listAppPasswords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListAppPasswordsOutput<'de>;
-    type Err<'de> = ListAppPasswordsError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for ListAppPasswords {
-    const NSID: &'static str = "com.atproto.server.listAppPasswords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListAppPasswordsResponse;
-}
-
-/// Endpoint type for
-///com.atproto.server.listAppPasswords
-pub struct ListAppPasswordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListAppPasswordsRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.server.listAppPasswords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListAppPasswords;
-    type Response = ListAppPasswordsResponse;
 }

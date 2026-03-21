@@ -24,6 +24,72 @@ pub struct DeleteTarget<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteTargetOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteTargetError<'a> {}
+impl core::fmt::Display for DeleteTargetError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.multistream.deleteTarget
+pub struct DeleteTargetResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteTargetResponse {
+    const NSID: &'static str = "place.stream.multistream.deleteTarget";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DeleteTargetOutput<'de>;
+    type Err<'de> = DeleteTargetError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTarget<'a> {
+    const NSID: &'static str = "place.stream.multistream.deleteTarget";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteTargetResponse;
+}
+
+/// Endpoint type for
+///place.stream.multistream.deleteTarget
+pub struct DeleteTargetRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteTargetRequest {
+    const PATH: &'static str = "/xrpc/place.stream.multistream.deleteTarget";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteTarget<'de>;
+    type Response = DeleteTargetResponse;
+}
+
 pub mod delete_target_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -135,70 +201,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteTargetOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteTargetError<'a> {}
-impl core::fmt::Display for DeleteTargetError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.multistream.deleteTarget
-pub struct DeleteTargetResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteTargetResponse {
-    const NSID: &'static str = "place.stream.multistream.deleteTarget";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteTargetOutput<'de>;
-    type Err<'de> = DeleteTargetError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTarget<'a> {
-    const NSID: &'static str = "place.stream.multistream.deleteTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteTargetResponse;
-}
-
-/// Endpoint type for
-///place.stream.multistream.deleteTarget
-pub struct DeleteTargetRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteTargetRequest {
-    const PATH: &'static str = "/xrpc/place.stream.multistream.deleteTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteTarget<'de>;
-    type Response = DeleteTargetResponse;
 }

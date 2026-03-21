@@ -22,6 +22,50 @@ pub struct GetApikeys {
     pub offset: std::option::Option<i64>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetApikeysOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub api_keys: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+}
+
+/// Response type for
+///app.rocksky.apikey.getApikeys
+pub struct GetApikeysResponse;
+impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
+    const NSID: &'static str = "app.rocksky.apikey.getApikeys";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetApikeysOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for GetApikeys {
+    const NSID: &'static str = "app.rocksky.apikey.getApikeys";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetApikeysResponse;
+}
+
+/// Endpoint type for
+///app.rocksky.apikey.getApikeys
+pub struct GetApikeysRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {
+    const PATH: &'static str = "/xrpc/app.rocksky.apikey.getApikeys";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetApikeys;
+    type Response = GetApikeysResponse;
+}
+
 pub mod get_apikeys_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -101,48 +145,4 @@ where
             offset: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetApikeysOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub api_keys: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-}
-
-/// Response type for
-///app.rocksky.apikey.getApikeys
-pub struct GetApikeysResponse;
-impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
-    const NSID: &'static str = "app.rocksky.apikey.getApikeys";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetApikeysOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for GetApikeys {
-    const NSID: &'static str = "app.rocksky.apikey.getApikeys";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetApikeysResponse;
-}
-
-/// Endpoint type for
-///app.rocksky.apikey.getApikeys
-pub struct GetApikeysRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {
-    const PATH: &'static str = "/xrpc/app.rocksky.apikey.getApikeys";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetApikeys;
-    type Response = GetApikeysResponse;
 }

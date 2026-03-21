@@ -31,6 +31,84 @@ pub struct Verification<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct VerificationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Verification<'a>,
+}
+
+impl<'a> Verification<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, VerificationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct VerificationRecord;
+impl jacquard_common::xrpc::XrpcResp for VerificationRecord {
+    const NSID: &'static str = "app.bsky.graph.verification";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = VerificationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<VerificationGetRecordOutput<'_>> for Verification<'_> {
+    fn from(output: VerificationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Verification<'_> {
+    const NSID: &'static str = "app.bsky.graph.verification";
+    type Record = VerificationRecord;
+}
+
+impl jacquard_common::types::collection::Collection for VerificationRecord {
+    const NSID: &'static str = "app.bsky.graph.verification";
+    type Record = VerificationRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Verification<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.graph.verification"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_graph_verification()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod verification_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -41,65 +119,65 @@ pub mod verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Handle;
         type Subject;
+        type CreatedAt;
         type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Handle = Unset;
         type Subject = Unset;
+        type CreatedAt = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Handle = S::Handle;
-        type Subject = S::Subject;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type CreatedAt = S::CreatedAt;
         type Handle = Set<members::handle>;
         type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
         type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Handle = S::Handle;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Handle = S::Handle;
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
         type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type CreatedAt = S::CreatedAt;
         type Handle = S::Handle;
         type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
         type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
     }
@@ -214,9 +292,9 @@ where
 impl<'a, S> VerificationBuilder<'a, S>
 where
     S: verification_state::State,
-    S::CreatedAt: verification_state::IsSet,
     S::Handle: verification_state::IsSet,
     S::Subject: verification_state::IsSet,
+    S::CreatedAt: verification_state::IsSet,
     S::DisplayName: verification_state::IsSet,
 {
     /// Build the final struct
@@ -244,84 +322,6 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Verification<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, VerificationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Verification<'a>,
-}
-
-impl From<VerificationGetRecordOutput<'_>> for Verification<'_> {
-    fn from(output: VerificationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Verification<'_> {
-    const NSID: &'static str = "app.bsky.graph.verification";
-    type Record = VerificationRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct VerificationRecord;
-impl jacquard_common::xrpc::XrpcResp for VerificationRecord {
-    const NSID: &'static str = "app.bsky.graph.verification";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = VerificationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for VerificationRecord {
-    const NSID: &'static str = "app.bsky.graph.verification";
-    type Record = VerificationRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Verification<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.graph.verification"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_graph_verification()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

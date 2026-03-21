@@ -23,6 +23,84 @@ pub struct EndorsementProof<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EndorsementProofGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: EndorsementProof<'a>,
+}
+
+impl<'a> EndorsementProof<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, EndorsementProofRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EndorsementProofRecord;
+impl jacquard_common::xrpc::XrpcResp for EndorsementProofRecord {
+    const NSID: &'static str = "place.atwork.endorsementProof";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EndorsementProofGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<EndorsementProofGetRecordOutput<'_>> for EndorsementProof<'_> {
+    fn from(output: EndorsementProofGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for EndorsementProof<'_> {
+    const NSID: &'static str = "place.atwork.endorsementProof";
+    type Record = EndorsementProofRecord;
+}
+
+impl jacquard_common::types::collection::Collection for EndorsementProofRecord {
+    const NSID: &'static str = "place.atwork.endorsementProof";
+    type Record = EndorsementProofRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EndorsementProof<'a> {
+    fn nsid() -> &'static str {
+        "place.atwork.endorsementProof"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_atwork_endorsementProof()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod endorsement_proof_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,84 +203,6 @@ where
             cid: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> EndorsementProof<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EndorsementProofRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EndorsementProofGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: EndorsementProof<'a>,
-}
-
-impl From<EndorsementProofGetRecordOutput<'_>> for EndorsementProof<'_> {
-    fn from(output: EndorsementProofGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for EndorsementProof<'_> {
-    const NSID: &'static str = "place.atwork.endorsementProof";
-    type Record = EndorsementProofRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct EndorsementProofRecord;
-impl jacquard_common::xrpc::XrpcResp for EndorsementProofRecord {
-    const NSID: &'static str = "place.atwork.endorsementProof";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = EndorsementProofGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for EndorsementProofRecord {
-    const NSID: &'static str = "place.atwork.endorsementProof";
-    type Record = EndorsementProofRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EndorsementProof<'a> {
-    fn nsid() -> &'static str {
-        "place.atwork.endorsementProof"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_place_atwork_endorsementProof()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

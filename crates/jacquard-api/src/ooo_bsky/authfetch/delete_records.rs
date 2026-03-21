@@ -22,6 +22,36 @@ pub struct DeleteRecords<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+/// Response type for
+///ooo.bsky.authfetch.deleteRecords
+pub struct DeleteRecordsResponse;
+impl jacquard_common::xrpc::XrpcResp for DeleteRecordsResponse {
+    const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecords<'a> {
+    const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteRecordsResponse;
+}
+
+/// Endpoint type for
+///ooo.bsky.authfetch.deleteRecords
+pub struct DeleteRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordsRequest {
+    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.deleteRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteRecords<'de>;
+    type Response = DeleteRecordsResponse;
+}
+
 pub mod delete_records_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -125,34 +155,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-/// Response type for
-///ooo.bsky.authfetch.deleteRecords
-pub struct DeleteRecordsResponse;
-impl jacquard_common::xrpc::XrpcResp for DeleteRecordsResponse {
-    const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecords<'a> {
-    const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeleteRecordsResponse;
-}
-
-/// Endpoint type for
-///ooo.bsky.authfetch.deleteRecords
-pub struct DeleteRecordsRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordsRequest {
-    const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.deleteRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeleteRecords<'de>;
-    type Response = DeleteRecordsResponse;
 }

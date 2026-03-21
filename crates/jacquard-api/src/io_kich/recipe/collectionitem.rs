@@ -30,6 +30,84 @@ pub struct Collectionitem<'a> {
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionitemGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collectionitem<'a>,
+}
+
+impl<'a> Collectionitem<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CollectionitemRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CollectionitemRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionitemRecord {
+    const NSID: &'static str = "io.kich.recipe.collectionitem";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionitemGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CollectionitemGetRecordOutput<'_>> for Collectionitem<'_> {
+    fn from(output: CollectionitemGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Collectionitem<'_> {
+    const NSID: &'static str = "io.kich.recipe.collectionitem";
+    type Record = CollectionitemRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CollectionitemRecord {
+    const NSID: &'static str = "io.kich.recipe.collectionitem";
+    type Record = CollectionitemRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.recipe.collectionitem"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_recipe_collectionitem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod collectionitem_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -40,49 +118,49 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Subject;
+        type Collection;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Subject = Unset;
+        type Collection = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Collection = S::Collection;
         type Subject = Set<members::subject>;
+        type Collection = S::Collection;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Subject = S::Subject;
+        type Collection = Set<members::collection>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
         type Subject = S::Subject;
+        type Collection = S::Collection;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -191,8 +269,8 @@ where
 impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
-    S::Collection: collectionitem_state::IsSet,
     S::Subject: collectionitem_state::IsSet,
+    S::Collection: collectionitem_state::IsSet,
     S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
@@ -220,84 +298,6 @@ where
             subject: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Collectionitem<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CollectionitemRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionitemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collectionitem<'a>,
-}
-
-impl From<CollectionitemGetRecordOutput<'_>> for Collectionitem<'_> {
-    fn from(output: CollectionitemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Collectionitem<'_> {
-    const NSID: &'static str = "io.kich.recipe.collectionitem";
-    type Record = CollectionitemRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CollectionitemRecord;
-impl jacquard_common::xrpc::XrpcResp for CollectionitemRecord {
-    const NSID: &'static str = "io.kich.recipe.collectionitem";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionitemGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CollectionitemRecord {
-    const NSID: &'static str = "io.kich.recipe.collectionitem";
-    type Record = CollectionitemRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.recipe.collectionitem"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_recipe_collectionitem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

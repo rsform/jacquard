@@ -25,6 +25,23 @@ pub struct Plaintext<'a> {
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Plaintext<'a> {
+    fn nsid() -> &'static str {
+        "art.cllctv.content.plaintext"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_art_cllctv_content_plaintext()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_art_cllctv_content_plaintext() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -88,22 +105,5 @@ fn lexicon_doc_art_cllctv_content_plaintext() -> ::jacquard_lexicon::lexicon::Le
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Plaintext<'a> {
-    fn nsid() -> &'static str {
-        "art.cllctv.content.plaintext"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_art_cllctv_content_plaintext()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

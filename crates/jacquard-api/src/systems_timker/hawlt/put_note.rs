@@ -27,6 +27,54 @@ pub struct PutNote<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutNoteOutput<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+/// Response type for
+///systems.timker.hawlt.putNote
+pub struct PutNoteResponse;
+impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
+    const NSID: &'static str = "systems.timker.hawlt.putNote";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutNoteOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
+    const NSID: &'static str = "systems.timker.hawlt.putNote";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutNoteResponse;
+}
+
+/// Endpoint type for
+///systems.timker.hawlt.putNote
+pub struct PutNoteRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
+    const PATH: &'static str = "/xrpc/systems.timker.hawlt.putNote";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutNote<'de>;
+    type Response = PutNoteResponse;
+}
+
 pub mod put_note_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,37 +85,37 @@ pub mod put_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Record;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Record = S::Record;
+        type Rkey = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Rkey = S::Rkey;
         type Record = Set<members::record>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Record = S::Record;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -148,8 +196,8 @@ where
 impl<'a, S> PutNoteBuilder<'a, S>
 where
     S: put_note_state::State,
-    S::Rkey: put_note_state::IsSet,
     S::Record: put_note_state::IsSet,
+    S::Rkey: put_note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutNote<'a> {
@@ -173,52 +221,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutNoteOutput<'a> {
-    #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-/// Response type for
-///systems.timker.hawlt.putNote
-pub struct PutNoteResponse;
-impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
-    const NSID: &'static str = "systems.timker.hawlt.putNote";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutNoteOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
-    const NSID: &'static str = "systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutNoteResponse;
-}
-
-/// Endpoint type for
-///systems.timker.hawlt.putNote
-pub struct PutNoteRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
-    const PATH: &'static str = "/xrpc/systems.timker.hawlt.putNote";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutNote<'de>;
-    type Response = PutNoteResponse;
 }

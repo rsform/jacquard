@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(20i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -29,6 +25,55 @@ pub struct GetSubscriptionUpdates<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSubscriptionUpdatesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub updates: Vec<crate::sh_weaver::notification::SubscriptionUpdateView<'a>>,
+}
+
+/// Response type for
+///sh.weaver.notification.getSubscriptionUpdates
+pub struct GetSubscriptionUpdatesResponse;
+impl jacquard_common::xrpc::XrpcResp for GetSubscriptionUpdatesResponse {
+    const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetSubscriptionUpdatesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubscriptionUpdates<'a> {
+    const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSubscriptionUpdatesResponse;
+}
+
+/// Endpoint type for
+///sh.weaver.notification.getSubscriptionUpdates
+pub struct GetSubscriptionUpdatesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSubscriptionUpdatesRequest {
+    const PATH: &'static str = "/xrpc/sh.weaver.notification.getSubscriptionUpdates";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSubscriptionUpdates<'de>;
+    type Response = GetSubscriptionUpdatesResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(20i64)
 }
 
 pub mod get_subscription_updates_state {
@@ -142,49 +187,4 @@ where
             since: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetSubscriptionUpdatesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub updates: Vec<crate::sh_weaver::notification::SubscriptionUpdateView<'a>>,
-}
-
-/// Response type for
-///sh.weaver.notification.getSubscriptionUpdates
-pub struct GetSubscriptionUpdatesResponse;
-impl jacquard_common::xrpc::XrpcResp for GetSubscriptionUpdatesResponse {
-    const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSubscriptionUpdatesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubscriptionUpdates<'a> {
-    const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetSubscriptionUpdatesResponse;
-}
-
-/// Endpoint type for
-///sh.weaver.notification.getSubscriptionUpdates
-pub struct GetSubscriptionUpdatesRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetSubscriptionUpdatesRequest {
-    const PATH: &'static str = "/xrpc/sh.weaver.notification.getSubscriptionUpdates";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSubscriptionUpdates<'de>;
-    type Response = GetSubscriptionUpdatesResponse;
 }

@@ -36,6 +36,88 @@ pub struct UpdateRule<'a> {
     pub url: jacquard_common::CowStr<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateRuleOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::tools_ozone::safelink::Event<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateRuleError<'a> {
+    /// No active rule found for this URL/domain
+    #[serde(rename = "RuleNotFound")]
+    RuleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for UpdateRuleError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::RuleNotFound(msg) => {
+                write!(f, "RuleNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///tools.ozone.safelink.updateRule
+pub struct UpdateRuleResponse;
+impl jacquard_common::xrpc::XrpcResp for UpdateRuleResponse {
+    const NSID: &'static str = "tools.ozone.safelink.updateRule";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = UpdateRuleOutput<'de>;
+    type Err<'de> = UpdateRuleError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateRule<'a> {
+    const NSID: &'static str = "tools.ozone.safelink.updateRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateRuleResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.safelink.updateRule
+pub struct UpdateRuleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateRuleRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.updateRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateRule<'de>;
+    type Response = UpdateRuleResponse;
+}
+
 pub mod update_rule_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -46,8 +128,8 @@ pub mod update_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
         type Url;
+        type Reason;
         type Action;
         type Pattern;
     }
@@ -55,26 +137,26 @@ pub mod update_rule_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
         type Url = Unset;
+        type Reason = Unset;
         type Action = Unset;
         type Pattern = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Url = S::Url;
-        type Action = S::Action;
-        type Pattern = S::Pattern;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Reason = S::Reason;
         type Url = Set<members::url>;
+        type Reason = S::Reason;
+        type Action = S::Action;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Url = S::Url;
+        type Reason = Set<members::reason>;
         type Action = S::Action;
         type Pattern = S::Pattern;
     }
@@ -82,8 +164,8 @@ pub mod update_rule_state {
     pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAction<S> {}
     impl<S: State> State for SetAction<S> {
-        type Reason = S::Reason;
         type Url = S::Url;
+        type Reason = S::Reason;
         type Action = Set<members::action>;
         type Pattern = S::Pattern;
     }
@@ -91,18 +173,18 @@ pub mod update_rule_state {
     pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPattern<S> {}
     impl<S: State> State for SetPattern<S> {
-        type Reason = S::Reason;
         type Url = S::Url;
+        type Reason = S::Reason;
         type Action = S::Action;
         type Pattern = Set<members::pattern>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `action` field
         pub struct action(());
         ///Marker type for the `pattern` field
@@ -256,8 +338,8 @@ where
 impl<'a, S> UpdateRuleBuilder<'a, S>
 where
     S: update_rule_state::State,
-    S::Reason: update_rule_state::IsSet,
     S::Url: update_rule_state::IsSet,
+    S::Reason: update_rule_state::IsSet,
     S::Action: update_rule_state::IsSet,
     S::Pattern: update_rule_state::IsSet,
 {
@@ -291,86 +373,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateRuleOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::tools_ozone::safelink::Event<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateRuleError<'a> {
-    /// No active rule found for this URL/domain
-    #[serde(rename = "RuleNotFound")]
-    RuleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for UpdateRuleError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::RuleNotFound(msg) => {
-                write!(f, "RuleNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///tools.ozone.safelink.updateRule
-pub struct UpdateRuleResponse;
-impl jacquard_common::xrpc::XrpcResp for UpdateRuleResponse {
-    const NSID: &'static str = "tools.ozone.safelink.updateRule";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateRuleOutput<'de>;
-    type Err<'de> = UpdateRuleError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateRule<'a> {
-    const NSID: &'static str = "tools.ozone.safelink.updateRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = UpdateRuleResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.safelink.updateRule
-pub struct UpdateRuleRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for UpdateRuleRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.safelink.updateRule";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = UpdateRule<'de>;
-    type Response = UpdateRuleResponse;
 }

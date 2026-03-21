@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -27,6 +23,55 @@ pub struct GetBookmarks<'a> {
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetBookmarksOutput<'a> {
+    #[serde(borrow)]
+    pub bookmarks: Vec<crate::app_bsky::bookmark::BookmarkView<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///app.bsky.bookmark.getBookmarks
+pub struct GetBookmarksResponse;
+impl jacquard_common::xrpc::XrpcResp for GetBookmarksResponse {
+    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetBookmarksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookmarks<'a> {
+    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBookmarksResponse;
+}
+
+/// Endpoint type for
+///app.bsky.bookmark.getBookmarks
+pub struct GetBookmarksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBookmarksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.bookmark.getBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBookmarks<'de>;
+    type Response = GetBookmarksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod get_bookmarks_state {
@@ -116,49 +161,4 @@ where
             limit: self.__unsafe_private_named.1,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetBookmarksOutput<'a> {
-    #[serde(borrow)]
-    pub bookmarks: Vec<crate::app_bsky::bookmark::BookmarkView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///app.bsky.bookmark.getBookmarks
-pub struct GetBookmarksResponse;
-impl jacquard_common::xrpc::XrpcResp for GetBookmarksResponse {
-    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBookmarksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookmarks<'a> {
-    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetBookmarksResponse;
-}
-
-/// Endpoint type for
-///app.bsky.bookmark.getBookmarks
-pub struct GetBookmarksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetBookmarksRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.bookmark.getBookmarks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBookmarks<'de>;
-    type Response = GetBookmarksResponse;
 }

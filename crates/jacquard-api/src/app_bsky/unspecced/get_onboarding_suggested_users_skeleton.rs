@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -30,6 +26,60 @@ pub struct GetOnboardingSuggestedUsersSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetOnboardingSuggestedUsersSkeletonOutput<'a> {
+    #[serde(borrow)]
+    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    ///DEPRECATED: use recIdStr instead.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Snowflake for this recommendation, use when submitting recommendation events.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Response type for
+///app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton
+pub struct GetOnboardingSuggestedUsersSkeletonResponse;
+impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedUsersSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetOnboardingSuggestedUsersSkeletonOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedUsersSkeleton<'a> {
+    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetOnboardingSuggestedUsersSkeletonResponse;
+}
+
+/// Endpoint type for
+///app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton
+pub struct GetOnboardingSuggestedUsersSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedUsersSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetOnboardingSuggestedUsersSkeleton<'de>;
+    type Response = GetOnboardingSuggestedUsersSkeletonResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod get_onboarding_suggested_users_skeleton_state {
@@ -160,54 +210,4 @@ where
             viewer: self.__unsafe_private_named.2,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetOnboardingSuggestedUsersSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
-    ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-/// Response type for
-///app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton
-pub struct GetOnboardingSuggestedUsersSkeletonResponse;
-impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedUsersSkeletonResponse {
-    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetOnboardingSuggestedUsersSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedUsersSkeleton<'a> {
-    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetOnboardingSuggestedUsersSkeletonResponse;
-}
-
-/// Endpoint type for
-///app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton
-pub struct GetOnboardingSuggestedUsersSkeletonRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedUsersSkeletonRequest {
-    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedUsersSkeleton";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetOnboardingSuggestedUsersSkeleton<'de>;
-    type Response = GetOnboardingSuggestedUsersSkeletonResponse;
 }

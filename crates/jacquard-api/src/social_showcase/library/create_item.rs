@@ -39,6 +39,148 @@ pub struct CreateItem<'a> {
     pub visibility: CreateItemVisibility<'a>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateItemVisibility<'a> {
+    Public,
+    Unlisted,
+    Private,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CreateItemVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CreateItemVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CreateItemVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CreateItemVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CreateItemVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CreateItemVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CreateItemVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CreateItemVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateItemVisibility<'_> {
+    type Output = CreateItemVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateItemVisibility::Public => CreateItemVisibility::Public,
+            CreateItemVisibility::Unlisted => CreateItemVisibility::Unlisted,
+            CreateItemVisibility::Private => CreateItemVisibility::Private,
+            CreateItemVisibility::Other(v) => {
+                CreateItemVisibility::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateItemOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::social_showcase::ItemView<'a>,
+}
+
+/// Response type for
+///social.showcase.library.createItem
+pub struct CreateItemResponse;
+impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
+    const NSID: &'static str = "social.showcase.library.createItem";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CreateItemOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateItem<'a> {
+    const NSID: &'static str = "social.showcase.library.createItem";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateItemResponse;
+}
+
+/// Endpoint type for
+///social.showcase.library.createItem
+pub struct CreateItemRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
+    const PATH: &'static str = "/xrpc/social.showcase.library.createItem";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateItem<'de>;
+    type Response = CreateItemResponse;
+}
+
 pub mod create_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -49,67 +191,67 @@ pub mod create_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Tags;
-        type Images;
         type Visibility;
+        type Images;
+        type Tags;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Tags = Unset;
-        type Images = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Tags = S::Tags;
-        type Images = S::Images;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Title = S::Title;
-        type Tags = Set<members::tags>;
-        type Images = S::Images;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = Set<members::images>;
-        type Visibility = S::Visibility;
+        type Images = Unset;
+        type Tags = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = S::Images;
         type Visibility = Set<members::visibility>;
+        type Images = S::Images;
+        type Tags = S::Tags;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Visibility = S::Visibility;
+        type Images = Set<members::images>;
+        type Tags = S::Tags;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Tags = Set<members::tags>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Visibility = S::Visibility;
+        type Images = S::Images;
+        type Tags = S::Tags;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `images` field
-        pub struct images(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `images` field
+        pub struct images(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -299,10 +441,10 @@ where
 impl<'a, S> CreateItemBuilder<'a, S>
 where
     S: create_item_state::State,
-    S::Title: create_item_state::IsSet,
-    S::Tags: create_item_state::IsSet,
-    S::Images: create_item_state::IsSet,
     S::Visibility: create_item_state::IsSet,
+    S::Images: create_item_state::IsSet,
+    S::Tags: create_item_state::IsSet,
+    S::Title: create_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateItem<'a> {
@@ -338,146 +480,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateItemVisibility<'a> {
-    Public,
-    Unlisted,
-    Private,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> CreateItemVisibility<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Public => "public",
-            Self::Unlisted => "unlisted",
-            Self::Private => "private",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for CreateItemVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for CreateItemVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateItemVisibility<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for CreateItemVisibility<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for CreateItemVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for CreateItemVisibility<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for CreateItemVisibility<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for CreateItemVisibility<'_> {
-    type Output = CreateItemVisibility<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreateItemVisibility::Public => CreateItemVisibility::Public,
-            CreateItemVisibility::Unlisted => CreateItemVisibility::Unlisted,
-            CreateItemVisibility::Private => CreateItemVisibility::Private,
-            CreateItemVisibility::Other(v) => {
-                CreateItemVisibility::Other(v.into_static())
-            }
-        }
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateItemOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::social_showcase::ItemView<'a>,
-}
-
-/// Response type for
-///social.showcase.library.createItem
-pub struct CreateItemResponse;
-impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
-    const NSID: &'static str = "social.showcase.library.createItem";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateItemOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateItem<'a> {
-    const NSID: &'static str = "social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = CreateItemResponse;
-}
-
-/// Endpoint type for
-///social.showcase.library.createItem
-pub struct CreateItemRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
-    const PATH: &'static str = "/xrpc/social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = CreateItem<'de>;
-    type Response = CreateItemResponse;
 }

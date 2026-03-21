@@ -21,6 +21,48 @@ pub struct DeletePageParams<'a> {
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// XRPC request marker type
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
+pub struct DeletePage;
+/// Response type for
+///app.blebbit.authr.page.deletePage
+pub struct DeletePageResponse;
+impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
+    const NSID: &'static str = "app.blebbit.authr.page.deletePage";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcRequest for DeletePage {
+    const NSID: &'static str = "app.blebbit.authr.page.deletePage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeletePageResponse;
+}
+
+/// Endpoint type for
+///app.blebbit.authr.page.deletePage
+pub struct DeletePageRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
+    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeletePage;
+    type Response = DeletePageResponse;
+}
+
 pub mod delete_page_params_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -88,46 +130,4 @@ where
             id: self.__unsafe_private_named.0,
         }
     }
-}
-
-/// XRPC request marker type
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    jacquard_derive::IntoStatic
-)]
-pub struct DeletePage;
-/// Response type for
-///app.blebbit.authr.page.deletePage
-pub struct DeletePageResponse;
-impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
-    const NSID: &'static str = "app.blebbit.authr.page.deletePage";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl jacquard_common::xrpc::XrpcRequest for DeletePage {
-    const NSID: &'static str = "app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = DeletePageResponse;
-}
-
-/// Endpoint type for
-///app.blebbit.authr.page.deletePage
-pub struct DeletePageRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
-    const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = DeletePage;
-    type Response = DeletePageResponse;
 }

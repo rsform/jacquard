@@ -31,227 +31,6 @@ pub struct UpsertOption<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-pub mod upsert_option_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Scope;
-        type Key;
-        type Value;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Scope = Unset;
-        type Key = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Scope = Set<members::scope>;
-        type Key = S::Key;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Scope = S::Scope;
-        type Key = Set<members::key>;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Scope = S::Scope;
-        type Key = S::Key;
-        type Value = Set<members::value>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `scope` field
-        pub struct scope(());
-        ///Marker type for the `key` field
-        pub struct key(());
-        ///Marker type for the `value` field
-        pub struct value(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct UpsertOptionBuilder<'a, S: upsert_option_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
-        ::core::option::Option<UpsertOptionManagerRole<'a>>,
-        ::core::option::Option<UpsertOptionScope<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> UpsertOption<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
-        UpsertOptionBuilder::new()
-    }
-}
-
-impl<'a> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        UpsertOptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
-    /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> UpsertOptionBuilder<'a, S>
-where
-    S: upsert_option_state::State,
-    S::Key: upsert_option_state::IsUnset,
-{
-    /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
-    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        UpsertOptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
-    /// Set the `managerRole` field (optional)
-    pub fn manager_role(
-        mut self,
-        value: impl Into<Option<UpsertOptionManagerRole<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `managerRole` field to an Option value (optional)
-    pub fn maybe_manager_role(
-        mut self,
-        value: Option<UpsertOptionManagerRole<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S> UpsertOptionBuilder<'a, S>
-where
-    S: upsert_option_state::State,
-    S::Scope: upsert_option_state::IsUnset,
-{
-    /// Set the `scope` field (required)
-    pub fn scope(
-        mut self,
-        value: impl Into<UpsertOptionScope<'a>>,
-    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetScope<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        UpsertOptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> UpsertOptionBuilder<'a, S>
-where
-    S: upsert_option_state::State,
-    S::Value: upsert_option_state::IsUnset,
-{
-    /// Set the `value` field (required)
-    pub fn value(
-        mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
-    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetValue<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
-        UpsertOptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> UpsertOptionBuilder<'a, S>
-where
-    S: upsert_option_state::State,
-    S::Scope: upsert_option_state::IsSet,
-    S::Key: upsert_option_state::IsSet,
-    S::Value: upsert_option_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> UpsertOption<'a> {
-        UpsertOption {
-            description: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            manager_role: self.__unsafe_private_named.2,
-            scope: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> UpsertOption<'a> {
-        UpsertOption {
-            description: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            manager_role: self.__unsafe_private_named.2,
-            scope: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpsertOptionManagerRole<'a> {
     RoleModerator,
@@ -488,4 +267,225 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpsertOptionRequest {
     );
     type Request<'de> = UpsertOption<'de>;
     type Response = UpsertOptionResponse;
+}
+
+pub mod upsert_option_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Scope;
+        type Value;
+        type Key;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Scope = Unset;
+        type Value = Unset;
+        type Key = Unset;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Scope = Set<members::scope>;
+        type Value = S::Value;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Scope = S::Scope;
+        type Value = Set<members::value>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Scope = S::Scope;
+        type Value = S::Value;
+        type Key = Set<members::key>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpsertOptionBuilder<'a, S: upsert_option_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<UpsertOptionManagerRole<'a>>,
+        ::core::option::Option<UpsertOptionScope<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UpsertOption<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
+        UpsertOptionBuilder::new()
+    }
+}
+
+impl<'a> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpsertOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> UpsertOptionBuilder<'a, S>
+where
+    S: upsert_option_state::State,
+    S::Key: upsert_option_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetKey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UpsertOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
+    /// Set the `managerRole` field (optional)
+    pub fn manager_role(
+        mut self,
+        value: impl Into<Option<UpsertOptionManagerRole<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `managerRole` field to an Option value (optional)
+    pub fn maybe_manager_role(
+        mut self,
+        value: Option<UpsertOptionManagerRole<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> UpsertOptionBuilder<'a, S>
+where
+    S: upsert_option_state::State,
+    S::Scope: upsert_option_state::IsUnset,
+{
+    /// Set the `scope` field (required)
+    pub fn scope(
+        mut self,
+        value: impl Into<UpsertOptionScope<'a>>,
+    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetScope<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        UpsertOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpsertOptionBuilder<'a, S>
+where
+    S: upsert_option_state::State,
+    S::Value: upsert_option_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> UpsertOptionBuilder<'a, upsert_option_state::SetValue<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        UpsertOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpsertOptionBuilder<'a, S>
+where
+    S: upsert_option_state::State,
+    S::Scope: upsert_option_state::IsSet,
+    S::Value: upsert_option_state::IsSet,
+    S::Key: upsert_option_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UpsertOption<'a> {
+        UpsertOption {
+            description: self.__unsafe_private_named.0,
+            key: self.__unsafe_private_named.1.unwrap(),
+            manager_role: self.__unsafe_private_named.2,
+            scope: self.__unsafe_private_named.3.unwrap(),
+            value: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UpsertOption<'a> {
+        UpsertOption {
+            description: self.__unsafe_private_named.0,
+            key: self.__unsafe_private_named.1.unwrap(),
+            manager_role: self.__unsafe_private_named.2,
+            scope: self.__unsafe_private_named.3.unwrap(),
+            value: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }

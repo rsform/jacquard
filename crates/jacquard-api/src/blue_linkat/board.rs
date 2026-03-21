@@ -32,6 +32,119 @@ pub struct Card<'a> {
     pub url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Record containing a cards of your profile.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Board<'a> {
+    ///List of cards in the board.
+    #[serde(borrow)]
+    pub cards: Vec<crate::blue_linkat::board::Card<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BoardGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Board<'a>,
+}
+
+impl<'a> Board<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BoardRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
+    fn nsid() -> &'static str {
+        "blue.linkat.board"
+    }
+    fn def_name() -> &'static str {
+        "card"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_linkat_board()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct BoardRecord;
+impl jacquard_common::xrpc::XrpcResp for BoardRecord {
+    const NSID: &'static str = "blue.linkat.board";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BoardGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<BoardGetRecordOutput<'_>> for Board<'_> {
+    fn from(output: BoardGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Board<'_> {
+    const NSID: &'static str = "blue.linkat.board";
+    type Record = BoardRecord;
+}
+
+impl jacquard_common::types::collection::Collection for BoardRecord {
+    const NSID: &'static str = "blue.linkat.board";
+    type Record = BoardRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
+    fn nsid() -> &'static str {
+        "blue.linkat.board"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blue_linkat_board()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
@@ -158,41 +271,6 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
-    fn nsid() -> &'static str {
-        "blue.linkat.board"
-    }
-    fn def_name() -> &'static str {
-        "card"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_linkat_board()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Record containing a cards of your profile.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Board<'a> {
-    ///List of cards in the board.
-    #[serde(borrow)]
-    pub cards: Vec<crate::blue_linkat::board::Card<'a>>,
-}
-
 pub mod board_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -295,83 +373,5 @@ where
             cards: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Board<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BoardRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Board<'a>,
-}
-
-impl From<BoardGetRecordOutput<'_>> for Board<'_> {
-    fn from(output: BoardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Board<'_> {
-    const NSID: &'static str = "blue.linkat.board";
-    type Record = BoardRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct BoardRecord;
-impl jacquard_common::xrpc::XrpcResp for BoardRecord {
-    const NSID: &'static str = "blue.linkat.board";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = BoardGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for BoardRecord {
-    const NSID: &'static str = "blue.linkat.board";
-    type Record = BoardRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
-    fn nsid() -> &'static str {
-        "blue.linkat.board"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blue_linkat_board()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

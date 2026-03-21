@@ -25,6 +25,126 @@ pub struct DraftView<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutDraft<'a> {
+    ///Markdown content of the draft.
+    #[serde(borrow)]
+    pub content: jacquard_common::CowStr<'a>,
+    ///TID of an existing draft to update. Omit to create a new draft.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tid: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutDraftOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PutDraftError<'a> {
+    #[serde(rename = "DraftNotFound")]
+    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for PutDraftError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::DraftNotFound(msg) => {
+                write!(f, "DraftNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
+    fn nsid() -> &'static str {
+        "at.unthread.document.putDraft"
+    }
+    fn def_name() -> &'static str {
+        "draftView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_at_unthread_document_putDraft()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Response type for
+///at.unthread.document.putDraft
+pub struct PutDraftResponse;
+impl jacquard_common::xrpc::XrpcResp for PutDraftResponse {
+    const NSID: &'static str = "at.unthread.document.putDraft";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutDraftOutput<'de>;
+    type Err<'de> = PutDraftError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutDraft<'a> {
+    const NSID: &'static str = "at.unthread.document.putDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutDraftResponse;
+}
+
+/// Endpoint type for
+///at.unthread.document.putDraft
+pub struct PutDraftRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutDraftRequest {
+    const PATH: &'static str = "/xrpc/at.unthread.document.putDraft";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutDraft<'de>;
+    type Response = PutDraftResponse;
+}
+
 pub mod draft_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -35,65 +155,65 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tid;
-        type CreatedAt;
         type Content;
+        type CreatedAt;
+        type Tid;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tid = Unset;
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
+        type Tid = Unset;
         type UpdatedAt = Unset;
     }
-    ///State transition - sets the `tid` field to Set
-    pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTid<S> {}
-    impl<S: State> State for SetTid<S> {
-        type Tid = Set<members::tid>;
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
         type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
+        type Tid = S::Tid;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Tid = S::Tid;
-        type CreatedAt = Set<members::created_at>;
         type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type Tid = S::Tid;
         type UpdatedAt = S::UpdatedAt;
     }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Tid = S::Tid;
+    ///State transition - sets the `tid` field to Set
+    pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTid<S> {}
+    impl<S: State> State for SetTid<S> {
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
+        type Tid = Set<members::tid>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Tid = S::Tid;
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Tid = S::Tid;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tid` field
-        pub struct tid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `tid` field
+        pub struct tid(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -208,9 +328,9 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::Tid: draft_view_state::IsSet,
-    S::CreatedAt: draft_view_state::IsSet,
     S::Content: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
+    S::Tid: draft_view_state::IsSet,
     S::UpdatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct
@@ -419,124 +539,4 @@ fn lexicon_doc_at_unthread_document_putDraft() -> ::jacquard_lexicon::lexicon::L
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
-    fn nsid() -> &'static str {
-        "at.unthread.document.putDraft"
-    }
-    fn def_name() -> &'static str {
-        "draftView"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_at_unthread_document_putDraft()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutDraft<'a> {
-    ///Markdown content of the draft.
-    #[serde(borrow)]
-    pub content: jacquard_common::CowStr<'a>,
-    ///TID of an existing draft to update. Omit to create a new draft.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tid: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutDraftOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PutDraftError<'a> {
-    #[serde(rename = "DraftNotFound")]
-    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for PutDraftError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::DraftNotFound(msg) => {
-                write!(f, "DraftNotFound")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///at.unthread.document.putDraft
-pub struct PutDraftResponse;
-impl jacquard_common::xrpc::XrpcResp for PutDraftResponse {
-    const NSID: &'static str = "at.unthread.document.putDraft";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutDraftOutput<'de>;
-    type Err<'de> = PutDraftError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutDraft<'a> {
-    const NSID: &'static str = "at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutDraftResponse;
-}
-
-/// Endpoint type for
-///at.unthread.document.putDraft
-pub struct PutDraftRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutDraftRequest {
-    const PATH: &'static str = "/xrpc/at.unthread.document.putDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutDraft<'de>;
-    type Response = PutDraftResponse;
 }

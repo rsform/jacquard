@@ -42,6 +42,134 @@ pub struct JobStatus<'a> {
     pub state: JobStatusState<'a>,
 }
 
+/// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JobStatusState<'a> {
+    JobStateCompleted,
+    JobStateFailed,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> JobStatusState<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::JobStateCompleted => "JOB_STATE_COMPLETED",
+            Self::JobStateFailed => "JOB_STATE_FAILED",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for JobStatusState<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
+            "JOB_STATE_FAILED" => Self::JobStateFailed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for JobStatusState<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
+            "JOB_STATE_FAILED" => Self::JobStateFailed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for JobStatusState<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for JobStatusState<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for JobStatusState<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for JobStatusState<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for JobStatusState<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for JobStatusState<'_> {
+    type Output = JobStatusState<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            JobStatusState::JobStateCompleted => JobStatusState::JobStateCompleted,
+            JobStatusState::JobStateFailed => JobStatusState::JobStateFailed,
+            JobStatusState::Other(v) => JobStatusState::Other(v.into_static()),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.video.defs"
+    }
+    fn def_name() -> &'static str {
+        "jobStatus"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_video_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.progress {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.progress {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod job_status_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -52,51 +180,51 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type State;
         type JobId;
         type Did;
-        type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type State = Unset;
         type JobId = Unset;
         type Did = Unset;
-        type State = Unset;
-    }
-    ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJobId<S> {}
-    impl<S: State> State for SetJobId<S> {
-        type JobId = Set<members::job_id>;
-        type Did = S::Did;
-        type State = S::State;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type JobId = S::JobId;
-        type Did = Set<members::did>;
-        type State = S::State;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
+        type State = Set<members::state>;
         type JobId = S::JobId;
         type Did = S::Did;
-        type State = Set<members::state>;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type State = S::State;
+        type JobId = Set<members::job_id>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type State = S::State;
+        type JobId = S::JobId;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `state` field
+        pub struct state(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `state` field
-        pub struct state(());
     }
 }
 
@@ -257,9 +385,9 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
+    S::State: job_status_state::IsSet,
     S::JobId: job_status_state::IsSet,
     S::Did: job_status_state::IsSet,
-    S::State: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
@@ -291,95 +419,6 @@ where
             progress: self.__unsafe_private_named.5,
             state: self.__unsafe_private_named.6.unwrap(),
             extra_data: Some(extra_data),
-        }
-    }
-}
-
-/// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum JobStatusState<'a> {
-    JobStateCompleted,
-    JobStateFailed,
-    Other(jacquard_common::CowStr<'a>),
-}
-
-impl<'a> JobStatusState<'a> {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::JobStateCompleted => "JOB_STATE_COMPLETED",
-            Self::JobStateFailed => "JOB_STATE_FAILED",
-            Self::Other(s) => s.as_ref(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for JobStatusState<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
-            "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
-            "JOB_STATE_FAILED" => Self::JobStateFailed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> From<String> for JobStatusState<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
-            "JOB_STATE_FAILED" => Self::JobStateFailed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for JobStatusState<'a> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-impl<'a> AsRef<str> for JobStatusState<'a> {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
-impl<'a> serde::Serialize for JobStatusState<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de, 'a> serde::Deserialize<'de> for JobStatusState<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
-    }
-}
-
-impl<'a> Default for JobStatusState<'a> {
-    fn default() -> Self {
-        Self::Other(Default::default())
-    }
-}
-
-impl jacquard_common::IntoStatic for JobStatusState<'_> {
-    type Output = JobStatusState<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            JobStatusState::JobStateCompleted => JobStatusState::JobStateCompleted,
-            JobStatusState::JobStateFailed => JobStatusState::JobStateFailed,
-            JobStatusState::Other(v) => JobStatusState::Other(v.into_static()),
         }
     }
 }
@@ -529,44 +568,5 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
-    fn nsid() -> &'static str {
-        "app.bsky.video.defs"
-    }
-    fn def_name() -> &'static str {
-        "jobStatus"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_app_bsky_video_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.progress {
-            if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "progress",
-                    ),
-                    max: 100i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.progress {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "progress",
-                    ),
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
     }
 }

@@ -20,6 +20,61 @@ pub struct GetCheckout<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetCheckoutOutput {
+    pub body: jacquard_common::deps::bytes::Bytes,
+}
+
+/// Response type for
+///com.atproto.sync.getCheckout
+pub struct GetCheckoutResponse;
+impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
+    const NSID: &'static str = "com.atproto.sync.getCheckout";
+    const ENCODING: &'static str = "application/vnd.ipld.car";
+    type Output<'de> = GetCheckoutOutput;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetCheckoutOutput {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
+    }
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
+    const NSID: &'static str = "com.atproto.sync.getCheckout";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetCheckoutResponse;
+}
+
+/// Endpoint type for
+///com.atproto.sync.getCheckout
+pub struct GetCheckoutRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getCheckout";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetCheckout<'de>;
+    type Response = GetCheckoutResponse;
+}
+
 pub mod get_checkout_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,59 +164,4 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetCheckoutOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
-}
-
-/// Response type for
-///com.atproto.sync.getCheckout
-pub struct GetCheckoutResponse;
-impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
-    const NSID: &'static str = "com.atproto.sync.getCheckout";
-    const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetCheckoutOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(output.body.to_vec())
-    }
-    fn decode_output<'de>(
-        body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
-    where
-        Self::Output<'de>: serde::Deserialize<'de>,
-    {
-        Ok(GetCheckoutOutput {
-            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-        })
-    }
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
-    const NSID: &'static str = "com.atproto.sync.getCheckout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetCheckoutResponse;
-}
-
-/// Endpoint type for
-///com.atproto.sync.getCheckout
-pub struct GetCheckoutRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {
-    const PATH: &'static str = "/xrpc/com.atproto.sync.getCheckout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCheckout<'de>;
-    type Response = GetCheckoutResponse;
 }

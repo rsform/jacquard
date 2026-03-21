@@ -43,6 +43,208 @@ pub struct Ingredient<'a> {
     pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct InstructionStep<'a> {
+    ///Unique identifier for this instruction step
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    ///Instruction text
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Recipe<'a> {
+    ///Cooking time in minutes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cook_time_minutes: std::option::Option<i64>,
+    ///When this recipe was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///Reference to the user who created this recipe
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub created_by: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    ///Recipe description
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Image URL for the recipe
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    ///Recipe ingredients
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ingredients: std::option::Option<
+        Vec<crate::io_kich::recipe::recipe::Ingredient<'a>>,
+    >,
+    ///Cooking instructions as an array of steps
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub instructions: std::option::Option<
+        Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>,
+    >,
+    ///Whether this recipe is private (only visible to household members) Defaults to `false`.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default = "_default_recipe_is_private")]
+    pub is_private: std::option::Option<bool>,
+    ///Recipe name
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    ///Preparation time in minutes
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub prep_time_minutes: std::option::Option<i64>,
+    ///Number of servings this recipe makes Defaults to `1`.
+    #[serde(default = "_default_recipe_servings")]
+    pub servings: i64,
+    ///Source name (book, magazine, blog)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///When this recipe was last updated
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Source URL of the recipe
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecipeGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Recipe<'a>,
+}
+
+impl<'a> Recipe<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RecipeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.recipe.recipe"
+    }
+    fn def_name() -> &'static str {
+        "ingredient"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_recipe_recipe()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InstructionStep<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.recipe.recipe"
+    }
+    fn def_name() -> &'static str {
+        "instructionStep"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_recipe_recipe()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RecipeRecord;
+impl jacquard_common::xrpc::XrpcResp for RecipeRecord {
+    const NSID: &'static str = "io.kich.recipe.recipe";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RecipeGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RecipeGetRecordOutput<'_>> for Recipe<'_> {
+    fn from(output: RecipeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Recipe<'_> {
+    const NSID: &'static str = "io.kich.recipe.recipe";
+    type Record = RecipeRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RecipeRecord {
+    const NSID: &'static str = "io.kich.recipe.recipe";
+    type Record = RecipeRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
+    fn nsid() -> &'static str {
+        "io.kich.recipe.recipe"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_io_kich_recipe_recipe()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 fn _default_ingredient_is_detached() -> std::option::Option<bool> {
     Some(false)
 }
@@ -61,49 +263,49 @@ pub mod ingredient_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Grams;
         type Name;
+        type Grams;
         type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Grams = Unset;
         type Name = Unset;
+        type Grams = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `grams` field to Set
-    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGrams<S> {}
-    impl<S: State> State for SetGrams<S> {
-        type Grams = Set<members::grams>;
-        type Name = S::Name;
-        type Id = S::Id;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Grams = S::Grams;
         type Name = Set<members::name>;
+        type Grams = S::Grams;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `grams` field to Set
+    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGrams<S> {}
+    impl<S: State> State for SetGrams<S> {
+        type Name = S::Name;
+        type Grams = Set<members::grams>;
         type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Grams = S::Grams;
         type Name = S::Name;
+        type Grams = S::Grams;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `grams` field
-        pub struct grams(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `grams` field
+        pub struct grams(());
         ///Marker type for the `id` field
         pub struct id(());
     }
@@ -260,8 +462,8 @@ impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
 impl<'a, S> IngredientBuilder<'a, S>
 where
     S: ingredient_state::State,
-    S::Grams: ingredient_state::IsSet,
     S::Name: ingredient_state::IsSet,
+    S::Grams: ingredient_state::IsSet,
     S::Id: ingredient_state::IsSet,
 {
     /// Build the final struct
@@ -773,130 +975,6 @@ fn lexicon_doc_io_kich_recipe_recipe() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.recipe.recipe"
-    }
-    fn def_name() -> &'static str {
-        "ingredient"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_recipe_recipe()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct InstructionStep<'a> {
-    ///Unique identifier for this instruction step
-    #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
-    ///Instruction text
-    #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InstructionStep<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.recipe.recipe"
-    }
-    fn def_name() -> &'static str {
-        "instructionStep"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_recipe_recipe()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Recipe<'a> {
-    ///Cooking time in minutes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cook_time_minutes: std::option::Option<i64>,
-    ///When this recipe was created
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Reference to the user who created this recipe
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub created_by: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///Recipe description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Image URL for the recipe
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ///Recipe ingredients
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub ingredients: std::option::Option<
-        Vec<crate::io_kich::recipe::recipe::Ingredient<'a>>,
-    >,
-    ///Cooking instructions as an array of steps
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub instructions: std::option::Option<
-        Vec<crate::io_kich::recipe::recipe::InstructionStep<'a>>,
-    >,
-    ///Whether this recipe is private (only visible to household members) Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(default = "_default_recipe_is_private")]
-    pub is_private: std::option::Option<bool>,
-    ///Recipe name
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    ///Preparation time in minutes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub prep_time_minutes: std::option::Option<i64>,
-    ///Number of servings this recipe makes Defaults to `1`.
-    #[serde(default = "_default_recipe_servings")]
-    pub servings: i64,
-    ///Source name (book, magazine, blog)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When this recipe was last updated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Source URL of the recipe
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-}
-
 fn _default_recipe_is_private() -> std::option::Option<bool> {
     Some(false)
 }
@@ -915,49 +993,49 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Servings;
         type CreatedAt;
+        type Servings;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Servings = Unset;
         type CreatedAt = Unset;
+        type Servings = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `servings` field to Set
-    pub struct SetServings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServings<S> {}
-    impl<S: State> State for SetServings<S> {
-        type Servings = Set<members::servings>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Servings = S::Servings;
         type CreatedAt = Set<members::created_at>;
+        type Servings = S::Servings;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `servings` field to Set
+    pub struct SetServings<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServings<S> {}
+    impl<S: State> State for SetServings<S> {
+        type CreatedAt = S::CreatedAt;
+        type Servings = Set<members::servings>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Servings = S::Servings;
         type CreatedAt = S::CreatedAt;
+        type Servings = S::Servings;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `servings` field
-        pub struct servings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `servings` field
+        pub struct servings(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -1268,8 +1346,8 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Servings: recipe_state::IsSet,
     S::CreatedAt: recipe_state::IsSet,
+    S::Servings: recipe_state::IsSet,
     S::Name: recipe_state::IsSet,
 {
     /// Build the final struct
@@ -1317,83 +1395,5 @@ where
             url: self.__unsafe_private_named.13,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Recipe<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RecipeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RecipeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Recipe<'a>,
-}
-
-impl From<RecipeGetRecordOutput<'_>> for Recipe<'_> {
-    fn from(output: RecipeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Recipe<'_> {
-    const NSID: &'static str = "io.kich.recipe.recipe";
-    type Record = RecipeRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RecipeRecord;
-impl jacquard_common::xrpc::XrpcResp for RecipeRecord {
-    const NSID: &'static str = "io.kich.recipe.recipe";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecipeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RecipeRecord {
-    const NSID: &'static str = "io.kich.recipe.recipe";
-    type Record = RecipeRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
-    fn nsid() -> &'static str {
-        "io.kich.recipe.recipe"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_io_kich_recipe_recipe()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

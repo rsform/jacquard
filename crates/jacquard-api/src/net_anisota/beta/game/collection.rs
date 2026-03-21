@@ -81,6 +81,258 @@ pub struct Collection<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collection<'a>,
+}
+
+/// Additional details about how the specimen was acquired
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceDetails<'a> {
+    ///Number of attempts before successful capture
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub attempts: std::option::Option<i64>,
+    ///Probability used when catching this specimen (decimal string, e.g. '0.75')
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///URI of the game card that provided this specimen
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Location where specimen was found or observed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+/// Complete specimen information
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SpecimenData<'a> {
+    ///Scientific authorship of the species
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub authorship: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Detailed description of the specimen
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl<'a> Collection<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CollectionRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CollectionRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionRecord {
+    const NSID: &'static str = "net.anisota.beta.game.collection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
+    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Collection<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.collection";
+    type Record = CollectionRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CollectionRecord {
+    const NSID: &'static str = "net.anisota.beta.game.collection";
+    type Record = CollectionRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.collection"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_collection()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.common_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common_name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.family {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "family",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.genus {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "genus",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.quantity;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.scientific_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scientific_name",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.species {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "species",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.specimen_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "specimen_id",
+                    ),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.collection"
+    }
+    fn def_name() -> &'static str {
+        "sourceDetails"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_collection()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecimenData<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.collection"
+    }
+    fn def_name() -> &'static str {
+        "specimenData"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_collection()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod collection_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -92,8 +344,8 @@ pub mod collection_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Quantity;
-        type AcquiredAt;
         type SpecimenId;
+        type AcquiredAt;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -101,8 +353,8 @@ pub mod collection_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Quantity = Unset;
-        type AcquiredAt = Unset;
         type SpecimenId = Unset;
+        type AcquiredAt = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `quantity` field to Set
@@ -110,17 +362,8 @@ pub mod collection_state {
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
         type Quantity = Set<members::quantity>;
+        type SpecimenId = S::SpecimenId;
         type AcquiredAt = S::AcquiredAt;
-        type SpecimenId = S::SpecimenId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `acquired_at` field to Set
-    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
-    impl<S: State> State for SetAcquiredAt<S> {
-        type Quantity = S::Quantity;
-        type AcquiredAt = Set<members::acquired_at>;
-        type SpecimenId = S::SpecimenId;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `specimen_id` field to Set
@@ -128,8 +371,17 @@ pub mod collection_state {
     impl<S: State> sealed::Sealed for SetSpecimenId<S> {}
     impl<S: State> State for SetSpecimenId<S> {
         type Quantity = S::Quantity;
-        type AcquiredAt = S::AcquiredAt;
         type SpecimenId = Set<members::specimen_id>;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `acquired_at` field to Set
+    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
+    impl<S: State> State for SetAcquiredAt<S> {
+        type Quantity = S::Quantity;
+        type SpecimenId = S::SpecimenId;
+        type AcquiredAt = Set<members::acquired_at>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -137,8 +389,8 @@ pub mod collection_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Quantity = S::Quantity;
-        type AcquiredAt = S::AcquiredAt;
         type SpecimenId = S::SpecimenId;
+        type AcquiredAt = S::AcquiredAt;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -146,10 +398,10 @@ pub mod collection_state {
     pub mod members {
         ///Marker type for the `quantity` field
         pub struct quantity(());
-        ///Marker type for the `acquired_at` field
-        pub struct acquired_at(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
+        ///Marker type for the `acquired_at` field
+        pub struct acquired_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -533,8 +785,8 @@ impl<'a, S> CollectionBuilder<'a, S>
 where
     S: collection_state::State,
     S::Quantity: collection_state::IsSet,
-    S::AcquiredAt: collection_state::IsSet,
     S::SpecimenId: collection_state::IsSet,
+    S::AcquiredAt: collection_state::IsSet,
     S::CreatedAt: collection_state::IsSet,
 {
     /// Build the final struct
@@ -588,169 +840,6 @@ where
             status: self.__unsafe_private_named.16,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Collection<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CollectionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collection<'a>,
-}
-
-impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
-    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Collection<'_> {
-    const NSID: &'static str = "net.anisota.beta.game.collection";
-    type Record = CollectionRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CollectionRecord;
-impl jacquard_common::xrpc::XrpcResp for CollectionRecord {
-    const NSID: &'static str = "net.anisota.beta.game.collection";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CollectionRecord {
-    const NSID: &'static str = "net.anisota.beta.game.collection";
-    type Record = CollectionRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.collection"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_collection()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.common_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "common_name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.family {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "family",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.genus {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "genus",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.quantity;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.scientific_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scientific_name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.species {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "species",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.specimen_id;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "specimen_id",
-                    ),
-                    max: 100usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
     }
 }
 
@@ -1277,94 +1366,5 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon
             );
             map
         },
-    }
-}
-
-/// Additional details about how the specimen was acquired
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceDetails<'a> {
-    ///Number of attempts before successful capture
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attempts: std::option::Option<i64>,
-    ///Probability used when catching this specimen (decimal string, e.g. '0.75')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the game card that provided this specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Location where specimen was found or observed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.collection"
-    }
-    fn def_name() -> &'static str {
-        "sourceDetails"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_collection()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Complete specimen information
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SpecimenData<'a> {
-    ///Scientific authorship of the species
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub authorship: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Detailed description of the specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecimenData<'a> {
-    fn nsid() -> &'static str {
-        "net.anisota.beta.game.collection"
-    }
-    fn def_name() -> &'static str {
-        "specimenData"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_anisota_beta_game_collection()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

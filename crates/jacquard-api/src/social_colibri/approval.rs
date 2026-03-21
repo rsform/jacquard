@@ -26,6 +26,84 @@ pub struct Approval<'a> {
     pub membership: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ApprovalGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Approval<'a>,
+}
+
+impl<'a> Approval<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ApprovalRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct ApprovalRecord;
+impl jacquard_common::xrpc::XrpcResp for ApprovalRecord {
+    const NSID: &'static str = "social.colibri.approval";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ApprovalGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<ApprovalGetRecordOutput<'_>> for Approval<'_> {
+    fn from(output: ApprovalGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Approval<'_> {
+    const NSID: &'static str = "social.colibri.approval";
+    type Record = ApprovalRecord;
+}
+
+impl jacquard_common::types::collection::Collection for ApprovalRecord {
+    const NSID: &'static str = "social.colibri.approval";
+    type Record = ApprovalRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Approval<'a> {
+    fn nsid() -> &'static str {
+        "social.colibri.approval"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_colibri_approval()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod approval_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -37,50 +115,50 @@ pub mod approval_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Membership;
         type Community;
+        type Membership;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Membership = Unset;
         type Community = Unset;
+        type Membership = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Community = S::Community;
         type Membership = S::Membership;
-        type Community = S::Community;
-    }
-    ///State transition - sets the `membership` field to Set
-    pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembership<S> {}
-    impl<S: State> State for SetMembership<S> {
-        type CreatedAt = S::CreatedAt;
-        type Membership = Set<members::membership>;
-        type Community = S::Community;
     }
     ///State transition - sets the `community` field to Set
     pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunity<S> {}
     impl<S: State> State for SetCommunity<S> {
         type CreatedAt = S::CreatedAt;
-        type Membership = S::Membership;
         type Community = Set<members::community>;
+        type Membership = S::Membership;
+    }
+    ///State transition - sets the `membership` field to Set
+    pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembership<S> {}
+    impl<S: State> State for SetMembership<S> {
+        type CreatedAt = S::CreatedAt;
+        type Community = S::Community;
+        type Membership = Set<members::membership>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `membership` field
-        pub struct membership(());
         ///Marker type for the `community` field
         pub struct community(());
+        ///Marker type for the `membership` field
+        pub struct membership(());
     }
 }
 
@@ -174,8 +252,8 @@ impl<'a, S> ApprovalBuilder<'a, S>
 where
     S: approval_state::State,
     S::CreatedAt: approval_state::IsSet,
-    S::Membership: approval_state::IsSet,
     S::Community: approval_state::IsSet,
+    S::Membership: approval_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Approval<'a> {
@@ -200,84 +278,6 @@ where
             membership: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Approval<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ApprovalRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ApprovalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Approval<'a>,
-}
-
-impl From<ApprovalGetRecordOutput<'_>> for Approval<'_> {
-    fn from(output: ApprovalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Approval<'_> {
-    const NSID: &'static str = "social.colibri.approval";
-    type Record = ApprovalRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct ApprovalRecord;
-impl jacquard_common::xrpc::XrpcResp for ApprovalRecord {
-    const NSID: &'static str = "social.colibri.approval";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ApprovalGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for ApprovalRecord {
-    const NSID: &'static str = "social.colibri.approval";
-    type Record = ApprovalRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Approval<'a> {
-    fn nsid() -> &'static str {
-        "social.colibri.approval"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_social_colibri_approval()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
 

@@ -21,6 +21,279 @@ pub struct ContainerId<'a> {
     pub value: ContainerIdValue<'a>,
 }
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ContainerIdValue<'a> {
+    #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
+    NormalContainerId(Box<crate::sh_weaver::edit::cursor::NormalContainerId<'a>>),
+    #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
+    RootContainerId(Box<crate::sh_weaver::edit::cursor::RootContainerId<'a>>),
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CursorSide<'a> {
+    ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
+    pub value: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Id<'a> {
+    pub counter: i64,
+    pub peer: i64,
+}
+
+/// An edit record for a notebook.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Cursor<'a> {
+    #[serde(borrow)]
+    pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
+    #[serde(borrow)]
+    pub id: crate::sh_weaver::edit::cursor::Id<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CursorGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Cursor<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct NormalContainerId<'a> {
+    #[serde(borrow)]
+    pub container_type: jacquard_common::CowStr<'a>,
+    pub counter: i64,
+    pub peer: i64,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RootContainerId<'a> {
+    #[serde(borrow)]
+    pub container_type: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> Cursor<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, CursorRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "containerId"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "cursorSide"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "id"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct CursorRecord;
+impl jacquard_common::xrpc::XrpcResp for CursorRecord {
+    const NSID: &'static str = "sh.weaver.edit.cursor";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CursorGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
+    fn from(output: CursorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Cursor<'_> {
+    const NSID: &'static str = "sh.weaver.edit.cursor";
+    type Record = CursorRecord;
+}
+
+impl jacquard_common::types::collection::Collection for CursorRecord {
+    const NSID: &'static str = "sh.weaver.edit.cursor";
+    type Record = CursorRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "normalContainerId"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "rootContainerId"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_cursor()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod container_id_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -122,25 +395,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContainerIdValue<'a> {
-    #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
-    NormalContainerId(Box<crate::sh_weaver::edit::cursor::NormalContainerId<'a>>),
-    #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
-    RootContainerId(Box<crate::sh_weaver::edit::cursor::RootContainerId<'a>>),
 }
 
 fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -433,39 +687,6 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "containerId"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CursorSide<'a> {
-    ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
-    pub value: i64,
-}
-
 pub mod cursor_side_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -569,39 +790,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "cursorSide"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Id<'a> {
-    pub counter: i64,
-    pub peer: i64,
-}
-
 pub mod id_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -612,37 +800,37 @@ pub mod id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
+        type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
+        type Peer = Unset;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCounter<S> {}
     impl<S: State> State for SetCounter<S> {
-        type Peer = S::Peer;
         type Counter = Set<members::counter>;
+        type Peer = S::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Counter = S::Counter;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
     }
 }
 
@@ -709,8 +897,8 @@ where
 impl<'a, S> IdBuilder<'a, S>
 where
     S: id_state::State,
-    S::Peer: id_state::IsSet,
     S::Counter: id_state::IsSet,
+    S::Peer: id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Id<'a> {
@@ -736,45 +924,6 @@ where
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "id"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// An edit record for a notebook.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Cursor<'a> {
-    #[serde(borrow)]
-    pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
-    #[serde(borrow)]
-    pub id: crate::sh_weaver::edit::cursor::Id<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
-}
-
 pub mod cursor_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -785,37 +934,37 @@ pub mod cursor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Container;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Container = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Container = S::Container;
+        type Id = Unset;
     }
     ///State transition - sets the `container` field to Set
     pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContainer<S> {}
     impl<S: State> State for SetContainer<S> {
-        type Id = S::Id;
         type Container = Set<members::container>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Container = S::Container;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `container` field
         pub struct container(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -908,8 +1057,8 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
 impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
-    S::Id: cursor_state::IsSet,
     S::Container: cursor_state::IsSet,
+    S::Id: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
@@ -937,102 +1086,6 @@ where
     }
 }
 
-impl<'a> Cursor<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CursorRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CursorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Cursor<'a>,
-}
-
-impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
-    fn from(output: CursorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Cursor<'_> {
-    const NSID: &'static str = "sh.weaver.edit.cursor";
-    type Record = CursorRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct CursorRecord;
-impl jacquard_common::xrpc::XrpcResp for CursorRecord {
-    const NSID: &'static str = "sh.weaver.edit.cursor";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = CursorGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for CursorRecord {
-    const NSID: &'static str = "sh.weaver.edit.cursor";
-    type Record = CursorRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct NormalContainerId<'a> {
-    #[serde(borrow)]
-    pub container_type: jacquard_common::CowStr<'a>,
-    pub counter: i64,
-    pub peer: i64,
-}
-
 pub mod normal_container_id_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -1043,51 +1096,51 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Counter;
         type ContainerType;
         type Peer;
-        type Counter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Counter = Unset;
         type ContainerType = Unset;
         type Peer = Unset;
-        type Counter = Unset;
-    }
-    ///State transition - sets the `container_type` field to Set
-    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainerType<S> {}
-    impl<S: State> State for SetContainerType<S> {
-        type ContainerType = Set<members::container_type>;
-        type Peer = S::Peer;
-        type Counter = S::Counter;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type ContainerType = S::ContainerType;
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCounter<S> {}
     impl<S: State> State for SetCounter<S> {
+        type Counter = Set<members::counter>;
         type ContainerType = S::ContainerType;
         type Peer = S::Peer;
-        type Counter = Set<members::counter>;
+    }
+    ///State transition - sets the `container_type` field to Set
+    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainerType<S> {}
+    impl<S: State> State for SetContainerType<S> {
+        type Counter = S::Counter;
+        type ContainerType = Set<members::container_type>;
+        type Peer = S::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Counter = S::Counter;
+        type ContainerType = S::ContainerType;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `counter` field
+        pub struct counter(());
         ///Marker type for the `container_type` field
         pub struct container_type(());
         ///Marker type for the `peer` field
         pub struct peer(());
-        ///Marker type for the `counter` field
-        pub struct counter(());
     }
 }
 
@@ -1180,9 +1233,9 @@ where
 impl<'a, S> NormalContainerIdBuilder<'a, S>
 where
     S: normal_container_id_state::State,
+    S::Counter: normal_container_id_state::IsSet,
     S::ContainerType: normal_container_id_state::IsSet,
     S::Peer: normal_container_id_state::IsSet,
-    S::Counter: normal_container_id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NormalContainerId<'a> {
@@ -1207,58 +1260,5 @@ where
             peer: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "normalContainerId"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RootContainerId<'a> {
-    #[serde(borrow)]
-    pub container_type: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
-    fn nsid() -> &'static str {
-        "sh.weaver.edit.cursor"
-    }
-    fn def_name() -> &'static str {
-        "rootContainerId"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_sh_weaver_edit_cursor()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }

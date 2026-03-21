@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(25i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,6 +31,55 @@ pub struct SearchBooks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub q: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchBooksOutput<'a> {
+    #[serde(borrow)]
+    pub books: Vec<crate::buzz_bookhive::hive_book::HiveBook<'a>>,
+    ///The next offset to use for pagination (result of limit + offset)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offset: std::option::Option<i64>,
+}
+
+/// Response type for
+///buzz.bookhive.searchBooks
+pub struct SearchBooksResponse;
+impl jacquard_common::xrpc::XrpcResp for SearchBooksResponse {
+    const NSID: &'static str = "buzz.bookhive.searchBooks";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SearchBooksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchBooks<'a> {
+    const NSID: &'static str = "buzz.bookhive.searchBooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchBooksResponse;
+}
+
+/// Endpoint type for
+///buzz.bookhive.searchBooks
+pub struct SearchBooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchBooksRequest {
+    const PATH: &'static str = "/xrpc/buzz.bookhive.searchBooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchBooks<'de>;
+    type Response = SearchBooksResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(25i64)
 }
 
 pub mod search_books_state {
@@ -169,49 +214,4 @@ where
             q: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchBooksOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<crate::buzz_bookhive::hive_book::HiveBook<'a>>,
-    ///The next offset to use for pagination (result of limit + offset)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
-}
-
-/// Response type for
-///buzz.bookhive.searchBooks
-pub struct SearchBooksResponse;
-impl jacquard_common::xrpc::XrpcResp for SearchBooksResponse {
-    const NSID: &'static str = "buzz.bookhive.searchBooks";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchBooks<'a> {
-    const NSID: &'static str = "buzz.bookhive.searchBooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = SearchBooksResponse;
-}
-
-/// Endpoint type for
-///buzz.bookhive.searchBooks
-pub struct SearchBooksRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for SearchBooksRequest {
-    const PATH: &'static str = "/xrpc/buzz.bookhive.searchBooks";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchBooks<'de>;
-    type Response = SearchBooksResponse;
 }

@@ -24,6 +24,92 @@ pub struct PushNotify<'a> {
     pub target: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PushNotifyOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PushNotifyError<'a> {
+    #[serde(rename = "ServiceNotAllowedError")]
+    ServiceNotAllowedError(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "DeviceNotFoundError")]
+    DeviceNotFoundError(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for PushNotifyError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::ServiceNotAllowedError(msg) => {
+                write!(f, "ServiceNotAllowedError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DeviceNotFoundError(msg) => {
+                write!(f, "DeviceNotFoundError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///win.tomo-x.pushat.pushNotify
+pub struct PushNotifyResponse;
+impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
+    const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PushNotifyOutput<'de>;
+    type Err<'de> = PushNotifyError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
+    const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PushNotifyResponse;
+}
+
+/// Endpoint type for
+///win.tomo-x.pushat.pushNotify
+pub struct PushNotifyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
+    const PATH: &'static str = "/xrpc/win.tomo-x.pushat.pushNotify";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PushNotify<'de>;
+    type Response = PushNotifyResponse;
+}
+
 pub mod push_notify_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -162,90 +248,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PushNotifyOutput<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PushNotifyError<'a> {
-    #[serde(rename = "ServiceNotAllowedError")]
-    ServiceNotAllowedError(std::option::Option<jacquard_common::CowStr<'a>>),
-    #[serde(rename = "DeviceNotFoundError")]
-    DeviceNotFoundError(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for PushNotifyError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::ServiceNotAllowedError(msg) => {
-                write!(f, "ServiceNotAllowedError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::DeviceNotFoundError(msg) => {
-                write!(f, "DeviceNotFoundError")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///win.tomo-x.pushat.pushNotify
-pub struct PushNotifyResponse;
-impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
-    const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PushNotifyOutput<'de>;
-    type Err<'de> = PushNotifyError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
-    const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PushNotifyResponse;
-}
-
-/// Endpoint type for
-///win.tomo-x.pushat.pushNotify
-pub struct PushNotifyRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
-    const PATH: &'static str = "/xrpc/win.tomo-x.pushat.pushNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PushNotify<'de>;
-    type Response = PushNotifyResponse;
 }

@@ -29,6 +29,88 @@ pub struct PutTarget<'a> {
     >,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PutTargetOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::place_stream::multistream::TargetView<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PutTargetError<'a> {
+    /// The provided target URL is invalid or unreachable.
+    #[serde(rename = "InvalidTargetUrl")]
+    InvalidTargetUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for PutTargetError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidTargetUrl(msg) => {
+                write!(f, "InvalidTargetUrl")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///place.stream.multistream.putTarget
+pub struct PutTargetResponse;
+impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
+    const NSID: &'static str = "place.stream.multistream.putTarget";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PutTargetOutput<'de>;
+    type Err<'de> = PutTargetError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutTarget<'a> {
+    const NSID: &'static str = "place.stream.multistream.putTarget";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutTargetResponse;
+}
+
+/// Endpoint type for
+///place.stream.multistream.putTarget
+pub struct PutTargetRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
+    const PATH: &'static str = "/xrpc/place.stream.multistream.putTarget";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutTarget<'de>;
+    type Response = PutTargetResponse;
+}
+
 pub mod put_target_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -168,86 +250,4 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct PutTargetOutput<'a> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: crate::place_stream::multistream::TargetView<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PutTargetError<'a> {
-    /// The provided target URL is invalid or unreachable.
-    #[serde(rename = "InvalidTargetUrl")]
-    InvalidTargetUrl(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for PutTargetError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidTargetUrl(msg) => {
-                write!(f, "InvalidTargetUrl")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///place.stream.multistream.putTarget
-pub struct PutTargetResponse;
-impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
-    const NSID: &'static str = "place.stream.multistream.putTarget";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutTargetOutput<'de>;
-    type Err<'de> = PutTargetError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutTarget<'a> {
-    const NSID: &'static str = "place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Response = PutTargetResponse;
-}
-
-/// Endpoint type for
-///place.stream.multistream.putTarget
-pub struct PutTargetRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
-    const PATH: &'static str = "/xrpc/place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    type Request<'de> = PutTarget<'de>;
-    type Response = PutTargetResponse;
 }

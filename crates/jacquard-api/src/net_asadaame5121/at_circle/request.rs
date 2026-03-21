@@ -37,6 +37,146 @@ pub struct Request<'a> {
     pub site_url: jacquard_common::types::string::UriValue<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RequestGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Request<'a>,
+}
+
+impl<'a> Request<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, RequestRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct RequestRecord;
+impl jacquard_common::xrpc::XrpcResp for RequestRecord {
+    const NSID: &'static str = "net.asadaame5121.at-circle.request";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RequestGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl From<RequestGetRecordOutput<'_>> for Request<'_> {
+    fn from(output: RequestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Request<'_> {
+    const NSID: &'static str = "net.asadaame5121.at-circle.request";
+    type Record = RequestRecord;
+}
+
+impl jacquard_common::types::collection::Collection for RequestRecord {
+    const NSID: &'static str = "net.asadaame5121.at-circle.request";
+    type Record = RequestRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
+    fn nsid() -> &'static str {
+        "net.asadaame5121.at-circle.request"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_asadaame5121_at_circle_request()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.message {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "message",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.message {
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "message",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.site_title;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "site_title",
+                    ),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.site_title;
+            {
+                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "site_title",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 pub mod request_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -47,65 +187,65 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SiteUrl;
-        type SiteTitle;
         type CreatedAt;
+        type SiteTitle;
+        type SiteUrl;
         type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SiteUrl = Unset;
-        type SiteTitle = Unset;
         type CreatedAt = Unset;
+        type SiteTitle = Unset;
+        type SiteUrl = Unset;
         type Ring = Unset;
     }
-    ///State transition - sets the `site_url` field to Set
-    pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
-    impl<S: State> State for SetSiteUrl<S> {
-        type SiteUrl = Set<members::site_url>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type SiteTitle = S::SiteTitle;
-        type CreatedAt = S::CreatedAt;
+        type SiteUrl = S::SiteUrl;
         type Ring = S::Ring;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
     impl<S: State> State for SetSiteTitle<S> {
-        type SiteUrl = S::SiteUrl;
-        type SiteTitle = Set<members::site_title>;
         type CreatedAt = S::CreatedAt;
+        type SiteTitle = Set<members::site_title>;
+        type SiteUrl = S::SiteUrl;
         type Ring = S::Ring;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SiteUrl = S::SiteUrl;
+    ///State transition - sets the `site_url` field to Set
+    pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
+    impl<S: State> State for SetSiteUrl<S> {
+        type CreatedAt = S::CreatedAt;
         type SiteTitle = S::SiteTitle;
-        type CreatedAt = Set<members::created_at>;
+        type SiteUrl = Set<members::site_url>;
         type Ring = S::Ring;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type SiteUrl = S::SiteUrl;
-        type SiteTitle = S::SiteTitle;
         type CreatedAt = S::CreatedAt;
+        type SiteTitle = S::SiteTitle;
+        type SiteUrl = S::SiteUrl;
         type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site_url` field
-        pub struct site_url(());
-        ///Marker type for the `site_title` field
-        pub struct site_title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `site_title` field
+        pub struct site_title(());
+        ///Marker type for the `site_url` field
+        pub struct site_url(());
         ///Marker type for the `ring` field
         pub struct ring(());
     }
@@ -257,9 +397,9 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
-    S::SiteUrl: request_state::IsSet,
-    S::SiteTitle: request_state::IsSet,
     S::CreatedAt: request_state::IsSet,
+    S::SiteTitle: request_state::IsSet,
+    S::SiteUrl: request_state::IsSet,
     S::Ring: request_state::IsSet,
 {
     /// Build the final struct
@@ -291,146 +431,6 @@ where
             site_url: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-impl<'a> Request<'a> {
-    pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RequestRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
-    }
-}
-
-/// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Request<'a>,
-}
-
-impl From<RequestGetRecordOutput<'_>> for Request<'_> {
-    fn from(output: RequestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
-}
-
-impl jacquard_common::types::collection::Collection for Request<'_> {
-    const NSID: &'static str = "net.asadaame5121.at-circle.request";
-    type Record = RequestRecord;
-}
-
-/// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct RequestRecord;
-impl jacquard_common::xrpc::XrpcResp for RequestRecord {
-    const NSID: &'static str = "net.asadaame5121.at-circle.request";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = RequestGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
-}
-
-impl jacquard_common::types::collection::Collection for RequestRecord {
-    const NSID: &'static str = "net.asadaame5121.at-circle.request";
-    type Record = RequestRecord;
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
-    fn nsid() -> &'static str {
-        "net.asadaame5121.at-circle.request"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_asadaame5121_at_circle_request()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.message {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.message {
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.site_title;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "site_title",
-                    ),
-                    max: 1000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.site_title;
-            {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "site_title",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        Ok(())
     }
 }
 

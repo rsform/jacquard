@@ -20,6 +20,94 @@ pub struct GetQuota<'a> {
     pub user_did: jacquard_common::types::string::Did<'a>,
 }
 
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GetQuotaOutput<'a> {
+    ///Storage limit in bytes (absent if unlimited)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    ///Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Total size in bytes of unique blobs
+    pub total_size: i64,
+    ///Number of unique blob digests
+    pub unique_blobs: i64,
+    ///DID of the user
+    #[serde(borrow)]
+    pub user_did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetQuotaError<'a> {
+    #[serde(rename = "InvalidUserDid")]
+    InvalidUserDid(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl core::fmt::Display for GetQuotaError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidUserDid(msg) => {
+                write!(f, "InvalidUserDid")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+/// Response type for
+///io.atcr.hold.getQuota
+pub struct GetQuotaResponse;
+impl jacquard_common::xrpc::XrpcResp for GetQuotaResponse {
+    const NSID: &'static str = "io.atcr.hold.getQuota";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GetQuotaOutput<'de>;
+    type Err<'de> = GetQuotaError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetQuota<'a> {
+    const NSID: &'static str = "io.atcr.hold.getQuota";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetQuotaResponse;
+}
+
+/// Endpoint type for
+///io.atcr.hold.getQuota
+pub struct GetQuotaRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetQuotaRequest {
+    const PATH: &'static str = "/xrpc/io.atcr.hold.getQuota";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetQuota<'de>;
+    type Response = GetQuotaResponse;
+}
+
 pub mod get_quota_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -109,92 +197,4 @@ where
             user_did: self.__unsafe_private_named.0.unwrap(),
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct GetQuotaOutput<'a> {
-    ///Storage limit in bytes (absent if unlimited)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    ///Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Total size in bytes of unique blobs
-    pub total_size: i64,
-    ///Number of unique blob digests
-    pub unique_blobs: i64,
-    ///DID of the user
-    #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetQuotaError<'a> {
-    #[serde(rename = "InvalidUserDid")]
-    InvalidUserDid(std::option::Option<jacquard_common::CowStr<'a>>),
-}
-
-impl core::fmt::Display for GetQuotaError<'_> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::InvalidUserDid(msg) => {
-                write!(f, "InvalidUserDid")?;
-                if let Some(msg) = msg {
-                    write!(f, ": {}", msg)?;
-                }
-                Ok(())
-            }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-/// Response type for
-///io.atcr.hold.getQuota
-pub struct GetQuotaResponse;
-impl jacquard_common::xrpc::XrpcResp for GetQuotaResponse {
-    const NSID: &'static str = "io.atcr.hold.getQuota";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetQuotaOutput<'de>;
-    type Err<'de> = GetQuotaError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetQuota<'a> {
-    const NSID: &'static str = "io.atcr.hold.getQuota";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = GetQuotaResponse;
-}
-
-/// Endpoint type for
-///io.atcr.hold.getQuota
-pub struct GetQuotaRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for GetQuotaRequest {
-    const PATH: &'static str = "/xrpc/io.atcr.hold.getQuota";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetQuota<'de>;
-    type Response = GetQuotaResponse;
 }

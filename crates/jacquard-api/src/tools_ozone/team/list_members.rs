@@ -5,10 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-fn _default_limit() -> std::option::Option<i64> {
-    Some(50i64)
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,6 +31,55 @@ pub struct ListMembers<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub roles: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListMembersOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub members: Vec<crate::tools_ozone::team::Member<'a>>,
+}
+
+/// Response type for
+///tools.ozone.team.listMembers
+pub struct ListMembersResponse;
+impl jacquard_common::xrpc::XrpcResp for ListMembersResponse {
+    const NSID: &'static str = "tools.ozone.team.listMembers";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListMembersOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+}
+
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListMembers<'a> {
+    const NSID: &'static str = "tools.ozone.team.listMembers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListMembersResponse;
+}
+
+/// Endpoint type for
+///tools.ozone.team.listMembers
+pub struct ListMembersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListMembersRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.team.listMembers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListMembers<'de>;
+    type Response = ListMembersResponse;
+}
+
+fn _default_limit() -> std::option::Option<i64> {
+    Some(50i64)
 }
 
 pub mod list_members_state {
@@ -175,49 +220,4 @@ where
             roles: self.__unsafe_private_named.4,
         }
     }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ListMembersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub members: Vec<crate::tools_ozone::team::Member<'a>>,
-}
-
-/// Response type for
-///tools.ozone.team.listMembers
-pub struct ListMembersResponse;
-impl jacquard_common::xrpc::XrpcResp for ListMembersResponse {
-    const NSID: &'static str = "tools.ozone.team.listMembers";
-    const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListMembersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-}
-
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListMembers<'a> {
-    const NSID: &'static str = "tools.ozone.team.listMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Response = ListMembersResponse;
-}
-
-/// Endpoint type for
-///tools.ozone.team.listMembers
-pub struct ListMembersRequest;
-impl jacquard_common::xrpc::XrpcEndpoint for ListMembersRequest {
-    const PATH: &'static str = "/xrpc/tools.ozone.team.listMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListMembers<'de>;
-    type Response = ListMembersResponse;
 }

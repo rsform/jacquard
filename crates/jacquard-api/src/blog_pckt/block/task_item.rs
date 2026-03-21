@@ -24,6 +24,23 @@ pub struct TaskItem<'a> {
     pub content: Vec<crate::blog_pckt::block::text::Text<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
+    fn nsid() -> &'static str {
+        "blog.pckt.block.taskItem"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_blog_pckt_block_taskItem()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod task_item_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -225,22 +242,5 @@ fn lexicon_doc_blog_pckt_block_taskItem() -> ::jacquard_lexicon::lexicon::Lexico
             );
             map
         },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.taskItem"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_taskItem()
-    }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
     }
 }
