@@ -147,51 +147,51 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Moderation;
         type Title;
         type Lang;
-        type Moderation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Moderation = Unset;
         type Title = Unset;
         type Lang = Unset;
-        type Moderation = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Lang = S::Lang;
-        type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Title = S::Title;
-        type Lang = Set<members::lang>;
-        type Moderation = S::Moderation;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModeration<S> {}
     impl<S: State> State for SetModeration<S> {
+        type Moderation = Set<members::moderation>;
         type Title = S::Title;
         type Lang = S::Lang;
-        type Moderation = Set<members::moderation>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Moderation = S::Moderation;
+        type Title = Set<members::title>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Moderation = S::Moderation;
+        type Title = S::Title;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `lang` field
         pub struct lang(());
-        ///Marker type for the `moderation` field
-        pub struct moderation(());
     }
 }
 
@@ -301,9 +301,9 @@ where
 impl<'a, S> LangsBuilder<'a, S>
 where
     S: langs_state::State,
+    S::Moderation: langs_state::IsSet,
     S::Title: langs_state::IsSet,
     S::Lang: langs_state::IsSet,
-    S::Moderation: langs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Langs<'a> {

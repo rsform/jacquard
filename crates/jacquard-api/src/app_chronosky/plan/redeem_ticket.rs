@@ -221,83 +221,83 @@ pub mod redeemed_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivatedAt;
-        type ExpiresAt;
         type Status;
+        type ExpiresAt;
         type PlanId;
+        type ActivatedAt;
         type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivatedAt = Unset;
-        type ExpiresAt = Unset;
         type Status = Unset;
+        type ExpiresAt = Unset;
         type PlanId = Unset;
+        type ActivatedAt = Unset;
         type Id = Unset;
     }
-    ///State transition - sets the `activated_at` field to Set
-    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
-    impl<S: State> State for SetActivatedAt<S> {
-        type ActivatedAt = Set<members::activated_at>;
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
         type ExpiresAt = S::ExpiresAt;
-        type Status = S::Status;
         type PlanId = S::PlanId;
+        type ActivatedAt = S::ActivatedAt;
         type Id = S::Id;
     }
     ///State transition - sets the `expires_at` field to Set
     pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
     impl<S: State> State for SetExpiresAt<S> {
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = Set<members::expires_at>;
         type Status = S::Status;
+        type ExpiresAt = Set<members::expires_at>;
         type PlanId = S::PlanId;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
         type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Status = Set<members::status>;
-        type PlanId = S::PlanId;
         type Id = S::Id;
     }
     ///State transition - sets the `plan_id` field to Set
     pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlanId<S> {}
     impl<S: State> State for SetPlanId<S> {
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
         type Status = S::Status;
+        type ExpiresAt = S::ExpiresAt;
         type PlanId = Set<members::plan_id>;
+        type ActivatedAt = S::ActivatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `activated_at` field to Set
+    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
+    impl<S: State> State for SetActivatedAt<S> {
+        type Status = S::Status;
+        type ExpiresAt = S::ExpiresAt;
+        type PlanId = S::PlanId;
+        type ActivatedAt = Set<members::activated_at>;
         type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
         type Status = S::Status;
+        type ExpiresAt = S::ExpiresAt;
         type PlanId = S::PlanId;
+        type ActivatedAt = S::ActivatedAt;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activated_at` field
-        pub struct activated_at(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
         ///Marker type for the `plan_id` field
         pub struct plan_id(());
+        ///Marker type for the `activated_at` field
+        pub struct activated_at(());
         ///Marker type for the `id` field
         pub struct id(());
     }
@@ -432,10 +432,10 @@ where
 impl<'a, S> RedeemedAssignmentBuilder<'a, S>
 where
     S: redeemed_assignment_state::State,
-    S::ActivatedAt: redeemed_assignment_state::IsSet,
-    S::ExpiresAt: redeemed_assignment_state::IsSet,
     S::Status: redeemed_assignment_state::IsSet,
+    S::ExpiresAt: redeemed_assignment_state::IsSet,
     S::PlanId: redeemed_assignment_state::IsSet,
+    S::ActivatedAt: redeemed_assignment_state::IsSet,
     S::Id: redeemed_assignment_state::IsSet,
 {
     /// Build the final struct

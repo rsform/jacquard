@@ -157,83 +157,83 @@ pub mod proposal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cts;
-        type Typ;
         type Uri;
         type Val;
+        type Typ;
+        type Cts;
         type Src;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cts = Unset;
-        type Typ = Unset;
         type Uri = Unset;
         type Val = Unset;
+        type Typ = Unset;
+        type Cts = Unset;
         type Src = Unset;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Cts = Set<members::cts>;
-        type Typ = S::Typ;
-        type Uri = S::Uri;
-        type Val = S::Val;
-        type Src = S::Src;
-    }
-    ///State transition - sets the `typ` field to Set
-    pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTyp<S> {}
-    impl<S: State> State for SetTyp<S> {
-        type Cts = S::Cts;
-        type Typ = Set<members::typ>;
-        type Uri = S::Uri;
-        type Val = S::Val;
-        type Src = S::Src;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cts = S::Cts;
-        type Typ = S::Typ;
         type Uri = Set<members::uri>;
         type Val = S::Val;
+        type Typ = S::Typ;
+        type Cts = S::Cts;
         type Src = S::Src;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Cts = S::Cts;
-        type Typ = S::Typ;
         type Uri = S::Uri;
         type Val = Set<members::val>;
+        type Typ = S::Typ;
+        type Cts = S::Cts;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `typ` field to Set
+    pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTyp<S> {}
+    impl<S: State> State for SetTyp<S> {
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Typ = Set<members::typ>;
+        type Cts = S::Cts;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Typ = S::Typ;
+        type Cts = Set<members::cts>;
         type Src = S::Src;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Cts = S::Cts;
-        type Typ = S::Typ;
         type Uri = S::Uri;
         type Val = S::Val;
+        type Typ = S::Typ;
+        type Cts = S::Cts;
         type Src = Set<members::src>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cts` field
-        pub struct cts(());
-        ///Marker type for the `typ` field
-        pub struct typ(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `val` field
         pub struct val(());
+        ///Marker type for the `typ` field
+        pub struct typ(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
         ///Marker type for the `src` field
         pub struct src(());
     }
@@ -485,10 +485,10 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 impl<'a, S> ProposalBuilder<'a, S>
 where
     S: proposal_state::State,
-    S::Cts: proposal_state::IsSet,
-    S::Typ: proposal_state::IsSet,
     S::Uri: proposal_state::IsSet,
     S::Val: proposal_state::IsSet,
+    S::Typ: proposal_state::IsSet,
+    S::Cts: proposal_state::IsSet,
     S::Src: proposal_state::IsSet,
 {
     /// Build the final struct

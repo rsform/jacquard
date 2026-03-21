@@ -132,50 +132,50 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Blocks;
         type Post;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Blocks = Unset;
         type Post = Unset;
+        type Blocks = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
         type Blocks = S::Blocks;
-        type Post = S::Post;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type CreatedAt = S::CreatedAt;
-        type Blocks = Set<members::blocks>;
-        type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
         type CreatedAt = S::CreatedAt;
-        type Blocks = S::Blocks;
         type Post = Set<members::post>;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -289,8 +289,8 @@ impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
     S::CreatedAt: comment_state::IsSet,
-    S::Blocks: comment_state::IsSet,
     S::Post: comment_state::IsSet,
+    S::Blocks: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {

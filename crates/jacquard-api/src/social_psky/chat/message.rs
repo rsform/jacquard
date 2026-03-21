@@ -152,37 +152,37 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Content;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Content = S::Content;
+        type Room = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Room = S::Room;
         type Content = Set<members::content>;
+        type Room = S::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Content = S::Content;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
@@ -295,8 +295,8 @@ where
 impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
-    S::Room: message_state::IsSet,
     S::Content: message_state::IsSet,
+    S::Room: message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Message<'a> {

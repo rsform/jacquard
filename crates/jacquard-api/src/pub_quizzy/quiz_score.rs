@@ -443,37 +443,37 @@ pub mod team_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TeamScore;
         type TotalScore;
+        type TeamScore;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TeamScore = Unset;
         type TotalScore = Unset;
-    }
-    ///State transition - sets the `team_score` field to Set
-    pub struct SetTeamScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeamScore<S> {}
-    impl<S: State> State for SetTeamScore<S> {
-        type TeamScore = Set<members::team_score>;
-        type TotalScore = S::TotalScore;
+        type TeamScore = Unset;
     }
     ///State transition - sets the `total_score` field to Set
     pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalScore<S> {}
     impl<S: State> State for SetTotalScore<S> {
-        type TeamScore = S::TeamScore;
         type TotalScore = Set<members::total_score>;
+        type TeamScore = S::TeamScore;
+    }
+    ///State transition - sets the `team_score` field to Set
+    pub struct SetTeamScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeamScore<S> {}
+    impl<S: State> State for SetTeamScore<S> {
+        type TotalScore = S::TotalScore;
+        type TeamScore = Set<members::team_score>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `team_score` field
-        pub struct team_score(());
         ///Marker type for the `total_score` field
         pub struct total_score(());
+        ///Marker type for the `team_score` field
+        pub struct team_score(());
     }
 }
 
@@ -546,8 +546,8 @@ where
 impl<'a, S> TeamResultBuilder<'a, S>
 where
     S: team_result_state::State,
-    S::TeamScore: team_result_state::IsSet,
     S::TotalScore: team_result_state::IsSet,
+    S::TeamScore: team_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeamResult<'a> {

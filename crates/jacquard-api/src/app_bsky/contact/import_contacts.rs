@@ -154,37 +154,37 @@ pub mod import_contacts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Contacts;
         type Token;
+        type Contacts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Contacts = Unset;
         type Token = Unset;
-    }
-    ///State transition - sets the `contacts` field to Set
-    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContacts<S> {}
-    impl<S: State> State for SetContacts<S> {
-        type Contacts = Set<members::contacts>;
-        type Token = S::Token;
+        type Contacts = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
-        type Contacts = S::Contacts;
         type Token = Set<members::token>;
+        type Contacts = S::Contacts;
+    }
+    ///State transition - sets the `contacts` field to Set
+    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContacts<S> {}
+    impl<S: State> State for SetContacts<S> {
+        type Token = S::Token;
+        type Contacts = Set<members::contacts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contacts` field
-        pub struct contacts(());
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `contacts` field
+        pub struct contacts(());
     }
 }
 
@@ -257,8 +257,8 @@ where
 impl<'a, S> ImportContactsBuilder<'a, S>
 where
     S: import_contacts_state::State,
-    S::Contacts: import_contacts_state::IsSet,
     S::Token: import_contacts_state::IsSet,
+    S::Contacts: import_contacts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImportContacts<'a> {

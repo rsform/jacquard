@@ -211,50 +211,50 @@ pub mod service_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Ionosphere;
-        type Name;
         type Language;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Ionosphere = Unset;
-        type Name = Unset;
         type Language = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
         type Ionosphere = Set<members::ionosphere>;
+        type Language = S::Language;
         type Name = S::Name;
-        type Language = S::Language;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Ionosphere = S::Ionosphere;
-        type Name = Set<members::name>;
-        type Language = S::Language;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
         type Ionosphere = S::Ionosphere;
-        type Name = S::Name;
         type Language = Set<members::language>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Ionosphere = S::Ionosphere;
+        type Language = S::Language;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -499,8 +499,8 @@ impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
     S::Ionosphere: service_state::IsSet,
-    S::Name: service_state::IsSet,
     S::Language: service_state::IsSet,
+    S::Name: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {

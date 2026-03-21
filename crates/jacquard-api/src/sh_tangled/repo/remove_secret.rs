@@ -63,37 +63,37 @@ pub mod remove_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Repo;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Repo = S::Repo;
+        type Key = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Key = S::Key;
         type Repo = Set<members::repo>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Repo = S::Repo;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -166,8 +166,8 @@ where
 impl<'a, S> RemoveSecretBuilder<'a, S>
 where
     S: remove_secret_state::State,
-    S::Key: remove_secret_state::IsSet,
     S::Repo: remove_secret_state::IsSet,
+    S::Key: remove_secret_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveSecret<'a> {

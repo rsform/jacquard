@@ -125,67 +125,67 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Pipeline;
         type CreatedAt;
         type Workflow;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Pipeline = Unset;
         type CreatedAt = Unset;
         type Workflow = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Pipeline = S::Pipeline;
-        type CreatedAt = S::CreatedAt;
-        type Workflow = S::Workflow;
+        type Status = Unset;
     }
     ///State transition - sets the `pipeline` field to Set
     pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPipeline<S> {}
     impl<S: State> State for SetPipeline<S> {
-        type Status = S::Status;
         type Pipeline = Set<members::pipeline>;
         type CreatedAt = S::CreatedAt;
         type Workflow = S::Workflow;
+        type Status = S::Status;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type Pipeline = S::Pipeline;
         type CreatedAt = Set<members::created_at>;
         type Workflow = S::Workflow;
+        type Status = S::Status;
     }
     ///State transition - sets the `workflow` field to Set
     pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflow<S> {}
     impl<S: State> State for SetWorkflow<S> {
-        type Status = S::Status;
         type Pipeline = S::Pipeline;
         type CreatedAt = S::CreatedAt;
         type Workflow = Set<members::workflow>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Pipeline = S::Pipeline;
+        type CreatedAt = S::CreatedAt;
+        type Workflow = S::Workflow;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -329,10 +329,10 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Status: status_state::IsSet,
     S::Pipeline: status_state::IsSet,
     S::CreatedAt: status_state::IsSet,
     S::Workflow: status_state::IsSet,
+    S::Status: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {

@@ -195,67 +195,67 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
+        type Parent;
         type CreatedAt;
         type Text;
-        type Parent;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
+        type Parent = Unset;
         type CreatedAt = Unset;
         type Text = Unset;
-        type Parent = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Root = S::Root;
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
-        type Text = Set<members::text>;
-        type Parent = S::Parent;
+        type Root = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Root = S::Root;
+        type Parent = Set<members::parent>;
         type CreatedAt = S::CreatedAt;
         type Text = S::Text;
-        type Parent = Set<members::parent>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Parent = S::Parent;
+        type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `parent` field
-        pub struct parent(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
@@ -385,10 +385,10 @@ where
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::Root: reply_state::IsSet,
+    S::Parent: reply_state::IsSet,
     S::CreatedAt: reply_state::IsSet,
     S::Text: reply_state::IsSet,
-    S::Parent: reply_state::IsSet,
+    S::Root: reply_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reply<'a> {
@@ -614,37 +614,37 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -717,8 +717,8 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Cid: reply_ref_state::IsSet,
     S::Uri: reply_ref_state::IsSet,
+    S::Cid: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {

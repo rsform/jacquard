@@ -141,50 +141,50 @@ pub mod resolution_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Answer;
-        type Market;
         type CreatedAt;
+        type Market;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Answer = Unset;
-        type Market = Unset;
         type CreatedAt = Unset;
+        type Market = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
         type Answer = Set<members::answer>;
+        type CreatedAt = S::CreatedAt;
         type Market = S::Market;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
-        type Answer = S::Answer;
-        type Market = Set<members::market>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Answer = S::Answer;
-        type Market = S::Market;
         type CreatedAt = Set<members::created_at>;
+        type Market = S::Market;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarket<S> {}
+    impl<S: State> State for SetMarket<S> {
+        type Answer = S::Answer;
+        type CreatedAt = S::CreatedAt;
+        type Market = Set<members::market>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `answer` field
         pub struct answer(());
-        ///Marker type for the `market` field
-        pub struct market(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `market` field
+        pub struct market(());
     }
 }
 
@@ -278,8 +278,8 @@ impl<'a, S> ResolutionBuilder<'a, S>
 where
     S: resolution_state::State,
     S::Answer: resolution_state::IsSet,
-    S::Market: resolution_state::IsSet,
     S::CreatedAt: resolution_state::IsSet,
+    S::Market: resolution_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Resolution<'a> {

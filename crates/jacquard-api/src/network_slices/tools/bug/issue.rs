@@ -114,51 +114,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Bug;
         type Issue;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Bug = Unset;
         type Issue = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type Bug = Set<members::bug>;
-        type Issue = S::Issue;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssue<S> {}
-    impl<S: State> State for SetIssue<S> {
-        type Bug = S::Bug;
-        type Issue = Set<members::issue>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Bug = S::Bug;
         type Issue = S::Issue;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type CreatedAt = S::CreatedAt;
+        type Bug = Set<members::bug>;
+        type Issue = S::Issue;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssue<S> {}
+    impl<S: State> State for SetIssue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Bug = S::Bug;
+        type Issue = Set<members::issue>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `bug` field
         pub struct bug(());
         ///Marker type for the `issue` field
         pub struct issue(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -251,9 +251,9 @@ where
 impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
+    S::CreatedAt: issue_state::IsSet,
     S::Bug: issue_state::IsSet,
     S::Issue: issue_state::IsSet,
-    S::CreatedAt: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {

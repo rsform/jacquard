@@ -229,51 +229,51 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Uri;
         type Description;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Uri = Unset;
         type Description = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Uri = S::Uri;
-        type Description = Set<members::description>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
         type Uri = S::Uri;
         type Description = S::Description;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Title = S::Title;
+        type Uri = Set<members::uri>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Uri = S::Uri;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -386,9 +386,9 @@ where
 impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
     S: external_embed_state::State,
+    S::Title: external_embed_state::IsSet,
     S::Uri: external_embed_state::IsSet,
     S::Description: external_embed_state::IsSet,
-    S::Title: external_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExternalEmbed<'a> {
@@ -894,51 +894,51 @@ pub mod view_external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Uri;
         type Description;
+        type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Uri = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Uri = S::Uri;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
-        type Uri = Set<members::uri>;
-        type Description = S::Description;
+        type Uri = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Uri = S::Uri;
         type Description = Set<members::description>;
+        type Uri = S::Uri;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Description = S::Description;
+        type Uri = Set<members::uri>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1051,9 +1051,9 @@ where
 impl<'a, S> ViewExternalBuilder<'a, S>
 where
     S: view_external_state::State,
-    S::Title: view_external_state::IsSet,
-    S::Uri: view_external_state::IsSet,
     S::Description: view_external_state::IsSet,
+    S::Uri: view_external_state::IsSet,
+    S::Title: view_external_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewExternal<'a> {

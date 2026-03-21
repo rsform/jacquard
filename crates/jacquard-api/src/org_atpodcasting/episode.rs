@@ -1205,11 +1205,11 @@ pub mod episode_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Duration;
         type Podcast;
-        type Media;
-        type Title;
         type PublishedAt;
+        type Duration;
+        type Title;
+        type Media;
         type FeedItemGuid;
     }
     /// Empty state - all required fields are unset
@@ -1217,11 +1217,11 @@ pub mod episode_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Duration = Unset;
         type Podcast = Unset;
-        type Media = Unset;
-        type Title = Unset;
         type PublishedAt = Unset;
+        type Duration = Unset;
+        type Title = Unset;
+        type Media = Unset;
         type FeedItemGuid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -1229,23 +1229,11 @@ pub mod episode_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
         type Duration = S::Duration;
-        type Podcast = S::Podcast;
-        type Media = S::Media;
         type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
-        type Duration = Set<members::duration>;
-        type Podcast = S::Podcast;
         type Media = S::Media;
-        type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
         type FeedItemGuid = S::FeedItemGuid;
     }
     ///State transition - sets the `podcast` field to Set
@@ -1253,35 +1241,11 @@ pub mod episode_state {
     impl<S: State> sealed::Sealed for SetPodcast<S> {}
     impl<S: State> State for SetPodcast<S> {
         type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
         type Podcast = Set<members::podcast>;
-        type Media = S::Media;
-        type Title = S::Title;
         type PublishedAt = S::PublishedAt;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type CreatedAt = S::CreatedAt;
         type Duration = S::Duration;
-        type Podcast = S::Podcast;
-        type Media = Set<members::media>;
         type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type Podcast = S::Podcast;
         type Media = S::Media;
-        type Title = Set<members::title>;
-        type PublishedAt = S::PublishedAt;
         type FeedItemGuid = S::FeedItemGuid;
     }
     ///State transition - sets the `published_at` field to Set
@@ -1289,11 +1253,47 @@ pub mod episode_state {
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
         type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
         type Podcast = S::Podcast;
-        type Media = S::Media;
-        type Title = S::Title;
         type PublishedAt = Set<members::published_at>;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type CreatedAt = S::CreatedAt;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type Duration = Set<members::duration>;
+        type Title = S::Title;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Title = Set<members::title>;
+        type Media = S::Media;
+        type FeedItemGuid = S::FeedItemGuid;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type CreatedAt = S::CreatedAt;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type Media = Set<members::media>;
         type FeedItemGuid = S::FeedItemGuid;
     }
     ///State transition - sets the `feed_item_guid` field to Set
@@ -1301,11 +1301,11 @@ pub mod episode_state {
     impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
     impl<S: State> State for SetFeedItemGuid<S> {
         type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
         type Podcast = S::Podcast;
-        type Media = S::Media;
-        type Title = S::Title;
         type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Title = S::Title;
+        type Media = S::Media;
         type FeedItemGuid = Set<members::feed_item_guid>;
     }
     /// Marker types for field names
@@ -1313,16 +1313,16 @@ pub mod episode_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `podcast` field
         pub struct podcast(());
-        ///Marker type for the `media` field
-        pub struct media(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `media` field
+        pub struct media(());
         ///Marker type for the `feed_item_guid` field
         pub struct feed_item_guid(());
     }
@@ -1697,11 +1697,11 @@ impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
     S::CreatedAt: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
     S::Podcast: episode_state::IsSet,
-    S::Media: episode_state::IsSet,
-    S::Title: episode_state::IsSet,
     S::PublishedAt: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
+    S::Title: episode_state::IsSet,
+    S::Media: episode_state::IsSet,
     S::FeedItemGuid: episode_state::IsSet,
 {
     /// Build the final struct
@@ -1768,37 +1768,37 @@ pub mod media_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MimeType = S::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Url = S::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MimeType = S::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -1871,8 +1871,8 @@ where
 impl<'a, S> MediaRefBuilder<'a, S>
 where
     S: media_ref_state::State,
-    S::Url: media_ref_state::IsSet,
     S::MimeType: media_ref_state::IsSet,
+    S::Url: media_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MediaRef<'a> {
@@ -1908,37 +1908,37 @@ pub mod transcript_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MimeType = S::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Url = S::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MimeType = S::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -2031,8 +2031,8 @@ where
 impl<'a, S> TranscriptRefBuilder<'a, S>
 where
     S: transcript_ref_state::State,
-    S::Url: transcript_ref_state::IsSet,
     S::MimeType: transcript_ref_state::IsSet,
+    S::Url: transcript_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TranscriptRef<'a> {

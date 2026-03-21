@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 
 /// Mode flag for codegen output style.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -15,28 +15,108 @@ pub enum CodegenMode {
 /// Common types from jacquard_common that appear frequently in generated code.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum CommonType {
-    // string types
+    // string types (jacquard_common::types::string::*)
     Did,
     Handle,
     AtUri,
     Nsid,
     Tid,
     Cid,
-    CidLink,
     Datetime,
     Language,
     RecordKey,
-    // value types
+    Rkey,
+    UriValue,
+    // ident types (jacquard_common::types::ident::*)
+    AtIdentifier,
+    // cid types (jacquard_common::types::cid::*)
+    CidLink,
+    // blob types (jacquard_common::types::blob::*)
+    BlobRef,
+    // value types (jacquard_common::types::value::*)
     Data,
     RawData,
-    // blob
-    BlobRef,
-    // cow
-    CowStr,
-    SmolStr,
-    // collection
+    // collection types (jacquard_common::types::collection::*)
     Collection,
     RecordError,
+    // cow/string types (jacquard_common::*)
+    CowStr,
+    SmolStr,
+}
+
+impl CommonType {
+    /// The short name used in Pretty mode (the final path segment).
+    pub fn short_name(&self) -> &'static str {
+        match self {
+            Self::Did => "Did",
+            Self::Handle => "Handle",
+            Self::AtUri => "AtUri",
+            Self::Nsid => "Nsid",
+            Self::Tid => "Tid",
+            Self::Cid => "Cid",
+            Self::Datetime => "Datetime",
+            Self::Language => "Language",
+            Self::RecordKey => "RecordKey",
+            Self::Rkey => "Rkey",
+            Self::UriValue => "UriValue",
+            Self::AtIdentifier => "AtIdentifier",
+            Self::CidLink => "CidLink",
+            Self::BlobRef => "BlobRef",
+            Self::Data => "Data",
+            Self::RawData => "RawData",
+            Self::Collection => "Collection",
+            Self::RecordError => "RecordError",
+            Self::CowStr => "CowStr",
+            Self::SmolStr => "SmolStr",
+        }
+    }
+
+    /// The fully-qualified token path used in Macro mode.
+    /// Returns (path_tokens, needs_lifetime).
+    pub fn fully_qualified(&self) -> (&'static str, bool) {
+        match self {
+            Self::Did => ("jacquard_common::types::string::Did", true),
+            Self::Handle => ("jacquard_common::types::string::Handle", true),
+            Self::Datetime => ("jacquard_common::types::string::Datetime", false),
+            Self::Language => ("jacquard_common::types::string::Language", false),
+            Self::Tid => ("jacquard_common::types::string::Tid", false),
+            Self::CowStr => ("jacquard_common::CowStr", true),
+            Self::SmolStr => ("jacquard_common::deps::smol_str::SmolStr", false),
+            Self::Data => ("jacquard_common::types::value::Data", true),
+            Self::CidLink => ("jacquard_common::types::cid::CidLink", true),
+            Self::BlobRef => ("jacquard_common::types::blob::BlobRef", true),
+            Self::AtUri => ("jacquard_common::types::string::AtUri", true),
+            Self::Nsid => ("jacquard_common::types::string::Nsid", true),
+            Self::Cid => ("jacquard_common::types::string::Cid", true),
+            // RecordKey is a COMPOSITE type: RecordKey<Rkey<'a>>. needs_lifetime
+            // is false here because the lifetime is carried by the inner Rkey, not
+            // RecordKey itself. type_tokens() must special-case this — see Phase 3.
+            Self::RecordKey => ("jacquard_common::types::string::RecordKey", false),
+            Self::Rkey => ("jacquard_common::types::string::Rkey", true),
+            Self::UriValue => ("jacquard_common::types::string::UriValue", true),
+            Self::AtIdentifier => ("jacquard_common::types::ident::AtIdentifier", true),
+            Self::Collection => ("jacquard_common::types::collection::Collection", false),
+            Self::RecordError => ("jacquard_common::types::collection::RecordError", true),
+            Self::RawData => ("jacquard_common::types::value::RawData", true),
+        }
+    }
+
+    /// The `use` path for grouping imports (everything before the type name).
+    pub fn use_path(&self) -> &'static str {
+        match self {
+            Self::Did | Self::Handle | Self::AtUri | Self::Nsid
+            | Self::Tid | Self::Cid | Self::Datetime | Self::Language
+            | Self::RecordKey | Self::Rkey | Self::UriValue
+                => "jacquard_common::types::string",
+            Self::AtIdentifier => "jacquard_common::types::ident",
+            Self::CidLink => "jacquard_common::types::cid",
+            Self::BlobRef => "jacquard_common::types::blob",
+            Self::Data | Self::RawData => "jacquard_common::types::value",
+            Self::Collection | Self::RecordError => "jacquard_common::types::collection",
+            Self::CowStr => "jacquard_common",
+            Self::SmolStr => "jacquard_common::deps::smol_str",
+        }
+    }
 }
 
 /// External crate imports (serde, bytes, jacquard_derive, jacquard_lexicon, etc.).
@@ -57,6 +137,33 @@ pub enum ExternalImport {
     Bytes,
 }
 
+impl ExternalImport {
+    pub fn short_name(&self) -> &'static str {
+        match self {
+            Self::Serialize => "Serialize",
+            Self::Deserialize => "Deserialize",
+            Self::IntoStatic => "IntoStatic",
+            Self::LexiconAttr => "lexicon",
+            Self::OpenUnion => "open_union",
+            Self::Bytes => "Bytes",
+            Self::LexiconSchema => "LexiconSchema",
+            Self::LexiconDoc => "LexiconDoc",
+            Self::ConstraintError => "ConstraintError",
+        }
+    }
+
+    pub fn use_path(&self) -> &'static str {
+        match self {
+            Self::Serialize | Self::Deserialize => "serde",
+            Self::IntoStatic | Self::LexiconAttr | Self::OpenUnion => "jacquard_derive",
+            Self::Bytes => "jacquard_common::deps::bytes",
+            Self::LexiconSchema => "jacquard_lexicon::schema",
+            Self::LexiconDoc => "jacquard_lexicon::lexicon",
+            Self::ConstraintError => "jacquard_lexicon::validation",
+        }
+    }
+}
+
 /// Accumulator for types referenced during generation (without path-form decisions).
 #[derive(Default, Clone, Debug)]
 pub struct ImportSet {
@@ -75,16 +182,114 @@ impl ImportSet {
 
 /// Decision table built between collection and emission passes.
 /// Maps each type to either a short Ident or fully-qualified form.
-/// Stub in Phase 1 — always returns fully-qualified paths.
 pub struct ResolvedImports {
     mode: CodegenMode,
+    /// CommonTypes that resolved to short names (no collision).
+    short: BTreeMap<CommonType, syn::Ident>,
+    /// CommonTypes that must stay fully-qualified (collision or Macro mode).
+    qualified: BTreeSet<CommonType>,
+    /// ExternalImports that resolved to short names.
+    external_short: BTreeMap<ExternalImport, syn::Ident>,
+    /// Cross-namespace lexicon refs to include in use block.
+    lexicon_uses: BTreeSet<String>,
 }
 
 impl ResolvedImports {
-    pub fn macro_mode() -> Self {
-        Self {
-            mode: CodegenMode::Macro,
+    /// Build decision table from collected imports, local names, and mode.
+    pub fn resolve(
+        imports: &ImportSet,
+        local_type_names: &HashSet<String>,
+        mode: CodegenMode,
+    ) -> Self {
+        match mode {
+            CodegenMode::Macro => {
+                // Everything stays fully-qualified.
+                Self {
+                    mode,
+                    short: BTreeMap::new(),
+                    qualified: imports.common.iter().cloned().collect(),
+                    external_short: BTreeMap::new(),
+                    lexicon_uses: BTreeSet::new(),
+                }
+            }
+            CodegenMode::Pretty => {
+                let mut short = BTreeMap::new();
+                let mut qualified = BTreeSet::new();
+
+                for ct in &imports.common {
+                    let name = ct.short_name();
+                    if local_type_names.contains(name) {
+                        // Collision — stay fully-qualified.
+                        qualified.insert(ct.clone());
+                    } else {
+                        let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+                        short.insert(ct.clone(), ident);
+                    }
+                }
+
+                let mut external_short = BTreeMap::new();
+                for ei in &imports.external {
+                    let name = ei.short_name();
+                    // External imports don't collide with local types
+                    // (Serialize, Deserialize, IntoStatic, Bytes unlikely to clash).
+                    let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+                    external_short.insert(ei.clone(), ident);
+                }
+
+                Self {
+                    mode,
+                    short,
+                    qualified,
+                    external_short,
+                    lexicon_uses: imports.lexicon_refs.clone(),
+                }
+            }
         }
+    }
+
+    /// Returns tokens for a CommonType — short name or fully-qualified.
+    pub fn type_tokens(&self, ct: &CommonType) -> TokenStream {
+        if let Some(ident) = self.short.get(ct) {
+            quote! { #ident }
+        } else {
+            let (path_str, _needs_lifetime) = ct.fully_qualified();
+            let path: syn::Path = syn::parse_str(path_str)
+                .expect("invalid fully_qualified path");
+            quote! { #path }
+        }
+    }
+
+    /// Produces the grouped `use` block for the top of the file.
+    pub fn to_use_block(&self) -> TokenStream {
+        if self.mode == CodegenMode::Macro {
+            // Macro mode: no use block.
+            return TokenStream::new();
+        }
+
+        // Group types by use_path.
+        let mut grouped: BTreeMap<&'static str, Vec<&syn::Ident>> = BTreeMap::new();
+        for (ct, ident) in &self.short {
+            let path = ct.use_path();
+            grouped.entry(path).or_default().push(ident);
+        }
+
+        // Group external imports by use_path.
+        for (ei, ident) in &self.external_short {
+            let path = ei.use_path();
+            grouped.entry(path).or_default().push(ident);
+        }
+
+        // Generate use statements.
+        let mut tokens = TokenStream::new();
+        for (path_str, idents) in grouped {
+            let path: syn::Path = syn::parse_str(path_str)
+                .expect("invalid use_path");
+            tokens.extend(quote! {
+                use #path::{#(#idents),*};
+            });
+        }
+
+        tokens
     }
 }
 
@@ -337,5 +542,276 @@ mod tests {
         assert!(set1.external.contains(&ExternalImport::Deserialize));
         assert!(set1.lexicon_refs.contains("foo.bar"));
         assert!(set1.lexicon_refs.contains("baz.qux"));
+    }
+
+    #[test]
+    fn test_common_type_short_names() {
+        assert_eq!(CommonType::Did.short_name(), "Did");
+        assert_eq!(CommonType::Handle.short_name(), "Handle");
+        assert_eq!(CommonType::AtUri.short_name(), "AtUri");
+        assert_eq!(CommonType::Nsid.short_name(), "Nsid");
+        assert_eq!(CommonType::Tid.short_name(), "Tid");
+        assert_eq!(CommonType::Cid.short_name(), "Cid");
+        assert_eq!(CommonType::Datetime.short_name(), "Datetime");
+        assert_eq!(CommonType::Language.short_name(), "Language");
+        assert_eq!(CommonType::RecordKey.short_name(), "RecordKey");
+        assert_eq!(CommonType::Rkey.short_name(), "Rkey");
+        assert_eq!(CommonType::UriValue.short_name(), "UriValue");
+        assert_eq!(CommonType::AtIdentifier.short_name(), "AtIdentifier");
+        assert_eq!(CommonType::CidLink.short_name(), "CidLink");
+        assert_eq!(CommonType::BlobRef.short_name(), "BlobRef");
+        assert_eq!(CommonType::Data.short_name(), "Data");
+        assert_eq!(CommonType::RawData.short_name(), "RawData");
+        assert_eq!(CommonType::Collection.short_name(), "Collection");
+        assert_eq!(CommonType::RecordError.short_name(), "RecordError");
+        assert_eq!(CommonType::CowStr.short_name(), "CowStr");
+        assert_eq!(CommonType::SmolStr.short_name(), "SmolStr");
+    }
+
+    #[test]
+    fn test_common_type_fully_qualified() {
+        let (path, needs_lifetime) = CommonType::Did.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::string::Did");
+        assert!(needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::Datetime.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::string::Datetime");
+        assert!(!needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::CowStr.fully_qualified();
+        assert_eq!(path, "jacquard_common::CowStr");
+        assert!(needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::SmolStr.fully_qualified();
+        assert_eq!(path, "jacquard_common::deps::smol_str::SmolStr");
+        assert!(!needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::Data.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::value::Data");
+        assert!(needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::Collection.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::collection::Collection");
+        assert!(!needs_lifetime);
+
+        let (path, needs_lifetime) = CommonType::RecordError.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::collection::RecordError");
+        assert!(needs_lifetime);
+
+        // Test RecordKey special case (composite type)
+        let (path, needs_lifetime) = CommonType::RecordKey.fully_qualified();
+        assert_eq!(path, "jacquard_common::types::string::RecordKey");
+        assert!(!needs_lifetime);
+    }
+
+    #[test]
+    fn test_common_type_use_path_grouping() {
+        // All string types should share same use_path
+        assert_eq!(CommonType::Did.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Handle.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::AtUri.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Nsid.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Tid.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Cid.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Datetime.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Language.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::RecordKey.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::Rkey.use_path(), "jacquard_common::types::string");
+        assert_eq!(CommonType::UriValue.use_path(), "jacquard_common::types::string");
+
+        // Value types
+        assert_eq!(CommonType::Data.use_path(), "jacquard_common::types::value");
+        assert_eq!(CommonType::RawData.use_path(), "jacquard_common::types::value");
+
+        // Collection types
+        assert_eq!(CommonType::Collection.use_path(), "jacquard_common::types::collection");
+        assert_eq!(CommonType::RecordError.use_path(), "jacquard_common::types::collection");
+
+        // Other types
+        assert_eq!(CommonType::AtIdentifier.use_path(), "jacquard_common::types::ident");
+        assert_eq!(CommonType::CidLink.use_path(), "jacquard_common::types::cid");
+        assert_eq!(CommonType::BlobRef.use_path(), "jacquard_common::types::blob");
+        assert_eq!(CommonType::CowStr.use_path(), "jacquard_common");
+        assert_eq!(CommonType::SmolStr.use_path(), "jacquard_common::deps::smol_str");
+    }
+
+    #[test]
+    fn test_external_import_short_names() {
+        assert_eq!(ExternalImport::Serialize.short_name(), "Serialize");
+        assert_eq!(ExternalImport::Deserialize.short_name(), "Deserialize");
+        assert_eq!(ExternalImport::IntoStatic.short_name(), "IntoStatic");
+        assert_eq!(ExternalImport::LexiconAttr.short_name(), "lexicon");
+        assert_eq!(ExternalImport::OpenUnion.short_name(), "open_union");
+        assert_eq!(ExternalImport::Bytes.short_name(), "Bytes");
+        assert_eq!(ExternalImport::LexiconSchema.short_name(), "LexiconSchema");
+        assert_eq!(ExternalImport::LexiconDoc.short_name(), "LexiconDoc");
+        assert_eq!(ExternalImport::ConstraintError.short_name(), "ConstraintError");
+    }
+
+    #[test]
+    fn test_external_import_use_paths() {
+        assert_eq!(ExternalImport::Serialize.use_path(), "serde");
+        assert_eq!(ExternalImport::Deserialize.use_path(), "serde");
+        assert_eq!(ExternalImport::IntoStatic.use_path(), "jacquard_derive");
+        assert_eq!(ExternalImport::LexiconAttr.use_path(), "jacquard_derive");
+        assert_eq!(ExternalImport::OpenUnion.use_path(), "jacquard_derive");
+        assert_eq!(ExternalImport::Bytes.use_path(), "jacquard_common::deps::bytes");
+        assert_eq!(ExternalImport::LexiconSchema.use_path(), "jacquard_lexicon::schema");
+        assert_eq!(ExternalImport::LexiconDoc.use_path(), "jacquard_lexicon::lexicon");
+        assert_eq!(ExternalImport::ConstraintError.use_path(), "jacquard_lexicon::validation");
+    }
+
+    #[test]
+    fn test_resolved_imports_macro_mode() {
+        // AC4.4: Macro mode should fully-qualify everything with empty use block
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+        imports.common.insert(CommonType::Handle);
+        imports.external.insert(ExternalImport::Serialize);
+        imports.external.insert(ExternalImport::Deserialize);
+
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
+
+        // In Macro mode, nothing goes into short maps
+        assert!(resolved.short.is_empty());
+        assert_eq!(resolved.qualified.len(), 2);
+        assert!(resolved.qualified.contains(&CommonType::Did));
+        assert!(resolved.qualified.contains(&CommonType::Handle));
+        assert!(resolved.external_short.is_empty());
+
+        // Use block should be empty in Macro mode
+        let use_block = resolved.to_use_block();
+        assert_eq!(use_block.to_string(), "");
+    }
+
+    #[test]
+    fn test_resolved_imports_pretty_no_collisions() {
+        // AC4.1: Pretty mode, no collisions → all types get short names, use block
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+        imports.common.insert(CommonType::Handle);
+        imports.common.insert(CommonType::Data);
+        imports.external.insert(ExternalImport::Serialize);
+        imports.external.insert(ExternalImport::Deserialize);
+
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+
+        // All should be in short maps
+        assert_eq!(resolved.short.len(), 3);
+        assert!(resolved.qualified.is_empty());
+        assert_eq!(resolved.external_short.len(), 2);
+
+        // Use block should contain the types (may have spaces or formatting variations)
+        let use_block = resolved.to_use_block().to_string();
+        let normalized = use_block.replace(" ", "").replace("\n", "");
+        assert!(normalized.contains("jacquard_common::types::string"));
+        assert!(normalized.contains("Did"));
+        assert!(normalized.contains("Handle"));
+        assert!(normalized.contains("jacquard_common::types::value"));
+        assert!(normalized.contains("Data"));
+        assert!(normalized.contains("serde"));
+        assert!(normalized.contains("Serialize"));
+        assert!(normalized.contains("Deserialize"));
+    }
+
+    #[test]
+    fn test_resolved_imports_pretty_with_collision() {
+        // AC4.2: Pretty mode, local type "Did" defined → Did stays qualified
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+        imports.common.insert(CommonType::Handle);
+        imports.common.insert(CommonType::Data);
+        imports.external.insert(ExternalImport::Serialize);
+
+        let mut local_names = HashSet::new();
+        local_names.insert("Did".to_string());
+
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+
+        // Did should be in qualified, others in short
+        assert_eq!(resolved.short.len(), 2);
+        assert!(resolved.short.contains_key(&CommonType::Handle));
+        assert!(resolved.short.contains_key(&CommonType::Data));
+        assert_eq!(resolved.qualified.len(), 1);
+        assert!(resolved.qualified.contains(&CommonType::Did));
+
+        // Use block should exclude Did
+        let use_block = resolved.to_use_block().to_string();
+        assert!(use_block.contains("Handle"));
+        assert!(use_block.contains("Data"));
+        // Did should NOT appear in the use block
+        assert!(!use_block.contains("Did,") && !use_block.contains("Did}"));
+    }
+
+    #[test]
+    fn test_resolved_imports_collection_collision() {
+        // AC4.3: Pretty mode, local type "Collection" defined
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+        imports.common.insert(CommonType::Collection);
+        imports.common.insert(CommonType::RecordError);
+
+        let mut local_names = HashSet::new();
+        local_names.insert("Collection".to_string());
+
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+
+        // Collection stays qualified, others short
+        assert!(resolved.qualified.contains(&CommonType::Collection));
+        assert!(resolved.short.contains_key(&CommonType::Did));
+        assert!(resolved.short.contains_key(&CommonType::RecordError));
+
+        let use_block = resolved.to_use_block().to_string();
+        // Both Did and RecordError in the block, but Collection not
+        assert!(use_block.contains("Did"));
+        assert!(use_block.contains("RecordError"));
+        assert!(!use_block.contains("Collection,") && !use_block.contains("Collection}"));
+    }
+
+    #[test]
+    fn test_resolved_imports_empty() {
+        // Edge case: empty ImportSet
+        let imports = ImportSet::default();
+        let local_names = HashSet::new();
+
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+
+        assert!(resolved.short.is_empty());
+        assert!(resolved.qualified.is_empty());
+        assert!(resolved.external_short.is_empty());
+        assert_eq!(resolved.to_use_block().to_string(), "");
+    }
+
+    #[test]
+    fn test_resolved_imports_type_tokens() {
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+
+        // For a short-named type, type_tokens should emit just the ident
+        let tokens = resolved.type_tokens(&CommonType::Did);
+        let tokens_str = tokens.to_string();
+        assert_eq!(tokens_str, "Did");
+    }
+
+    #[test]
+    fn test_resolved_imports_type_tokens_qualified() {
+        let mut imports = ImportSet::default();
+        imports.common.insert(CommonType::Did);
+
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
+
+        // In Macro mode, type_tokens should emit the fully-qualified path
+        let tokens = resolved.type_tokens(&CommonType::Did);
+        let tokens_str = tokens.to_string();
+        // Should contain the full path
+        assert!(tokens_str.contains("jacquard_common"));
+        assert!(tokens_str.contains("string"));
+        assert!(tokens_str.contains("Did"));
     }
 }

@@ -295,66 +295,66 @@ pub mod measurement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Unit;
-        type CreatedAt;
         type Metric;
         type Value;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Unit = Unset;
-        type CreatedAt = Unset;
         type Metric = Unset;
         type Value = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `unit` field to Set
     pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnit<S> {}
     impl<S: State> State for SetUnit<S> {
         type Unit = Set<members::unit>;
+        type Metric = S::Metric;
+        type Value = S::Value;
         type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Unit = S::Unit;
-        type CreatedAt = Set<members::created_at>;
-        type Metric = S::Metric;
-        type Value = S::Value;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type Unit = S::Unit;
-        type CreatedAt = S::CreatedAt;
         type Metric = Set<members::metric>;
         type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Unit = S::Unit;
-        type CreatedAt = S::CreatedAt;
         type Metric = S::Metric;
         type Value = Set<members::value>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Unit = S::Unit;
+        type Metric = S::Metric;
+        type Value = S::Value;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `unit` field
         pub struct unit(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `metric` field
         pub struct metric(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -684,9 +684,9 @@ impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
     S::Unit: measurement_state::IsSet,
-    S::CreatedAt: measurement_state::IsSet,
     S::Metric: measurement_state::IsSet,
     S::Value: measurement_state::IsSet,
+    S::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {

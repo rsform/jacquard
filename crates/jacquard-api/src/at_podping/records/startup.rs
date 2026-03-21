@@ -147,51 +147,51 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Timestamp;
         type ServerAccount;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Timestamp = Unset;
         type ServerAccount = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Timestamp = S::Timestamp;
-        type ServerAccount = S::ServerAccount;
+        type Message = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Message = S::Message;
         type Timestamp = Set<members::timestamp>;
         type ServerAccount = S::ServerAccount;
+        type Message = S::Message;
     }
     ///State transition - sets the `server_account` field to Set
     pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServerAccount<S> {}
     impl<S: State> State for SetServerAccount<S> {
-        type Message = S::Message;
         type Timestamp = S::Timestamp;
         type ServerAccount = Set<members::server_account>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Timestamp = S::Timestamp;
+        type ServerAccount = S::ServerAccount;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
         ///Marker type for the `server_account` field
         pub struct server_account(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -435,9 +435,9 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S> StartupBuilder<'a, S>
 where
     S: startup_state::State,
-    S::Message: startup_state::IsSet,
     S::Timestamp: startup_state::IsSet,
     S::ServerAccount: startup_state::IsSet,
+    S::Message: startup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Startup<'a> {

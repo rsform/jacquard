@@ -200,67 +200,67 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Expression;
+        type CreatedAt;
         type Version;
         type UsedTags;
-        type CreatedAt;
+        type Expression;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Expression = Unset;
+        type CreatedAt = Unset;
         type Version = Unset;
         type UsedTags = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `expression` field to Set
-    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpression<S> {}
-    impl<S: State> State for SetExpression<S> {
-        type Expression = Set<members::expression>;
-        type Version = S::Version;
-        type UsedTags = S::UsedTags;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Expression = S::Expression;
-        type Version = Set<members::version>;
-        type UsedTags = S::UsedTags;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `used_tags` field to Set
-    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
-    impl<S: State> State for SetUsedTags<S> {
-        type Expression = S::Expression;
-        type Version = S::Version;
-        type UsedTags = Set<members::used_tags>;
-        type CreatedAt = S::CreatedAt;
+        type Expression = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Expression = S::Expression;
+        type CreatedAt = Set<members::created_at>;
         type Version = S::Version;
         type UsedTags = S::UsedTags;
-        type CreatedAt = Set<members::created_at>;
+        type Expression = S::Expression;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type CreatedAt = S::CreatedAt;
+        type Version = Set<members::version>;
+        type UsedTags = S::UsedTags;
+        type Expression = S::Expression;
+    }
+    ///State transition - sets the `used_tags` field to Set
+    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
+    impl<S: State> State for SetUsedTags<S> {
+        type CreatedAt = S::CreatedAt;
+        type Version = S::Version;
+        type UsedTags = Set<members::used_tags>;
+        type Expression = S::Expression;
+    }
+    ///State transition - sets the `expression` field to Set
+    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpression<S> {}
+    impl<S: State> State for SetExpression<S> {
+        type CreatedAt = S::CreatedAt;
+        type Version = S::Version;
+        type UsedTags = S::UsedTags;
+        type Expression = Set<members::expression>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expression` field
-        pub struct expression(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `version` field
         pub struct version(());
         ///Marker type for the `used_tags` field
         pub struct used_tags(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `expression` field
+        pub struct expression(());
     }
 }
 
@@ -373,10 +373,10 @@ where
 impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
-    S::Expression: cel_state::IsSet,
+    S::CreatedAt: cel_state::IsSet,
     S::Version: cel_state::IsSet,
     S::UsedTags: cel_state::IsSet,
-    S::CreatedAt: cel_state::IsSet,
+    S::Expression: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {

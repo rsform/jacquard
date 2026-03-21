@@ -667,49 +667,49 @@ pub mod verification_input_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Handle;
+        type Subject;
         type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Handle = Unset;
+        type Subject = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Handle = S::Handle;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Subject = S::Subject;
         type Handle = Set<members::handle>;
+        type Subject = S::Subject;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Handle = S::Handle;
+        type Subject = Set<members::subject>;
         type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Subject = S::Subject;
         type Handle = S::Handle;
+        type Subject = S::Subject;
         type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
     }
@@ -824,8 +824,8 @@ where
 impl<'a, S> VerificationInputBuilder<'a, S>
 where
     S: verification_input_state::State,
-    S::Subject: verification_input_state::IsSet,
     S::Handle: verification_input_state::IsSet,
+    S::Subject: verification_input_state::IsSet,
     S::DisplayName: verification_input_state::IsSet,
 {
     /// Build the final struct

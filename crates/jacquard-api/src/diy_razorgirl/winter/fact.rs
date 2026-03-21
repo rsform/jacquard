@@ -167,51 +167,51 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Predicate;
         type Args;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Predicate = Unset;
         type Args = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Predicate = S::Predicate;
-        type Args = S::Args;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `predicate` field to Set
     pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPredicate<S> {}
     impl<S: State> State for SetPredicate<S> {
-        type CreatedAt = S::CreatedAt;
         type Predicate = Set<members::predicate>;
         type Args = S::Args;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `args` field to Set
     pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArgs<S> {}
     impl<S: State> State for SetArgs<S> {
-        type CreatedAt = S::CreatedAt;
         type Predicate = S::Predicate;
         type Args = Set<members::args>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Predicate = S::Predicate;
+        type Args = S::Args;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `predicate` field
         pub struct predicate(());
         ///Marker type for the `args` field
         pub struct args(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -401,9 +401,9 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
-    S::CreatedAt: fact_state::IsSet,
     S::Predicate: fact_state::IsSet,
     S::Args: fact_state::IsSet,
+    S::CreatedAt: fact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fact<'a> {

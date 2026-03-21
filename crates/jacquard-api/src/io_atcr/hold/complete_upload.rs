@@ -213,50 +213,50 @@ pub mod complete_upload_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UploadId;
-        type Digest;
         type Parts;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UploadId = Unset;
-        type Digest = Unset;
         type Parts = Unset;
+        type Digest = Unset;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
         type UploadId = Set<members::upload_id>;
+        type Parts = S::Parts;
         type Digest = S::Digest;
-        type Parts = S::Parts;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type UploadId = S::UploadId;
-        type Digest = Set<members::digest>;
-        type Parts = S::Parts;
     }
     ///State transition - sets the `parts` field to Set
     pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParts<S> {}
     impl<S: State> State for SetParts<S> {
         type UploadId = S::UploadId;
-        type Digest = S::Digest;
         type Parts = Set<members::parts>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type UploadId = S::UploadId;
+        type Parts = S::Parts;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -350,8 +350,8 @@ impl<'a, S> CompleteUploadBuilder<'a, S>
 where
     S: complete_upload_state::State,
     S::UploadId: complete_upload_state::IsSet,
-    S::Digest: complete_upload_state::IsSet,
     S::Parts: complete_upload_state::IsSet,
+    S::Digest: complete_upload_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompleteUpload<'a> {

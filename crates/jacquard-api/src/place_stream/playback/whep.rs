@@ -155,37 +155,37 @@ pub mod whep_params_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Rendition;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Rendition = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Rendition = S::Rendition;
+        type Streamer = Unset;
     }
     ///State transition - sets the `rendition` field to Set
     pub struct SetRendition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRendition<S> {}
     impl<S: State> State for SetRendition<S> {
-        type Streamer = S::Streamer;
         type Rendition = Set<members::rendition>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Rendition = S::Rendition;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `rendition` field
         pub struct rendition(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -258,8 +258,8 @@ where
 impl<'a, S> WhepParamsBuilder<'a, S>
 where
     S: whep_params_state::State,
-    S::Streamer: whep_params_state::IsSet,
     S::Rendition: whep_params_state::IsSet,
+    S::Streamer: whep_params_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WhepParams<'a> {

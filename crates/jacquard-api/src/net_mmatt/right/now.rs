@@ -117,37 +117,37 @@ pub mod now_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
         type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -237,8 +237,8 @@ where
 impl<'a, S> NowBuilder<'a, S>
 where
     S: now_state::State,
-    S::CreatedAt: now_state::IsSet,
     S::Text: now_state::IsSet,
+    S::CreatedAt: now_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Now<'a> {

@@ -188,49 +188,49 @@ pub mod league_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Teams;
         type QuizMasters;
+        type Teams;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Teams = Unset;
         type QuizMasters = Unset;
+        type Teams = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `teams` field to Set
-    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeams<S> {}
-    impl<S: State> State for SetTeams<S> {
-        type Teams = Set<members::teams>;
-        type QuizMasters = S::QuizMasters;
-        type Name = S::Name;
     }
     ///State transition - sets the `quiz_masters` field to Set
     pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
     impl<S: State> State for SetQuizMasters<S> {
-        type Teams = S::Teams;
         type QuizMasters = Set<members::quiz_masters>;
+        type Teams = S::Teams;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `teams` field to Set
+    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeams<S> {}
+    impl<S: State> State for SetTeams<S> {
+        type QuizMasters = S::QuizMasters;
+        type Teams = Set<members::teams>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Teams = S::Teams;
         type QuizMasters = S::QuizMasters;
+        type Teams = S::Teams;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `teams` field
-        pub struct teams(());
         ///Marker type for the `quiz_masters` field
         pub struct quiz_masters(());
+        ///Marker type for the `teams` field
+        pub struct teams(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -325,8 +325,8 @@ where
 impl<'a, S> LeagueBuilder<'a, S>
 where
     S: league_state::State,
-    S::Teams: league_state::IsSet,
     S::QuizMasters: league_state::IsSet,
+    S::Teams: league_state::IsSet,
     S::Name: league_state::IsSet,
 {
     /// Build the final struct

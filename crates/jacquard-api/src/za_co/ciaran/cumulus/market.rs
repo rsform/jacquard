@@ -126,67 +126,67 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Question;
         type CreatedAt;
-        type Liquidity;
         type ClosesAt;
+        type Question;
+        type Liquidity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Question = Unset;
         type CreatedAt = Unset;
-        type Liquidity = Unset;
         type ClosesAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type CreatedAt = S::CreatedAt;
-        type Liquidity = S::Liquidity;
-        type ClosesAt = S::ClosesAt;
+        type Question = Unset;
+        type Liquidity = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
         type CreatedAt = Set<members::created_at>;
-        type Liquidity = S::Liquidity;
         type ClosesAt = S::ClosesAt;
-    }
-    ///State transition - sets the `liquidity` field to Set
-    pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLiquidity<S> {}
-    impl<S: State> State for SetLiquidity<S> {
         type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
-        type Liquidity = Set<members::liquidity>;
-        type ClosesAt = S::ClosesAt;
+        type Liquidity = S::Liquidity;
     }
     ///State transition - sets the `closes_at` field to Set
     pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClosesAt<S> {}
     impl<S: State> State for SetClosesAt<S> {
-        type Question = S::Question;
         type CreatedAt = S::CreatedAt;
-        type Liquidity = S::Liquidity;
         type ClosesAt = Set<members::closes_at>;
+        type Question = S::Question;
+        type Liquidity = S::Liquidity;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClosesAt = S::ClosesAt;
+        type Question = Set<members::question>;
+        type Liquidity = S::Liquidity;
+    }
+    ///State transition - sets the `liquidity` field to Set
+    pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLiquidity<S> {}
+    impl<S: State> State for SetLiquidity<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClosesAt = S::ClosesAt;
+        type Question = S::Question;
+        type Liquidity = Set<members::liquidity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `liquidity` field
-        pub struct liquidity(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
+        ///Marker type for the `question` field
+        pub struct question(());
+        ///Marker type for the `liquidity` field
+        pub struct liquidity(());
     }
 }
 
@@ -299,10 +299,10 @@ where
 impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
-    S::Question: market_state::IsSet,
     S::CreatedAt: market_state::IsSet,
-    S::Liquidity: market_state::IsSet,
     S::ClosesAt: market_state::IsSet,
+    S::Question: market_state::IsSet,
+    S::Liquidity: market_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Market<'a> {

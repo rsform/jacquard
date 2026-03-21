@@ -2176,37 +2176,37 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteStart;
         type ByteEnd;
+        type ByteStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteStart = Unset;
         type ByteEnd = Unset;
-    }
-    ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
-        type ByteStart = Set<members::byte_start>;
-        type ByteEnd = S::ByteEnd;
+        type ByteStart = Unset;
     }
     ///State transition - sets the `byte_end` field to Set
     pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetByteEnd<S> {}
     impl<S: State> State for SetByteEnd<S> {
-        type ByteStart = S::ByteStart;
         type ByteEnd = Set<members::byte_end>;
+        type ByteStart = S::ByteStart;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteStart<S> {}
+    impl<S: State> State for SetByteStart<S> {
+        type ByteEnd = S::ByteEnd;
+        type ByteStart = Set<members::byte_start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_start` field
-        pub struct byte_start(());
         ///Marker type for the `byte_end` field
         pub struct byte_end(());
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
     }
 }
 
@@ -2276,8 +2276,8 @@ where
 impl<'a, S> ByteSliceBuilder<'a, S>
 where
     S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsSet,
     S::ByteEnd: byte_slice_state::IsSet,
+    S::ByteStart: byte_slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ByteSlice<'a> {
@@ -2313,37 +2313,37 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Uri = S::Uri;
+        type Title = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
         type Uri = Set<members::uri>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -2456,8 +2456,8 @@ where
 impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
     S: external_embed_state::State,
-    S::Title: external_embed_state::IsSet,
     S::Uri: external_embed_state::IsSet,
+    S::Title: external_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExternalEmbed<'a> {
@@ -2602,37 +2602,37 @@ pub mod image_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Image;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Image = S::Image;
+        type Alt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Alt = S::Alt;
         type Image = Set<members::image>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Image = S::Image;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
@@ -2725,8 +2725,8 @@ where
 impl<'a, S> ImageItemBuilder<'a, S>
 where
     S: image_item_state::State,
-    S::Alt: image_item_state::IsSet,
     S::Image: image_item_state::IsSet,
+    S::Alt: image_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImageItem<'a> {
@@ -2869,49 +2869,49 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Channel;
+        type Text;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Channel = Unset;
+        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Channel = S::Channel;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `channel` field to Set
     pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannel<S> {}
     impl<S: State> State for SetChannel<S> {
-        type Text = S::Text;
         type Channel = Set<members::channel>;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Channel = S::Channel;
+        type Text = Set<members::text>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
         type Channel = S::Channel;
+        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `channel` field
         pub struct channel(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -3064,8 +3064,8 @@ where
 impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
-    S::Text: message_state::IsSet,
     S::Channel: message_state::IsSet,
+    S::Text: message_state::IsSet,
     S::CreatedAt: message_state::IsSet,
 {
     /// Build the final struct
@@ -3355,37 +3355,37 @@ pub mod rich_text_facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Features;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Features = S::Features;
+        type Index = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeatures<S> {}
     impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
         type Features = Set<members::features>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Features = S::Features;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
@@ -3458,8 +3458,8 @@ where
 impl<'a, S> RichTextFacetBuilder<'a, S>
 where
     S: rich_text_facet_state::State,
-    S::Index: rich_text_facet_state::IsSet,
     S::Features: rich_text_facet_state::IsSet,
+    S::Index: rich_text_facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RichTextFacet<'a> {

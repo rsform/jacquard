@@ -1166,51 +1166,51 @@ pub mod furnishing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rotation;
         type Object;
         type Position;
-        type Rotation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rotation = Unset;
         type Object = Unset;
         type Position = Unset;
-        type Rotation = Unset;
-    }
-    ///State transition - sets the `object` field to Set
-    pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObject<S> {}
-    impl<S: State> State for SetObject<S> {
-        type Object = Set<members::object>;
-        type Position = S::Position;
-        type Rotation = S::Rotation;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Object = S::Object;
-        type Position = Set<members::position>;
-        type Rotation = S::Rotation;
     }
     ///State transition - sets the `rotation` field to Set
     pub struct SetRotation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRotation<S> {}
     impl<S: State> State for SetRotation<S> {
+        type Rotation = Set<members::rotation>;
         type Object = S::Object;
         type Position = S::Position;
-        type Rotation = Set<members::rotation>;
+    }
+    ///State transition - sets the `object` field to Set
+    pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObject<S> {}
+    impl<S: State> State for SetObject<S> {
+        type Rotation = S::Rotation;
+        type Object = Set<members::object>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type Rotation = S::Rotation;
+        type Object = S::Object;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rotation` field
+        pub struct rotation(());
         ///Marker type for the `object` field
         pub struct object(());
         ///Marker type for the `position` field
         pub struct position(());
-        ///Marker type for the `rotation` field
-        pub struct rotation(());
     }
 }
 
@@ -1303,9 +1303,9 @@ where
 impl<'a, S> FurnishingBuilder<'a, S>
 where
     S: furnishing_state::State,
+    S::Rotation: furnishing_state::IsSet,
     S::Object: furnishing_state::IsSet,
     S::Position: furnishing_state::IsSet,
-    S::Rotation: furnishing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Furnishing<'a> {
@@ -1344,9 +1344,9 @@ pub mod layout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Furnishings;
-        type Size;
         type CreatedAt;
         type Floor;
+        type Size;
         type Wall;
     }
     /// Empty state - all required fields are unset
@@ -1354,9 +1354,9 @@ pub mod layout_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Furnishings = Unset;
-        type Size = Unset;
         type CreatedAt = Unset;
         type Floor = Unset;
+        type Size = Unset;
         type Wall = Unset;
     }
     ///State transition - sets the `furnishings` field to Set
@@ -1364,19 +1364,9 @@ pub mod layout_state {
     impl<S: State> sealed::Sealed for SetFurnishings<S> {}
     impl<S: State> State for SetFurnishings<S> {
         type Furnishings = Set<members::furnishings>;
+        type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
         type Size = S::Size;
-        type CreatedAt = S::CreatedAt;
-        type Floor = S::Floor;
-        type Wall = S::Wall;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Furnishings = S::Furnishings;
-        type Size = Set<members::size>;
-        type CreatedAt = S::CreatedAt;
-        type Floor = S::Floor;
         type Wall = S::Wall;
     }
     ///State transition - sets the `created_at` field to Set
@@ -1384,9 +1374,9 @@ pub mod layout_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Furnishings = S::Furnishings;
-        type Size = S::Size;
         type CreatedAt = Set<members::created_at>;
         type Floor = S::Floor;
+        type Size = S::Size;
         type Wall = S::Wall;
     }
     ///State transition - sets the `floor` field to Set
@@ -1394,9 +1384,19 @@ pub mod layout_state {
     impl<S: State> sealed::Sealed for SetFloor<S> {}
     impl<S: State> State for SetFloor<S> {
         type Furnishings = S::Furnishings;
-        type Size = S::Size;
         type CreatedAt = S::CreatedAt;
         type Floor = Set<members::floor>;
+        type Size = S::Size;
+        type Wall = S::Wall;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Furnishings = S::Furnishings;
+        type CreatedAt = S::CreatedAt;
+        type Floor = S::Floor;
+        type Size = Set<members::size>;
         type Wall = S::Wall;
     }
     ///State transition - sets the `wall` field to Set
@@ -1404,9 +1404,9 @@ pub mod layout_state {
     impl<S: State> sealed::Sealed for SetWall<S> {}
     impl<S: State> State for SetWall<S> {
         type Furnishings = S::Furnishings;
-        type Size = S::Size;
         type CreatedAt = S::CreatedAt;
         type Floor = S::Floor;
+        type Size = S::Size;
         type Wall = Set<members::wall>;
     }
     /// Marker types for field names
@@ -1414,12 +1414,12 @@ pub mod layout_state {
     pub mod members {
         ///Marker type for the `furnishings` field
         pub struct furnishings(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `floor` field
         pub struct floor(());
+        ///Marker type for the `size` field
+        pub struct size(());
         ///Marker type for the `wall` field
         pub struct wall(());
     }
@@ -1555,9 +1555,9 @@ impl<'a, S> LayoutBuilder<'a, S>
 where
     S: layout_state::State,
     S::Furnishings: layout_state::IsSet,
-    S::Size: layout_state::IsSet,
     S::CreatedAt: layout_state::IsSet,
     S::Floor: layout_state::IsSet,
+    S::Size: layout_state::IsSet,
     S::Wall: layout_state::IsSet,
 {
     /// Build the final struct

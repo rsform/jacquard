@@ -178,37 +178,37 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Uri;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Uri = S::Uri;
+        type Type = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Type = S::Type;
         type Uri = Set<members::uri>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Uri = S::Uri;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -295,8 +295,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Type: subject_ref_state::IsSet,
     S::Uri: subject_ref_state::IsSet,
+    S::Type: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {

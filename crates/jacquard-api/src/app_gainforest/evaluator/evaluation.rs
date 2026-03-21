@@ -243,37 +243,37 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EvaluationType;
         type CreatedAt;
+        type EvaluationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EvaluationType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluation_type` field to Set
-    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
-    impl<S: State> State for SetEvaluationType<S> {
-        type EvaluationType = Set<members::evaluation_type>;
-        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EvaluationType = S::EvaluationType;
         type CreatedAt = Set<members::created_at>;
+        type EvaluationType = S::EvaluationType;
+    }
+    ///State transition - sets the `evaluation_type` field to Set
+    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
+    impl<S: State> State for SetEvaluationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Set<members::evaluation_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluation_type` field
-        pub struct evaluation_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluation_type` field
+        pub struct evaluation_type(());
     }
 }
 
@@ -499,8 +499,8 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::EvaluationType: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::EvaluationType: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {

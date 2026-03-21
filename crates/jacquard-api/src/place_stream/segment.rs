@@ -288,51 +288,51 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Channels;
         type Codec;
         type Rate;
+        type Channels;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Channels = Unset;
         type Codec = Unset;
         type Rate = Unset;
-    }
-    ///State transition - sets the `channels` field to Set
-    pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannels<S> {}
-    impl<S: State> State for SetChannels<S> {
-        type Channels = Set<members::channels>;
-        type Codec = S::Codec;
-        type Rate = S::Rate;
+        type Channels = Unset;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodec<S> {}
     impl<S: State> State for SetCodec<S> {
-        type Channels = S::Channels;
         type Codec = Set<members::codec>;
         type Rate = S::Rate;
+        type Channels = S::Channels;
     }
     ///State transition - sets the `rate` field to Set
     pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRate<S> {}
     impl<S: State> State for SetRate<S> {
-        type Channels = S::Channels;
         type Codec = S::Codec;
         type Rate = Set<members::rate>;
+        type Channels = S::Channels;
+    }
+    ///State transition - sets the `channels` field to Set
+    pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannels<S> {}
+    impl<S: State> State for SetChannels<S> {
+        type Codec = S::Codec;
+        type Rate = S::Rate;
+        type Channels = Set<members::channels>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channels` field
-        pub struct channels(());
         ///Marker type for the `codec` field
         pub struct codec(());
         ///Marker type for the `rate` field
         pub struct rate(());
+        ///Marker type for the `channels` field
+        pub struct channels(());
     }
 }
 
@@ -425,9 +425,9 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
-    S::Channels: audio_state::IsSet,
     S::Codec: audio_state::IsSet,
     S::Rate: audio_state::IsSet,
+    S::Channels: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
@@ -1048,67 +1048,67 @@ pub mod segment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Creator;
         type Id;
-        type StartTime;
         type SigningKey;
+        type Creator;
+        type StartTime;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Creator = Unset;
         type Id = Unset;
-        type StartTime = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Creator = Set<members::creator>;
-        type Id = S::Id;
-        type StartTime = S::StartTime;
-        type SigningKey = S::SigningKey;
+        type Creator = Unset;
+        type StartTime = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Creator = S::Creator;
         type Id = Set<members::id>;
-        type StartTime = S::StartTime;
         type SigningKey = S::SigningKey;
-    }
-    ///State transition - sets the `start_time` field to Set
-    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartTime<S> {}
-    impl<S: State> State for SetStartTime<S> {
         type Creator = S::Creator;
-        type Id = S::Id;
-        type StartTime = Set<members::start_time>;
-        type SigningKey = S::SigningKey;
+        type StartTime = S::StartTime;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigningKey<S> {}
     impl<S: State> State for SetSigningKey<S> {
-        type Creator = S::Creator;
         type Id = S::Id;
-        type StartTime = S::StartTime;
         type SigningKey = Set<members::signing_key>;
+        type Creator = S::Creator;
+        type StartTime = S::StartTime;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Id = S::Id;
+        type SigningKey = S::SigningKey;
+        type Creator = Set<members::creator>;
+        type StartTime = S::StartTime;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartTime<S> {}
+    impl<S: State> State for SetStartTime<S> {
+        type Id = S::Id;
+        type SigningKey = S::SigningKey;
+        type Creator = S::Creator;
+        type StartTime = Set<members::start_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `start_time` field
-        pub struct start_time(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
     }
 }
 
@@ -1381,10 +1381,10 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
 impl<'a, S> SegmentBuilder<'a, S>
 where
     S: segment_state::State,
-    S::Creator: segment_state::IsSet,
     S::Id: segment_state::IsSet,
-    S::StartTime: segment_state::IsSet,
     S::SigningKey: segment_state::IsSet,
+    S::Creator: segment_state::IsSet,
+    S::StartTime: segment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Segment<'a> {
@@ -1438,37 +1438,37 @@ pub mod segment_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Cid;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Cid = S::Cid;
+        type Record = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
         type Cid = Set<members::cid>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -1541,8 +1541,8 @@ where
 impl<'a, S> SegmentViewBuilder<'a, S>
 where
     S: segment_view_state::State,
-    S::Record: segment_view_state::IsSet,
     S::Cid: segment_view_state::IsSet,
+    S::Record: segment_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SegmentView<'a> {

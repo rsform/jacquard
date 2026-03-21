@@ -250,51 +250,51 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Key;
         type Label;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Key = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Key = S::Key;
-        type Label = S::Label;
+        type Content = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Content = S::Content;
         type Key = Set<members::key>;
         type Label = S::Label;
+        type Content = S::Content;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type Content = S::Content;
         type Key = S::Key;
         type Label = Set<members::label>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Key = S::Key;
+        type Label = S::Label;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `key` field
         pub struct key(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -387,9 +387,9 @@ where
 impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
-    S::Content: tab_state::IsSet,
     S::Key: tab_state::IsSet,
     S::Label: tab_state::IsSet,
+    S::Content: tab_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tab<'a> {

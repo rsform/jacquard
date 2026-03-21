@@ -154,37 +154,37 @@ pub mod update_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LivestreamUri;
         type Streamer;
+        type LivestreamUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LivestreamUri = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `livestream_uri` field to Set
-    pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
-    impl<S: State> State for SetLivestreamUri<S> {
-        type LivestreamUri = Set<members::livestream_uri>;
-        type Streamer = S::Streamer;
+        type LivestreamUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type LivestreamUri = S::LivestreamUri;
         type Streamer = Set<members::streamer>;
+        type LivestreamUri = S::LivestreamUri;
+    }
+    ///State transition - sets the `livestream_uri` field to Set
+    pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
+    impl<S: State> State for SetLivestreamUri<S> {
+        type Streamer = S::Streamer;
+        type LivestreamUri = Set<members::livestream_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `livestream_uri` field
-        pub struct livestream_uri(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `livestream_uri` field
+        pub struct livestream_uri(());
     }
 }
 
@@ -274,8 +274,8 @@ impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
 impl<'a, S> UpdateLivestreamBuilder<'a, S>
 where
     S: update_livestream_state::State,
-    S::LivestreamUri: update_livestream_state::IsSet,
     S::Streamer: update_livestream_state::IsSet,
+    S::LivestreamUri: update_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateLivestream<'a> {

@@ -133,37 +133,37 @@ pub mod get_part_upload_url_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UploadId;
         type PartNumber;
+        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UploadId = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type UploadId = Set<members::upload_id>;
-        type PartNumber = S::PartNumber;
+        type UploadId = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPartNumber<S> {}
     impl<S: State> State for SetPartNumber<S> {
-        type UploadId = S::UploadId;
         type PartNumber = Set<members::part_number>;
+        type UploadId = S::UploadId;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUploadId<S> {}
+    impl<S: State> State for SetUploadId<S> {
+        type PartNumber = S::PartNumber;
+        type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
     }
 }
 
@@ -236,8 +236,8 @@ where
 impl<'a, S> GetPartUploadUrlBuilder<'a, S>
 where
     S: get_part_upload_url_state::State,
-    S::UploadId: get_part_upload_url_state::IsSet,
     S::PartNumber: get_part_upload_url_state::IsSet,
+    S::UploadId: get_part_upload_url_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPartUploadUrl<'a> {

@@ -120,37 +120,37 @@ pub mod resolve_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Handle;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Handle = S::Handle;
+        type Name = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Name = S::Name;
         type Handle = Set<members::handle>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Handle = S::Handle;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -240,8 +240,8 @@ impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
 impl<'a, S> ResolveLabelBuilder<'a, S>
 where
     S: resolve_label_state::State,
-    S::Name: resolve_label_state::IsSet,
     S::Handle: resolve_label_state::IsSet,
+    S::Name: resolve_label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveLabel<'a> {

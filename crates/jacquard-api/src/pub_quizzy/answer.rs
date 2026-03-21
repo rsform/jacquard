@@ -250,67 +250,67 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Certainty;
-        type Question;
+        type Timestamp;
         type Text;
+        type Question;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Certainty = Unset;
-        type Question = Unset;
+        type Timestamp = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type Certainty = S::Certainty;
-        type Question = S::Question;
-        type Text = S::Text;
+        type Question = Unset;
     }
     ///State transition - sets the `certainty` field to Set
     pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCertainty<S> {}
     impl<S: State> State for SetCertainty<S> {
-        type Timestamp = S::Timestamp;
         type Certainty = Set<members::certainty>;
-        type Question = S::Question;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
         type Timestamp = S::Timestamp;
-        type Certainty = S::Certainty;
-        type Question = Set<members::question>;
         type Text = S::Text;
+        type Question = S::Question;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Certainty = S::Certainty;
+        type Timestamp = Set<members::timestamp>;
+        type Text = S::Text;
+        type Question = S::Question;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Timestamp = S::Timestamp;
         type Certainty = S::Certainty;
-        type Question = S::Question;
+        type Timestamp = S::Timestamp;
         type Text = Set<members::text>;
+        type Question = S::Question;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type Certainty = S::Certainty;
+        type Timestamp = S::Timestamp;
+        type Text = S::Text;
+        type Question = Set<members::question>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `certainty` field
         pub struct certainty(());
-        ///Marker type for the `question` field
-        pub struct question(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `question` field
+        pub struct question(());
     }
 }
 
@@ -423,10 +423,10 @@ where
 impl<'a, S> AnswerBuilder<'a, S>
 where
     S: answer_state::State,
-    S::Timestamp: answer_state::IsSet,
     S::Certainty: answer_state::IsSet,
-    S::Question: answer_state::IsSet,
+    S::Timestamp: answer_state::IsSet,
     S::Text: answer_state::IsSet,
+    S::Question: answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Answer<'a> {

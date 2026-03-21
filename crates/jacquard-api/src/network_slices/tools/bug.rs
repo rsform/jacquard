@@ -347,105 +347,105 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Severity;
         type StepsToReproduce;
+        type Severity;
+        type CreatedAt;
+        type Description;
         type Title;
         type Namespace;
-        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Severity = Unset;
         type StepsToReproduce = Unset;
+        type Severity = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
         type Title = Unset;
         type Namespace = Unset;
-        type Description = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
-        type Namespace = S::Namespace;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type CreatedAt = S::CreatedAt;
-        type Severity = Set<members::severity>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
-        type Namespace = S::Namespace;
-        type Description = S::Description;
     }
     ///State transition - sets the `steps_to_reproduce` field to Set
     pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
     impl<S: State> State for SetStepsToReproduce<S> {
-        type CreatedAt = S::CreatedAt;
-        type Severity = S::Severity;
         type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
         type Title = S::Title;
         type Namespace = S::Namespace;
-        type Description = S::Description;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Severity = S::Severity;
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
         type StepsToReproduce = S::StepsToReproduce;
-        type Title = Set<members::title>;
-        type Namespace = S::Namespace;
+        type Severity = Set<members::severity>;
+        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-    }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
-        type CreatedAt = S::CreatedAt;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
         type Title = S::Title;
-        type Namespace = Set<members::namespace>;
+        type Namespace = S::Namespace;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = Set<members::created_at>;
         type Description = S::Description;
+        type Title = S::Title;
+        type Namespace = S::Namespace;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Severity = S::Severity;
         type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
         type Title = S::Title;
         type Namespace = S::Namespace;
-        type Description = Set<members::description>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = Set<members::title>;
+        type Namespace = S::Namespace;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNamespace<S> {}
+    impl<S: State> State for SetNamespace<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = S::Title;
+        type Namespace = Set<members::namespace>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `severity` field
-        pub struct severity(());
         ///Marker type for the `steps_to_reproduce` field
         pub struct steps_to_reproduce(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `namespace` field
         pub struct namespace(());
-        ///Marker type for the `description` field
-        pub struct description(());
     }
 }
 
@@ -694,12 +694,12 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::CreatedAt: bug_state::IsSet,
-    S::Severity: bug_state::IsSet,
     S::StepsToReproduce: bug_state::IsSet,
+    S::Severity: bug_state::IsSet,
+    S::CreatedAt: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
     S::Title: bug_state::IsSet,
     S::Namespace: bug_state::IsSet,
-    S::Description: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {

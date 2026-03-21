@@ -136,37 +136,37 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContributorRef;
         type CreatedAt;
+        type ContributorRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContributorRef = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `contributor_ref` field to Set
-    pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributorRef<S> {}
-    impl<S: State> State for SetContributorRef<S> {
-        type ContributorRef = Set<members::contributor_ref>;
-        type CreatedAt = S::CreatedAt;
+        type ContributorRef = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ContributorRef = S::ContributorRef;
         type CreatedAt = Set<members::created_at>;
+        type ContributorRef = S::ContributorRef;
+    }
+    ///State transition - sets the `contributor_ref` field to Set
+    pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContributorRef<S> {}
+    impl<S: State> State for SetContributorRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContributorRef = Set<members::contributor_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contributor_ref` field
-        pub struct contributor_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `contributor_ref` field
+        pub struct contributor_ref(());
     }
 }
 
@@ -333,8 +333,8 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S> ContributorBuilder<'a, S>
 where
     S: contributor_state::State,
-    S::ContributorRef: contributor_state::IsSet,
     S::CreatedAt: contributor_state::IsSet,
+    S::ContributorRef: contributor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {

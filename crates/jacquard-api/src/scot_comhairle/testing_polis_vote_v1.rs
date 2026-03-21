@@ -195,65 +195,65 @@ pub mod testing_polis_vote_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Value;
         type CreatedAt;
-        type Subject;
         type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Value = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
         type Poll = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+        type Poll = S::Poll;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Subject = S::Subject;
         type Value = Set<members::value>;
         type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
         type Poll = S::Poll;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
         type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
-        type Poll = S::Poll;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
         type Poll = S::Poll;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
+        type Subject = S::Subject;
         type Value = S::Value;
         type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
         type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `poll` field
         pub struct poll(());
     }
@@ -372,9 +372,9 @@ where
 impl<'a, S> TestingPolisVoteV1Builder<'a, S>
 where
     S: testing_polis_vote_v1_state::State,
+    S::Subject: testing_polis_vote_v1_state::IsSet,
     S::Value: testing_polis_vote_v1_state::IsSet,
     S::CreatedAt: testing_polis_vote_v1_state::IsSet,
-    S::Subject: testing_polis_vote_v1_state::IsSet,
     S::Poll: testing_polis_vote_v1_state::IsSet,
 {
     /// Build the final struct
@@ -656,37 +656,37 @@ pub mod poll_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -759,8 +759,8 @@ where
 impl<'a, S> PollRefBuilder<'a, S>
 where
     S: poll_ref_state::State,
-    S::Uri: poll_ref_state::IsSet,
     S::Cid: poll_ref_state::IsSet,
+    S::Uri: poll_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PollRef<'a> {
@@ -796,37 +796,37 @@ pub mod statement_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -899,8 +899,8 @@ where
 impl<'a, S> StatementRefBuilder<'a, S>
 where
     S: statement_ref_state::State,
-    S::Cid: statement_ref_state::IsSet,
     S::Uri: statement_ref_state::IsSet,
+    S::Cid: statement_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StatementRef<'a> {

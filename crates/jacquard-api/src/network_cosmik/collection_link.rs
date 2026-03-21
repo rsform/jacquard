@@ -133,8 +133,8 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Card;
-        type AddedAt;
         type AddedBy;
+        type AddedAt;
         type Collection;
     }
     /// Empty state - all required fields are unset
@@ -142,8 +142,8 @@ pub mod collection_link_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Card = Unset;
-        type AddedAt = Unset;
         type AddedBy = Unset;
+        type AddedAt = Unset;
         type Collection = Unset;
     }
     ///State transition - sets the `card` field to Set
@@ -151,17 +151,8 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
         type Card = Set<members::card>;
+        type AddedBy = S::AddedBy;
         type AddedAt = S::AddedAt;
-        type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Card = S::Card;
-        type AddedAt = Set<members::added_at>;
-        type AddedBy = S::AddedBy;
         type Collection = S::Collection;
     }
     ///State transition - sets the `added_by` field to Set
@@ -169,8 +160,17 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetAddedBy<S> {}
     impl<S: State> State for SetAddedBy<S> {
         type Card = S::Card;
-        type AddedAt = S::AddedAt;
         type AddedBy = Set<members::added_by>;
+        type AddedAt = S::AddedAt;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Card = S::Card;
+        type AddedBy = S::AddedBy;
+        type AddedAt = Set<members::added_at>;
         type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
@@ -178,8 +178,8 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Card = S::Card;
-        type AddedAt = S::AddedAt;
         type AddedBy = S::AddedBy;
+        type AddedAt = S::AddedAt;
         type Collection = Set<members::collection>;
     }
     /// Marker types for field names
@@ -187,10 +187,10 @@ pub mod collection_link_state {
     pub mod members {
         ///Marker type for the `card` field
         pub struct card(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `added_by` field
         pub struct added_by(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
     }
@@ -366,8 +366,8 @@ impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
     S::Card: collection_link_state::IsSet,
-    S::AddedAt: collection_link_state::IsSet,
     S::AddedBy: collection_link_state::IsSet,
+    S::AddedAt: collection_link_state::IsSet,
     S::Collection: collection_link_state::IsSet,
 {
     /// Build the final struct

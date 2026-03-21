@@ -1063,37 +1063,37 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Text;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Text = S::Text;
+        type Level = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Level = S::Level;
         type Text = Set<members::text>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Text = S::Text;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -1190,8 +1190,8 @@ where
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Level: heading_state::IsSet,
     S::Text: heading_state::IsSet,
+    S::Level: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
@@ -1350,65 +1350,65 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Slug;
         type CreatedAt;
+        type Slug;
+        type Title;
         type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Slug = Unset;
         type CreatedAt = Unset;
+        type Slug = Unset;
+        type Title = Unset;
         type Blocks = Unset;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Slug = S::Slug;
-        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type Blocks = S::Blocks;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Title = S::Title;
-        type Slug = Set<members::slug>;
         type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
+        type Title = S::Title;
         type Blocks = S::Blocks;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
         type Slug = S::Slug;
-        type CreatedAt = Set<members::created_at>;
+        type Title = Set<members::title>;
         type Blocks = S::Blocks;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
-        type Title = S::Title;
-        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+        type Title = S::Title;
         type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
     }
@@ -1543,9 +1543,9 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Title: document_state::IsSet,
-    S::Slug: document_state::IsSet,
     S::CreatedAt: document_state::IsSet,
+    S::Slug: document_state::IsSet,
+    S::Title: document_state::IsSet,
     S::Blocks: document_state::IsSet,
 {
     /// Build the final struct

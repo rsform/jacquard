@@ -127,37 +127,37 @@ pub mod update_crew_tier_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
         type TierRank;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
         type TierRank = Unset;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type UserDid = Set<members::user_did>;
-        type TierRank = S::TierRank;
+        type UserDid = Unset;
     }
     ///State transition - sets the `tier_rank` field to Set
     pub struct SetTierRank<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTierRank<S> {}
     impl<S: State> State for SetTierRank<S> {
-        type UserDid = S::UserDid;
         type TierRank = Set<members::tier_rank>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type TierRank = S::TierRank;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `tier_rank` field
         pub struct tier_rank(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -230,8 +230,8 @@ where
 impl<'a, S> UpdateCrewTierBuilder<'a, S>
 where
     S: update_crew_tier_state::State,
-    S::UserDid: update_crew_tier_state::IsSet,
     S::TierRank: update_crew_tier_state::IsSet,
+    S::UserDid: update_crew_tier_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateCrewTier<'a> {

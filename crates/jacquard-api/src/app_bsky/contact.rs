@@ -170,37 +170,37 @@ pub mod match_and_contact_index_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContactIndex;
         type Match;
+        type ContactIndex;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContactIndex = Unset;
         type Match = Unset;
-    }
-    ///State transition - sets the `contact_index` field to Set
-    pub struct SetContactIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContactIndex<S> {}
-    impl<S: State> State for SetContactIndex<S> {
-        type ContactIndex = Set<members::contact_index>;
-        type Match = S::Match;
+        type ContactIndex = Unset;
     }
     ///State transition - sets the `match` field to Set
     pub struct SetMatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMatch<S> {}
     impl<S: State> State for SetMatch<S> {
-        type ContactIndex = S::ContactIndex;
         type Match = Set<members::r#match>;
+        type ContactIndex = S::ContactIndex;
+    }
+    ///State transition - sets the `contact_index` field to Set
+    pub struct SetContactIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContactIndex<S> {}
+    impl<S: State> State for SetContactIndex<S> {
+        type Match = S::Match;
+        type ContactIndex = Set<members::contact_index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contact_index` field
-        pub struct contact_index(());
         ///Marker type for the `match` field
         pub struct r#match(());
+        ///Marker type for the `contact_index` field
+        pub struct contact_index(());
     }
 }
 
@@ -279,8 +279,8 @@ where
 impl<'a, S> MatchAndContactIndexBuilder<'a, S>
 where
     S: match_and_contact_index_state::State,
-    S::ContactIndex: match_and_contact_index_state::IsSet,
     S::Match: match_and_contact_index_state::IsSet,
+    S::ContactIndex: match_and_contact_index_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MatchAndContactIndex<'a> {

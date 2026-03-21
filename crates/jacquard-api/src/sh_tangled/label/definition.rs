@@ -205,66 +205,66 @@ pub mod definition_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ValueType;
-        type Scope;
-        type Name;
         type CreatedAt;
+        type Name;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ValueType = Unset;
-        type Scope = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
+        type Scope = Unset;
     }
     ///State transition - sets the `value_type` field to Set
     pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValueType<S> {}
     impl<S: State> State for SetValueType<S> {
         type ValueType = Set<members::value_type>;
-        type Scope = S::Scope;
+        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type ValueType = S::ValueType;
-        type Scope = Set<members::scope>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ValueType = S::ValueType;
         type Scope = S::Scope;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type ValueType = S::ValueType;
-        type Scope = S::Scope;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type ValueType = S::ValueType;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type ValueType = S::ValueType;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value_type` field
         pub struct value_type(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
@@ -409,9 +409,9 @@ impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
     S::ValueType: definition_state::IsSet,
-    S::Scope: definition_state::IsSet,
-    S::Name: definition_state::IsSet,
     S::CreatedAt: definition_state::IsSet,
+    S::Name: definition_state::IsSet,
+    S::Scope: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {

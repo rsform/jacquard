@@ -169,67 +169,67 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Question;
-        type Channel;
-        type Options;
         type CreatedAt;
+        type Channel;
+        type Question;
+        type Options;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Question = Unset;
-        type Channel = Unset;
-        type Options = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type Channel = S::Channel;
-        type Options = S::Options;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
-        type Question = S::Question;
-        type Channel = Set<members::channel>;
-        type Options = S::Options;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `options` field to Set
-    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOptions<S> {}
-    impl<S: State> State for SetOptions<S> {
-        type Question = S::Question;
-        type Channel = S::Channel;
-        type Options = Set<members::options>;
-        type CreatedAt = S::CreatedAt;
+        type Channel = Unset;
+        type Question = Unset;
+        type Options = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
-        type Channel = S::Channel;
-        type Options = S::Options;
         type CreatedAt = Set<members::created_at>;
+        type Channel = S::Channel;
+        type Question = S::Question;
+        type Options = S::Options;
+    }
+    ///State transition - sets the `channel` field to Set
+    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannel<S> {}
+    impl<S: State> State for SetChannel<S> {
+        type CreatedAt = S::CreatedAt;
+        type Channel = Set<members::channel>;
+        type Question = S::Question;
+        type Options = S::Options;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type CreatedAt = S::CreatedAt;
+        type Channel = S::Channel;
+        type Question = Set<members::question>;
+        type Options = S::Options;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOptions<S> {}
+    impl<S: State> State for SetOptions<S> {
+        type CreatedAt = S::CreatedAt;
+        type Channel = S::Channel;
+        type Question = S::Question;
+        type Options = Set<members::options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
-        ///Marker type for the `channel` field
-        pub struct channel(());
-        ///Marker type for the `options` field
-        pub struct options(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `channel` field
+        pub struct channel(());
+        ///Marker type for the `question` field
+        pub struct question(());
+        ///Marker type for the `options` field
+        pub struct options(());
     }
 }
 
@@ -376,10 +376,10 @@ where
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::Question: poll_state::IsSet,
-    S::Channel: poll_state::IsSet,
-    S::Options: poll_state::IsSet,
     S::CreatedAt: poll_state::IsSet,
+    S::Channel: poll_state::IsSet,
+    S::Question: poll_state::IsSet,
+    S::Options: poll_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Poll<'a> {

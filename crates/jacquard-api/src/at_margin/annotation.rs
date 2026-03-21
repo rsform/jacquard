@@ -1958,37 +1958,37 @@ pub mod annotation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Target;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Target = S::Target;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
         type Target = Set<members::target>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Target = S::Target;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -2178,8 +2178,8 @@ where
 impl<'a, S> AnnotationBuilder<'a, S>
 where
     S: annotation_state::State,
-    S::CreatedAt: annotation_state::IsSet,
     S::Target: annotation_state::IsSet,
+    S::CreatedAt: annotation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Annotation<'a> {
@@ -2570,37 +2570,37 @@ pub mod text_position_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Start = S::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -2693,8 +2693,8 @@ impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a,
 impl<'a, S> TextPositionSelectorBuilder<'a, S>
 where
     S: text_position_selector_state::State,
-    S::End: text_position_selector_state::IsSet,
     S::Start: text_position_selector_state::IsSet,
+    S::End: text_position_selector_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TextPositionSelector<'a> {

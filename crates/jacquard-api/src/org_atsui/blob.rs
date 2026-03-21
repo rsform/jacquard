@@ -147,37 +147,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Width = S::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
-        type Height = S::Height;
         type Width = Set<members::width>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Width = S::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -247,8 +247,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsSet,
     S::Width: aspect_ratio_state::IsSet,
+    S::Height: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -434,37 +434,37 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Src;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Src = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Src = S::Src;
+        type Did = Unset;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Did = S::Did;
         type Src = Set<members::src>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Src = S::Src;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `src` field
         pub struct src(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -571,8 +571,8 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
-    S::Did: blob_state::IsSet,
     S::Src: blob_state::IsSet,
+    S::Did: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {

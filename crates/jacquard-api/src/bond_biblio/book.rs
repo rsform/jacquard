@@ -166,50 +166,50 @@ pub mod book_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Authors;
-        type CreatedAt;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Authors = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
         type Authors = Set<members::authors>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Authors = S::Authors;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Authors = S::Authors;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `authors` field
         pub struct authors(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -323,8 +323,8 @@ impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
     S::Authors: book_state::IsSet,
-    S::CreatedAt: book_state::IsSet,
     S::Title: book_state::IsSet,
+    S::CreatedAt: book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Book<'a> {

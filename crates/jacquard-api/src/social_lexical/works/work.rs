@@ -321,37 +321,37 @@ pub mod work_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type Title;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkType<S> {}
-    impl<S: State> State for SetWorkType<S> {
-        type WorkType = Set<members::work_type>;
-        type Title = S::Title;
+        type WorkType = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type WorkType = S::WorkType;
         type Title = Set<members::title>;
+        type WorkType = S::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkType<S> {}
+    impl<S: State> State for SetWorkType<S> {
+        type Title = S::Title;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
@@ -452,8 +452,8 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
 impl<'a, S> WorkBuilder<'a, S>
 where
     S: work_state::State,
-    S::WorkType: work_state::IsSet,
     S::Title: work_state::IsSet,
+    S::WorkType: work_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Work<'a> {

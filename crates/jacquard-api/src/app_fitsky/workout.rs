@@ -3424,37 +3424,37 @@ pub mod exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Sets;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Sets = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Sets = S::Sets;
+        type Name = Unset;
     }
     ///State transition - sets the `sets` field to Set
     pub struct SetSets<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSets<S> {}
     impl<S: State> State for SetSets<S> {
-        type Name = S::Name;
         type Sets = Set<members::sets>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Sets = S::Sets;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `sets` field
         pub struct sets(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -3527,8 +3527,8 @@ where
 impl<'a, S> ExerciseBuilder<'a, S>
 where
     S: exercise_state::State,
-    S::Name: exercise_state::IsSet,
     S::Sets: exercise_state::IsSet,
+    S::Name: exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Exercise<'a> {
@@ -3704,85 +3704,85 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type StartedAt;
+        type Title;
         type CreatedAt;
         type Type;
         type Duration;
-        type Title;
-        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type StartedAt = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
         type Type = Unset;
         type Duration = Unset;
-        type Title = Unset;
-        type StartedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Duration = Set<members::duration>;
-        type Title = S::Title;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Duration = S::Duration;
-        type Title = Set<members::title>;
-        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
+        type StartedAt = Set<members::started_at>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Type = S::Type;
         type Duration = S::Duration;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type StartedAt = S::StartedAt;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type StartedAt = S::StartedAt;
         type Title = S::Title;
-        type StartedAt = Set<members::started_at>;
+        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type StartedAt = S::StartedAt;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Duration = S::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type StartedAt = S::StartedAt;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `duration` field
         pub struct duration(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
     }
 }
 
@@ -4074,11 +4074,11 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
+    S::StartedAt: workout_state::IsSet,
+    S::Title: workout_state::IsSet,
     S::CreatedAt: workout_state::IsSet,
     S::Type: workout_state::IsSet,
     S::Duration: workout_state::IsSet,
-    S::Title: workout_state::IsSet,
-    S::StartedAt: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -4311,51 +4311,51 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LatE6;
-        type LngE6;
         type Timestamp;
+        type LngE6;
+        type LatE6;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LatE6 = Unset;
-        type LngE6 = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatE6<S> {}
-    impl<S: State> State for SetLatE6<S> {
-        type LatE6 = Set<members::lat_e6>;
-        type LngE6 = S::LngE6;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `lng_e6` field to Set
-    pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLngE6<S> {}
-    impl<S: State> State for SetLngE6<S> {
-        type LatE6 = S::LatE6;
-        type LngE6 = Set<members::lng_e6>;
-        type Timestamp = S::Timestamp;
+        type LngE6 = Unset;
+        type LatE6 = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type LatE6 = S::LatE6;
-        type LngE6 = S::LngE6;
         type Timestamp = Set<members::timestamp>;
+        type LngE6 = S::LngE6;
+        type LatE6 = S::LatE6;
+    }
+    ///State transition - sets the `lng_e6` field to Set
+    pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLngE6<S> {}
+    impl<S: State> State for SetLngE6<S> {
+        type Timestamp = S::Timestamp;
+        type LngE6 = Set<members::lng_e6>;
+        type LatE6 = S::LatE6;
+    }
+    ///State transition - sets the `lat_e6` field to Set
+    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLatE6<S> {}
+    impl<S: State> State for SetLatE6<S> {
+        type Timestamp = S::Timestamp;
+        type LngE6 = S::LngE6;
+        type LatE6 = Set<members::lat_e6>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lat_e6` field
-        pub struct lat_e6(());
-        ///Marker type for the `lng_e6` field
-        pub struct lng_e6(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `lng_e6` field
+        pub struct lng_e6(());
+        ///Marker type for the `lat_e6` field
+        pub struct lat_e6(());
     }
 }
 
@@ -4448,9 +4448,9 @@ where
 impl<'a, S> RoutePointBuilder<'a, S>
 where
     S: route_point_state::State,
-    S::LatE6: route_point_state::IsSet,
-    S::LngE6: route_point_state::IsSet,
     S::Timestamp: route_point_state::IsSet,
+    S::LngE6: route_point_state::IsSet,
+    S::LatE6: route_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoutePoint<'a> {

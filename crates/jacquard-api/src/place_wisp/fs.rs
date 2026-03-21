@@ -885,37 +885,37 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Name;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Name = S::Name;
+        type Node = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Node = S::Node;
         type Name = Set<members::name>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Name = S::Name;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -988,8 +988,8 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Node: entry_state::IsSet,
     S::Name: entry_state::IsSet,
+    S::Node: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -1222,49 +1222,49 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Site;
+        type CreatedAt;
         type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Site = Unset;
+        type CreatedAt = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Site = S::Site;
-        type Root = S::Root;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type CreatedAt = S::CreatedAt;
         type Site = Set<members::site>;
+        type CreatedAt = S::CreatedAt;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Site = S::Site;
+        type CreatedAt = Set<members::created_at>;
         type Root = S::Root;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
         type Site = S::Site;
+        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
     }
@@ -1373,8 +1373,8 @@ where
 impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
-    S::CreatedAt: fs_state::IsSet,
     S::Site: fs_state::IsSet,
+    S::CreatedAt: fs_state::IsSet,
     S::Root: fs_state::IsSet,
 {
     /// Build the final struct
@@ -1415,37 +1415,37 @@ pub mod subfs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Subject;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Subject = S::Subject;
+        type Type = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Type = S::Type;
         type Subject = Set<members::subject>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Subject = S::Subject;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1532,8 +1532,8 @@ where
 impl<'a, S> SubfsBuilder<'a, S>
 where
     S: subfs_state::State,
-    S::Type: subfs_state::IsSet,
     S::Subject: subfs_state::IsSet,
+    S::Type: subfs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subfs<'a> {

@@ -227,51 +227,51 @@ pub mod team_score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizBegin;
-        type Team;
         type Answers;
+        type Team;
+        type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizBegin = Unset;
-        type Team = Unset;
         type Answers = Unset;
-    }
-    ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
-    impl<S: State> State for SetQuizBegin<S> {
-        type QuizBegin = Set<members::quiz_begin>;
-        type Team = S::Team;
-        type Answers = S::Answers;
-    }
-    ///State transition - sets the `team` field to Set
-    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeam<S> {}
-    impl<S: State> State for SetTeam<S> {
-        type QuizBegin = S::QuizBegin;
-        type Team = Set<members::team>;
-        type Answers = S::Answers;
+        type Team = Unset;
+        type QuizBegin = Unset;
     }
     ///State transition - sets the `answers` field to Set
     pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswers<S> {}
     impl<S: State> State for SetAnswers<S> {
-        type QuizBegin = S::QuizBegin;
-        type Team = S::Team;
         type Answers = Set<members::answers>;
+        type Team = S::Team;
+        type QuizBegin = S::QuizBegin;
+    }
+    ///State transition - sets the `team` field to Set
+    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeam<S> {}
+    impl<S: State> State for SetTeam<S> {
+        type Answers = S::Answers;
+        type Team = Set<members::team>;
+        type QuizBegin = S::QuizBegin;
+    }
+    ///State transition - sets the `quiz_begin` field to Set
+    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
+    impl<S: State> State for SetQuizBegin<S> {
+        type Answers = S::Answers;
+        type Team = S::Team;
+        type QuizBegin = Set<members::quiz_begin>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_begin` field
-        pub struct quiz_begin(());
-        ///Marker type for the `team` field
-        pub struct team(());
         ///Marker type for the `answers` field
         pub struct answers(());
+        ///Marker type for the `team` field
+        pub struct team(());
+        ///Marker type for the `quiz_begin` field
+        pub struct quiz_begin(());
     }
 }
 
@@ -364,9 +364,9 @@ where
 impl<'a, S> TeamScoreBuilder<'a, S>
 where
     S: team_score_state::State,
-    S::QuizBegin: team_score_state::IsSet,
-    S::Team: team_score_state::IsSet,
     S::Answers: team_score_state::IsSet,
+    S::Team: team_score_state::IsSet,
+    S::QuizBegin: team_score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeamScore<'a> {

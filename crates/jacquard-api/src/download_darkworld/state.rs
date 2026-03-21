@@ -289,65 +289,65 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type DeltaruneCharacter;
         type Album;
         type Game;
-        type DeltaruneCharacter;
         type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type DeltaruneCharacter = Unset;
         type Album = Unset;
         type Game = Unset;
-        type DeltaruneCharacter = Unset;
         type Artist = Unset;
+    }
+    ///State transition - sets the `deltarune_character` field to Set
+    pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
+    impl<S: State> State for SetDeltaruneCharacter<S> {
+        type DeltaruneCharacter = Set<members::deltarune_character>;
+        type Album = S::Album;
+        type Game = S::Game;
+        type Artist = S::Artist;
     }
     ///State transition - sets the `album` field to Set
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
         type Album = Set<members::album>;
         type Game = S::Game;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
         type Artist = S::Artist;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
         type Album = S::Album;
         type Game = Set<members::game>;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-        type Artist = S::Artist;
-    }
-    ///State transition - sets the `deltarune_character` field to Set
-    pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
-    impl<S: State> State for SetDeltaruneCharacter<S> {
-        type Album = S::Album;
-        type Game = S::Game;
-        type DeltaruneCharacter = Set<members::deltarune_character>;
         type Artist = S::Artist;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
         type Album = S::Album;
         type Game = S::Game;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
         type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `deltarune_character` field
+        pub struct deltarune_character(());
         ///Marker type for the `album` field
         pub struct album(());
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `deltarune_character` field
-        pub struct deltarune_character(());
         ///Marker type for the `artist` field
         pub struct artist(());
     }
@@ -462,9 +462,9 @@ where
 impl<'a, S> FavoriteBuilder<'a, S>
 where
     S: favorite_state::State,
+    S::DeltaruneCharacter: favorite_state::IsSet,
     S::Album: favorite_state::IsSet,
     S::Game: favorite_state::IsSet,
-    S::DeltaruneCharacter: favorite_state::IsSet,
     S::Artist: favorite_state::IsSet,
 {
     /// Build the final struct
@@ -730,37 +730,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Favorite;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Favorite = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Site = Set<members::site>;
-        type Favorite = S::Favorite;
+        type Site = Unset;
     }
     ///State transition - sets the `favorite` field to Set
     pub struct SetFavorite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavorite<S> {}
     impl<S: State> State for SetFavorite<S> {
-        type Site = S::Site;
         type Favorite = Set<members::favorite>;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Favorite = S::Favorite;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `favorite` field
         pub struct favorite(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
@@ -833,8 +833,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Site: state_state::IsSet,
     S::Favorite: state_state::IsSet,
+    S::Site: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {

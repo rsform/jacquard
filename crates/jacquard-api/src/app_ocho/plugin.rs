@@ -1644,50 +1644,50 @@ pub mod asset_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blob;
-        type Hash;
         type Type;
+        type Hash;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blob = Unset;
-        type Hash = Unset;
         type Type = Unset;
+        type Hash = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
         type Blob = Set<members::blob>;
+        type Type = S::Type;
         type Hash = S::Hash;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type Blob = S::Blob;
-        type Hash = Set<members::hash>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Blob = S::Blob;
-        type Hash = S::Hash;
         type Type = Set<members::r#type>;
+        type Hash = S::Hash;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Blob = S::Blob;
+        type Type = S::Type;
+        type Hash = Set<members::hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blob` field
         pub struct blob(());
-        ///Marker type for the `hash` field
-        pub struct hash(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `hash` field
+        pub struct hash(());
     }
 }
 
@@ -1801,8 +1801,8 @@ impl<'a, S> AssetBuilder<'a, S>
 where
     S: asset_state::State,
     S::Blob: asset_state::IsSet,
-    S::Hash: asset_state::IsSet,
     S::Type: asset_state::IsSet,
+    S::Hash: asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Asset<'a> {
@@ -2124,105 +2124,105 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Id;
+        type RuntimeVersion;
+        type Metadata;
+        type CreatedAt;
         type Extra;
         type LaunchAsset;
-        type CreatedAt;
-        type Metadata;
-        type RuntimeVersion;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Id = Unset;
+        type RuntimeVersion = Unset;
+        type Metadata = Unset;
+        type CreatedAt = Unset;
         type Extra = Unset;
         type LaunchAsset = Unset;
-        type CreatedAt = Unset;
-        type Metadata = Unset;
-        type RuntimeVersion = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `extra` field to Set
-    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExtra<S> {}
-    impl<S: State> State for SetExtra<S> {
-        type Extra = Set<members::extra>;
-        type LaunchAsset = S::LaunchAsset;
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `launch_asset` field to Set
-    pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
-    impl<S: State> State for SetLaunchAsset<S> {
-        type Extra = S::Extra;
-        type LaunchAsset = Set<members::launch_asset>;
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-        type CreatedAt = Set<members::created_at>;
-        type Metadata = S::Metadata;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetadata<S> {}
-    impl<S: State> State for SetMetadata<S> {
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-        type CreatedAt = S::CreatedAt;
-        type Metadata = Set<members::metadata>;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `runtime_version` field to Set
-    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
-    impl<S: State> State for SetRuntimeVersion<S> {
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type RuntimeVersion = Set<members::runtime_version>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
         type Extra = S::Extra;
         type LaunchAsset = S::LaunchAsset;
-        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type Id = S::Id;
+        type RuntimeVersion = Set<members::runtime_version>;
         type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetadata<S> {}
+    impl<S: State> State for SetMetadata<S> {
+        type Id = S::Id;
         type RuntimeVersion = S::RuntimeVersion;
-        type Id = Set<members::id>;
+        type Metadata = Set<members::metadata>;
+        type CreatedAt = S::CreatedAt;
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Metadata = S::Metadata;
+        type CreatedAt = Set<members::created_at>;
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExtra<S> {}
+    impl<S: State> State for SetExtra<S> {
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type Extra = Set<members::extra>;
+        type LaunchAsset = S::LaunchAsset;
+    }
+    ///State transition - sets the `launch_asset` field to Set
+    pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
+    impl<S: State> State for SetLaunchAsset<S> {
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type Extra = S::Extra;
+        type LaunchAsset = Set<members::launch_asset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `extra` field
         pub struct extra(());
         ///Marker type for the `launch_asset` field
         pub struct launch_asset(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
-        ///Marker type for the `runtime_version` field
-        pub struct runtime_version(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
@@ -2375,12 +2375,12 @@ where
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
+    S::Id: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
+    S::Metadata: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
     S::Extra: manifest_state::IsSet,
     S::LaunchAsset: manifest_state::IsSet,
-    S::CreatedAt: manifest_state::IsSet,
-    S::Metadata: manifest_state::IsSet,
-    S::RuntimeVersion: manifest_state::IsSet,
-    S::Id: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {

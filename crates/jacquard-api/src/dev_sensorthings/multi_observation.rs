@@ -450,66 +450,66 @@ pub mod multi_observation_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Sensor;
+        type Entries;
         type Thing;
         type PhenomenonTime;
-        type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Sensor = Unset;
+        type Entries = Unset;
         type Thing = Unset;
         type PhenomenonTime = Unset;
-        type Entries = Unset;
     }
     ///State transition - sets the `sensor` field to Set
     pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSensor<S> {}
     impl<S: State> State for SetSensor<S> {
         type Sensor = Set<members::sensor>;
+        type Entries = S::Entries;
         type Thing = S::Thing;
         type PhenomenonTime = S::PhenomenonTime;
-        type Entries = S::Entries;
-    }
-    ///State transition - sets the `thing` field to Set
-    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThing<S> {}
-    impl<S: State> State for SetThing<S> {
-        type Sensor = S::Sensor;
-        type Thing = Set<members::thing>;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Entries = S::Entries;
-    }
-    ///State transition - sets the `phenomenon_time` field to Set
-    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
-    impl<S: State> State for SetPhenomenonTime<S> {
-        type Sensor = S::Sensor;
-        type Thing = S::Thing;
-        type PhenomenonTime = Set<members::phenomenon_time>;
-        type Entries = S::Entries;
     }
     ///State transition - sets the `entries` field to Set
     pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntries<S> {}
     impl<S: State> State for SetEntries<S> {
         type Sensor = S::Sensor;
+        type Entries = Set<members::entries>;
         type Thing = S::Thing;
         type PhenomenonTime = S::PhenomenonTime;
-        type Entries = Set<members::entries>;
+    }
+    ///State transition - sets the `thing` field to Set
+    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThing<S> {}
+    impl<S: State> State for SetThing<S> {
+        type Sensor = S::Sensor;
+        type Entries = S::Entries;
+        type Thing = Set<members::thing>;
+        type PhenomenonTime = S::PhenomenonTime;
+    }
+    ///State transition - sets the `phenomenon_time` field to Set
+    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
+    impl<S: State> State for SetPhenomenonTime<S> {
+        type Sensor = S::Sensor;
+        type Entries = S::Entries;
+        type Thing = S::Thing;
+        type PhenomenonTime = Set<members::phenomenon_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sensor` field
         pub struct sensor(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
         ///Marker type for the `thing` field
         pub struct thing(());
         ///Marker type for the `phenomenon_time` field
         pub struct phenomenon_time(());
-        ///Marker type for the `entries` field
-        pub struct entries(());
     }
 }
 
@@ -707,9 +707,9 @@ impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
     S::Sensor: multi_observation_state::IsSet,
+    S::Entries: multi_observation_state::IsSet,
     S::Thing: multi_observation_state::IsSet,
     S::PhenomenonTime: multi_observation_state::IsSet,
-    S::Entries: multi_observation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservation<'a> {
@@ -1094,50 +1094,50 @@ pub mod multi_observation_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Result;
-        type ObservedProperty;
         type UnitOfMeasurement;
+        type ObservedProperty;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Result = Unset;
-        type ObservedProperty = Unset;
         type UnitOfMeasurement = Unset;
+        type ObservedProperty = Unset;
     }
     ///State transition - sets the `result` field to Set
     pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResult<S> {}
     impl<S: State> State for SetResult<S> {
         type Result = Set<members::result>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type Result = S::Result;
-        type ObservedProperty = Set<members::observed_property>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
     pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
     impl<S: State> State for SetUnitOfMeasurement<S> {
         type Result = S::Result;
-        type ObservedProperty = S::ObservedProperty;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type ObservedProperty = S::ObservedProperty;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type Result = S::Result;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservedProperty = Set<members::observed_property>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `result` field
         pub struct result(());
-        ///Marker type for the `observed_property` field
-        pub struct observed_property(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
+        ///Marker type for the `observed_property` field
+        pub struct observed_property(());
     }
 }
 
@@ -1276,8 +1276,8 @@ impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
     S::Result: multi_observation_entry_state::IsSet,
-    S::ObservedProperty: multi_observation_entry_state::IsSet,
     S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
+    S::ObservedProperty: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {

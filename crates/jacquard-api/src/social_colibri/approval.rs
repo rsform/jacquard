@@ -114,51 +114,51 @@ pub mod approval_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Community;
         type Membership;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Community = Unset;
         type Membership = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Community = S::Community;
-        type Membership = S::Membership;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `community` field to Set
     pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunity<S> {}
     impl<S: State> State for SetCommunity<S> {
-        type CreatedAt = S::CreatedAt;
         type Community = Set<members::community>;
         type Membership = S::Membership;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `membership` field to Set
     pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembership<S> {}
     impl<S: State> State for SetMembership<S> {
-        type CreatedAt = S::CreatedAt;
         type Community = S::Community;
         type Membership = Set<members::membership>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Community = S::Community;
+        type Membership = S::Membership;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `community` field
         pub struct community(());
         ///Marker type for the `membership` field
         pub struct membership(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -251,9 +251,9 @@ where
 impl<'a, S> ApprovalBuilder<'a, S>
 where
     S: approval_state::State,
-    S::CreatedAt: approval_state::IsSet,
     S::Community: approval_state::IsSet,
     S::Membership: approval_state::IsSet,
+    S::CreatedAt: approval_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Approval<'a> {

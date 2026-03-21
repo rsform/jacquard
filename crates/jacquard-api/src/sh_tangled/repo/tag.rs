@@ -142,37 +142,37 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Repo;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Repo = S::Repo;
+        type Tag = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Tag = S::Tag;
         type Repo = Set<members::repo>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Repo = S::Repo;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -245,8 +245,8 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Tag: tag_state::IsSet,
     S::Repo: tag_state::IsSet,
+    S::Tag: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {

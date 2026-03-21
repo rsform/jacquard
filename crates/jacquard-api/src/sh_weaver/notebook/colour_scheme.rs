@@ -646,51 +646,51 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Colours;
-        type Name;
         type Variant;
+        type Name;
+        type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Colours = Unset;
-        type Name = Unset;
         type Variant = Unset;
-    }
-    ///State transition - sets the `colours` field to Set
-    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetColours<S> {}
-    impl<S: State> State for SetColours<S> {
-        type Colours = Set<members::colours>;
-        type Name = S::Name;
-        type Variant = S::Variant;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Colours = S::Colours;
-        type Name = Set<members::name>;
-        type Variant = S::Variant;
+        type Name = Unset;
+        type Colours = Unset;
     }
     ///State transition - sets the `variant` field to Set
     pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVariant<S> {}
     impl<S: State> State for SetVariant<S> {
-        type Colours = S::Colours;
-        type Name = S::Name;
         type Variant = Set<members::variant>;
+        type Name = S::Name;
+        type Colours = S::Colours;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Variant = S::Variant;
+        type Name = Set<members::name>;
+        type Colours = S::Colours;
+    }
+    ///State transition - sets the `colours` field to Set
+    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetColours<S> {}
+    impl<S: State> State for SetColours<S> {
+        type Variant = S::Variant;
+        type Name = S::Name;
+        type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `colours` field
-        pub struct colours(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `colours` field
+        pub struct colours(());
     }
 }
 
@@ -783,9 +783,9 @@ where
 impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
-    S::Colours: colour_scheme_state::IsSet,
-    S::Name: colour_scheme_state::IsSet,
     S::Variant: colour_scheme_state::IsSet,
+    S::Name: colour_scheme_state::IsSet,
+    S::Colours: colour_scheme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ColourScheme<'a> {

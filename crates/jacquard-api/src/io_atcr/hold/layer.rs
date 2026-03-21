@@ -153,8 +153,8 @@ pub mod layer_state {
         type Digest;
         type Size;
         type Manifest;
-        type CreatedAt;
         type UserDid;
+        type CreatedAt;
         type MediaType;
     }
     /// Empty state - all required fields are unset
@@ -164,8 +164,8 @@ pub mod layer_state {
         type Digest = Unset;
         type Size = Unset;
         type Manifest = Unset;
-        type CreatedAt = Unset;
         type UserDid = Unset;
+        type CreatedAt = Unset;
         type MediaType = Unset;
     }
     ///State transition - sets the `digest` field to Set
@@ -175,8 +175,8 @@ pub mod layer_state {
         type Digest = Set<members::digest>;
         type Size = S::Size;
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
         type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
         type MediaType = S::MediaType;
     }
     ///State transition - sets the `size` field to Set
@@ -186,8 +186,8 @@ pub mod layer_state {
         type Digest = S::Digest;
         type Size = Set<members::size>;
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
         type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
         type MediaType = S::MediaType;
     }
     ///State transition - sets the `manifest` field to Set
@@ -197,19 +197,8 @@ pub mod layer_state {
         type Digest = S::Digest;
         type Size = S::Size;
         type Manifest = Set<members::manifest>;
+        type UserDid = S::UserDid;
         type CreatedAt = S::CreatedAt;
-        type UserDid = S::UserDid;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
-        type Size = S::Size;
-        type Manifest = S::Manifest;
-        type CreatedAt = Set<members::created_at>;
-        type UserDid = S::UserDid;
         type MediaType = S::MediaType;
     }
     ///State transition - sets the `user_did` field to Set
@@ -219,8 +208,19 @@ pub mod layer_state {
         type Digest = S::Digest;
         type Size = S::Size;
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
         type UserDid = Set<members::user_did>;
+        type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
+        type CreatedAt = Set<members::created_at>;
         type MediaType = S::MediaType;
     }
     ///State transition - sets the `media_type` field to Set
@@ -230,8 +230,8 @@ pub mod layer_state {
         type Digest = S::Digest;
         type Size = S::Size;
         type Manifest = S::Manifest;
-        type CreatedAt = S::CreatedAt;
         type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
         type MediaType = Set<members::media_type>;
     }
     /// Marker types for field names
@@ -243,10 +243,10 @@ pub mod layer_state {
         pub struct size(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
     }
@@ -404,8 +404,8 @@ where
     S::Digest: layer_state::IsSet,
     S::Size: layer_state::IsSet,
     S::Manifest: layer_state::IsSet,
-    S::CreatedAt: layer_state::IsSet,
     S::UserDid: layer_state::IsSet,
+    S::CreatedAt: layer_state::IsSet,
     S::MediaType: layer_state::IsSet,
 {
     /// Build the final struct

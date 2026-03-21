@@ -552,37 +552,37 @@ pub mod recording_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
@@ -750,8 +750,8 @@ where
 impl<'a, S> RecordingBuilder<'a, S>
 where
     S: recording_state::State,
-    S::Artists: recording_state::IsSet,
     S::Title: recording_state::IsSet,
+    S::Artists: recording_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recording<'a> {

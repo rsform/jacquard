@@ -257,49 +257,49 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Name;
+        type Room;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Name = Unset;
+        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Room = S::Room;
         type Name = Set<members::name>;
+        type Room = S::Room;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Name = S::Name;
+        type Room = Set<members::room>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
         type Name = S::Name;
+        type Room = S::Room;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `room` field
+        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -445,8 +445,8 @@ where
 impl<'a, S> ChannelBuilder<'a, S>
 where
     S: channel_state::State,
-    S::Room: channel_state::IsSet,
     S::Name: channel_state::IsSet,
+    S::Room: channel_state::IsSet,
     S::CreatedAt: channel_state::IsSet,
 {
     /// Build the final struct

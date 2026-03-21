@@ -164,84 +164,84 @@ pub mod stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PushCount;
-        type PullCount;
-        type OwnerDid;
         type Repository;
         type UpdatedAt;
+        type PullCount;
+        type OwnerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PushCount = Unset;
-        type PullCount = Unset;
-        type OwnerDid = Unset;
         type Repository = Unset;
         type UpdatedAt = Unset;
+        type PullCount = Unset;
+        type OwnerDid = Unset;
     }
     ///State transition - sets the `push_count` field to Set
     pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPushCount<S> {}
     impl<S: State> State for SetPushCount<S> {
         type PushCount = Set<members::push_count>;
+        type Repository = S::Repository;
+        type UpdatedAt = S::UpdatedAt;
         type PullCount = S::PullCount;
         type OwnerDid = S::OwnerDid;
-        type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `pull_count` field to Set
-    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPullCount<S> {}
-    impl<S: State> State for SetPullCount<S> {
-        type PushCount = S::PushCount;
-        type PullCount = Set<members::pull_count>;
-        type OwnerDid = S::OwnerDid;
-        type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
-        type OwnerDid = Set<members::owner_did>;
-        type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
         type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
-        type OwnerDid = S::OwnerDid;
         type Repository = Set<members::repository>;
         type UpdatedAt = S::UpdatedAt;
+        type PullCount = S::PullCount;
+        type OwnerDid = S::OwnerDid;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type PushCount = S::PushCount;
-        type PullCount = S::PullCount;
-        type OwnerDid = S::OwnerDid;
         type Repository = S::Repository;
         type UpdatedAt = Set<members::updated_at>;
+        type PullCount = S::PullCount;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `pull_count` field to Set
+    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPullCount<S> {}
+    impl<S: State> State for SetPullCount<S> {
+        type PushCount = S::PushCount;
+        type Repository = S::Repository;
+        type UpdatedAt = S::UpdatedAt;
+        type PullCount = Set<members::pull_count>;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
+        type PushCount = S::PushCount;
+        type Repository = S::Repository;
+        type UpdatedAt = S::UpdatedAt;
+        type PullCount = S::PullCount;
+        type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `push_count` field
         pub struct push_count(());
-        ///Marker type for the `pull_count` field
-        pub struct pull_count(());
-        ///Marker type for the `owner_did` field
-        pub struct owner_did(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `pull_count` field
+        pub struct pull_count(());
+        ///Marker type for the `owner_did` field
+        pub struct owner_did(());
     }
 }
 
@@ -415,10 +415,10 @@ impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
     S::PushCount: stats_state::IsSet,
-    S::PullCount: stats_state::IsSet,
-    S::OwnerDid: stats_state::IsSet,
     S::Repository: stats_state::IsSet,
     S::UpdatedAt: stats_state::IsSet,
+    S::PullCount: stats_state::IsSet,
+    S::OwnerDid: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {

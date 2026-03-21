@@ -6,6 +6,7 @@ use quote::quote;
 
 pub(crate) mod builder_gen;
 pub(crate) mod builder_heuristics;
+pub(crate) mod collect;
 pub(crate) mod lifetime;
 pub(crate) mod names;
 pub(crate) mod nsid_utils;

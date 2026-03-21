@@ -438,37 +438,37 @@ pub mod spark_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Elapsed;
         type Spark;
+        type Elapsed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Elapsed = Unset;
         type Spark = Unset;
-    }
-    ///State transition - sets the `elapsed` field to Set
-    pub struct SetElapsed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetElapsed<S> {}
-    impl<S: State> State for SetElapsed<S> {
-        type Elapsed = Set<members::elapsed>;
-        type Spark = S::Spark;
+        type Elapsed = Unset;
     }
     ///State transition - sets the `spark` field to Set
     pub struct SetSpark<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSpark<S> {}
     impl<S: State> State for SetSpark<S> {
-        type Elapsed = S::Elapsed;
         type Spark = Set<members::spark>;
+        type Elapsed = S::Elapsed;
+    }
+    ///State transition - sets the `elapsed` field to Set
+    pub struct SetElapsed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetElapsed<S> {}
+    impl<S: State> State for SetElapsed<S> {
+        type Spark = S::Spark;
+        type Elapsed = Set<members::elapsed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `elapsed` field
-        pub struct elapsed(());
         ///Marker type for the `spark` field
         pub struct spark(());
+        ///Marker type for the `elapsed` field
+        pub struct elapsed(());
     }
 }
 
@@ -541,8 +541,8 @@ where
 impl<'a, S> SparkRefBuilder<'a, S>
 where
     S: spark_ref_state::State,
-    S::Elapsed: spark_ref_state::IsSet,
     S::Spark: spark_ref_state::IsSet,
+    S::Elapsed: spark_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparkRef<'a> {

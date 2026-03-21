@@ -442,37 +442,37 @@ pub mod subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -545,8 +545,8 @@ where
 impl<'a, S> SubjectBuilder<'a, S>
 where
     S: subject_state::State,
-    S::CreatedAt: subject_state::IsSet,
     S::Did: subject_state::IsSet,
+    S::CreatedAt: subject_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subject<'a> {

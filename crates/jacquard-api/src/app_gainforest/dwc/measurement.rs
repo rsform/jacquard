@@ -333,65 +333,65 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MeasurementType;
         type CreatedAt;
         type OccurrenceRef;
-        type MeasurementType;
         type MeasurementValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MeasurementType = Unset;
         type CreatedAt = Unset;
         type OccurrenceRef = Unset;
-        type MeasurementType = Unset;
         type MeasurementValue = Unset;
+    }
+    ///State transition - sets the `measurement_type` field to Set
+    pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
+    impl<S: State> State for SetMeasurementType<S> {
+        type MeasurementType = Set<members::measurement_type>;
+        type CreatedAt = S::CreatedAt;
+        type OccurrenceRef = S::OccurrenceRef;
+        type MeasurementValue = S::MeasurementValue;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type MeasurementType = S::MeasurementType;
         type CreatedAt = Set<members::created_at>;
         type OccurrenceRef = S::OccurrenceRef;
-        type MeasurementType = S::MeasurementType;
         type MeasurementValue = S::MeasurementValue;
     }
     ///State transition - sets the `occurrence_ref` field to Set
     pub struct SetOccurrenceRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurrenceRef<S> {}
     impl<S: State> State for SetOccurrenceRef<S> {
+        type MeasurementType = S::MeasurementType;
         type CreatedAt = S::CreatedAt;
         type OccurrenceRef = Set<members::occurrence_ref>;
-        type MeasurementType = S::MeasurementType;
-        type MeasurementValue = S::MeasurementValue;
-    }
-    ///State transition - sets the `measurement_type` field to Set
-    pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
-    impl<S: State> State for SetMeasurementType<S> {
-        type CreatedAt = S::CreatedAt;
-        type OccurrenceRef = S::OccurrenceRef;
-        type MeasurementType = Set<members::measurement_type>;
         type MeasurementValue = S::MeasurementValue;
     }
     ///State transition - sets the `measurement_value` field to Set
     pub struct SetMeasurementValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMeasurementValue<S> {}
     impl<S: State> State for SetMeasurementValue<S> {
+        type MeasurementType = S::MeasurementType;
         type CreatedAt = S::CreatedAt;
         type OccurrenceRef = S::OccurrenceRef;
-        type MeasurementType = S::MeasurementType;
         type MeasurementValue = Set<members::measurement_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `measurement_type` field
+        pub struct measurement_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `occurrence_ref` field
         pub struct occurrence_ref(());
-        ///Marker type for the `measurement_type` field
-        pub struct measurement_type(());
         ///Marker type for the `measurement_value` field
         pub struct measurement_value(());
     }
@@ -679,9 +679,9 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
+    S::MeasurementType: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
     S::OccurrenceRef: measurement_state::IsSet,
-    S::MeasurementType: measurement_state::IsSet,
     S::MeasurementValue: measurement_state::IsSet,
 {
     /// Build the final struct

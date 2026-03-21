@@ -263,51 +263,51 @@ pub mod ingredient_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Grams;
         type Id;
+        type Grams;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Grams = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Grams = S::Grams;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `grams` field to Set
-    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGrams<S> {}
-    impl<S: State> State for SetGrams<S> {
-        type Name = S::Name;
-        type Grams = Set<members::grams>;
-        type Id = S::Id;
+        type Grams = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
-        type Grams = S::Grams;
         type Id = Set<members::id>;
+        type Grams = S::Grams;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `grams` field to Set
+    pub struct SetGrams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGrams<S> {}
+    impl<S: State> State for SetGrams<S> {
+        type Id = S::Id;
+        type Grams = Set<members::grams>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Grams = S::Grams;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `grams` field
-        pub struct grams(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `grams` field
+        pub struct grams(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -462,9 +462,9 @@ impl<'a, S: ingredient_state::State> IngredientBuilder<'a, S> {
 impl<'a, S> IngredientBuilder<'a, S>
 where
     S: ingredient_state::State,
-    S::Name: ingredient_state::IsSet,
-    S::Grams: ingredient_state::IsSet,
     S::Id: ingredient_state::IsSet,
+    S::Grams: ingredient_state::IsSet,
+    S::Name: ingredient_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ingredient<'a> {

@@ -236,65 +236,65 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Collection;
         type Repo;
+        type Record;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Collection = Unset;
         type Repo = Unset;
+        type Record = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Collection = S::Collection;
-        type Repo = S::Repo;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Record = S::Record;
         type Collection = Set<members::collection>;
         type Repo = S::Repo;
+        type Record = S::Record;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Record = S::Record;
         type Collection = S::Collection;
         type Repo = Set<members::repo>;
+        type Record = S::Record;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Collection = S::Collection;
+        type Repo = S::Repo;
+        type Record = Set<members::record>;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Record = S::Record;
         type Collection = S::Collection;
         type Repo = S::Repo;
+        type Record = S::Record;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
@@ -471,9 +471,9 @@ impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
 impl<'a, S> PutRecordBuilder<'a, S>
 where
     S: put_record_state::State,
-    S::Record: put_record_state::IsSet,
     S::Collection: put_record_state::IsSet,
     S::Repo: put_record_state::IsSet,
+    S::Record: put_record_state::IsSet,
     S::Rkey: put_record_state::IsSet,
 {
     /// Build the final struct

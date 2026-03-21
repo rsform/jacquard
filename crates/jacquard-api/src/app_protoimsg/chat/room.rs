@@ -447,67 +447,67 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
-        type Purpose;
         type CreatedAt;
         type Name;
+        type Topic;
+        type Purpose;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
-        type Purpose = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Topic = Set<members::topic>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Topic = S::Topic;
-        type Purpose = Set<members::purpose>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Topic = Unset;
+        type Purpose = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Topic = S::Topic;
-        type Purpose = S::Purpose;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Topic = S::Topic;
-        type Purpose = S::Purpose;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Topic = Set<members::topic>;
+        type Purpose = S::Purpose;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPurpose<S> {}
+    impl<S: State> State for SetPurpose<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Topic = S::Topic;
+        type Purpose = Set<members::purpose>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
     }
 }
 
@@ -677,10 +677,10 @@ where
 impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
-    S::Topic: room_state::IsSet,
-    S::Purpose: room_state::IsSet,
     S::CreatedAt: room_state::IsSet,
     S::Name: room_state::IsSet,
+    S::Topic: room_state::IsSet,
+    S::Purpose: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {

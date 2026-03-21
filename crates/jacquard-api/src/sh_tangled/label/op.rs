@@ -539,37 +539,37 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Key;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Key = S::Key;
+        type Value = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Value = S::Value;
         type Key = Set<members::key>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Key = S::Key;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -642,8 +642,8 @@ where
 impl<'a, S> OperandBuilder<'a, S>
 where
     S: operand_state::State,
-    S::Value: operand_state::IsSet,
     S::Key: operand_state::IsSet,
+    S::Value: operand_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Operand<'a> {

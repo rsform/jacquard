@@ -120,37 +120,37 @@ pub mod push_notify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Body;
         type Target;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Body = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type Target = S::Target;
+        type Body = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Body = S::Body;
         type Target = Set<members::target>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Target = S::Target;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
@@ -223,8 +223,8 @@ where
 impl<'a, S> PushNotifyBuilder<'a, S>
 where
     S: push_notify_state::State,
-    S::Body: push_notify_state::IsSet,
     S::Target: push_notify_state::IsSet,
+    S::Body: push_notify_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PushNotify<'a> {

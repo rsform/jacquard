@@ -9877,37 +9877,37 @@ pub mod custom_stat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Name;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Name = S::Name;
+        type Value = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Value = S::Value;
         type Name = Set<members::name>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Name = S::Name;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -10025,8 +10025,8 @@ where
 impl<'a, S> CustomStatBuilder<'a, S>
 where
     S: custom_stat_state::State,
-    S::Value: custom_stat_state::IsSet,
     S::Name: custom_stat_state::IsSet,
+    S::Value: custom_stat_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CustomStat<'a> {
@@ -10068,37 +10068,37 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Level = S::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
         type Level = Set<members::level>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Level = S::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -10202,8 +10202,8 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
 impl<'a, S> DccClericSpellBuilder<'a, S>
 where
     S: dcc_cleric_spell_state::State,
-    S::Name: dcc_cleric_spell_state::IsSet,
     S::Level: dcc_cleric_spell_state::IsSet,
+    S::Name: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccClericSpell<'a> {
@@ -10243,37 +10243,37 @@ pub mod dcc_wizard_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Level = S::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
         type Level = Set<members::level>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Level = S::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -10411,8 +10411,8 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S> DccWizardSpellBuilder<'a, S>
 where
     S: dcc_wizard_spell_state::State,
-    S::Name: dcc_wizard_spell_state::IsSet,
     S::Level: dcc_wizard_spell_state::IsSet,
+    S::Name: dcc_wizard_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccWizardSpell<'a> {

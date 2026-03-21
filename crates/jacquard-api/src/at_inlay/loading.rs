@@ -80,37 +80,37 @@ pub mod loading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Children;
         type Fallback;
+        type Children;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Children = Unset;
         type Fallback = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-        type Fallback = S::Fallback;
+        type Children = Unset;
     }
     ///State transition - sets the `fallback` field to Set
     pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFallback<S> {}
     impl<S: State> State for SetFallback<S> {
-        type Children = S::Children;
         type Fallback = Set<members::fallback>;
+        type Children = S::Children;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Fallback = S::Fallback;
+        type Children = Set<members::children>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
         ///Marker type for the `fallback` field
         pub struct fallback(());
+        ///Marker type for the `children` field
+        pub struct children(());
     }
 }
 
@@ -183,8 +183,8 @@ where
 impl<'a, S> LoadingBuilder<'a, S>
 where
     S: loading_state::State,
-    S::Children: loading_state::IsSet,
     S::Fallback: loading_state::IsSet,
+    S::Children: loading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Loading<'a> {

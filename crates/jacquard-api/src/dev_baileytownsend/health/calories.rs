@@ -111,51 +111,51 @@ pub mod calories_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Burned;
-        type CreatedAt;
         type Intake;
+        type CreatedAt;
+        type Burned;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Burned = Unset;
-        type CreatedAt = Unset;
         type Intake = Unset;
-    }
-    ///State transition - sets the `burned` field to Set
-    pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBurned<S> {}
-    impl<S: State> State for SetBurned<S> {
-        type Burned = Set<members::burned>;
-        type CreatedAt = S::CreatedAt;
-        type Intake = S::Intake;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Burned = S::Burned;
-        type CreatedAt = Set<members::created_at>;
-        type Intake = S::Intake;
+        type CreatedAt = Unset;
+        type Burned = Unset;
     }
     ///State transition - sets the `intake` field to Set
     pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIntake<S> {}
     impl<S: State> State for SetIntake<S> {
-        type Burned = S::Burned;
-        type CreatedAt = S::CreatedAt;
         type Intake = Set<members::intake>;
+        type CreatedAt = S::CreatedAt;
+        type Burned = S::Burned;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Intake = S::Intake;
+        type CreatedAt = Set<members::created_at>;
+        type Burned = S::Burned;
+    }
+    ///State transition - sets the `burned` field to Set
+    pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBurned<S> {}
+    impl<S: State> State for SetBurned<S> {
+        type Intake = S::Intake;
+        type CreatedAt = S::CreatedAt;
+        type Burned = Set<members::burned>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `burned` field
-        pub struct burned(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `intake` field
         pub struct intake(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `burned` field
+        pub struct burned(());
     }
 }
 
@@ -248,9 +248,9 @@ where
 impl<'a, S> CaloriesBuilder<'a, S>
 where
     S: calories_state::State,
-    S::Burned: calories_state::IsSet,
-    S::CreatedAt: calories_state::IsSet,
     S::Intake: calories_state::IsSet,
+    S::CreatedAt: calories_state::IsSet,
+    S::Burned: calories_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Calories<'a> {

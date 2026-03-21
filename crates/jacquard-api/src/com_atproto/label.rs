@@ -1646,67 +1646,67 @@ pub mod label_value_definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Identifier;
         type Severity;
         type Locales;
         type Blurs;
-        type Identifier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Identifier = Unset;
         type Severity = Unset;
         type Locales = Unset;
         type Blurs = Unset;
-        type Identifier = Unset;
-    }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Severity = Set<members::severity>;
-        type Locales = S::Locales;
-        type Blurs = S::Blurs;
-        type Identifier = S::Identifier;
-    }
-    ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocales<S> {}
-    impl<S: State> State for SetLocales<S> {
-        type Severity = S::Severity;
-        type Locales = Set<members::locales>;
-        type Blurs = S::Blurs;
-        type Identifier = S::Identifier;
-    }
-    ///State transition - sets the `blurs` field to Set
-    pub struct SetBlurs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlurs<S> {}
-    impl<S: State> State for SetBlurs<S> {
-        type Severity = S::Severity;
-        type Locales = S::Locales;
-        type Blurs = Set<members::blurs>;
-        type Identifier = S::Identifier;
     }
     ///State transition - sets the `identifier` field to Set
     pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIdentifier<S> {}
     impl<S: State> State for SetIdentifier<S> {
+        type Identifier = Set<members::identifier>;
         type Severity = S::Severity;
         type Locales = S::Locales;
         type Blurs = S::Blurs;
-        type Identifier = Set<members::identifier>;
+    }
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type Identifier = S::Identifier;
+        type Severity = Set<members::severity>;
+        type Locales = S::Locales;
+        type Blurs = S::Blurs;
+    }
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocales<S> {}
+    impl<S: State> State for SetLocales<S> {
+        type Identifier = S::Identifier;
+        type Severity = S::Severity;
+        type Locales = Set<members::locales>;
+        type Blurs = S::Blurs;
+    }
+    ///State transition - sets the `blurs` field to Set
+    pub struct SetBlurs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlurs<S> {}
+    impl<S: State> State for SetBlurs<S> {
+        type Identifier = S::Identifier;
+        type Severity = S::Severity;
+        type Locales = S::Locales;
+        type Blurs = Set<members::blurs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
         ///Marker type for the `severity` field
         pub struct severity(());
         ///Marker type for the `locales` field
         pub struct locales(());
         ///Marker type for the `blurs` field
         pub struct blurs(());
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
     }
 }
 
@@ -1861,10 +1861,10 @@ where
 impl<'a, S> LabelValueDefinitionBuilder<'a, S>
 where
     S: label_value_definition_state::State,
+    S::Identifier: label_value_definition_state::IsSet,
     S::Severity: label_value_definition_state::IsSet,
     S::Locales: label_value_definition_state::IsSet,
     S::Blurs: label_value_definition_state::IsSet,
-    S::Identifier: label_value_definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelValueDefinition<'a> {

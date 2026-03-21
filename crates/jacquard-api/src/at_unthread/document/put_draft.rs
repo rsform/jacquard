@@ -155,65 +155,65 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type CreatedAt;
         type Tid;
+        type CreatedAt;
+        type Content;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type CreatedAt = Unset;
         type Tid = Unset;
+        type CreatedAt = Unset;
+        type Content = Unset;
         type UpdatedAt = Unset;
     }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
+    ///State transition - sets the `tid` field to Set
+    pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTid<S> {}
+    impl<S: State> State for SetTid<S> {
+        type Tid = Set<members::tid>;
         type CreatedAt = S::CreatedAt;
-        type Tid = S::Tid;
+        type Content = S::Content;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
         type Tid = S::Tid;
+        type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
         type UpdatedAt = S::UpdatedAt;
     }
-    ///State transition - sets the `tid` field to Set
-    pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTid<S> {}
-    impl<S: State> State for SetTid<S> {
-        type Content = S::Content;
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Tid = S::Tid;
         type CreatedAt = S::CreatedAt;
-        type Tid = Set<members::tid>;
+        type Content = Set<members::content>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Tid = S::Tid;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `tid` field
         pub struct tid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -328,9 +328,9 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::Content: draft_view_state::IsSet,
-    S::CreatedAt: draft_view_state::IsSet,
     S::Tid: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
+    S::Content: draft_view_state::IsSet,
     S::UpdatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct

@@ -298,49 +298,49 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Hash;
         type Message;
+        type Hash;
         type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Hash = Unset;
         type Message = Unset;
+        type Hash = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type Hash = Set<members::hash>;
-        type Message = S::Message;
-        type When = S::When;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Hash = S::Hash;
         type Message = Set<members::message>;
+        type Hash = S::Hash;
+        type When = S::When;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Message = S::Message;
+        type Hash = Set<members::hash>;
         type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Hash = S::Hash;
         type Message = S::Message;
+        type Hash = S::Hash;
         type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hash` field
-        pub struct hash(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `hash` field
+        pub struct hash(());
         ///Marker type for the `when` field
         pub struct when(());
     }
@@ -455,8 +455,8 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
-    S::Hash: last_commit_state::IsSet,
     S::Message: last_commit_state::IsSet,
+    S::Hash: last_commit_state::IsSet,
     S::When: last_commit_state::IsSet,
 {
     /// Build the final struct
@@ -858,51 +858,51 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Path;
         type Repo;
         type Ref;
-        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Path = Unset;
         type Repo = Unset;
         type Ref = Unset;
-        type Path = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Ref = S::Ref;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
-        type Ref = Set<members::r#ref>;
-        type Path = S::Path;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
+        type Path = Set<members::path>;
         type Repo = S::Repo;
         type Ref = S::Ref;
-        type Path = Set<members::path>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Path = S::Path;
+        type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Path = S::Path;
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `path` field
+        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
-        ///Marker type for the `path` field
-        pub struct path(());
     }
 }
 
@@ -1009,9 +1009,9 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
+    S::Path: blob_state::IsSet,
     S::Repo: blob_state::IsSet,
     S::Ref: blob_state::IsSet,
-    S::Path: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {

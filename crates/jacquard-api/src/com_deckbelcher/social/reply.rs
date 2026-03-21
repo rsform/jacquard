@@ -120,67 +120,67 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type CreatedAt;
         type Root;
+        type CreatedAt;
         type Parent;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type CreatedAt = Unset;
         type Root = Unset;
+        type CreatedAt = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Root = S::Root;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
-        type Root = S::Root;
-        type Parent = S::Parent;
+        type Content = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
+        type CreatedAt = S::CreatedAt;
         type Parent = S::Parent;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Root = S::Root;
+        type CreatedAt = Set<members::created_at>;
+        type Parent = S::Parent;
+        type Content = S::Content;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
         type Parent = Set<members::parent>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -313,10 +313,10 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::Content: reply_state::IsSet,
-    S::CreatedAt: reply_state::IsSet,
     S::Root: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
     S::Parent: reply_state::IsSet,
+    S::Content: reply_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reply<'a> {

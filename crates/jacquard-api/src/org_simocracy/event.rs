@@ -217,66 +217,66 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SimNames;
-        type ActorDid;
         type Type;
         type CreatedAt;
+        type ActorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SimNames = Unset;
-        type ActorDid = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
+        type ActorDid = Unset;
     }
     ///State transition - sets the `sim_names` field to Set
     pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSimNames<S> {}
     impl<S: State> State for SetSimNames<S> {
         type SimNames = Set<members::sim_names>;
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
         type ActorDid = S::ActorDid;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `actor_did` field to Set
-    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActorDid<S> {}
-    impl<S: State> State for SetActorDid<S> {
-        type SimNames = S::SimNames;
-        type ActorDid = Set<members::actor_did>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type SimNames = S::SimNames;
-        type ActorDid = S::ActorDid;
         type Type = Set<members::r#type>;
         type CreatedAt = S::CreatedAt;
+        type ActorDid = S::ActorDid;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type SimNames = S::SimNames;
-        type ActorDid = S::ActorDid;
         type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type ActorDid = S::ActorDid;
+    }
+    ///State transition - sets the `actor_did` field to Set
+    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActorDid<S> {}
+    impl<S: State> State for SetActorDid<S> {
+        type SimNames = S::SimNames;
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type ActorDid = Set<members::actor_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sim_names` field
         pub struct sim_names(());
-        ///Marker type for the `actor_did` field
-        pub struct actor_did(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `actor_did` field
+        pub struct actor_did(());
     }
 }
 
@@ -491,9 +491,9 @@ impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
     S::SimNames: event_state::IsSet,
-    S::ActorDid: event_state::IsSet,
     S::Type: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::ActorDid: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
