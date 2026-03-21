@@ -23,7 +23,6 @@ trait-variant.workspace = true
 bon.workspace = true
 bytes.workspace = true
 jacquard-common = { version = "0.10", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-api = {  version = "0.10", path = "../jacquard-api", default-features = false, features = ["minimal"] }
 jacquard-lexicon = { version = "0.10", path = "../jacquard-lexicon", default-features = false }
 reqwest.workspace = true
 serde.workspace = true

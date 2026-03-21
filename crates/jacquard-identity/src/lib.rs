@@ -75,8 +75,7 @@ use crate::resolver::{
     ResolverOptions,
 };
 use bytes::Bytes;
-use jacquard_api::com_atproto::identity::resolve_did;
-use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
+use jacquard_common::xrpc::atproto::{ResolveDid, ResolveHandle};
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
 use jacquard_common::deps::fluent_uri::Uri;
@@ -577,9 +576,9 @@ impl JacquardResolver {
             Some(u) => u.clone(),
             None => return Err(IdentityError::no_pds_fallback()),
         };
-        let req = ResolveHandle::new()
-            .handle(handle.clone().into_static())
-            .build();
+        let req = ResolveHandle {
+            handle: handle.clone().into_static(),
+        };
         let resp = self.http.xrpc(pds).send(&req).await.map_err(|e| {
             IdentityError::from(e).with_context(format!("resolving handle {}", handle))
         })?;
@@ -608,7 +607,9 @@ impl JacquardResolver {
             Some(u) => u.clone(),
             None => return Err(IdentityError::no_pds_fallback()),
         };
-        let req = resolve_did::ResolveDid::new().did(did.clone()).build();
+        let req = ResolveDid {
+            did: did.clone(),
+        };
         let resp = self.http.xrpc(pds).send(&req).await.map_err(|e| {
             IdentityError::from(e).with_context(format!("fetching DID doc for {}", did))
         })?;
@@ -640,9 +641,9 @@ impl JacquardResolver {
         };
         // Build URL using string manipulation, then parse
         let qs = serde_html_form::to_string(
-            &resolve_did::ResolveDid::new()
-                .did(did.clone().into_static())
-                .build(),
+            &ResolveDid {
+                did: did.clone().into_static(),
+            },
         )
         .unwrap_or_default();
         let url_str = if qs.is_empty() {
@@ -722,7 +723,9 @@ impl IdentityResolver for JacquardResolver {
                     // Public unauth fallback
                     if self.opts.public_fallback_for_handle {
                         if let Ok(qs) = serde_html_form::to_string(
-                            &ResolveHandle::new().handle((*handle).clone()).build(),
+                            &ResolveHandle {
+                                handle: (*handle).clone(),
+                            },
                         ) {
                             let url_str = format!(
                                 "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?{}",
@@ -756,7 +759,9 @@ impl IdentityResolver for JacquardResolver {
                     // Non-auth path: if PlcSource is Slingshot, use its resolveHandle endpoint.
                     if let PlcSource::Slingshot { base } = &self.opts.plc_source {
                         let qs = serde_html_form::to_string(
-                            &ResolveHandle::new().handle((*handle).clone()).build(),
+                            &ResolveHandle {
+                                handle: (*handle).clone(),
+                            },
                         )
                         .unwrap_or_default();
                         let url_str = if qs.is_empty() {

@@ -1,5 +1,5 @@
 use super::LexiconSource;
-use jacquard_api::com_atproto::repo::list_records::{ListRecords, Record};
+use jacquard_common::xrpc::atproto::{ListRecords, ListRecordsRecord};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
@@ -35,7 +35,7 @@ impl AtProtoSource {
         Ok(lexicons)
     }
 
-    fn parse_lexicon_record(record_data: &Record<'_>) -> Option<LexiconDoc<'static>> {
+    fn parse_lexicon_record(record_data: &ListRecordsRecord<'_>) -> Option<LexiconDoc<'static>> {
         // // Extract the 'value' field from the record
         // let value = match record_data {
         //     jacquard_common::types::value::Data::Object(map) => map.0.get("value")?,
@@ -104,10 +104,13 @@ impl LexiconSource for AtProtoSource {
         let mut lexicons = HashMap::new();
 
         // Try to fetch all records at once first
-        let req = ListRecords::new()
-            .repo(repo.clone().into_static())
-            .collection(collection.clone().into_static())
-            .build();
+        let req = ListRecords {
+            repo: repo.clone().into_static().into(),
+            collection: collection.clone().into_static(),
+            cursor: None,
+            limit: None,
+            reverse: None,
+        };
 
         let resp = resolver.xrpc(pds.clone()).send(&req).await?;
 
@@ -128,19 +131,12 @@ impl LexiconSource for AtProtoSource {
 
                 let mut cursor: Option<CowStr> = None;
                 loop {
-                    let req = if let Some(ref c) = cursor {
-                        ListRecords::new()
-                            .repo(repo.clone().into_static())
-                            .collection(collection.clone().into_static())
-                            .limit(1)
-                            .cursor(c.clone())
-                            .build()
-                    } else {
-                        ListRecords::new()
-                            .repo(repo.clone().into_static())
-                            .collection(collection.clone().into_static())
-                            .limit(1)
-                            .build()
+                    let req = ListRecords {
+                        repo: repo.clone().into_static().into(),
+                        collection: collection.clone().into_static(),
+                        cursor: cursor.clone(),
+                        limit: Some(1),
+                        reverse: None,
                     };
                     let resp = resolver.xrpc(pds.clone()).send(&req).await?;
 

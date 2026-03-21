@@ -4,14 +4,15 @@
 //! between jacquard-lexgen/jacquard-identity and jacquard-api. They provide minimal
 //! implementations sufficient for bootstrap code generation without builders or
 //! validation helpers.
-
-use alloc::vec::Vec;
+//!
 use crate::CowStr;
 use crate::IntoStatic;
-use crate::types::string::{AtUri, Cid, Did, Handle, Nsid};
 use crate::types::ident::AtIdentifier;
+use crate::types::string::{AtUri, Cid, Did, Handle, Nsid};
 use crate::types::value::Data;
 use crate::xrpc::{GenericError, XrpcMethod, XrpcRequest, XrpcResp};
+
+use alloc::vec::Vec;
 use core::error::Error;
 use core::fmt::{self, Display};
 use serde::{Deserialize, Serialize};
@@ -21,15 +22,9 @@ use serde::{Deserialize, Serialize};
 // ============================================================================
 
 /// Request for com.atproto.repo.listRecords.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ListRecords<'a> {
     #[serde(borrow)]
     pub collection: Nsid<'a>,
@@ -59,15 +54,9 @@ impl IntoStatic for ListRecords<'_> {
 }
 
 /// Output for com.atproto.repo.listRecords.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ListRecordsOutput<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -88,15 +77,9 @@ impl IntoStatic for ListRecordsOutput<'_> {
 }
 
 /// A single record in a list response.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ListRecordsRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
@@ -140,14 +123,8 @@ impl<'a> XrpcRequest for ListRecords<'a> {
 // ============================================================================
 
 /// Request for com.atproto.repo.getRecord.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[allow(missing_docs)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecord<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -175,14 +152,8 @@ impl IntoStatic for GetRecord<'_> {
 }
 
 /// Output for com.atproto.repo.getRecord.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[allow(missing_docs)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordOutput<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -207,14 +178,8 @@ impl IntoStatic for GetRecordOutput<'_> {
 }
 
 /// Error type for com.atproto.repo.getRecord.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[allow(missing_docs)]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRecordError<'a> {
@@ -269,15 +234,9 @@ impl<'a> XrpcRequest for GetRecord<'a> {
 // ============================================================================
 
 /// Request for com.atproto.identity.resolveHandle.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ResolveHandle<'a> {
     #[serde(borrow)]
     pub handle: Handle<'a>,
@@ -294,15 +253,9 @@ impl IntoStatic for ResolveHandle<'_> {
 }
 
 /// Output for com.atproto.identity.resolveHandle.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ResolveHandleOutput<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
@@ -319,15 +272,9 @@ impl IntoStatic for ResolveHandleOutput<'_> {
 }
 
 /// Error type for com.atproto.identity.resolveHandle.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "error", content = "message")]
+#[allow(missing_docs)]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveHandleError<'a> {
     #[serde(rename = "HandleNotFound")]
@@ -381,15 +328,9 @@ impl<'a> XrpcRequest for ResolveHandle<'a> {
 // ============================================================================
 
 /// Request for com.atproto.identity.resolveDid.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ResolveDid<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
@@ -406,15 +347,9 @@ impl IntoStatic for ResolveDid<'_> {
 }
 
 /// Output for com.atproto.identity.resolveDid.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct ResolveDidOutput<'a> {
     #[serde(borrow)]
     pub did_doc: Data<'a>,
@@ -431,16 +366,10 @@ impl IntoStatic for ResolveDidOutput<'_> {
 }
 
 /// Error type for com.atproto.identity.resolveDid.
-#[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
+#[allow(missing_docs)]
 pub enum ResolveDidError<'a> {
     #[serde(rename = "DidNotFound")]
     DidNotFound(Option<CowStr<'a>>),
@@ -510,7 +439,10 @@ mod tests {
     #[test]
     fn test_list_records_serializes() {
         let req = ListRecords {
-            repo: AtIdentifier::new("test.bsky.social").unwrap().into_static().into(),
+            repo: AtIdentifier::new("test.bsky.social")
+                .unwrap()
+                .into_static()
+                .into(),
             collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
             cursor: None,
             limit: Some(50),
@@ -602,7 +534,10 @@ mod tests {
     #[test]
     fn test_types_implement_into_static() {
         let list_records = ListRecords {
-            repo: AtIdentifier::new("test.bsky.social").unwrap().into_static().into(),
+            repo: AtIdentifier::new("test.bsky.social")
+                .unwrap()
+                .into_static()
+                .into(),
             collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
             cursor: None,
             limit: Some(50),
@@ -611,7 +546,10 @@ mod tests {
         let _static = list_records.into_static();
 
         let get_record = GetRecord {
-            repo: AtIdentifier::new("test.bsky.social").unwrap().into_static().into(),
+            repo: AtIdentifier::new("test.bsky.social")
+                .unwrap()
+                .into_static()
+                .into(),
             collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
             rkey: CowStr::from("abc123").into_static(),
             cid: None,

@@ -32,7 +32,6 @@ path = "../../examples/extract_inventory.rs"
 clap.workspace = true
 glob = "0.3"
 inventory = "0.3"
-jacquard-api = { version = "0.10", path = "../jacquard-api", default-features = false, features = [ "minimal" ]  }
 jacquard-common = { version = "0.10", features = [ "reqwest-client" ], path = "../jacquard-common" }
 jacquard-derive = { version = "0.10", path = "../jacquard-derive" }
 jacquard-identity = { version = "0.10", path = "../jacquard-identity", features = ["dns"] }
